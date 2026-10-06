@@ -1,20 +1,24 @@
-/* =========================
-   DESIGN TOKENS
-========================= */
+/* DESIGN TOKENS */
 
 :root {
-  /* Colors */
-  --teal: #216c68;
-  --coral: #fb8665;
-  --ink: #2c302f;
-  --gray: #6f7371;
-  --sand: #f3f0ea;
-  --paper: #fbfaf7;
-  --white: #ffffff;
-  --coral-tint: #ffe9e2;
-  --coral-soft: #fdcdbd;
-  --success: #2f8f5b;
-  --success-tint: #e3f4ea;
+  --teal: #216C68;
+  --teal-dark: #1A5451;
+  --teal-light: #E7F1F0;
+  --coral: #FB8665;
+  --coral-dark: #DC7659;
+  --coral-light: #FEEBE3;
+
+  --charcoal: #2C302F;
+  --ink: #2C302F;
+  --cream: #F7F3E8;
+  --gray: #6F7371;
+  --sand: #F3F0EA;
+  --paper: #FBFAF7;
+  --white: #FFFFFF;
+  --coral-tint: #FFE9E2;
+  --coral-soft: #FDCDBD;
+  --success: #2F8F5B;
+  --success-tint: #E3F4EA;
   --border: rgba(44, 48, 47, 0.12);
 
   /* Typography */
@@ -78,9 +82,7 @@ h6 {
   min-height: 100vh;
 }
 
-/* =========================
-   SHARED LAYOUT HELPERS
-========================= */
+/* SHARED LAYOUT HELPERS */
 
 .container {
   width: min(1200px, 100% - var(--space-12));
