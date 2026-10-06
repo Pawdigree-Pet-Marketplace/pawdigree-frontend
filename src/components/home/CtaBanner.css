@@ -1,0 +1,18 @@
+.cta-banner {
+  padding: var(--space-8) var(--space-4);
+  border-radius: var(--space-4);
+  background: var(--coral-tint);
+  text-align: center;
+}
+
+.cta-banner h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 36px;
+}
+
+.cta-banner p {
+  margin: var(--space-2) 0 var(--space-4);
+  color: var(--ink);
+  font-size: 18px;
+}
