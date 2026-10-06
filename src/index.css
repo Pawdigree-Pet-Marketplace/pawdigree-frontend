@@ -1,17 +1,40 @@
-:root {
-  --teal: #216C68;
-  --coral: #FB8665;
-  --charcoal: #2C302F;
-  --cream: #F7F3E8;
-  --white: #FFFFFF;
+/* =========================
+   DESIGN TOKENS
+========================= */
 
-  --font-heading: 'Fredoka', sans-serif;
-  --font-body: 'Nunito', sans-serif;
- 
+:root {
+  /* Colors */
+  --teal: #216c68;
+  --coral: #fb8665;
+  --ink: #2c302f;
+  --gray: #6f7371;
+  --sand: #f3f0ea;
+  --paper: #fbfaf7;
+  --white: #ffffff;
+  --coral-tint: #ffe9e2;
+  --coral-soft: #fdcdbd;
+  --success: #2f8f5b;
+  --success-tint: #e3f4ea;
+  --border: rgba(44, 48, 47, 0.12);
+
+  /* Typography */
+  --font-heading: "Fredoka Variable", "Fredoka", system-ui, sans-serif;
+  --font-body: "Nunito Variable", "Nunito", system-ui, sans-serif;
+
+  /* Spacing (8px system) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
 
   font-family: var(--font-body);
-  color: var(--charcoal);
-  background-color: var(--cream);
+  color: var(--ink);
+  background-color: var(--paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -22,10 +45,15 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-body);
 }
 
 button,
@@ -48,4 +76,62 @@ h6 {
 
 #root {
   min-height: 100vh;
+}
+
+/* =========================
+   SHARED LAYOUT HELPERS
+========================= */
+
+.container {
+  width: min(1200px, 100% - var(--space-12));
+  margin-inline: auto;
+}
+
+.section {
+  margin-block: var(--space-10);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 28px;
+}
+
+.section-link {
+  color: var(--coral);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: 999px;
+  background: var(--teal);
+  color: var(--white);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }
