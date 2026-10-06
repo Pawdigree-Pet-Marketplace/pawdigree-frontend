@@ -1,316 +1,168 @@
-.app {
-  min-height: 100vh;
-  background: #fbfaf7;
-  color: #2c302f;
+.registration-page {
+min-height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 40px 20px;
+background-color: var(--cream);
+background-image:
+	linear-gradient(rgba(247, 243, 232, 0.45), rgba(247, 243, 232, 0.45)),
+	url('/dog-background.jpg');
+background-position: center;
+background-size: cover;
+background-repeat: no-repeat;
 }
 
-/* =========================
-   NAVBAR
-========================= */
-
-.navbar {
-  width: 100%;
-  height: 80px;
-  padding: 0 6%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fbfaf7;
-  border-bottom: 1px solid rgba(44, 48, 47, 0.08);
+.registration-card {
+width: 100%;
+max-width: 520px;
+padding: 40px;
+background-color: var(--white);
+border-radius: 20px;
+box-shadow: 0 8px 30px rgba(44, 48, 47, 0.08);
 }
 
-.navbar-left,
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.registration-header {
+text-align: center;
+margin-bottom: 32px;
 }
 
-.logo {
-  color: #216c68;
-  font-family: "Fredoka", sans-serif;
-  font-size: 26px;
-  font-weight: 700;
-  text-decoration: none;
+.registration-header h1 {
+margin: 0 0 10px;
+font-size: 32px;
 }
 
-.menu-button {
-  display: none;
+.registration-header p {
+margin: 0;
+color: var(--charcoal);
+line-height: 1.5;
 }
 
-.desktop-nav {
-  display: flex;
-  gap: 36px;
+.registration-form {
+display: flex;
+flex-direction: column;
+gap: 20px;
 }
 
-.desktop-nav a {
-  color: #2c302f;
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 500;
+.form-group {
+display: flex;
+flex-direction: column;
+gap: 8px;
 }
 
-.navbar-actions button {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  color: #2c302f;
+.form-group label {
+font-weight: 600;
+color: var(--charcoal);
 }
 
-.login-button {
-  padding: 11px 22px;
-  border: 1px solid #216c68 !important;
-  border-radius: 24px;
-  color: #216c68 !important;
+.form-group input {
+width: 100%;
+padding: 13px 14px;
+border: 1px solid #d8d8d8;
+border-radius: 10px;
+outline: none;
+background-color: var(--white);
+color: var(--charcoal);
 }
 
-/* =========================
-   HERO
-========================= */
-
-.hero {
-  min-height: 620px;
-  padding: 70px 6%;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 60px;
-  align-items: center;
+.form-group input:focus {
+border-color: var(--teal);
+box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
 }
 
-.hero-content {
-  max-width: 590px;
+.password-field {
+display: flex;
+gap: 8px;
 }
 
-.eyebrow {
-  margin-bottom: 18px;
-  color: #216c68;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+.password-field input {
+flex: 1;
 }
 
-.hero h1 {
-  margin: 0;
-  color: #2c302f;
-  font-family: "Fredoka", sans-serif;
-  font-size: clamp(42px, 5vw, 70px);
-  line-height: 1.08;
-  letter-spacing: -2px;
+.password-field button {
+padding: 0 16px;
+border: 1px solid #d8d8d8;
+border-radius: 10px;
+background-color: var(--white);
+color: var(--teal);
+font-weight: 600;
+cursor: pointer;
 }
 
-.hero-description {
-  max-width: 500px;
-  margin: 24px 0 30px;
-  color: #6f7371;
-  font-size: 17px;
-  line-height: 1.7;
+.password-field button:hover {
+background-color: var(--cream);
 }
 
-.primary-button {
-  padding: 15px 28px;
-  border: 0;
-  border-radius: 28px;
-  background: #216c68;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
+.register-button {
+margin-top: 8px;
+padding: 14px;
+border: none;
+border-radius: 10px;
+background-color: var(--coral);
+color: var(--white);
+font-weight: 700;
+cursor: pointer;
+transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.hero-actions p {
-  margin-top: 15px;
-  color: #6f7371;
-  font-size: 14px;
+.register-button:hover {
+opacity: 0.9;
+transform: translateY(-1px);
 }
 
-.text-button {
-  border: 0;
-  background: transparent;
-  color: #216c68;
-  font-weight: 700;
-  cursor: pointer;
+.form-error {
+margin: 0;
+padding: 12px 14px;
+border-radius: 10px;
+background-color: #fff0ed;
+color: #b63b24;
+font-weight: 600;
 }
 
-/* =========================
-   HERO IMAGE
-========================= */
-
-.hero-image {
-  position: relative;
-  min-height: 500px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  border-radius: 36px;
-  background: #f3f0ea;
-  overflow: hidden;
+.form-success {
+margin: 0;
+padding: 12px 14px;
+border-radius: 10px;
+background-color: #e8f5f1;
+color: var(--teal);
+font-weight: 600;
+text-align: center;
 }
 
-.hero-image-placeholder {
-  display: flex;
-  gap: 40px;
-  align-items: flex-end;
-  padding-bottom: 45px;
-  font-size: 170px;
+.login-link {
+margin: 24px 0 0;
+text-align: center;
+color: var(--charcoal);
 }
 
-.search-bar {
-  position: absolute;
-  z-index: 2;
-  top: 28px;
-  left: 50%;
-  width: calc(100% - 56px);
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 10px 35px rgba(44, 48, 47, 0.12);
+.login-link a {
+color: var(--teal);
+font-weight: 700;
+text-decoration: none;
 }
 
-.search-bar input {
-  flex: 1;
-  border: 0;
-  outline: 0;
-  color: #2c302f;
-  font: inherit;
-}
-
-.search-bar button {
-  border: 0;
-  background: #f3f0ea;
-  border-radius: 12px;
-  padding: 10px 13px;
-  cursor: pointer;
-}
-
-/* =========================
-   STATS
-========================= */
-
-.stats {
-  margin: 0 6% 70px;
-  padding: 30px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  border-radius: 24px;
-  background: #216c68;
-  color: #fff;
-  text-align: center;
-}
-
-.stats div {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.stats strong {
-  font-family: "Fredoka", sans-serif;
-  font-size: 30px;
-}
-
-.stats span {
-  font-size: 14px;
-  opacity: 0.85;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 900px) {
-  .desktop-nav {
-    display: none;
-  }
-
-  .menu-button {
-    display: block;
-    border: 0;
-    background: transparent;
-    font-size: 22px;
-    cursor: pointer;
-  }
-
-  .login-button {
-    display: none;
-  }
-
-  .hero {
-    grid-template-columns: 1fr;
-    padding: 45px 5%;
-  }
-
-  .hero-content {
-    text-align: center;
-    margin: 0 auto;
-  }
-
-  .hero-description {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-image {
-    min-height: 420px;
-  }
-
-  .hero-image-placeholder {
-    font-size: 120px;
-  }
+.login-link a:hover {
+text-decoration: underline;
 }
 
 @media (max-width: 600px) {
-  .navbar {
-    height: 68px;
-    padding: 0 20px;
-  }
+.registration-page {
+padding: 20px 16px;
+}
 
-  .navbar-left,
-  .navbar-actions {
-    gap: 10px;
-  }
+.registration-card {
+padding: 28px 20px;
+}
 
-  .logo {
-    font-size: 21px;
-  }
+.registration-header h1 {
+font-size: 28px;
+}
 
-  .hero {
-    padding: 35px 20px;
-  }
+.password-field {
+flex-direction: column;
+}
 
-  .hero h1 {
-    font-size: 40px;
-    letter-spacing: -1px;
-  }
-
-  .hero-image {
-    min-height: 350px;
-    border-radius: 26px;
-  }
-
-  .hero-image-placeholder {
-    font-size: 85px;
-    gap: 15px;
-  }
-
-  .search-bar {
-    width: calc(100% - 30px);
-    top: 15px;
-  }
-
-  .stats {
-    margin: 0 20px 40px;
-    padding: 22px 10px;
-  }
-
-  .stats strong {
-    font-size: 23px;
-  }
-
-  .stats span {
-    font-size: 11px;
-  }
+.password-field button {
+padding: 10px;
+}
 }
