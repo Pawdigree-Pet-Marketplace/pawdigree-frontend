@@ -1,4 +1,4 @@
-import ImagePlaceholder from '../ImagePlaceholder'
+import adoptionImage from '../../assets/images/adoption.jpg'
 import { CheckIcon } from '../icons'
 import './Adoption.css'
 
@@ -36,7 +36,10 @@ export default function Adoption() {
       </div>
 
       <div className="adoption-photo">
-        <ImagePlaceholder emoji="🐶" label="A puppy ready for adoption" />
+       <img
+         src={adoptionImage}
+         alt="A puppy ready for adoption"
+       />
       </div>
     </section>
   )

@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { merchandise } from '../../data/landing'
-import ImagePlaceholder from '../ImagePlaceholder'
 import { ChevronLeftIcon, ChevronRightIcon } from '../icons'
 import './Merchandise.css'
 
@@ -44,6 +43,7 @@ export default function Merchandise() {
           >
             <ChevronLeftIcon />
           </button>
+
           <button
             type="button"
             className="merch-arrow"
@@ -59,9 +59,9 @@ export default function Merchandise() {
       <div className="merch-track" ref={trackRef} onScroll={updateArrows}>
         {merchandise.map((item) => (
           <a key={item.name} href="#merchandise" className="merch-card">
-            <ImagePlaceholder
-              emoji={item.emoji}
-              label={item.name}
+            <img
+              src={item.image}
+              alt={item.name}
               className="merch-image"
             />
             <span>{item.name}</span>

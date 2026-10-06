@@ -45,9 +45,6 @@
 
 .sidemenu-content { padding: 20px; display: flex; flex-direction: column; }
 
-.section-title { font-size: 12px; letter-spacing: 1px; color: var(--charcoal); opacity: 0.6; font-weight: 600; margin-bottom: 14px; }
-.section-title.coral { color: var(--coral); opacity: 1; font-weight: 800; }
-
 .sidemenu-auth { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
 
 .login-btn-full {

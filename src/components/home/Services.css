@@ -12,9 +12,11 @@
 }
 
 .service-card .service-image {
+  display: block;
+  width: 100%;
   height: 240px;
   border-radius: 0;
-  font-size: 88px;
+  object-fit: cover;
 }
 
 .service-body {

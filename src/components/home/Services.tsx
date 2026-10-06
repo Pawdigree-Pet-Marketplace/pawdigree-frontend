@@ -1,5 +1,4 @@
 import { services } from '../../data/landing'
-import ImagePlaceholder from '../ImagePlaceholder'
 import { CheckIcon } from '../icons'
 import './Services.css'
 
@@ -16,9 +15,9 @@ export default function Services() {
       <div className="services-grid">
         {services.map((service) => (
           <article key={service.id} className="service-card">
-            <ImagePlaceholder
-              emoji={service.emoji}
-              label={service.name}
+            <img
+              src={service.image}
+              alt={service.name}
               className="service-image"
             />
             <div className="service-body">

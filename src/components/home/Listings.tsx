@@ -1,5 +1,4 @@
 import { listings } from '../../data/landing'
-import ImagePlaceholder from '../ImagePlaceholder'
 import { HeartIcon } from '../icons'
 import './Listings.css'
 
@@ -17,11 +16,11 @@ export default function Listings() {
         {listings.map((pet) => (
           <article key={pet.id} className="listing-card">
             <div className="listing-media">
-              <ImagePlaceholder
-                emoji={pet.emoji}
-                label={pet.name}
-                className="listing-image"
-              />
+             <img
+               src={pet.image}
+               alt={pet.name}
+               className="listing-image"
+             />
               {pet.forSale && <span className="listing-badge">For Sale</span>}
               <button
                 type="button"

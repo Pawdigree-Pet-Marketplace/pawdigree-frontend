@@ -1,12 +1,16 @@
-import ImagePlaceholder from '../ImagePlaceholder'
+import heroimage from '../../assets/images/heroimage.jpg'
 import { FilterIcon, SearchIcon } from '../icons'
 import './Hero.css'
 
 export default function Hero() {
   return (
-    <section className="container hero" aria-labelledby="hero-title">
+    <section className="hero" aria-labelledby="hero-title">
       <div className="hero-photo">
-        <ImagePlaceholder emoji="🐕 🐈" label="A dog and a cat" className="hero-photo-fill" />
+        <img
+          src={heroimage}
+          alt="Pets available on Pawdigree"
+          className="hero-photo-fill"
+        />
       </div>
 
       <form className="hero-search" role="search" onSubmit={(e) => e.preventDefault()}>
@@ -39,3 +43,4 @@ export default function Hero() {
     </section>
   )
 }
+

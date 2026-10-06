@@ -1,5 +1,4 @@
 import { categories } from '../../data/landing'
-import ImagePlaceholder from '../ImagePlaceholder'
 import './Categories.css'
 
 export default function Categories() {
@@ -11,9 +10,9 @@ export default function Categories() {
         {categories.map((category) => (
           <li key={category.name}>
             <a href={`#${category.name.toLowerCase()}`} className="category">
-              <ImagePlaceholder
-                emoji={category.emoji}
-                label={category.name}
+             <img
+               src={category.image}
+                alt={category.name}
                 className="category-image"
               />
               <span>{category.name}</span>

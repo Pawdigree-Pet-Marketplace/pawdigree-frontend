@@ -103,7 +103,7 @@ h6 {
 .section-title {
   margin: 0;
   color: var(--ink);
-  font-size: 28px;
+  font-size: 36px;
 }
 
 .section-link {
@@ -136,4 +136,35 @@ h6 {
 :focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
+}
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .container {
+    width: calc(100% - var(--space-6));
+  }
+
+  .section {
+    margin-block: var(--space-8);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: calc(100% - var(--space-4));
+  }
+
+  .section {
+    margin-block: var(--space-6);
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+
+  .section-header {
+    margin-bottom: var(--space-2);
+  }
 }
