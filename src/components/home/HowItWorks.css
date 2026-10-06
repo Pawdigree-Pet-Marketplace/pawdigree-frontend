@@ -1,0 +1,48 @@
+.how-it-works {
+  padding: var(--space-8) var(--space-6);
+  border-radius: var(--space-4);
+  background: var(--sand);
+  text-align: center;
+}
+
+.how-intro {
+  margin: var(--space-1) 0 var(--space-6);
+  color: var(--gray);
+  font-size: 18px;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.how-number {
+  display: inline-grid;
+  place-items: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  margin-bottom: var(--space-2);
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.how-step h3 {
+  margin: 0 0 var(--space-1);
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.how-step p {
+  max-width: 320px;
+  margin: 0 auto;
+  color: var(--gray);
+  line-height: 1.6;
+}

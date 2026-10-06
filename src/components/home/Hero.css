@@ -1,0 +1,104 @@
+.hero {
+  position: relative;
+  min-height: 640px;
+  margin-top: var(--space-3);
+  border-radius: var(--space-4);
+  overflow: hidden;
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-photo .hero-photo-fill {
+  align-items: flex-start;
+  padding-top: 140px;
+  font-size: 140px;
+  background: var(--sand);
+}
+
+/* fades the photo into the page color behind the headline */
+.hero-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 35%, var(--paper) 78%);
+}
+
+.hero-search {
+  position: absolute;
+  top: var(--space-4);
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: min(640px, 100% - var(--space-8));
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2);
+  transform: translateX(-50%);
+  border-radius: var(--space-3);
+  background: var(--white);
+  box-shadow: 0 8px 32px rgba(44, 48, 47, 0.15);
+  color: var(--gray);
+}
+
+.hero-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.hero-search button {
+  display: grid;
+  place-items: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 0;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--white);
+  cursor: pointer;
+}
+
+.hero-content {
+  position: absolute;
+  right: 0;
+  bottom: var(--space-6);
+  left: 0;
+  z-index: 1;
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.hero-content h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 56px;
+  line-height: 1.15;
+}
+
+.hero-content h1 span {
+  color: var(--coral);
+}
+
+.hero-content p {
+  margin: var(--space-2) 0 var(--space-3);
+  color: var(--gray);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.hero-content .hero-login {
+  margin: var(--space-2) 0 0;
+  font-size: 16px;
+}
+
+.hero-login a {
+  color: var(--coral);
+  font-weight: 700;
+  text-decoration: none;
+}

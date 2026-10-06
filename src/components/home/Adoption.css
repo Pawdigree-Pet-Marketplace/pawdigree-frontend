@@ -1,0 +1,76 @@
+.adoption {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-8);
+  align-items: center;
+  padding: var(--space-8);
+  border-radius: var(--space-4);
+  background: var(--coral-soft);
+}
+
+.adoption-eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.adoption h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 40px;
+  line-height: 1.2;
+}
+
+.adoption-text {
+  margin: var(--space-2) 0 var(--space-3);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.adoption-points {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.adoption-points li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.adoption-check {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--space-4);
+  height: var(--space-4);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--ink);
+}
+
+/* dark button: white text on coral is hard to read */
+.adoption .btn {
+  background: var(--ink);
+  text-decoration: none;
+}
+
+.adoption-photo {
+  height: 360px;
+  overflow: hidden;
+  border: 8px solid var(--white);
+  border-radius: var(--space-4);
+  background: var(--white);
+}
+
+.adoption-photo .image-placeholder {
+  font-size: 120px;
+}

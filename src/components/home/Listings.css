@@ -1,0 +1,76 @@
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.listing-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--space-2);
+  background: var(--white);
+}
+
+.listing-media {
+  position: relative;
+  height: 220px;
+}
+
+.listing-media .listing-image {
+  border-radius: 0;
+  font-size: 72px;
+}
+
+.listing-badge {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  padding: 4px var(--space-1);
+  border-radius: 999px;
+  background: var(--coral-tint);
+  color: var(--coral);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.listing-heart {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 0;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--coral);
+  cursor: pointer;
+}
+
+.listing-body {
+  padding: var(--space-2);
+}
+
+.listing-body h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.listing-details {
+  margin: 4px 0 var(--space-1);
+  color: var(--gray);
+  font-size: 14px;
+}
+
+.listing-price {
+  margin: 0;
+  color: var(--teal);
+  font-weight: 800;
+}
+
+.listing-price span {
+  color: var(--ink);
+  font-weight: 700;
+}
