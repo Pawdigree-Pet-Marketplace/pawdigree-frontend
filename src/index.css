@@ -1,13 +1,19 @@
 :root {
   --teal: #216C68;
+  --teal-dark: #1A5451;
+  --teal-light: #E7F1F0;
+
   --coral: #FB8665;
+  --coral-dark: #DC7659;
+  --coral-light: #FEEBE3;
+
   --charcoal: #2C302F;
   --cream: #F7F3E8;
   --white: #FFFFFF;
 
   --font-heading: 'Fredoka', sans-serif;
   --font-body: 'Nunito', sans-serif;
- 
+
 
   font-family: var(--font-body);
   color: var(--charcoal);

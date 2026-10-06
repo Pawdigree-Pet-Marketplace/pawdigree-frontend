@@ -1,0 +1,124 @@
+.sidemenu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44,48,47,0.4); 
+  backdrop-filter: blur(1px);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+.side-menu {
+  position: fixed;
+  top: 0; left: 0;
+  width: 82%;
+  max-width: 320px;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--cream);
+  z-index: 300;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.25s ease;
+  box-shadow: 4px 0 24px rgba(44,48,47,0.12);
+}
+.sidemenu-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 20px; background: var(--white); position: sticky; top: 0;
+}
+.sidemenu-logo-img { width: 120px; height: auto; }
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--charcoal);
+  padding: 6px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.close-btn:hover {
+  background: var(--teal-light);
+  color: var(--teal-dark);
+}
+
+.sidemenu-content { padding: 20px; display: flex; flex-direction: column; }
+
+.section-title { font-size: 12px; letter-spacing: 1px; color: var(--charcoal); opacity: 0.6; font-weight: 600; margin-bottom: 14px; }
+.section-title.coral { color: var(--coral); opacity: 1; font-weight: 800; }
+
+.sidemenu-auth { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+
+.login-btn-full {
+  background: var(--teal);
+  color: var(--white);
+  border: none;
+  padding: 13px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.login-btn-full:hover { background: var(--teal-dark); }
+
+.signup-btn-full {
+  background: var(--white);
+  color: var(--teal);
+  border: 1.5px solid var(--teal);
+  padding: 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.signup-btn-full:hover {
+  background: var(--teal-light);
+  border-color: var(--teal-dark);
+  color: var(--teal-dark);
+}
+
+.sidemenu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 10px;
+  text-decoration: none;
+  color: var(--charcoal);
+  font-size: 15px;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.sidemenu-item svg { color: var(--teal); flex-shrink: 0; }
+.sidemenu-item:hover {
+  background: var(--teal-light);
+  color: var(--teal-dark);
+}
+.sidemenu-item:hover svg { color: var(--teal-dark); }
+
+/* this rule didn't exist before, so the Log Out link just rendered
+   with default teal-icon styling like every other item */
+.sidemenu-item.logout { color: var(--coral); margin-top: 4px; }
+.sidemenu-item.logout svg { color: var(--coral); }
+.sidemenu-item.logout:hover {
+  background: var(--coral-light);
+  color: var(--coral-dark);
+}
+.sidemenu-item.logout:hover svg { color: var(--coral-dark); }
+
+.icon-teal { color: var(--teal); display: grid; }
+.icon-coral { color: var(--coral); display: grid; }
+.chevron { margin-left: auto; opacity: 0.4; }
+.sidemenu-divider { border: none; border-top: 1px solid rgba(44,48,47,0.1); margin: 16px 0; }
+
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* RESPONSIVE: Hide drawer on desktop */
+@media (min-width: 768px) {
+ .sidemenu-overlay, .side-menu { display: none !important; }
+}
