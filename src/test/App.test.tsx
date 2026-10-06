@@ -7,7 +7,9 @@ describe('Customer Registration Page', () => {
     render(<App />)
 
     expect(screen.getByText('Create your account')).toBeInTheDocument()
-    expect(screen.getByLabelText('Full name')).toBeInTheDocument()
+    expect(screen.getByLabelText('Username')).toBeInTheDocument()
+    expect(screen.getByLabelText('First name')).toBeInTheDocument()
+    expect(screen.getByLabelText('Last name')).toBeInTheDocument()
     expect(screen.getByLabelText('Email address')).toBeInTheDocument()
     expect(screen.getByLabelText('Phone number')).toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toBeInTheDocument()
