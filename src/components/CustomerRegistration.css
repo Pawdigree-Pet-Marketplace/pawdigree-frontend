@@ -1,0 +1,198 @@
+/* Page layout */
+.registration-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: #f7f4ef;
+  box-sizing: border-box;
+}
+
+/* Registration card */
+.registration-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+/* Header */
+.registration-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.paw-logo {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.registration-header h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+}
+
+.registration-header p {
+  margin: 0;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* Form */
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #a0e8a7;
+  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.1);
+}
+
+.form-group small {
+  color: #777777;
+  font-size: 12px;
+}
+
+/* Terms and conditions */
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.terms input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+/* Register button */
+.register-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #c7b4a6;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.register-button:hover {
+  background: #bceecf;
+}
+
+.register-button:focus-visible {
+  outline: 3px solid #b5d5a2;
+  outline-offset: 3px;
+}
+
+/* Login link */
+.login-text {
+  margin-top: 25px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.login-text a {
+  color: #e7c3a8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-text a:hover {
+  text-decoration: underline;
+}
+
+/* Tablet screens */
+@media (max-width: 768px) {
+  .registration-page {
+    padding: 24px 16px;
+  }
+
+  .registration-card {
+    max-width: 460px;
+    padding: 32px;
+  }
+
+  .registration-header h1 {
+    font-size: 27px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .registration-page {
+    align-items: flex-start;
+    padding: 16px 12px;
+  }
+
+  .registration-card {
+    padding: 24px 18px;
+    border-radius: 12px;
+  }
+
+  .registration-header {
+    margin-bottom: 24px;
+  }
+
+  .paw-logo {
+    font-size: 36px;
+  }
+
+  .registration-header h1 {
+    font-size: 25px;
+  }
+
+  .registration-header p {
+    font-size: 14px;
+  }
+
+  .registration-form {
+    gap: 16px;
+  }
+
+  .register-button {
+    padding: 13px;
+  }
+
+  .login-text {
+    margin-top: 20px;
+  }
+}

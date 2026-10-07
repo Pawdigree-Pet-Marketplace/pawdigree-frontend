@@ -1,0 +1,213 @@
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: #f7f4ef;
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.paw-logo {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.login-header h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+}
+
+.login-header p {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #8b5e3c;
+  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.1);
+}
+
+.password-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.password-label a {
+  color: #8b5e3c;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.password-label a:hover {
+  text-decoration: underline;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.remember-me input {
+  width: 16px;
+  height: 16px;
+  accent-color: #8b5e3c;
+}
+
+.remember-me label {
+  cursor: pointer;
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #8b5e3c;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.login-button:hover {
+  background: #70482d;
+}
+
+.login-button:focus-visible {
+  outline: 3px solid #c8a88e;
+  outline-offset: 3px;
+}
+
+.register-text {
+  margin-top: 25px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.register-text a {
+  color: #8b5e3c;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-text a:hover {
+  text-decoration: underline;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .login-page {
+    padding: 24px 16px;
+  }
+
+  .login-card {
+    max-width: 460px;
+    padding: 32px;
+  }
+
+  .login-header h1 {
+    font-size: 27px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .login-page {
+    align-items: flex-start;
+    padding: 16px 12px;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+    border-radius: 12px;
+  }
+
+  .login-header {
+    margin-bottom: 24px;
+  }
+
+  .paw-logo {
+    font-size: 36px;
+  }
+
+  .login-header h1 {
+    font-size: 25px;
+  }
+
+  .login-header p {
+    font-size: 14px;
+  }
+
+  .login-form {
+    gap: 16px;
+  }
+
+  .password-label {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .login-button {
+    padding: 13px;
+  }
+
+  .register-text {
+    margin-top: 20px;
+  }
+}
