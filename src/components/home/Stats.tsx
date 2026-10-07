@@ -3,7 +3,16 @@ import { stats } from '../../data/landing'
 import './Stats.css'
 
 function AnimatedNumber({ value }: { value: string }) {
-  const [displayValue, setDisplayValue] = useState('0')
+  const [displayValue, setDisplayValue] = useState(() => {
+    const number = Number.parseInt(value.replace(/\D/g, ''), 10)
+
+    if (Number.isNaN(number)) {
+      return value
+    }
+
+    return '0'
+  })
+
   const ref = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
@@ -14,7 +23,6 @@ function AnimatedNumber({ value }: { value: string }) {
     const number = Number.parseInt(value.replace(/\D/g, ''), 10)
 
     if (Number.isNaN(number)) {
-      setDisplayValue(value)
       return
     }
 
