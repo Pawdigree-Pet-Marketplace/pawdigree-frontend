@@ -1,3 +1,4 @@
+import useScrollReveal from '../../hooks/useScrollReveal'
 import './HowItWorks.css'
 
 const steps = [
@@ -16,16 +17,26 @@ const steps = [
 ]
 
 export default function HowItWorks() {
+  const stepsRef = useScrollReveal<HTMLOListElement>()
+
   return (
     <section className="container section how-it-works" id="how-it-works">
       <h2 className="section-title">How Pawdigree works</h2>
-      <p className="how-intro">Three simple steps from searching to snuggling.</p>
 
-      <ol className="how-steps">
+      <p className="how-intro">
+        Three simple steps from searching to snuggling.
+      </p>
+
+      <ol className="how-steps" ref={stepsRef}>
         {steps.map((step, index) => (
-          <li key={step.title} className="how-step">
+          <li
+            key={step.title}
+            className={`how-step reveal reveal-delay-${index + 1}`}
+          >
             <span className="how-number">{index + 1}</span>
+
             <h3>{step.title}</h3>
+
             <p>{step.text}</p>
           </li>
         ))}
