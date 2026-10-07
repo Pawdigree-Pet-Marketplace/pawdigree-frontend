@@ -1,17 +1,45 @@
+/* DESIGN TOKENS */
+@import './styles/animations.css';
+
 :root {
   --teal: #216C68;
+  --teal-dark: #1A5451;
+  --teal-light: #E7F1F0;
   --coral: #FB8665;
-  --charcoal: #2C302F;
-  --cream: #F7F3E8;
-  --white: #FFFFFF;
+  --coral-dark: #DC7659;
+  --coral-light: #FEEBE3;
 
-  --font-heading: 'Fredoka', sans-serif;
-  --font-body: 'Nunito', sans-serif;
- 
+  --charcoal: #2C302F;
+  --ink: #2C302F;
+  --cream: #F7F3E8;
+  --gray: #6F7371;
+  --sand: #F3F0EA;
+  --paper: #FBFAF7;
+  --white: #FFFFFF;
+  --coral-tint: #FFE9E2;
+  --coral-soft: #FDCDBD;
+  --success: #2F8F5B;
+  --success-tint: #E3F4EA;
+  --border: rgba(44, 48, 47, 0.12);
+
+  /* Typography */
+  --font-heading: "Fredoka Variable", "Fredoka", system-ui, sans-serif;
+  --font-body: "Nunito Variable", "Nunito", system-ui, sans-serif;
+
+  /* Spacing (8px system) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
 
   font-family: var(--font-body);
-  color: var(--charcoal);
-  background-color: var(--cream);
+  color: var(--ink);
+  background-color: var(--paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -22,10 +50,15 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-body);
 }
 
 button,
@@ -64,3 +97,147 @@ body {
   min-height: 100vh;
   width: 100%;
 }
+
+/* SHARED LAYOUT HELPERS */
+
+.container {
+  width: min(1200px, 100% - var(--space-12));
+  margin-inline: auto;
+}
+
+.section {
+  margin-block: var(--space-10);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 36px;
+}
+
+.section-link {
+  color: var(--coral);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: 999px;
+  background: var(--teal);
+  color: var(--white);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .container {
+    width: calc(100% - var(--space-6));
+  }
+
+  .section {
+    margin-block: var(--space-8);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: calc(100% - var(--space-4));
+  }
+
+  .section {
+    margin-block: var(--space-6);
+  }
+
+  .section-title {
+    font-size: 22px;
+    line-height: 1.25;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
+  }
+
+  .section-link {
+    flex-shrink: 0;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+/* =========================
+   PAWDIGREE PAW PRINT BACKGROUND
+========================= */
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+/* =========================
+   PAWDIGREE PAW PRINT BACKGROUND
+========================= */
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+#root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.08;
+
+  background-image:
+    /* Teal paw */
+    radial-gradient(circle at 10px 10px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(circle at 22px 6px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(circle at 34px 10px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 22px 24px, var(--teal) 0 7px, transparent 8px),
+
+    /* Coral paw */
+    radial-gradient(circle at 70px 70px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(circle at 82px 66px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(circle at 94px 70px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 82px 84px, var(--coral) 0 7px, transparent 8px);
+
+  background-size: 120px 120px;
+}
+
+ 

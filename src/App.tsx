@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import CustomerLogin from "./components/CustomerLogin";
 import CustomerRegistration from "./components/CustomerRegistration";
@@ -17,3 +18,12 @@ function App() {
 }
 
 export default App;
+=======
+import LandingPage from './pages/LandingPage'
+
+function App() {
+  return <LandingPage />
+}
+
+export default App
+>>>>>>> df9d54b24b17462d62e6d3b803d3bea9fbc6c26c
