@@ -28,7 +28,14 @@ const TopNavbar = ({
         {!isLoggedIn ? (
           <>
             <Button variant="primary">Log In</Button>
-            <Button variant="secondary">Sign Up</Button>
+            <Button
+                 variant="secondary"
+                 onClick={() => {
+                 window.location.href = '/registration'
+  }}
+>
+  Sign Up
+</Button>
           </>
         ) : (
           <div className="topnav-icons">
