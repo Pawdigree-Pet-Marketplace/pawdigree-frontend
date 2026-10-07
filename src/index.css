@@ -181,3 +181,48 @@ h6 {
     width: 100%;
   }
 }
+/* =========================
+   PAWDIGREE PAW PRINT BACKGROUND
+========================= */
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+/* =========================
+   PAWDIGREE PAW PRINT BACKGROUND
+========================= */
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+#root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.08;
+
+  background-image:
+    /* Teal paw */
+    radial-gradient(circle at 10px 10px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(circle at 22px 6px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(circle at 34px 10px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 22px 24px, var(--teal) 0 7px, transparent 8px),
+
+    /* Coral paw */
+    radial-gradient(circle at 70px 70px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(circle at 82px 66px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(circle at 94px 70px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 82px 84px, var(--coral) 0 7px, transparent 8px);
+
+  background-size: 120px 120px;
+}
+
+ 
