@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import '../App.css'
 
 export default function RegistrationPage() {
   const [formData, setFormData] = useState({
-    fullName: '',
+    username: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     password: '',
@@ -19,30 +22,46 @@ export default function RegistrationPage() {
     setError('')
     setSuccess('')
 
-    if (!formData.fullName.trim()) {
-      setError('Please enter your full name.')
+    if (!formData.username.trim()) {
+      setError('Please enter a username.')
       return
     }
+
+    if (!formData.first_name.trim()) {
+      setError('Please enter your first name.')
+      return
+    }
+
+    if (!formData.last_name.trim()) {
+      setError('Please enter your last name.')
+      return
+    }
+
     if (!formData.email.trim()) {
       setError('Please enter your email address.')
       return
     }
+
     if (!formData.phone.trim()) {
       setError('Please enter your phone number.')
       return
     }
+
     if (!formData.password) {
       setError('Please enter a password.')
       return
     }
+
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters.')
       return
     }
+
     if (!formData.confirmPassword) {
       setError('Please confirm your password.')
       return
     }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match.')
       return
@@ -62,17 +81,53 @@ export default function RegistrationPage() {
 
         <form className="registration-form" onSubmit={handleSubmit}>
           {error && <p className="form-error">{error}</p>}
+
           {success && <p className="form-success">{success}</p>}
 
           <div className="form-group">
-            <label htmlFor="fullName">Full name</label>
+            <label htmlFor="username">Username</label>
             <input
-              id="fullName"
+              id="username"
               type="text"
-              placeholder="Enter your full name"
-              value={formData.fullName}
+              placeholder="Enter your username"
+              value={formData.username}
               onChange={(e) =>
-                setFormData({ ...formData, fullName: e.target.value })
+                setFormData({
+                  ...formData,
+                  username: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="first_name">First name</label>
+            <input
+              id="first_name"
+              type="text"
+              placeholder="Enter your first name"
+              value={formData.first_name}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  first_name: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="last_name">Last name</label>
+            <input
+              id="last_name"
+              type="text"
+              placeholder="Enter your last name"
+              value={formData.last_name}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  last_name: e.target.value,
+                })
               }
             />
           </div>
@@ -85,7 +140,10 @@ export default function RegistrationPage() {
               placeholder="Enter your email address"
               value={formData.email}
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+                setFormData({
+                  ...formData,
+                  email: e.target.value,
+                })
               }
             />
           </div>
@@ -98,7 +156,10 @@ export default function RegistrationPage() {
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
+                setFormData({
+                  ...formData,
+                  phone: e.target.value,
+                })
               }
             />
           </div>
@@ -112,9 +173,13 @@ export default function RegistrationPage() {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
+                  setFormData({
+                    ...formData,
+                    password: e.target.value,
+                  })
                 }
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -139,6 +204,7 @@ export default function RegistrationPage() {
                   })
                 }
               />
+
               <button
                 type="button"
                 onClick={() =>
