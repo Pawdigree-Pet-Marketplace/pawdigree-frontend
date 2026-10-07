@@ -1,4 +1,4 @@
-import logo from "../../../assets/logo.png";
+import logo from "../../../assets/logos/lightmode-logo.png";
 import { Heart, ShoppingBag, Bell, MessageCircle, Menu, X } from "lucide-react";
 import Button from "../../Button/Button";
 import "./TopNavbar.css";
@@ -18,9 +18,9 @@ const TopNavbar = ({
     <header className="top-navbar">
       <img src={logo} alt="Pawdigree" className="logo-img" />
       <nav className="desktop-links">
-        <a href="#">Browse Pets</a>
-        <a href="#">Services</a>
-        <a href="#">Merchandise</a>
+        <a href="#pets">Browse Pets</a>
+        <a href="#services">Services</a>
+        <a href="#merchandise">Merchandise</a>
         <a href="#">Become a Seller</a>
         <a href="#">Help Center</a>
       </nav>
