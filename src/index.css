@@ -1,20 +1,25 @@
-/* =========================
-   DESIGN TOKENS
-========================= */
+/* DESIGN TOKENS */
+@import './styles/animations.css';
 
 :root {
-  /* Colors */
-  --teal: #216c68;
-  --coral: #fb8665;
-  --ink: #2c302f;
-  --gray: #6f7371;
-  --sand: #f3f0ea;
-  --paper: #fbfaf7;
-  --white: #ffffff;
-  --coral-tint: #ffe9e2;
-  --coral-soft: #fdcdbd;
-  --success: #2f8f5b;
-  --success-tint: #e3f4ea;
+  --teal: #216C68;
+  --teal-dark: #1A5451;
+  --teal-light: #E7F1F0;
+  --coral: #FB8665;
+  --coral-dark: #DC7659;
+  --coral-light: #FEEBE3;
+
+  --charcoal: #2C302F;
+  --ink: #2C302F;
+  --cream: #F7F3E8;
+  --gray: #6F7371;
+  --sand: #F3F0EA;
+  --paper: #FBFAF7;
+  --white: #FFFFFF;
+  --coral-tint: #FFE9E2;
+  --coral-soft: #FDCDBD;
+  --success: #2F8F5B;
+  --success-tint: #E3F4EA;
   --border: rgba(44, 48, 47, 0.12);
 
   /* Typography */
@@ -78,9 +83,7 @@ h6 {
   min-height: 100vh;
 }
 
-/* =========================
-   SHARED LAYOUT HELPERS
-========================= */
+/* SHARED LAYOUT HELPERS */
 
 .container {
   width: min(1200px, 100% - var(--space-12));
@@ -101,7 +104,7 @@ h6 {
 .section-title {
   margin: 0;
   color: var(--ink);
-  font-size: 28px;
+  font-size: 36px;
 }
 
 .section-link {
@@ -135,3 +138,91 @@ h6 {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .container {
+    width: calc(100% - var(--space-6));
+  }
+
+  .section {
+    margin-block: var(--space-8);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: calc(100% - var(--space-4));
+  }
+
+  .section {
+    margin-block: var(--space-6);
+  }
+
+  .section-title {
+    font-size: 22px;
+    line-height: 1.25;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
+  }
+
+  .section-link {
+    flex-shrink: 0;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+/* =========================
+   PAWDIGREE PAW PRINT BACKGROUND
+========================= */
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+/* =========================
+   PAWDIGREE PAW PRINT BACKGROUND
+========================= */
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+#root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.08;
+
+  background-image:
+    /* Teal paw */
+    radial-gradient(circle at 10px 10px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(circle at 22px 6px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(circle at 34px 10px, var(--teal) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 22px 24px, var(--teal) 0 7px, transparent 8px),
+
+    /* Coral paw */
+    radial-gradient(circle at 70px 70px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(circle at 82px 66px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(circle at 94px 70px, var(--coral) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 82px 84px, var(--coral) 0 7px, transparent 8px);
+
+  background-size: 120px 120px;
+}
+
+ 

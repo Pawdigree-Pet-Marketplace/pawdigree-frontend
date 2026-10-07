@@ -11,11 +11,13 @@ export interface Stat {
 export interface Category {
   name: string
   emoji: string
+  image: string
 }
 
 export interface MerchItem {
   name: string
   emoji: string
+  image: string
 }
 
 export interface Listing {
@@ -25,6 +27,7 @@ export interface Listing {
   priceLines: { label?: string; value: string; strong?: boolean }[]
   forSale: boolean
   emoji: string
+  image: string
 }
 
 export interface Service {
@@ -32,6 +35,7 @@ export interface Service {
   name: string
   vendor: string
   emoji: string
+  image: string
 }
 
 export interface Testimonial {
@@ -55,20 +59,64 @@ export const stats: Stat[] = [
 ]
 
 export const categories: Category[] = [
-  { name: 'Dogs', emoji: '🐕' },
-  { name: 'Cats', emoji: '🐈' },
-  { name: 'Birds', emoji: '🦜' },
-  { name: 'Rabbits', emoji: '🐇' },
-  { name: 'Aquatic', emoji: '🐠' },
+  {
+    name: 'Dogs',
+    emoji: '🐕',
+    image: '/src/assets/images/dogs.jpg',
+  },
+  {
+    name: 'Cats',
+    emoji: '🐈',
+    image: '/src/assets/images/cats.jpg',
+  },
+  {
+    name: 'Birds',
+    emoji: '🦜',
+    image: '/src/assets/images/birds.jpg',
+  },
+  {
+    name: 'Rabbits',
+    emoji: '🐇',
+    image: '/src/assets/images/rabbit.jpg',
+  },
+  {
+    name: 'Aquatic',
+    emoji: '🐠',
+    image: '/src/assets/images/aquatic.jpg',
+  },
 ]
 
 export const merchandise: MerchItem[] = [
-  { name: 'Consumables', emoji: '🦴' },
-  { name: 'Play and Comfort', emoji: '🧸' },
-  { name: 'Accessories', emoji: '🦮' },
-  { name: 'Beds and Carriers', emoji: '🛏️' },
-  { name: 'Grooming Supplies', emoji: '🧴' },
-  { name: 'Health and Care', emoji: '💊' },
+  {
+    name: 'Consumables',
+    emoji: '🦴',
+    image: '/src/assets/images/consumables.jpg',
+  },
+  {
+    name: 'Play and Comfort',
+    emoji: '🧸',
+    image: '/src/assets/images/play-and-comfort.jpg',
+  },
+  {
+    name: 'Accessories',
+    emoji: '🦮',
+    image: '/src/assets/images/accessories.jpg',
+  },
+  {
+    name: 'Beds and Carriers',
+    emoji: '🛏️',
+    image: '/src/assets/images/beds.jpg',
+  },
+  {
+    name: 'Grooming Supplies',
+    emoji: '🧴',
+    image: '/src/assets/images/grooming.jpg',
+  },
+  {
+    name: 'Health and Care',
+    emoji: '💊',
+    image: '/src/assets/images/veterinary.jpg',
+  },
 ]
 
 export const listings: Listing[] = [
@@ -82,7 +130,9 @@ export const listings: Listing[] = [
     ],
     forSale: false,
     emoji: '🐕',
+    image: '/src/assets/images/bella.jpg',
   },
+
   {
     id: 2,
     name: 'Milo',
@@ -90,7 +140,9 @@ export const listings: Listing[] = [
     priceLines: [{ label: 'Price:', value: 'UGX 450,000', strong: true }],
     forSale: true,
     emoji: '🐈',
+    image: '/src/assets/images/milo.jpg',
   },
+
   {
     id: 3,
     name: 'Kakito',
@@ -98,7 +150,9 @@ export const listings: Listing[] = [
     priceLines: [{ value: 'UGX 150,000', strong: true }],
     forSale: true,
     emoji: '🐇',
+    image: '/src/assets/images/kakito.jpg',
   },
+
   {
     id: 4,
     name: 'Mimi and Luna',
@@ -106,6 +160,7 @@ export const listings: Listing[] = [
     priceLines: [{ value: 'UGX 0', strong: true }],
     forSale: false,
     emoji: '🐱',
+    image: '/src/assets/images/mimi.jpg',
   },
 ]
 
@@ -115,12 +170,14 @@ export const services: Service[] = [
     name: 'Grooming & Spa',
     vendor: 'KAMPI DOG CLINIC - ENTEBBE',
     emoji: '🛁',
+    image: '/src/assets/images/spa.jpg',
   },
   {
     id: 2,
     name: 'Pet Walking',
     vendor: "GOD'S MERCY PET SERVICES - MUKONO",
     emoji: '🦮',
+    image: '/src/assets/images/pet-walking.jpg',
   },
 ]
 

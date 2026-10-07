@@ -1,0 +1,79 @@
+.bottom-navbar {
+    position: fixed;
+    bottom: 24px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 100;
+}
+
+.bottom-pill {
+    display: flex;
+    gap: 36px;
+    background: var(--white);
+    /* removed the duplicate `background-color: var(--cream)` that was here —
+       it silently overrode the line above, so the pill was the same color
+       as the page behind it and basically disappeared except for its shadow */
+    padding: 10px 30px 8px 30px;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(44,48,47,0.08);
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.icon-circle {
+    width: 36px; height: 36px;
+    display: grid;
+    place-items: center;
+    opacity: 0.7;
+    border-radius: 50%;
+    color: var(--charcoal);
+    transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+
+.active-circle {
+    background: var(--teal);
+    color: var(--white);
+    opacity: 1;
+}
+
+/* hover feedback for non-active tabs */
+.nav-item:hover .icon-circle:not(.active-circle) {
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    opacity: 1;
+}
+/* active tab gets a touch darker on hover rather than no feedback at all */
+.nav-item:hover .active-circle {
+    background: var(--teal-dark);
+}
+
+.nav-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--charcoal);
+    opacity: 0.7;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-item.active .nav-label {
+    color: var(--teal);
+    font-weight: 700;
+    opacity: 1;
+}
+.nav-item:hover .nav-label {
+    color: var(--teal);
+    opacity: 1;
+}
+
+@media (min-width: 768px) {
+    .bottom-navbar { display: none; }
+}

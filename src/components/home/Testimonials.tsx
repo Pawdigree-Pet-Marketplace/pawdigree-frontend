@@ -1,18 +1,34 @@
 import { testimonials } from '../../data/landing'
+import useScrollReveal from '../../hooks/useScrollReveal'
 import { StarIcon } from '../icons'
 import './Testimonials.css'
 
 export default function Testimonials() {
+  const testimonialsRef = useScrollReveal<HTMLDivElement>()
+
   return (
     <section className="container section" id="reviews">
       <h2 className="section-title">What buyers are saying</h2>
 
-      <div className="testimonials-grid">
-        {testimonials.map((review) => (
-          <figure key={review.id} className="testimonial">
-            <div className="testimonial-avatar" aria-hidden="true">
+      <div
+        className="testimonials-grid"
+        ref={testimonialsRef}
+      >
+        {testimonials.map((review, index) => (
+          <figure
+            key={review.id}
+            className={`testimonial reveal reveal-delay-${Math.min(
+              index + 1,
+              4,
+            )}`}
+          >
+            <div
+              className="testimonial-avatar"
+              aria-hidden="true"
+            >
               {review.author.charAt(0)}
             </div>
+
             <div>
               <div
                 className="testimonial-stars"
@@ -20,10 +36,17 @@ export default function Testimonials() {
                 aria-label={`${review.rating} out of 5 stars`}
               >
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <StarIcon key={n} width={18} height={18} filled={n <= review.rating} />
+                  <StarIcon
+                    key={n}
+                    width={18}
+                    height={18}
+                    filled={n <= review.rating}
+                  />
                 ))}
               </div>
+
               <blockquote>“{review.quote}”</blockquote>
+
               <figcaption>- {review.author}</figcaption>
             </div>
           </figure>
