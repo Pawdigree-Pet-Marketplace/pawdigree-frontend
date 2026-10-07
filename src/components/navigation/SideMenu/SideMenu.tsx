@@ -58,14 +58,7 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
               </a>
               <div className="sidemenu-auth">
                 <button className="login-btn-full">Log In</button>
-                <button
-                   className="signup-btn-full"
-                   onClick={() => {
-                     window.location.href = '/registration'
-                    }}
-                >
-                  Sign Up
-                </button>
+                <button className="signup-btn-full">Sign Up</button>
               </div>
             </>
           ) : (
