@@ -1,4 +1,5 @@
 /* DESIGN TOKENS */
+@import './styles/animations.css';
 
 :root {
   --teal: #216C68;
@@ -162,9 +163,21 @@ h6 {
 
   .section-title {
     font-size: 22px;
+    line-height: 1.25;
   }
 
   .section-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-1);
     margin-bottom: var(--space-2);
+  }
+
+  .section-link {
+    flex-shrink: 0;
+  }
+
+  .btn {
+    width: 100%;
   }
 }

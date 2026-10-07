@@ -10,7 +10,7 @@
 
 .adoption-eyebrow {
   margin: 0 0 var(--space-1);
-  color: var(--ink);
+  color: var(--coral);
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -54,27 +54,84 @@
   height: var(--space-4);
   border-radius: 50%;
   background: var(--white);
-  color: var(--ink);
+  color: var(--coral);
 }
 
-/* dark button: white text on coral is hard to read */
 .adoption .btn {
   background: var(--ink);
   text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.adoption .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(44, 48, 47, 0.14);
 }
 
 .adoption-photo {
   overflow: hidden;
   border-radius: var(--space-2);
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
 .adoption-photo img {
   display: block;
   width: 100%;
   height: 100%;
+  min-height: 320px;
   object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.adoption-photo:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(44, 48, 47, 0.1);
+}
+
+.adoption-photo:hover img {
+  transform: scale(1.04);
 }
 
 .adoption-photo .image-placeholder {
   font-size: 120px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .adoption {
+    gap: var(--space-5);
+    padding: var(--space-6);
+  }
+
+  .adoption h2 {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 700px) {
+  .adoption {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .adoption h2 {
+    font-size: 30px;
+  }
+
+  .adoption-text {
+    font-size: 16px;
+  }
+
+  .adoption-photo img {
+    min-height: 240px;
+    max-height: 320px;
+  }
 }

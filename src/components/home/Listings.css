@@ -9,11 +9,22 @@
   border: 1px solid var(--border);
   border-radius: var(--space-2);
   background: var(--white);
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.listing-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(251, 134, 101, 0.45);
+  box-shadow: 0 10px 24px rgba(44, 48, 47, 0.09);
 }
 
 .listing-media {
   position: relative;
   height: 220px;
+  overflow: hidden;
 }
 
 .listing-media .listing-image {
@@ -22,6 +33,11 @@
   height: 100%;
   border-radius: 0;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.listing-card:hover .listing-image {
+  transform: scale(1.04);
 }
 
 .listing-badge {
@@ -49,6 +65,14 @@
   background: var(--white);
   color: var(--coral);
   cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+
+.listing-heart:hover {
+  transform: scale(1.08);
+  background: var(--coral-tint);
 }
 
 .listing-body {
@@ -76,4 +100,25 @@
 .listing-price span {
   color: var(--ink);
   font-weight: 700;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+  .listings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .listings-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .listing-media {
+    height: 240px;
+  }
 }

@@ -1,4 +1,6 @@
 .stats {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-3);
@@ -10,6 +12,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  min-width: 0;
   padding: var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--space-2);
@@ -25,7 +28,13 @@
 .stat-card span {
   color: var(--gray);
   font-size: 14px;
+  text-align: center;
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media (max-width: 600px) {
   .stats {
     gap: var(--space-1);
@@ -43,9 +52,4 @@
   .stat-card span {
     font-size: 12px;
   }
-}
-.stats {
-  position: relative;
-  z-index: 2;
-  margin-top: -80px;
 }

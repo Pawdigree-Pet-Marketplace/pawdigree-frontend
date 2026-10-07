@@ -24,15 +24,19 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  animation: heroImageReveal 1.4s ease-out both;
 }
 
-/* fades the photo into the page color behind the headline */
-.hero-photo .hero-photo-fill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+@keyframes heroImageReveal {
+  from {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .hero-search {
@@ -43,7 +47,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  width: min(640px, 100% - var(--space-8));
+  width: min(640px, calc(100% - var(--space-8)));
   padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2);
   transform: translateX(-50%);
   border-radius: var(--space-3);
@@ -54,6 +58,7 @@
 
 .hero-search input {
   flex: 1;
+  min-width: 0;
   border: 0;
   outline: 0;
   background: transparent;
@@ -62,6 +67,7 @@
 
 .hero-search button {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   width: var(--space-6);
   height: var(--space-6);
@@ -75,11 +81,12 @@
 .hero-content {
   position: absolute;
   right: 0;
-  bottom: var(--space-6);
+  bottom: var(--space-8);
   left: 0;
-  z-index: 1;
+  z-index: 2;
   max-width: 720px;
   margin-inline: auto;
+  padding-inline: var(--space-2);
   text-align: center;
 }
 
@@ -102,7 +109,10 @@
 }
 
 .hero-content .hero-login {
+  position: relative;
+  z-index: 2;
   margin: var(--space-2) 0 0;
+  color: var(--gray);
   font-size: 16px;
 }
 
@@ -111,6 +121,10 @@
   font-weight: 700;
   text-decoration: none;
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 900px) {
   .hero {
@@ -145,9 +159,40 @@
 
   .hero-content h1 {
     font-size: 34px;
+    line-height: 1.2;
   }
 
   .hero-content p {
     font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .hero-content .hero-login {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero {
+    min-height: 600px;
+  }
+
+  .hero-search {
+    gap: var(--space-1);
+    width: calc(100% - var(--space-3));
+  }
+
+  .hero-content h1 {
+    font-size: 30px;
+  }
+
+  .hero-content p {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-photo .hero-photo-fill {
+    animation: none;
   }
 }
