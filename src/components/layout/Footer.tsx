@@ -1,5 +1,4 @@
 import useScrollReveal from '../../hooks/useScrollReveal'
-import logo from '../../assets/logo.png'
 import './Footer.css'
 
 export default function Footer() {
@@ -12,7 +11,7 @@ export default function Footer() {
           <div className="footer-brand reveal">
             <a href="/" className="footer-logo-link" aria-label="Pawdigree home">
               <img
-                src={logo}
+                src="/src/assets/logos/lightmode-logo.png"
                 alt="Pawdigree"
                 className="footer-logo"
               />
