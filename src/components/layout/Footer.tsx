@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="footer-brand reveal">
             <a href="/" className="footer-logo-link" aria-label="Pawdigree home">
               <img
-                src="/src/assets/logo.png"
+                src="/src/assets/logos/lightmode-logo.png"
                 alt="Pawdigree"
                 className="footer-logo"
               />
