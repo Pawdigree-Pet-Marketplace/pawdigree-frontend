@@ -1,4 +1,5 @@
 import useScrollReveal from '../../hooks/useScrollReveal'
+import logo from '../../assets/logo.png'
 import './Footer.css'
 
 export default function Footer() {
