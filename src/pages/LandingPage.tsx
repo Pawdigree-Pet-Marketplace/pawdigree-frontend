@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Adoption from "../components/home/Adoption";
 import Footer from "../components/layout/Footer";
 import Categories from "../components/home/Categories";
@@ -17,13 +17,7 @@ import BottomNavbar from "../components/navigation/BottomNavbar/BottomNavbar";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // This makes it switch between Logged In / Logged Out
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
+  const isLoggedIn = !!localStorage.getItem("token");
 
   return (
     <>
