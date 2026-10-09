@@ -39,7 +39,7 @@ function CustomerRegistration() {
     <main className="registration-page">
       <section className="registration-card">
         <div className="registration-header">
-          <div className="paw-logo">🐾</div>
+          <div className="paw-logo"><a href="C:\Users\Asus\pawdigree-frontend\src\assets"></a></div>
 
           <h1>Join Pawdigree</h1>
 

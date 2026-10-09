@@ -1,29 +1,25 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import "./CustomerLogin.css";
-
 function CustomerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  function handleSubmit(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
 
     console.log({
       email,
       password,
       rememberMe,
-    });
-
+    })
     alert("Login successful!");
-  };
-
+  }
   return (
-    <main className="login-page">
+        <main className="login-page">
       <section className="login-card">
         <div className="login-header">
-          <div className="paw-logo">🐾</div>
+          <div className="paw-logo"><a href="C:\Users\Asus\pawdigree-frontend\src\assets"></a></div>
 
           <h1>Welcome Back</h1>
 

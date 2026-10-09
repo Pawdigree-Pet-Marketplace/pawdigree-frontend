@@ -1,19 +1,41 @@
-import { render, screen } from '@testing-library/react'
+import { flushSync } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { describe, expect, test } from 'vitest'
 import RegistrationPage from '../pages/RegistrationPage'
 
 describe('Customer Registration Page', () => {
   test('renders the registration form', () => {
-    render(<RegistrationPage />)
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
 
-    expect(screen.getByText('Create your account')).toBeInTheDocument()
-    expect(screen.getByLabelText('Full name')).toBeInTheDocument()
-    expect(screen.getByLabelText('Email address')).toBeInTheDocument()
-    expect(screen.getByLabelText('Phone number')).toBeInTheDocument()
-    expect(screen.getByLabelText('Password')).toBeInTheDocument()
-    expect(screen.getByLabelText('Confirm password')).toBeInTheDocument()
+    flushSync(() => root.render(<RegistrationPage />))
+
+    const getByText = (text: string) =>
+      Array.from(container.querySelectorAll('*')).find(
+        (element) => element.textContent?.trim() === text,
+      )
+    const getByLabelText = (text: string) => {
+      const label = Array.from(container.querySelectorAll('label')).find(
+        (element) => element.textContent?.trim() === text,
+      )
+      return label?.htmlFor
+        ? container.querySelector(`#${CSS.escape(label.htmlFor)}`)
+        : label?.querySelector('input, textarea, select')
+    }
+
+    expect(getByText('Create your account')).toBeTruthy()
+    expect(getByLabelText('Full name')).toBeTruthy()
+    expect(getByLabelText('Email address')).toBeTruthy()
+    expect(getByLabelText('Phone number')).toBeTruthy()
+    expect(getByLabelText('Password')).toBeTruthy()
+    expect(getByLabelText('Confirm password')).toBeTruthy()
     expect(
-      screen.getByRole('button', { name: 'Create account' }),
-    ).toBeInTheDocument()
+      container.querySelector('button')?.textContent?.trim() ===
+        'Create account',
+    ).toBeTruthy()
+
+    root.unmount()
+    container.remove()
   })
 })
