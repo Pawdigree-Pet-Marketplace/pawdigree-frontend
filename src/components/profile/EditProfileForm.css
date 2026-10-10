@@ -1,0 +1,108 @@
+.edit-form {
+  --danger: #a63d22;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.edit-field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.edit-field label {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.edit-field input {
+  width: 100%;
+  padding: 14px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--space-2);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.edit-field input:focus {
+  border-color: var(--teal);
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+.edit-field input.has-error {
+  border-color: var(--danger);
+}
+
+.edit-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.edit-cancel,
+.edit-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.edit-cancel {
+  background: var(--sand);
+  color: var(--ink);
+}
+
+.edit-save {
+  background: var(--teal);
+  color: var(--white);
+}
+
+.edit-cancel:hover,
+.edit-save:hover {
+  filter: brightness(0.95);
+}
+
+@media (max-width: 600px) {
+  .edit-actions {
+    flex-direction: column-reverse;
+  }
+}
+.phone-input-group {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.9fr) minmax(0, 1.4fr);
+  gap: 8px;
+}
+
+.phone-input-group select,
+.phone-input-group input {
+  width: 100%;
+  min-width: 0;
+}
+
+.phone-help {
+  margin: 6px 0 0;
+  color: var(--gray, #6f7371);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .phone-input-group {
+    grid-template-columns: 1fr;
+  }
+}

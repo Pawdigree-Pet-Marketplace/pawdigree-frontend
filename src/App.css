@@ -166,3 +166,70 @@ flex-direction: column;
 padding: 10px;
 }
 }
+
+.registration-phone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.registration-phone-row select,
+.registration-phone-row input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 380px) {
+  .registration-phone-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 6px;
+  }
+}
+
+/* Registration form validation — consistent with Edit Profile */
+.form-group input.has-error,
+.form-group select.has-error {
+  border-color: #a63d22;
+}
+
+.form-group input.has-error:focus,
+.form-group select.has-error:focus {
+  outline: 2px solid #a63d22;
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+.field-error {
+  margin: 0;
+  color: #a63d22;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.form-group small {
+  color: var(--gray, #6f7371);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.registration-phone-row select {
+  padding: 13px 10px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background-color: var(--white);
+  color: var(--charcoal);
+  font-size: 14px;
+}
+
+.registration-phone-row select:focus {
+  border-color: var(--teal);
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+.registration-phone-row input.has-error {
+  border-color: #a63d22;
+}
