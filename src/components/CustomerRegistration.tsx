@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import "./CustomerRegistration.css";
-import logo from ".src\assets/log.png";
+import logo from "../assets/log.png";
 function CustomerRegistration() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
