@@ -27,9 +27,10 @@
   margin-bottom: 30px;
 }
 
-.paw-logo {
-  font-size: 42px;
-  margin-bottom: 10px;
+.logo img {
+  width: 150px;
+  height: auto;
+  display: block;
 }
 
 .registration-header h1 {

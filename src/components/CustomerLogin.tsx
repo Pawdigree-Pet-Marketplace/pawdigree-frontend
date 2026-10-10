@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import "./CustomerLogin.css";
+import logo from "./assets/log.png";
 function CustomerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -8,7 +9,7 @@ function CustomerLogin() {
   function handleSubmit(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
 
-    console.log({
+    console.log({ 
       email,
       password,
       rememberMe,
@@ -19,7 +20,11 @@ function CustomerLogin() {
         <main className="login-page">
       <section className="login-card">
         <div className="login-header">
-          <div className="paw-logo"><a href="C:\Users\Asus\pawdigree-frontend\src\assets"></a></div>
+<div className="logo">
+  <a href="/">
+    <img src={logo} alt="Pawdigree Logo" />
+  </a>
+</div>
 
           <h1>Welcome Back</h1>
 

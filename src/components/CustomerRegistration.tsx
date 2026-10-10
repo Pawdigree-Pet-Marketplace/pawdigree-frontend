@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import "./CustomerRegistration.css";
+import logo from "./assets/log.png";
 function CustomerRegistration() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -39,7 +40,11 @@ function CustomerRegistration() {
     <main className="registration-page">
       <section className="registration-card">
         <div className="registration-header">
-          <div className="paw-logo"><a href="C:\Users\Asus\pawdigree-frontend\src\assets"></a></div>
+<div className="logo">
+  <a href="/">
+    <img src={logo} alt="Pawdigree Logo" />
+  </a>
+</div>
 
           <h1>Join Pawdigree</h1>
 
