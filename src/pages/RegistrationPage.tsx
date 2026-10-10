@@ -129,10 +129,23 @@ export default function RegistrationPage() {
 
     const parsedPhone = parsePhoneNumber(cleanedPhone, country)
 
-    const {
-      confirmPassword: _confirmPassword,
-      ...accountFields
-    } = formData
+   const {
+  username,
+  first_name,
+  last_name,
+  email,
+  phone,
+  password,
+} = formData
+
+const accountFields = {
+  username,
+  first_name,
+  last_name,
+  email,
+  phone,
+  password,
+}
 
     const registrationData = {
       ...accountFields,
