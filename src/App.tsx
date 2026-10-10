@@ -1,14 +1,12 @@
-import LandingPage from './pages/LandingPage'
-import RegistrationPage from './pages/RegistrationPage'
+import LandingPage from "./pages/LandingPage";
+import RegistrationPage from "./pages/RegistrationPage";
 
 function App() {
-  const path = window.location.pathname
-
-  if (path === '/registration') {
-    return <RegistrationPage />
+  const path = window.location.pathname;
+  if (path === "/registration") {
+    return <RegistrationPage />;
   }
-
-  return <LandingPage />
+  return <LandingPage />;
 }
 
-export default App
+export default App;
