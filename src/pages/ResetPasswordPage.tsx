@@ -17,7 +17,8 @@ const ResetPasswordPage = () => {
       { ok: /[a-z]/.test(newPassword), text: "At least one lowercase letter" },
       { ok: /[0-9]/.test(newPassword), text: "At least one number" },
       {
-        ok: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword),
+        // FIXED: replaced complex escaped regex with simple symbol check (no useless escapes)
+        ok: /[^A-Za-z0-9]/.test(newPassword),
         text: "At least one symbol (!@#$...)",
       },
     ];
@@ -65,18 +66,17 @@ const ResetPasswordPage = () => {
       const token = params.get("token");
       console.log("Reset token:", token);
 
-      // TODO: Replace with real API call
-      // const res = await fetch('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) })
-      // if (!res.ok) throw new Error((await res.json()).message)
-
       await new Promise((r) => setTimeout(r, 1000));
       setSuccess(
         "Password reset successfully! You can now log in with your new password.",
       );
-    } catch (err: any) {
-      setError(
-        err?.message || "Failed to reset password. Link may be expired.",
-      );
+    } catch (err: unknown) {
+      // FIXED: no `any`
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to reset password. Link may be expired.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -85,28 +85,28 @@ const ResetPasswordPage = () => {
   return (
     <div className="registration-page">
       <style>{`
-       .registration-form input:focus {
+      .registration-form input:focus {
           box-shadow: none!important;
           outline: none!important;
         }
         @media (max-width: 480px) {
-         .registration-card {
+        .registration-card {
             width: 92%!important;
             margin: 20px auto!important;
             padding: 20px!important;
           }
-         .registration-form input {
+        .registration-form input {
             font-size: 16px!important;
             height: 48px!important;
           }
-         .registration-form input::placeholder {
+        .registration-form input::placeholder {
             font-size: 14px!important;
           }
-         .register-button {
+        .register-button {
             height: 48px!important;
             font-size: 15px!important;
           }
-         .registration-header h1 {
+        .registration-header h1 {
             font-size: 22px!important;
           }
         }
@@ -190,7 +190,6 @@ const ResetPasswordPage = () => {
                 </span>
               </div>
 
-              {/* ONLY UNMET CONDITIONS */}
               {newPassword && !allConditionsMet && (
                 <div
                   style={{
@@ -218,7 +217,6 @@ const ResetPasswordPage = () => {
                 </div>
               )}
 
-              {/* ONLY WHEN ALL MET */}
               {allConditionsMet && (
                 <div
                   style={{
