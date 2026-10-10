@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import "./CustomerLogin.css";
-import logo from ".Julie/pawdigree-frontend/src/assets/log.png";
+import logo from ".C:\Users\Asus\pawdigree-frontend\src\assets/log.png";
 function CustomerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
