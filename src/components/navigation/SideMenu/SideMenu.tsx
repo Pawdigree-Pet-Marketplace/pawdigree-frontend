@@ -1,7 +1,8 @@
-import logo from "../../../assets/logos/lightmode-logo.png";
+import { useState } from "react";
+import logo from "../../../assets/logos/lightmode-logo.svg";
 import {
   X,
-  User,
+  UserRound,
   MessageCircle,
   Bell,
   Heart,
@@ -11,6 +12,7 @@ import {
   Store,
   Package,
 } from "lucide-react";
+import { ConfirmLogout } from "../../layout/ConfirmLogout";
 import "./Sidemenu.css";
 
 type SideMenuProps = {
@@ -21,17 +23,22 @@ type SideMenuProps = {
 };
 
 const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
+  const [showLogout, setShowLogout] = useState(false);
+
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Charcoal overlay */}
       <div className="sidemenu-overlay" onClick={onClose} />
 
-      {/* Drawer - 82% width */}
       <aside className="side-menu">
         <div className="sidemenu-header">
-          <img src={logo} alt="Pawdigree" className="sidemenu-logo-img" />
+          <img
+            src={logo}
+            style={{ width: "160px" }}
+            alt="Pawdigree"
+            className="sidemenu-logo-img"
+          />
           <button className="close-btn" onClick={onClose}>
             <X size={22} />
           </button>
@@ -59,10 +66,10 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
               <div className="sidemenu-auth">
                 <button className="login-btn-full">Log In</button>
                 <button
-                   className="signup-btn-full"
-                   onClick={() => {
-                     window.location.href = '/registration'
-                    }}
+                  className="signup-btn-full"
+                  onClick={() => {
+                    window.location.href = "/registration";
+                  }}
                 >
                   Sign Up
                 </button>
@@ -71,7 +78,7 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
           ) : (
             <>
               <a href="#" className="sidemenu-item">
-                <User size={18} /> Profile
+                <UserRound size={18} /> Profile
               </a>
               <a href="#" className="sidemenu-item">
                 <MessageCircle size={18} /> Messages
@@ -95,12 +102,20 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
               <a href="#" className="sidemenu-item">
                 <HelpCircle size={18} /> Help Center
               </a>
-              <a href="#" className="sidemenu-item logout">
+              <button
+                className="sidemenu-item logout"
+                onClick={() => setShowLogout(true)}
+              >
                 <LogOut size={18} /> Log Out
-              </a>
+              </button>
             </>
           )}
         </div>
+
+        <ConfirmLogout
+          isOpen={showLogout}
+          onClose={() => setShowLogout(false)}
+        />
       </aside>
     </>
   );
