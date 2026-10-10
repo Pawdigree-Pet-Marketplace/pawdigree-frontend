@@ -55,7 +55,8 @@
   color: var(--charcoal);
 }
 
-.form-group input {
+.form-group input,
+.registration-phone-row select {
   width: 100%;
   padding: 13px 14px;
   border: 1px solid #d8d8d8;
@@ -63,9 +64,11 @@
   outline: none;
   background-color: var(--white);
   color: var(--charcoal);
+  box-sizing: border-box;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.registration-phone-row select:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
 }
@@ -75,9 +78,7 @@
   gap: 8px;
 }
 
-.password-field input {
-  flex: 1;
-}
+.password-field input { flex: 1; }
 
 .password-field button {
   padding: 0 16px;
@@ -111,7 +112,6 @@
 }
 
 .form-error {
-  margin: 0;
   padding: 12px 14px;
   border-radius: 10px;
   background-color: #fff0ed;
@@ -120,13 +120,35 @@
 }
 
 .form-success {
-  margin: 0;
   padding: 12px 14px;
   border-radius: 10px;
   background-color: #e8f5f1;
   color: var(--teal);
   font-weight: 600;
   text-align: center;
+}
+
+/* validation - consistent with Edit Profile */
+.form-group input.has-error,
+.form-group select.has-error {
+  border-color: #a63d22;
+}
+
+.field-error {
+  color: #a63d22;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group small {
+  color: var(--gray, #6f7371);
+  font-size: 13px;
+}
+
+.registration-phone-row {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 10px;
 }
 
 .login-link {
@@ -141,74 +163,20 @@
   text-decoration: none;
 }
 
-.login-link a:hover {
-  text-decoration: underline;
-}
-
-
 @media (max-width: 600px) {
   .registration-page {
     padding: 12px;
     align-items: flex-start;
     min-height: 100dvh;
   }
-
   .registration-card {
-    width: 100%;
-    max-width: 100%;
-    margin: 16px auto;
-    padding: 20px 16px !important;
+    padding: 20px 16px;
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(44, 48, 47, 0.06);
   }
-
-  .registration-header {
-    margin-bottom: 20px;
-  }
-
-  .registration-header h1 {
-    font-size: 1.45rem !important;
-    line-height: 1.2;
-  }
-
-  .registration-header p {
-    font-size: 0.9rem !important;
-  }
-
-  .registration-form {
-    gap: 14px !important;
-  }
-
-  .form-group {
+  .registration-header h1 { font-size: 1.45rem; }
+  .password-field { flex-direction: column; }
+  .registration-phone-row {
+    grid-template-columns: 1fr 1.2fr;
     gap: 6px;
-  }
-
-  .form-group label {
-    font-size: 0.85rem;
-  }
-
-  .form-group input {
-    padding: 10px 12px !important;
-    font-size: 0.9rem !important;
-    height: 42px;
-  }
-
-  .password-field {
-    flex-direction: column;
-  }
-
-  .password-field button {
-    padding: 10px;
-    font-size: 0.85rem;
-  }
-
-  .register-button {
-    padding: 11px !important;
-    font-size: 0.95rem !important;
-    margin-top: 4px;
-  }
-
-  .login-link, .form-error, .form-success {
-    font-size: 0.85rem;
   }
 }
