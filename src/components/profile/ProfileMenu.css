@@ -1,0 +1,49 @@
+.profile-menu {
+  margin: 0;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--space-3);
+  background: var(--white);
+  list-style: none;
+}
+
+.profile-menu li + li {
+  border-top: 1px solid var(--border);
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.profile-menu-item span {
+  flex: 1;
+}
+
+.profile-menu-icon {
+  flex-shrink: 0;
+  color: var(--teal);
+}
+
+.profile-menu-chevron {
+  color: var(--gray);
+}
+
+.profile-menu-item:hover {
+  color: var(--teal);
+}
+
+/* tablet and phone: plain list with dividers, like the mobile design */
+@media (max-width: 900px) {
+  .profile-menu {
+    padding: 0 var(--space-1);
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+}
