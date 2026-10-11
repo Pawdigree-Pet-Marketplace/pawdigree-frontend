@@ -36,7 +36,7 @@ function AdminAdd() {
         <header className="admin-header">
           <div className="admin-heading">
             <div className="admin-breadcrumb">
-              Admin / Admin Management / Admins / Add
+              Admin Management / Admins 
             </div>
             <h1>Add Admin</h1>
           </div>
