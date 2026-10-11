@@ -35,7 +35,14 @@ const TopNavbar = ({
       <div className="desktop-actions">
         {!isLoggedIn ? (
           <>
-            <Button variant="primary">Log In</Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                window.location.href = "/customer-login";
+              }}
+            >
+              Log In
+            </Button>
             <Button
               variant="secondary"
               onClick={() => {

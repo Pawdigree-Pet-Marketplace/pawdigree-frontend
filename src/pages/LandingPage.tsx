@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Adoption from "../components/home/Adoption";
 import Footer from "../components/layout/Footer";
 import Categories from "../components/home/Categories";
@@ -17,7 +17,24 @@ import BottomNavbar from "../components/navigation/BottomNavbar/BottomNavbar";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isLoggedIn = !!localStorage.getItem("token");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    window.addEventListener("focus", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("focus", checkAuth);
+    };
+  }, []);
 
   return (
     <>
@@ -35,7 +52,7 @@ export default function LandingPage() {
       />
 
       <main>
-        <Hero />
+        <Hero isLoggedIn={isLoggedIn} />
         <Stats />
         <Categories />
         <Merchandise />
@@ -44,7 +61,7 @@ export default function LandingPage() {
         <Adoption />
         <Services />
         <Testimonials />
-        <CtaBanner />
+        <CtaBanner isLoggedIn={isLoggedIn} />
       </main>
 
       <Footer />

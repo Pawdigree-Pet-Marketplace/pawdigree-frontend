@@ -3,6 +3,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
+import CustomerLoginPage from "./pages/CustomerLoginPage";
 
 function App() {
   const path = window.location.pathname;
@@ -21,6 +22,10 @@ function App() {
 
   if (path === "/profile/edit") {
     return <EditProfilePage />;
+  }
+
+  if (path === "/login" || path === "/customer-login") {
+    return <CustomerLoginPage />;
   }
 
   return <LandingPage />;
