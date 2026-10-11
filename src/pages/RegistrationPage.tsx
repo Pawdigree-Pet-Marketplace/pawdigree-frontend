@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import type { FocusEvent, FormEvent } from 'react'
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js'
 import '../App.css'
+import { apiRequest } from '../services/api'
 
 const countries = [
   { code: 'UG', name: 'Uganda', dialCode: '+256' },
@@ -53,6 +54,8 @@ export default function RegistrationPage() {
   >({})
   const [submitted, setSubmitted] = useState(false)
   const [success, setSuccess] = useState('')
+  const [apiError, setApiError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -106,6 +109,7 @@ export default function RegistrationPage() {
   const updateField = (name: RegistrationField, value: string) => {
     setFormData((current) => ({ ...current, [name]: value }))
     setSuccess('')
+    setApiError('')
   }
 
   const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
@@ -113,10 +117,11 @@ export default function RegistrationPage() {
     setTouched((current) => ({ ...current, [name]: true }))
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitted(true)
     setSuccess('')
+    setApiError('')
 
     const firstInvalid = fieldOrder.find((field) => errors[field])
 
@@ -129,36 +134,53 @@ export default function RegistrationPage() {
 
     const parsedPhone = parsePhoneNumber(cleanedPhone, country)
 
-   const {
-  username,
-  first_name,
-  last_name,
-  email,
-  phone,
-  password,
-} = formData
-
-const accountFields = {
-  username,
-  first_name,
-  last_name,
-  email,
-  phone,
-  password,
-}
+    if (!parsedPhone) {
+      setApiError('Please enter a valid phone number.')
+      return
+    }
 
     const registrationData = {
-      ...accountFields,
       username: trimmedUsername,
       first_name: formData.first_name.trim(),
       last_name: formData.last_name.trim(),
       email: formData.email.trim(),
       phone: parsedPhone.number,
+      password: formData.password,
     }
 
-    // Temporary mock until the registration API is connected.
-    console.log('Registration data:', registrationData)
-    setSuccess('Form validated successfully! Backend registration is not connected yet.')
+    setIsSubmitting(true)
+
+    try {
+      await apiRequest('/auth/register/customer/', {
+        method: 'POST',
+        body: JSON.stringify(registrationData),
+      })
+
+      setSuccess(
+        'Your account was created successfully! You can now log in.',
+      )
+
+      setFormData({
+        first_name: '',
+        last_name: '',
+        username: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+      })
+
+      setTouched({})
+      setSubmitted(false)
+    } catch (error) {
+      setApiError(
+        error instanceof Error
+          ? error.message
+          : 'Registration failed. Please try again.',
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -178,6 +200,12 @@ const accountFields = {
           {success && (
             <p className="form-success" role="status">
               {success}
+            </p>
+          )}
+
+          {apiError && (
+            <p className="field-error" role="alert">
+              {apiError}
             </p>
           )}
 
@@ -207,6 +235,7 @@ const accountFields = {
                   : undefined
               }
             />
+
             {(touched.first_name || submitted) && errors.first_name && (
               <p id="first_name-error" className="field-error" role="alert">
                 {errors.first_name}
@@ -240,6 +269,7 @@ const accountFields = {
                   : undefined
               }
             />
+
             {(touched.last_name || submitted) && errors.last_name && (
               <p id="last_name-error" className="field-error" role="alert">
                 {errors.last_name}
@@ -273,6 +303,7 @@ const accountFields = {
                   : 'username-help'
               }
             />
+
             {(touched.username || submitted) && errors.username ? (
               <p id="username-error" className="field-error" role="alert">
                 {errors.username}
@@ -308,6 +339,7 @@ const accountFields = {
                   : undefined
               }
             />
+
             {(touched.email || submitted) && errors.email && (
               <p id="email-error" className="field-error" role="alert">
                 {errors.email}
@@ -327,6 +359,7 @@ const accountFields = {
                   setCountry(e.target.value as SupportedCountry)
                   setTouched((current) => ({ ...current, phone: true }))
                   setSuccess('')
+                  setApiError('')
                 }}
                 aria-label="Country calling code"
               >
@@ -376,6 +409,7 @@ const accountFields = {
           {/* Password */}
           <div className="form-group">
             <label htmlFor="password">Password</label>
+
             <div className="password-field">
               <input
                 id="password"
@@ -400,6 +434,7 @@ const accountFields = {
                     : undefined
                 }
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
@@ -408,6 +443,7 @@ const accountFields = {
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
+
             {(touched.password || submitted) && errors.password && (
               <p id="password-error" className="field-error" role="alert">
                 {errors.password}
@@ -418,6 +454,7 @@ const accountFields = {
           {/* Confirm password */}
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm password</label>
+
             <div className="password-field">
               <input
                 id="confirmPassword"
@@ -447,6 +484,7 @@ const accountFields = {
                     : undefined
                 }
               />
+
               <button
                 type="button"
                 onClick={() =>
@@ -461,6 +499,7 @@ const accountFields = {
                 {showConfirmPassword ? 'Hide' : 'Show'}
               </button>
             </div>
+
             {(touched.confirmPassword || submitted) &&
               errors.confirmPassword && (
                 <p
@@ -473,8 +512,12 @@ const accountFields = {
               )}
           </div>
 
-          <button type="submit" className="register-button">
-            Create account
+          <button
+            type="submit"
+            className="register-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
