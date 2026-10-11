@@ -68,9 +68,11 @@ export default function CustomerLoginPage() {
       setStep("welcome");
       return;
     }
-    window.history.length > 1
-      ? window.history.back()
-      : (window.location.href = "/");
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/";
+    }
   };
 
   const handleWelcomeLogin = () => {
@@ -89,7 +91,6 @@ export default function CustomerLoginPage() {
       return;
     }
 
-    // TODO: MOCK AUTH - Replace with real API POST /api/auth/login
     const storage = keepLoggedIn ? localStorage : sessionStorage;
     storage.setItem("token", "fake-jwt-token");
     storage.setItem("role", "CUSTOMER");
@@ -127,12 +128,10 @@ export default function CustomerLoginPage() {
         {step === "welcome" && (
           <div className="welcome-content">
             <div className="login-logo">
-              {/* FIXED: Using real imported logo */}
               <img src={logo} alt="Pawdigree logo" className="real-logo" />
             </div>
             <h1>Login</h1>
             <p className="subtitle">Log in or create an account to continue.</p>
-
             <div className="login-illustration">
               <img
                 src="/pets-illustration.svg"
@@ -140,7 +139,6 @@ export default function CustomerLoginPage() {
                 onError={(e) => (e.currentTarget.style.display = "none")}
               />
             </div>
-
             <div className="login-actions">
               <button className="btn-primary" onClick={handleWelcomeLogin}>
                 Login
@@ -152,21 +150,18 @@ export default function CustomerLoginPage() {
                 Create account
               </button>
             </div>
-
             <p className="terms">
               By continuing you agree to Pawdigree's <a href="#">T&Cs</a> and{" "}
               <a href="#">Privacy Policy</a>
             </p>
           </div>
         )}
-
         {step === "password" && (
           <form className="form-content" onSubmit={handleLogin} noValidate>
             <h2>Welcome back, {getDisplayName()}</h2>
             <p className="subtitle">
               Enter your password to log in to your account.
             </p>
-
             <div className="field">
               <label>
                 {isPhoneMode ? "Phone" : "Email"}
@@ -182,7 +177,6 @@ export default function CustomerLoginPage() {
                   {isPhoneMode ? "(or email)" : "(or phone)"}
                 </button>
               </label>
-
               <div className="email-row">
                 {isEditing ? (
                   <input
@@ -238,7 +232,6 @@ export default function CustomerLoginPage() {
                 <span className="err">{errors.identifier}</span>
               )}
             </div>
-
             <div className="field">
               <label>Password</label>
               <div className="password-wrap">
@@ -261,7 +254,6 @@ export default function CustomerLoginPage() {
                 <span className="err">{errors.password}</span>
               )}
             </div>
-
             <div className="form-row">
               <label className="check">
                 <input
@@ -275,15 +267,12 @@ export default function CustomerLoginPage() {
                 Forgot password?
               </a>
             </div>
-
             <button type="submit" className="btn-primary full">
               Login
             </button>
-
             <div className="divider">
               <span>or</span>
             </div>
-
             <button
               type="button"
               className="btn-outline full"
@@ -294,13 +283,11 @@ export default function CustomerLoginPage() {
             >
               Log in with phone code
             </button>
-
             <p className="bottom-link">
               Don't have an account? <a href="/registration">Create account</a>
             </p>
           </form>
         )}
-
         {step === "phone" && (
           <div className="verify-content">
             <div className="verify-box">
@@ -335,7 +322,6 @@ export default function CustomerLoginPage() {
               className="btn-primary full"
               onClick={() => {
                 if (otp.join("").length === 6) {
-                  // TODO: Replace with real OTP verification API
                   localStorage.setItem("token", "fake-jwt-token");
                   window.location.href = "/";
                 }
