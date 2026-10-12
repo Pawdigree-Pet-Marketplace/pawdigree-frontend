@@ -1,5 +1,13 @@
-import logo from "../../../assets/logo.png";
-import { Heart, ShoppingBag, Bell, MessageCircle, Menu, X } from "lucide-react";
+import logo from "../../../assets/logos/lightmode-logo.svg";
+import {
+  Heart,
+  ShoppingCart,
+  Bell,
+  MessageCircle,
+  UserRound,
+  Menu,
+  X,
+} from "lucide-react";
 import Button from "../../Button/Button";
 import "./TopNavbar.css";
 
@@ -18,31 +26,39 @@ const TopNavbar = ({
     <header className="top-navbar">
       <img src={logo} alt="Pawdigree" className="logo-img" />
       <nav className="desktop-links">
-        <a href="#">Browse Pets</a>
-        <a href="#">Services</a>
-        <a href="#">Merchandise</a>
+        <a href="#pets">Browse Pets</a>
+        <a href="#services">Services</a>
+        <a href="#merchandise">Merchandise</a>
         <a href="#">Become a Seller</a>
         <a href="#">Help Center</a>
       </nav>
       <div className="desktop-actions">
         {!isLoggedIn ? (
           <>
-            <Button variant="primary">Log In</Button>
             <Button
-                 variant="secondary"
-                 onClick={() => {
-                 window.location.href = '/registration'
-  }}
->
-  Sign Up
-</Button>
+              variant="primary"
+              onClick={() => {
+                window.location.href = "/customer-login";
+              }}
+            >
+              Log In
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                window.location.href = "/registration";
+              }}
+            >
+              Sign Up
+            </Button>
           </>
         ) : (
           <div className="topnav-icons">
-            <Heart size={20} strokeWidth={1.8} />
-            <ShoppingBag size={20} strokeWidth={1.8} />
-            <Bell size={20} strokeWidth={1.8} />
-            <MessageCircle size={20} strokeWidth={1.8} />
+            <Heart size={22} strokeWidth={1.6} />
+            <ShoppingCart size={22} strokeWidth={1.6} />
+            <Bell size={22} strokeWidth={1.6} />
+            <MessageCircle size={22} strokeWidth={1.6} />
+            <UserRound size={22} strokeWidth={1.6} />
           </div>
         )}
         <button

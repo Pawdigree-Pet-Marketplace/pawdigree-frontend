@@ -1,19 +1,14 @@
-import LandingPage from "./pages/LandingPage";
-import RegistrationPage from "./pages/RegistrationPage";
-import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
+import LandingPage from './pages/LandingPage'
+import RegistrationPage from './pages/RegistrationPage'
 
 function App() {
-  const path = window.location.pathname;
-
-  if (path === "/vendor-registration") {
-    return <VendorRegistrationForm />;
-  }
+  const path = window.location.pathname
 
   if (path === "/registration") {
     return <RegistrationPage />;
   }
 
-  return <LandingPage />;
+  return <LandingPage />
 }
 
-export default App;
+export default App
