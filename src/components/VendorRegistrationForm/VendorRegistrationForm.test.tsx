@@ -35,18 +35,26 @@ describe("Vendor Registration Form", () => {
     ).toBeInTheDocument();
   });
 
-  test("renders business information fields", () => {
+  test("does not render business information fields", () => {
     render(<VendorRegistrationForm />);
 
-    expect(screen.getByLabelText(/^Business Name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Business Type/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Business Name/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Business Type/i)).not.toBeInTheDocument();
     expect(
-      screen.getByLabelText(/^Business Description/i)
-    ).toBeInTheDocument();
+      screen.queryByLabelText(/^Business Description/i)
+    ).not.toBeInTheDocument();
     expect(
-      screen.getByLabelText(/^Business Address/i)
+      screen.queryByLabelText(/^Business Address/i)
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^District/i)).not.toBeInTheDocument();
+  });
+
+  test("renders the terms acceptance checkbox", () => {
+    render(<VendorRegistrationForm />);
+
+    expect(
+      screen.getByRole("checkbox")
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/^District/i)).toBeInTheDocument();
   });
 
   test("renders the vendor account submit button", () => {
