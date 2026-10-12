@@ -1,10 +1,14 @@
-import heroimage from '../../assets/images/heroimage.jpg'
-import { FilterIcon, SearchIcon } from '../icons'
-import useScrollReveal from '../../hooks/useScrollReveal'
-import './Hero.css'
+import heroimage from "../../assets/images/heroimage.jpg";
+import { FilterIcon, SearchIcon } from "../icons";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "./Hero.css";
 
-export default function Hero() {
-  const contentRef = useScrollReveal<HTMLDivElement>()
+type HeroProps = {
+  isLoggedIn?: boolean;
+};
+
+export default function Hero({ isLoggedIn = false }: HeroProps) {
+  const contentRef = useScrollReveal<HTMLDivElement>();
 
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -32,24 +36,40 @@ export default function Hero() {
         </button>
       </form>
 
-    <div ref={contentRef} className="hero-content">
-  <h1 id="hero-title" className="reveal">
-    Find your next pet from <span>verified sellers</span> near you
-  </h1>
+      <div ref={contentRef} className="hero-content">
+        <h1 id="hero-title" className="reveal">
+          Find your next pet from <span>verified sellers</span> near you
+        </h1>
 
-  <p className="reveal reveal-delay-1">
-    Browse, adopt, buy and book care from verified vendors across Uganda,
-    all in one place.
-  </p>
+        <p className="reveal reveal-delay-1">
+          Browse, adopt, buy and book care from verified vendors across Uganda,
+          all in one place.
+        </p>
 
-  <button type="button" className="btn reveal reveal-delay-2">
-    Create Account
-  </button>
+        {!isLoggedIn ? (
+          <>
+            <button
+              type="button"
+              className="btn reveal reveal-delay-2"
+              onClick={() => (window.location.href = "/registration")}
+            >
+              Create Account
+            </button>
 
-  <p className="hero-login reveal reveal-delay-3">
-    Already have an account? <a href="/login">Log In</a>
-  </p>
-</div>
+            <p className="hero-login reveal reveal-delay-3">
+              Already have an account? <a href="/customer-login">Log In</a>
+            </p>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="btn reveal reveal-delay-2"
+            onClick={() => (window.location.href = "/marketplace")}
+          >
+            Browse Pets
+          </button>
+        )}
+      </div>
     </section>
-  )
+  );
 }

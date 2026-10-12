@@ -1,20 +1,21 @@
-import useScrollReveal from '../../hooks/useScrollReveal'
-import './Footer.css'
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "./Footer.css";
+import darkLogo from "../../assets/logos/darkmode-logo.svg";
 
 export default function Footer() {
-  const footerRef = useScrollReveal<HTMLDivElement>()
+  const footerRef = useScrollReveal<HTMLDivElement>();
 
   return (
     <footer className="footer">
       <div className="container footer-inner" ref={footerRef}>
         <div className="footer-main">
           <div className="footer-brand reveal">
-            <a href="/" className="footer-logo-link" aria-label="Pawdigree home">
-              <img
-                src="/src/assets/logo.png"
-                alt="Pawdigree"
-                className="footer-logo"
-              />
+            <a
+              href="/"
+              className="footer-logo-link"
+              aria-label="Pawdigree home"
+            >
+              <img src={darkLogo} alt="Pawdigree" className="footer-logo" />
             </a>
 
             <p>
@@ -57,5 +58,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }
