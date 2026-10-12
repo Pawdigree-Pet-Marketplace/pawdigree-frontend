@@ -4,9 +4,14 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
+import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
 
 function App() {
   const path = window.location.pathname;
+
+  if (path === "/vendor-registration") {
+    return <VendorRegistrationForm />;
+  }
 
   if (path === "/registration") {
     return <RegistrationPage />;
