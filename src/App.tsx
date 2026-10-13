@@ -5,18 +5,23 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
-
+import AdminAdd from "./pages/AdminAdd";
 function App() {
   const path = window.location.pathname;
+
+  if (path === "/admin/add") {
+    return <AdminAdd />;
+  }
 
   if (path === "/vendor-registration") {
     return <VendorRegistrationForm />;
   }
-
+    if (path === "/vendor-registration") {
+    return <VendorRegistrationForm />;
+  }
   if (path === "/registration") {
     return <RegistrationPage />;
   }
-
   if (path.startsWith("/reset-password")) {
     return <ResetPasswordPage />;
   }
