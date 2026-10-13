@@ -1,0 +1,96 @@
+.profile-page {
+  --danger: #a63d22;
+  padding-block: var(--space-6) var(--space-10);
+}
+
+.profile-title {
+  margin: 0 0 var(--space-4);
+  color: var(--ink);
+  font-size: 32px;
+}
+
+/* desktop: details card on the left, menu on the right */
+.profile-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 440px) 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.profile-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.profile-logout {
+  width: 100%;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: 999px;
+  background: var(--coral-tint);
+  color: var(--danger);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.profile-logout:hover {
+  background: var(--coral-soft);
+}
+
+/* edit page */
+.edit-wrap {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.edit-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  color: var(--teal);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.edit-back:hover {
+  text-decoration: underline;
+}
+
+.edit-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--space-3);
+  background: var(--white);
+}
+
+@media (max-width: 900px) {
+  .profile-page {
+    padding-block: var(--space-4) var(--space-8);
+  }
+
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-title {
+    margin-bottom: var(--space-3);
+    font-size: 24px;
+    text-align: center;
+  }
+}
+
+/* leave room for the floating bottom bar on phones */
+@media (max-width: 767px) {
+  .profile-page {
+    padding-bottom: 120px;
+  }
+}
+
+@media (max-width: 600px) {
+  .edit-card {
+    padding: var(--space-3) var(--space-2);
+  }
+}

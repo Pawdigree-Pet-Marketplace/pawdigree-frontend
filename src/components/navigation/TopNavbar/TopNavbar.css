@@ -2,7 +2,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 64px;
+  overflow: visible;
+  height: 72px;
   min-height: 64px;
   padding: 0 32px;
   background: var(--white);
@@ -13,7 +14,7 @@
   box-sizing: border-box;
 }
 
-.logo-img { width: 180px; height: auto; object-fit: contain; }
+.logo-img { width: auto; height: 34px; object-fit: contain; }
 
 .desktop-links { display: flex; gap: 24px; align-items: center; }
 .desktop-links a {
@@ -28,9 +29,11 @@
 
 .desktop-actions { display: flex; align-items: center; gap: 12px; }
 
-.topnav-icons { display: flex; align-items: center; gap: 16px; color: var(--charcoal); }
+.topnav-icons { display: flex; align-items: center; gap: 18px; overflow: visible; color: var(--charcoal); }
 .topnav-icons svg {
   cursor: pointer;
+  overflow: visible;
+  display: block;
   width: 20px;
   height: 20px;
   padding: 8;

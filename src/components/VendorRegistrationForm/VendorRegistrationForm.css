@@ -1,0 +1,569 @@
+/* ==========================================
+   PAWDIGREE VENDOR REGISTRATION
+   Brand colors:
+   Teal: #216C68
+   Coral: #FB8665
+   Charcoal: #2C302F
+   Cream: #F7F3E8
+========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+/* ==========================================
+   PAGE
+========================================== */
+
+.vendor-registration-form {
+  min-height: 100vh;
+  padding: 50px 20px 70px;
+  background-color: #F7F3E8;
+  background-image:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(33, 108, 104, 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(251, 134, 101, 0.10),
+      transparent 30%
+    );
+  color: #2C302F;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* Keep the page content centered and readable */
+
+.vendor-registration-form .form-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ==========================================
+   PAGE HEADING
+========================================== */
+
+.vendor-registration-form .page-heading {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.vendor-registration-form .page-heading h1 {
+  margin: 0 0 12px;
+  color: #216C68;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.vendor-registration-form .page-heading p {
+  max-width: 650px;
+  margin: 0 auto;
+  color: #626967;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* ==========================================
+   MAIN FORM CARD
+========================================== */
+
+.vendor-registration-form .form-card {
+  width: 100%;
+  padding: 38px;
+  border: 1px solid rgba(33, 108, 104, 0.12);
+  border-radius: 20px;
+  background-color: #FFFFFF;
+  box-shadow: 0 12px 35px rgba(44, 48, 47, 0.08);
+}
+
+/* ==========================================
+   FORM SECTIONS
+========================================== */
+
+.vendor-registration-form .form-section {
+  margin-bottom: 35px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #E8EDE9;
+}
+
+.vendor-registration-form .form-section:last-of-type {
+  margin-bottom: 25px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.vendor-registration-form .form-section h2 {
+  margin: 0 0 8px;
+  color: #216C68;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 500;
+}
+
+.vendor-registration-form .section-description {
+  margin: 0 0 22px;
+  color: #737A77;
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   FORM GRID
+========================================== */
+
+.vendor-registration-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.vendor-registration-form .form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vendor-registration-form .form-group.full-width,
+.vendor-registration-form .full-width {
+  grid-column: 1 / -1;
+}
+
+/* ==========================================
+   LABELS
+========================================== */
+
+.vendor-registration-form .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2C302F;
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.vendor-registration-form .required-mark {
+  color: #D95F45;
+}
+
+/* ==========================================
+   INPUTS, SELECTS AND TEXTAREAS
+========================================== */
+
+.vendor-registration-form input:not([type='checkbox']):not([type='file']),
+.vendor-registration-form select,
+.vendor-registration-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #D7DEDA;
+  border-radius: 9px;
+  outline: none;
+  background-color: #FFFFFF;
+  color: #2C302F;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.96rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.vendor-registration-form textarea {
+  min-height: 125px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.vendor-registration-form input::placeholder,
+.vendor-registration-form textarea::placeholder {
+  color: #A0A7A3;
+  opacity: 1;
+}
+
+.vendor-registration-form input:not([type='checkbox']):not([type='file']):focus,
+.vendor-registration-form select:focus,
+.vendor-registration-form textarea:focus {
+  border-color: #216C68;
+  box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
+}
+
+/* ==========================================
+   VALIDATION STATES
+========================================== */
+
+.vendor-registration-form .input-error {
+  border-color: #D94F4F !important;
+  background-color: #FFF9F9;
+}
+
+.vendor-registration-form .input-error:focus {
+  box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.12) !important;
+}
+
+.vendor-registration-form .input-valid {
+  border-color: #80B8A4;
+}
+
+.vendor-registration-form .field-message {
+  margin: 6px 0 0;
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.vendor-registration-form .error-message {
+  color: #C0392B;
+}
+
+.vendor-registration-form .success-message {
+  color: #216C68;
+}
+
+/* ==========================================
+   PASSWORD SHOW / HIDE
+========================================== */
+
+.vendor-registration-form .password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.vendor-registration-form .password-input-wrapper input {
+  width: 100%;
+  padding-right: 50px;
+}
+
+.vendor-registration-form .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #216C68;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 0.2s ease;
+}
+
+.vendor-registration-form .password-toggle:hover {
+  background-color: #EDF6F4;
+}
+
+.vendor-registration-form .password-toggle:focus-visible {
+  outline: 2px solid #216C68;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   BUSINESS CATEGORY CHECKBOXES
+========================================== */
+
+.vendor-registration-form .category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.vendor-registration-form .category-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #DDE5E0;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.vendor-registration-form .category-option:hover {
+  border-color: #216C68;
+  background-color: #F4FAF8;
+  transform: translateY(-1px);
+}
+
+.vendor-registration-form .category-option input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: #216C68;
+  cursor: pointer;
+}
+
+.vendor-registration-form .category-option span {
+  color: #414845;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   FILE UPLOADS
+========================================== */
+
+.vendor-registration-form input[type='file'] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed #A9C6BB;
+  border-radius: 9px;
+  background-color: #F8FBF9;
+  color: #555E59;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.vendor-registration-form input[type='file']:focus-visible {
+  outline: 2px solid #216C68;
+  outline-offset: 3px;
+}
+
+.vendor-registration-form input[type='file']::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #216C68;
+  color: #FFFFFF;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.vendor-registration-form input[type='file']::file-selector-button:hover {
+  background-color: #195653;
+}
+
+/* ==========================================
+   TERMS AND CONDITIONS
+========================================== */
+
+.vendor-registration-form .terms-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 10px 0 24px;
+  color: #515954;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.vendor-registration-form .terms-option input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: #216C68;
+  cursor: pointer;
+}
+
+/* ==========================================
+   SUBMIT BUTTON
+========================================== */
+
+.vendor-registration-form .submit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 10px;
+  background-color: #216C68;
+  color: #FFFFFF;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.vendor-registration-form .submit-button:hover:not(:disabled) {
+  background-color: #195653;
+  box-shadow: 0 6px 16px rgba(33, 108, 104, 0.2);
+  transform: translateY(-1px);
+}
+
+.vendor-registration-form .submit-button:focus-visible {
+  outline: 3px solid rgba(33, 108, 104, 0.35);
+  outline-offset: 3px;
+}
+
+.vendor-registration-form .submit-button:disabled {
+  background-color: #A7B8B1;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.vendor-registration-form .submit-button.is-valid {
+  background-color: #216C68;
+}
+
+/* ==========================================
+   FORM STATUS MESSAGES
+========================================== */
+
+.vendor-registration-form .form-message {
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
+.vendor-registration-form .form-message--error {
+  border-color: #F0C4C0;
+  background-color: #FFF4F2;
+  color: #A93226;
+}
+
+.vendor-registration-form .form-message--success {
+  border-color: #B8DCCB;
+  background-color: #F0F8F3;
+  color: #216C68;
+}
+
+/* ==========================================
+   HELPER TEXT AND LINKS
+========================================== */
+
+.vendor-registration-form .helper-text {
+  margin: 7px 0 0;
+  color: #737A77;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.vendor-registration-form a {
+  color: #216C68;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vendor-registration-form a:hover {
+  color: #195653;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN: TABLETS
+========================================== */
+
+@media (max-width: 768px) {
+  .vendor-registration-form {
+    padding: 35px 16px 50px;
+  }
+
+  .vendor-registration-form .form-card {
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+
+  .vendor-registration-form .form-grid {
+    gap: 18px;
+  }
+
+  .vendor-registration-form .category-grid {
+    gap: 11px;
+  }
+
+  .vendor-registration-form .category-option {
+    padding: 13px;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN: MOBILE PHONES
+========================================== */
+
+@media (max-width: 540px) {
+  .vendor-registration-form {
+    padding: 25px 12px 40px;
+  }
+
+  .vendor-registration-form .page-heading {
+    margin-bottom: 22px;
+  }
+
+  .vendor-registration-form .page-heading h1 {
+    font-size: 2rem;
+  }
+
+  .vendor-registration-form .page-heading p {
+    font-size: 0.92rem;
+  }
+
+  .vendor-registration-form .form-card {
+    padding: 23px 17px;
+    border-radius: 13px;
+  }
+
+  .vendor-registration-form .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .vendor-registration-form .form-group.full-width,
+  .vendor-registration-form .full-width {
+    grid-column: auto;
+  }
+
+  .vendor-registration-form .form-section {
+    margin-bottom: 27px;
+    padding-bottom: 24px;
+  }
+
+  .vendor-registration-form .form-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .vendor-registration-form .category-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vendor-registration-form .category-option {
+    padding: 14px;
+  }
+
+  .vendor-registration-form .submit-button {
+    min-height: 50px;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY: REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .vendor-registration-form *,
+  .vendor-registration-form *::before,
+  .vendor-registration-form *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
