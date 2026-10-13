@@ -1,0 +1,55 @@
+.stats {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--space-2);
+  background: var(--white);
+}
+
+.stat-card strong {
+  color: var(--teal);
+  font-family: var(--font-heading);
+  font-size: 32px;
+}
+
+.stat-card span {
+  color: var(--gray);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+  .stats {
+    gap: var(--space-1);
+  }
+
+  .stat-card {
+    padding: var(--space-2) var(--space-1);
+    text-align: center;
+  }
+
+  .stat-card strong {
+    font-size: 22px;
+  }
+
+  .stat-card span {
+    font-size: 12px;
+  }
+}
