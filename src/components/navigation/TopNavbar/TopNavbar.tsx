@@ -29,7 +29,7 @@ const TopNavbar = ({
         <a href="#pets">Browse Pets</a>
         <a href="#services">Services</a>
         <a href="#merchandise">Merchandise</a>
-        <a href="#">Become a Seller</a>
+        <a href="/vendor/register">Become a Seller</a>
         <a href="#">Help Center</a>
       </nav>
       <div className="desktop-actions">

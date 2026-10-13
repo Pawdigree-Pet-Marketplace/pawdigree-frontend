@@ -38,7 +38,6 @@ function VendorRegistrationForm() {
     password: "",
     confirmPassword: "",
   });
-
   const [countryCode, setCountryCode] = useState("+256");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -48,107 +47,61 @@ function VendorRegistrationForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function handleChange(field: keyof FormData, value: string) {
-    setFormData((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
-
-    setErrors((previous) => ({
-      ...previous,
-      [field]: "",
-    }));
-
+    setFormData((p) => ({ ...p, [field]: value }));
+    setErrors((p) => ({ ...p, [field]: "" }));
     setMessage("");
   }
-
   function fieldClass(field: keyof FormData): string {
     if (errors[field]) return "input-error";
-
-    if (formData[field].trim().length > 0) {
-      return "input-valid";
-    }
-
+    if (formData[field].trim().length > 0) return "input-valid";
     return "";
   }
-
   function validateForm(): FormErrors {
     const newErrors: FormErrors = {};
-
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required.";
-    }
-
-    if (!formData.first_name.trim()) {
+    if (!formData.username.trim()) newErrors.username = "Username is required.";
+    if (!formData.first_name.trim())
       newErrors.first_name = "First name is required.";
-    }
-
-    if (!formData.last_name.trim()) {
+    if (!formData.last_name.trim())
       newErrors.last_name = "Last name is required.";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email address is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!formData.email.trim()) newErrors.email = "Email address is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
-    }
-
     const phoneDigits = formData.phone.replace(/\D/g, "");
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required.";
-    } else if (phoneDigits.length < 7 || phoneDigits.length > 12) {
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required.";
+    else if (phoneDigits.length < 7 || phoneDigits.length > 12)
       newErrors.phone = "Enter a valid phone number.";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required.";
-    } else if (formData.password.length < 8) {
+    if (!formData.password) newErrors.password = "Password is required.";
+    else if (formData.password.length < 8)
       newErrors.password = "Password must contain at least 8 characters.";
-    }
-
-    if (!formData.confirmPassword) {
+    if (!formData.confirmPassword)
       newErrors.confirmPassword = "Please confirm your password.";
-    } else if (formData.password !== formData.confirmPassword) {
+    else if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "The passwords do not match.";
-    }
-
     return newErrors;
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
-
     const validationErrors = validateForm();
     setErrors(validationErrors);
-
     if (Object.keys(validationErrors).length > 0) {
       setMessage("Please correct the highlighted fields before continuing.");
       return;
     }
-
     if (!acceptTerms) {
       setMessage("Please accept the terms and conditions to continue.");
       return;
     }
-
-    // Remove spaces, brackets, and dashes from the phone number.
-    // Remove a leading zero so that 0712345678 becomes 712345678.
     const localPhone = formData.phone.replace(/\D/g, "").replace(/^0+/, "");
-
-    // Combine the selected country calling code with the local number.
     const internationalPhone = `${countryCode}${localPhone}`;
-
     setIsLoading(true);
-
     try {
       const response = await fetch(
         "http://127.0.0.1:8000/api/auth/register/vendor/",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             username: formData.username.trim(),
             first_name: formData.first_name.trim(),
@@ -157,14 +110,11 @@ function VendorRegistrationForm() {
             phone: internationalPhone,
             password: formData.password,
           }),
-        }
+        },
       );
-
       const result = await response.json().catch(() => ({}));
-
       if (!response.ok) {
         const backendErrors: FormErrors = {};
-
         for (const field of [
           "username",
           "first_name",
@@ -174,34 +124,25 @@ function VendorRegistrationForm() {
           "password",
         ] as const) {
           const errorValue = result[field];
-
-          if (Array.isArray(errorValue)) {
+          if (Array.isArray(errorValue))
             backendErrors[field] = errorValue.join(" ");
-          } else if (typeof errorValue === "string") {
+          else if (typeof errorValue === "string")
             backendErrors[field] = errorValue;
-          }
         }
-
-        setErrors((previous) => ({
-          ...previous,
-          ...backendErrors,
-        }));
-
+        setErrors((p) => ({ ...p, ...backendErrors }));
         setMessage(
           result.detail ||
             result.message ||
-            "Registration failed. Please check your information."
+            "Registration failed. Please check your information.",
         );
-
         return;
       }
-
       setMessage(
-        "Your vendor account was created successfully! You can now proceed to the next step."
+        "Your vendor account was created successfully! You can now proceed to the next step.",
       );
     } catch {
       setMessage(
-        "Could not connect to the server. Make sure the Django backend is running and try again."
+        "Could not connect to the server. Make sure the Django backend is running and try again.",
       );
     } finally {
       setIsLoading(false);
@@ -214,23 +155,20 @@ function VendorRegistrationForm() {
         <header className="page-heading">
           <h1>Become a Pawdigree Vendor</h1>
           <p>
-            Join Uganda's pet marketplace and connect with customers
-            looking for trusted pet products and services. Create your
-            vendor account to get started.
+            Join Uganda's pet marketplace and connect with customers looking for
+            trusted pet products and services. Create your vendor account to get
+            started.
           </p>
         </header>
-
         <div className="form-card">
           <form onSubmit={handleSubmit} noValidate>
             <section className="form-section">
               <h2>Vendor Account Information</h2>
-
               <p className="section-description">
-                Create the login details you will use to access your
-                Pawdigree vendor account. You can register your businesses
-                separately after creating your account.
+                Create the login details you will use to access your Pawdigree
+                vendor account. You can register your businesses separately
+                after creating your account.
               </p>
-
               <div className="form-grid">
                 <div className="form-group">
                   <label htmlFor="username">
@@ -244,9 +182,7 @@ function VendorRegistrationForm() {
                     className={fieldClass("username")}
                     placeholder="Choose a username"
                     aria-invalid={Boolean(errors.username)}
-                    onChange={(event) =>
-                      handleChange("username", event.target.value)
-                    }
+                    onChange={(e) => handleChange("username", e.target.value)}
                   />
                   {errors.username && (
                     <p className="field-message error-message">
@@ -254,7 +190,6 @@ function VendorRegistrationForm() {
                     </p>
                   )}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="email">
                     Email Address <span className="required-mark">*</span>
@@ -267,9 +202,7 @@ function VendorRegistrationForm() {
                     className={fieldClass("email")}
                     placeholder="you@example.com"
                     aria-invalid={Boolean(errors.email)}
-                    onChange={(event) =>
-                      handleChange("email", event.target.value)
-                    }
+                    onChange={(e) => handleChange("email", e.target.value)}
                   />
                   {errors.email && (
                     <p className="field-message error-message">
@@ -277,7 +210,6 @@ function VendorRegistrationForm() {
                     </p>
                   )}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="first_name">
                     First Name <span className="required-mark">*</span>
@@ -290,9 +222,7 @@ function VendorRegistrationForm() {
                     className={fieldClass("first_name")}
                     placeholder="Enter first name"
                     aria-invalid={Boolean(errors.first_name)}
-                    onChange={(event) =>
-                      handleChange("first_name", event.target.value)
-                    }
+                    onChange={(e) => handleChange("first_name", e.target.value)}
                   />
                   {errors.first_name && (
                     <p className="field-message error-message">
@@ -300,7 +230,6 @@ function VendorRegistrationForm() {
                     </p>
                   )}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="last_name">
                     Last Name <span className="required-mark">*</span>
@@ -313,9 +242,7 @@ function VendorRegistrationForm() {
                     className={fieldClass("last_name")}
                     placeholder="Enter last name"
                     aria-invalid={Boolean(errors.last_name)}
-                    onChange={(event) =>
-                      handleChange("last_name", event.target.value)
-                    }
+                    onChange={(e) => handleChange("last_name", e.target.value)}
                   />
                   {errors.last_name && (
                     <p className="field-message error-message">
@@ -323,34 +250,28 @@ function VendorRegistrationForm() {
                     </p>
                   )}
                 </div>
-
                 <div className="form-group full-width">
                   <label htmlFor="phone">
                     Phone Number <span className="required-mark">*</span>
                   </label>
-
                   <div className="phone-input-row">
                     <select
                       id="countryCode"
                       aria-label="Country calling code"
                       className="country-code-select"
                       value={countryCode}
-                      onChange={(event) => {
-                        setCountryCode(event.target.value);
-                        setErrors((previous) => ({
-                          ...previous,
-                          phone: "",
-                        }));
+                      onChange={(e) => {
+                        setCountryCode(e.target.value);
+                        setErrors((p) => ({ ...p, phone: "" }));
                         setMessage("");
                       }}
                     >
-                      {countries.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.flag} {country.name} ({country.code})
+                      {countries.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.flag} {c.name} ({c.code})
                         </option>
                       ))}
                     </select>
-
                     <input
                       id="phone"
                       type="tel"
@@ -359,33 +280,23 @@ function VendorRegistrationForm() {
                       className={fieldClass("phone")}
                       placeholder="e.g. 712 345 678"
                       aria-invalid={Boolean(errors.phone)}
-                      aria-describedby={errors.phone ? "phone-error" : undefined}
-                      onChange={(event) =>
-                        handleChange("phone", event.target.value)
-                      }
+                      onChange={(e) => handleChange("phone", e.target.value)}
                     />
                   </div>
-
                   <p className="field-hint">
-                    Select your country code and enter your number without
-                    the country code. You may include a leading zero.
+                    Select your country code and enter your number without the
+                    country code. You may include a leading zero.
                   </p>
-
                   {errors.phone && (
-                    <p
-                      id="phone-error"
-                      className="field-message error-message"
-                    >
+                    <p className="field-message error-message">
                       {errors.phone}
                     </p>
                   )}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="password">
                     Password <span className="required-mark">*</span>
                   </label>
-
                   <div className="password-input-wrapper">
                     <input
                       id="password"
@@ -395,37 +306,29 @@ function VendorRegistrationForm() {
                       className={fieldClass("password")}
                       placeholder="At least 8 characters"
                       aria-invalid={Boolean(errors.password)}
-                      onChange={(event) =>
-                        handleChange("password", event.target.value)
-                      }
+                      onChange={(e) => handleChange("password", e.target.value)}
                     />
                     <button
                       type="button"
                       className="password-toggle"
-                      onClick={() =>
-                        setShowPassword((previous) => !previous)
-                      }
+                      onClick={() => setShowPassword((p) => !p)}
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
-                      aria-pressed={showPassword}
                     >
                       {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                     </button>
                   </div>
-
                   {errors.password && (
                     <p className="field-message error-message">
                       {errors.password}
                     </p>
                   )}
                 </div>
-
                 <div className="form-group full-width">
                   <label htmlFor="confirmPassword">
                     Confirm Password <span className="required-mark">*</span>
                   </label>
-
                   <div className="password-input-wrapper">
                     <input
                       id="confirmPassword"
@@ -435,22 +338,19 @@ function VendorRegistrationForm() {
                       className={fieldClass("confirmPassword")}
                       placeholder="Enter your password again"
                       aria-invalid={Boolean(errors.confirmPassword)}
-                      onChange={(event) =>
-                        handleChange("confirmPassword", event.target.value)
+                      onChange={(e) =>
+                        handleChange("confirmPassword", e.target.value)
                       }
                     />
                     <button
                       type="button"
                       className="password-toggle"
-                      onClick={() =>
-                        setShowConfirmPassword((previous) => !previous)
-                      }
+                      onClick={() => setShowConfirmPassword((p) => !p)}
                       aria-label={
                         showConfirmPassword
                           ? "Hide confirmation password"
                           : "Show confirmation password"
                       }
-                      aria-pressed={showConfirmPassword}
                     >
                       {showConfirmPassword ? (
                         <EyeOff size={19} />
@@ -459,7 +359,6 @@ function VendorRegistrationForm() {
                       )}
                     </button>
                   </div>
-
                   {errors.confirmPassword && (
                     <p className="field-message error-message">
                       {errors.confirmPassword}
@@ -468,41 +367,32 @@ function VendorRegistrationForm() {
                 </div>
               </div>
             </section>
-
             <section className="form-section">
               <h2>Review and Submit</h2>
-
               <p className="section-description">
-                Check your details before creating your vendor account.
-                You can register one or more businesses separately.
+                Check your details before creating your vendor account. You can
+                register one or more businesses separately.
               </p>
-
               <label className="terms-option">
                 <input
                   type="checkbox"
                   checked={acceptTerms}
-                  onChange={(event) => setAcceptTerms(event.target.checked)}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
                 />
                 <span>
-                  I confirm that the information I have provided is accurate
-                  and agree to the Pawdigree terms and conditions.
+                  I confirm that the information I have provided is accurate and
+                  agree to the Pawdigree terms and conditions.
                 </span>
               </label>
-
               {message && (
                 <div
-                  className={`form-message ${
-                    message.toLowerCase().includes("successfully")
-                      ? "form-message--success"
-                      : "form-message--error"
-                  }`}
+                  className={`form-message ${message.toLowerCase().includes("successfully") ? "form-message--success" : "form-message--error"}`}
                   role="status"
                   aria-live="polite"
                 >
                   {message}
                 </div>
               )}
-
               <button
                 type="submit"
                 className="submit-button"
@@ -519,5 +409,4 @@ function VendorRegistrationForm() {
     </main>
   );
 }
-
 export default VendorRegistrationForm;
