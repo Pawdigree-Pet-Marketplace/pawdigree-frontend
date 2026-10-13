@@ -14,6 +14,20 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
+const countries = [
+  { name: "Uganda", code: "+256", flag: "🇺🇬" },
+  { name: "Kenya", code: "+254", flag: "🇰🇪" },
+  { name: "Tanzania", code: "+255", flag: "🇹🇿" },
+  { name: "Rwanda", code: "+250", flag: "🇷🇼" },
+  { name: "Burundi", code: "+257", flag: "🇧🇮" },
+  { name: "South Sudan", code: "+211", flag: "🇸🇸" },
+  { name: "Nigeria", code: "+234", flag: "🇳🇬" },
+  { name: "South Africa", code: "+27", flag: "🇿🇦" },
+  { name: "United Kingdom", code: "+44", flag: "🇬🇧" },
+  { name: "United States", code: "+1", flag: "🇺🇸" },
+  { name: "India", code: "+91", flag: "🇮🇳" },
+];
+
 function VendorRegistrationForm() {
   const [formData, setFormData] = useState<FormData>({
     username: "",
@@ -25,6 +39,7 @@ function VendorRegistrationForm() {
     confirmPassword: "",
   });
 
+  const [countryCode, setCountryCode] = useState("+256");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [message, setMessage] = useState("");
@@ -77,8 +92,12 @@ function VendorRegistrationForm() {
       newErrors.email = "Enter a valid email address.";
     }
 
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required.";
+    } else if (phoneDigits.length < 7 || phoneDigits.length > 12) {
+      newErrors.phone = "Enter a valid phone number.";
     }
 
     if (!formData.password) {
@@ -113,6 +132,13 @@ function VendorRegistrationForm() {
       return;
     }
 
+    // Remove spaces, brackets, and dashes from the phone number.
+    // Remove a leading zero so that 0712345678 becomes 712345678.
+    const localPhone = formData.phone.replace(/\D/g, "").replace(/^0+/, "");
+
+    // Combine the selected country calling code with the local number.
+    const internationalPhone = `${countryCode}${localPhone}`;
+
     setIsLoading(true);
 
     try {
@@ -128,7 +154,7 @@ function VendorRegistrationForm() {
             first_name: formData.first_name.trim(),
             last_name: formData.last_name.trim(),
             email: formData.email.trim(),
-            phone: formData.phone.trim(),
+            phone: internationalPhone,
             password: formData.password,
           }),
         }
@@ -198,6 +224,7 @@ function VendorRegistrationForm() {
           <form onSubmit={handleSubmit} noValidate>
             <section className="form-section">
               <h2>Vendor Account Information</h2>
+
               <p className="section-description">
                 Create the login details you will use to access your
                 Pawdigree vendor account. You can register your businesses
@@ -297,24 +324,58 @@ function VendorRegistrationForm() {
                   )}
                 </div>
 
-                <div className="form-group">
+                <div className="form-group full-width">
                   <label htmlFor="phone">
                     Phone Number <span className="required-mark">*</span>
                   </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    value={formData.phone}
-                    className={fieldClass("phone")}
-                    placeholder="e.g. +256 7XX XXX XXX"
-                    aria-invalid={Boolean(errors.phone)}
-                    onChange={(event) =>
-                      handleChange("phone", event.target.value)
-                    }
-                  />
+
+                  <div className="phone-input-row">
+                    <select
+                      id="countryCode"
+                      aria-label="Country calling code"
+                      className="country-code-select"
+                      value={countryCode}
+                      onChange={(event) => {
+                        setCountryCode(event.target.value);
+                        setErrors((previous) => ({
+                          ...previous,
+                          phone: "",
+                        }));
+                        setMessage("");
+                      }}
+                    >
+                      {countries.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.flag} {country.name} ({country.code})
+                        </option>
+                      ))}
+                    </select>
+
+                    <input
+                      id="phone"
+                      type="tel"
+                      autoComplete="tel-national"
+                      value={formData.phone}
+                      className={fieldClass("phone")}
+                      placeholder="e.g. 712 345 678"
+                      aria-invalid={Boolean(errors.phone)}
+                      aria-describedby={errors.phone ? "phone-error" : undefined}
+                      onChange={(event) =>
+                        handleChange("phone", event.target.value)
+                      }
+                    />
+                  </div>
+
+                  <p className="field-hint">
+                    Select your country code and enter your number without
+                    the country code. You may include a leading zero.
+                  </p>
+
                   {errors.phone && (
-                    <p className="field-message error-message">
+                    <p
+                      id="phone-error"
+                      className="field-message error-message"
+                    >
                       {errors.phone}
                     </p>
                   )}
@@ -324,6 +385,7 @@ function VendorRegistrationForm() {
                   <label htmlFor="password">
                     Password <span className="required-mark">*</span>
                   </label>
+
                   <div className="password-input-wrapper">
                     <input
                       id="password"
@@ -343,12 +405,15 @@ function VendorRegistrationForm() {
                       onClick={() =>
                         setShowPassword((previous) => !previous)
                       }
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       aria-pressed={showPassword}
                     >
                       {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                     </button>
                   </div>
+
                   {errors.password && (
                     <p className="field-message error-message">
                       {errors.password}
@@ -360,6 +425,7 @@ function VendorRegistrationForm() {
                   <label htmlFor="confirmPassword">
                     Confirm Password <span className="required-mark">*</span>
                   </label>
+
                   <div className="password-input-wrapper">
                     <input
                       id="confirmPassword"
@@ -393,6 +459,7 @@ function VendorRegistrationForm() {
                       )}
                     </button>
                   </div>
+
                   {errors.confirmPassword && (
                     <p className="field-message error-message">
                       {errors.confirmPassword}
@@ -404,6 +471,7 @@ function VendorRegistrationForm() {
 
             <section className="form-section">
               <h2>Review and Submit</h2>
+
               <p className="section-description">
                 Check your details before creating your vendor account.
                 You can register one or more businesses separately.
@@ -440,7 +508,9 @@ function VendorRegistrationForm() {
                 className="submit-button"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating Your Account..." : "Create Vendor Account"}
+                {isLoading
+                  ? "Creating Your Account..."
+                  : "Create Vendor Account"}
               </button>
             </section>
           </form>
