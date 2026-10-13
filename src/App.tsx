@@ -1,6 +1,5 @@
 import LandingPage from "./pages/LandingPage";
 import RegistrationPage from "./pages/RegistrationPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
@@ -15,10 +14,6 @@ function App() {
 
   if (path === "/registration") {
     return <RegistrationPage />;
-  }
-
-  if (path.startsWith("/reset-password")) {
-    return <ResetPasswordPage />;
   }
 
   if (path === "/profile") {

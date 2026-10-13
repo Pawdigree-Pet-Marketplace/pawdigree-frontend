@@ -1,0 +1,311 @@
+import { useState, useMemo } from "react";
+import { Eye, EyeOff, Check, X } from "lucide-react";
+
+const ResetPasswordForm = () => {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const conditions = useMemo(() => {
+    return [
+      { ok: newPassword.length >= 8, text: "At least 8 characters" },
+      { ok: /[A-Z]/.test(newPassword), text: "At least one uppercase letter" },
+      { ok: /[a-z]/.test(newPassword), text: "At least one lowercase letter" },
+      { ok: /[0-9]/.test(newPassword), text: "At least one number" },
+      {
+        ok: /[^A-Za-z0-9]/.test(newPassword),
+        text: "At least one symbol (!@#$...)",
+      },
+    ];
+  }, [newPassword]);
+
+  const allConditionsMet =
+    conditions.every((c) => c.ok) && newPassword.length > 0;
+  const unmetConditions = conditions.filter((c) => !c.ok);
+  const passwordsMatch = newPassword !== "" && newPassword === confirmPassword;
+  const isButtonDisabled = isLoading || !allConditionsMet || !passwordsMatch;
+
+  const getPasswordBorder = () => {
+    if (!newPassword)
+      return { borderColor: "", outline: "none", boxShadow: "none" };
+    if (!allConditionsMet)
+      return { borderColor: "#e5484d", outline: "none", boxShadow: "none" };
+    return { borderColor: "#30a46c", outline: "none", boxShadow: "none" };
+  };
+
+  const getConfirmBorder = () => {
+    if (!confirmPassword)
+      return { borderColor: "", outline: "none", boxShadow: "none" };
+    if (newPassword !== confirmPassword)
+      return { borderColor: "#e5484d", outline: "none", boxShadow: "none" };
+    return { borderColor: "#30a46c", outline: "none", boxShadow: "none" };
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (!allConditionsMet) {
+      setError("Please fix your password to meet all requirements");
+      return;
+    }
+    if (!passwordsMatch) {
+      setError("Passwords don't match");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      console.log("Reset token:", token);
+      await new Promise((r) => setTimeout(r, 1000));
+      setSuccess(
+        "Password reset successfully! You can now log in with your new password.",
+      );
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to reset password. Link may be expired.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "440px",
+          margin: "0 auto",
+          background: "white",
+          borderRadius: "16px",
+          padding: "24px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+        }}
+      >
+        <div className="registration-form" style={{ margin: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
+              padding: "16px",
+              background: "rgba(48,164,108,0.08)",
+              borderRadius: "12px",
+              border: "1px solid #30a46c",
+              color: "#30a46c",
+              textAlign: "center",
+            }}
+          >
+            <Check size={32} strokeWidth={2.5} />
+            <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.5" }}>
+              {success}
+            </p>
+          </div>
+          <a
+            href="/login"
+            className="register-button"
+            style={{
+              display: "block",
+              textAlign: "center",
+              textDecoration: "none",
+              marginTop: "16px",
+              borderRadius: "999px",
+            }}
+          >
+            Go to Login
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    // THIS wrapper fixes the full-screen problem
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "440px",
+        margin: "0 auto",
+        background: "white",
+        borderRadius: "16px",
+        padding: "28px",
+        boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="registration-form"
+        style={{ width: "100%", margin: 0 }}
+      >
+        {error && <p className="form-error">{error}</p>}
+
+        <div className="form-group">
+          <label>New Password</label>
+          <div style={{ position: "relative" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
+              required
+              style={{
+                ...getPasswordBorder(),
+                transition: "border-color 0.2s ease",
+              }}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                color: "var(--charcoal)",
+              }}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          </div>
+          {newPassword && !allConditionsMet && (
+            <div
+              style={{
+                marginTop: "10px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              {unmetConditions.map((item) => (
+                <div
+                  key={item.text}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "0.78rem",
+                    color: "#8a8f98",
+                  }}
+                >
+                  <X size={14} />
+                  <span>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {allConditionsMet && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                marginTop: "10px",
+                fontSize: "0.82rem",
+                color: "#30a46c",
+                fontWeight: 500,
+              }}
+            >
+              <Check size={14} strokeWidth={3} />
+              <span>Strong password</span>
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Confirm New Password</label>
+          <div style={{ position: "relative" }}>
+            <input
+              type={showConfirm ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              required
+              disabled={!allConditionsMet}
+              style={{
+                ...getConfirmBorder(),
+                transition: "border-color 0.2s ease",
+                opacity: allConditionsMet ? 1 : 0.6,
+                cursor: allConditionsMet ? "text" : "not-allowed",
+                backgroundColor: allConditionsMet ? "" : "#f5f5f5",
+              }}
+            />
+            <span
+              onClick={() => allConditionsMet && setShowConfirm(!showConfirm)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: allConditionsMet ? "pointer" : "not-allowed",
+                color: "var(--charcoal)",
+                opacity: allConditionsMet ? 1 : 0.4,
+              }}
+            >
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          </div>
+          {confirmPassword &&
+            newPassword !== confirmPassword &&
+            allConditionsMet && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  marginTop: "6px",
+                  fontSize: "0.78rem",
+                  color: "#e5484d",
+                }}
+              >
+                <X size={14} />
+                <span>Passwords do not match</span>
+              </div>
+            )}
+          {passwordsMatch && allConditionsMet && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                marginTop: "6px",
+                fontSize: "0.82rem",
+                color: "#30a46c",
+                fontWeight: 500,
+              }}
+            >
+              <Check size={14} strokeWidth={3} />
+              <span>Passwords match</span>
+            </div>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          className="register-button"
+          disabled={isButtonDisabled}
+          style={{
+            opacity: isButtonDisabled ? 0.5 : 1,
+            cursor: isButtonDisabled ? "not-allowed" : "pointer",
+            borderRadius: "999px",
+          }}
+        >
+          {isLoading ? "Resetting..." : "Reset Password"}
+        </button>
+        <p className="login-link">
+          Remembered your password? <a href="/login">Back to Login</a>
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default ResetPasswordForm;
