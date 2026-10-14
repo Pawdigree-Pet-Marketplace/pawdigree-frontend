@@ -1,3 +1,4 @@
+
 import heroimage from "../../assets/images/heroimage.jpg";
 import { FilterIcon, SearchIcon } from "../icons";
 import useScrollReveal from "../../hooks/useScrollReveal";
@@ -20,22 +21,6 @@ export default function Hero({ isLoggedIn = false }: HeroProps) {
         />
       </div>
 
-      <form
-        className="hero-search"
-        role="search"
-        onSubmit={(e) => e.preventDefault()}
-      >
-        <SearchIcon />
-        <input
-          type="search"
-          placeholder="Search pets, services, products"
-          aria-label="Search pets, services, products"
-        />
-        <button type="submit" aria-label="Filter and search">
-          <FilterIcon />
-        </button>
-      </form>
-
       <div ref={contentRef} className="hero-content">
         <h1 id="hero-title" className="reveal">
           Find your next pet from <span>verified sellers</span> near you
@@ -45,6 +30,22 @@ export default function Hero({ isLoggedIn = false }: HeroProps) {
           Browse, adopt, buy and book care from verified vendors across Uganda,
           all in one place.
         </p>
+
+        <form
+          className="hero-search"
+          role="search"
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <SearchIcon />
+          <input
+            type="search"
+            placeholder="Search pets, services, products"
+            aria-label="Search pets, services, products"
+          />
+          <button type="submit" aria-label="Filter and search">
+            <FilterIcon />
+          </button>
+        </form>
 
         {!isLoggedIn ? (
           <>
