@@ -6,10 +6,19 @@ import CustomerLoginPage from "./pages/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import VendorRegistrationPage from "./pages/VendorRegistrationPage";
+import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 
 function App() {
   const path = window.location.pathname;
 
+  if (path === "/terms-and-conditions") {
+  return <TermsAndConditionsPage />;
+}
+
+  if (path === "/business-registration") {
+    return <BusinessRegistrationForm />;
+  }
   if (path === "/vendor-registration") {
     return <VendorRegistrationForm />;
   }
