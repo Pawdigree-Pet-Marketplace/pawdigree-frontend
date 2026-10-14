@@ -397,9 +397,10 @@ export default function CustomerLoginPage() {
                 Keep me logged in
               </label>
 
-              <a href="/reset-password" className="forgot">
+              <a href="/forgot-password" className="forgot">
                 Forgot password?
               </a>
+
             </div>
 
             <button

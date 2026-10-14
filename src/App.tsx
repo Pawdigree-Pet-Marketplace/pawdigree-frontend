@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   const path = window.location.pathname;
@@ -31,6 +32,10 @@ function App() {
 
   if (path === "/login" || path === "/customer-login") {
     return <CustomerLoginPage />;
+  }
+
+  if (path === "/forgot-password") {
+    return <ForgotPasswordPage />;
   }
 
   return <LandingPage />;
