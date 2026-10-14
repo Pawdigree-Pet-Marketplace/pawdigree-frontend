@@ -33,7 +33,7 @@
 .login-card{
   background:var(--white);
   border-radius:20px;
-  padding:20px 16px;
+  padding:28px 32px;
   width:calc(100% - 24px);
   max-width:380px;
   margin:20px auto;
