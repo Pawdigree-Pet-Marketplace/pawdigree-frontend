@@ -1,11 +1,11 @@
 import LandingPage from "./pages/LandingPage";
 import RegistrationPage from "./pages/RegistrationPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import VendorRegistrationPage from "./pages/VendorRegistrationPage";
 
 function App() {
   const path = window.location.pathname;
@@ -13,13 +13,15 @@ function App() {
   if (path === "/vendor-registration") {
     return <VendorRegistrationForm />;
   }
+  if (
+    path.startsWith("/vendor/register") ||
+    path.startsWith("/register.vendor")
+  ) {
+    return <VendorRegistrationPage />;
+  }
 
   if (path === "/registration") {
     return <RegistrationPage />;
-  }
-
-  if (path.startsWith("/reset-password")) {
-    return <ResetPasswordPage />;
   }
 
   if (path === "/profile") {

@@ -56,7 +56,7 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
               <a href="#" className="sidemenu-item">
                 Merchandise
               </a>
-              <a href="#" className="sidemenu-item">
+              <a href="/vendor/register" className="sidemenu-item">
                 Become a Seller
               </a>
               <div className="sidemenu-divider" />
