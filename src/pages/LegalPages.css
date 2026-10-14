@@ -1,0 +1,151 @@
+.legal-page {
+  min-height: 100vh;
+  background: #FBFAF7;
+  color: #2C302F;
+  font-family: "Inter", sans-serif;
+}
+
+.legal-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 7%;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E8E1D2;
+}
+
+.legal-brand {
+  color: #216C68;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.legal-back-link {
+  color: #216C68;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.legal-back-link:hover {
+  color: #FB8665;
+}
+
+.legal-content {
+  width: min(850px, 86%);
+  margin: 0 auto;
+  padding: 64px 0 80px;
+}
+
+.legal-eyebrow {
+  color: #216C68;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.legal-content h1 {
+  margin: 12px 0;
+  color: #216C68;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.2;
+}
+
+.legal-updated {
+  margin-bottom: 32px;
+  color: #818A84;
+  font-size: 0.9rem;
+}
+
+.legal-intro {
+  margin-bottom: 36px;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.legal-content section {
+  margin-top: 32px;
+}
+
+.legal-content h2 {
+  margin-bottom: 12px;
+  color: #2C302F;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.legal-content p,
+.legal-content li {
+  color: #505854;
+  font-size: 0.98rem;
+  line-height: 1.85;
+}
+
+.legal-content ul {
+  padding-left: 24px;
+}
+
+.legal-content li {
+  margin-bottom: 8px;
+}
+
+.legal-note {
+  margin-top: 36px;
+  padding: 18px 20px;
+  border-left: 4px solid #FB8665;
+  border-radius: 4px;
+  background: #F3F0EA;
+  color: #505854;
+  line-height: 1.7;
+}
+
+.legal-footer {
+  padding: 24px 7%;
+  border-top: 1px solid #E8E1D2;
+  background: #FFFFFF;
+  text-align: center;
+}
+
+.legal-footer p {
+  margin: 0;
+  color: #818A84;
+  font-size: 0.85rem;
+}
+
+.legal-footer a {
+  color: #216C68;
+  text-decoration: none;
+}
+
+.legal-footer a:hover {
+  color: #FB8665;
+}
+
+@media (max-width: 600px) {
+  .legal-navbar {
+    padding: 18px 6%;
+  }
+
+  .legal-content {
+    width: 88%;
+    padding: 42px 0 56px;
+  }
+
+  .legal-content p,
+  .legal-content li {
+    font-size: 0.94rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legal-back-link {
+    transition: none;
+  }
+}
