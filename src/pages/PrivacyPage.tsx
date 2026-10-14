@@ -1,22 +1,43 @@
 import "./LegalPages.css";
+import lightLogo from "../assets/logos/lightmode-logo.svg";
+
+function LegalHeader() {
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/vendor";
+    }
+  };
+
+  return (
+    <header className="legal-navbar">
+      <a className="legal-brand" href="#" aria-label="Pawdigree home">
+        <img src={lightLogo} alt="Pawdigree" className="legal-logo" />
+      </a>
+
+      <button
+        className="legal-back-link"
+        type="button"
+        onClick={handleBack}
+      >
+        <span aria-hidden="true">←</span>
+        Back
+      </button>
+    </header>
+  );
+}
 
 function PrivacyPage() {
   return (
     <main className="legal-page">
-      <header className="legal-navbar">
-        <a className="legal-brand" href="/">
-          Pawdigree
-        </a>
-        <a className="legal-back-link" href="/vendor">
-          Back to marketplace
-        </a>
-      </header>
+        <LegalHeader />
 
       <article className="legal-content">
         <span className="legal-eyebrow">Your privacy matters</span>
         <h1>Privacy Policy</h1>
         <p className="legal-updated">
-          Effective date: [Insert date] · Last updated: [Insert date]
+          Effective date: [] · Last updated: []
         </p>
 
         <p className="legal-intro">

@@ -128,7 +128,7 @@ function VendorLandingPage() {
     <main className="vendor-page" id="home">
       {/* NAVIGATION */}
       <header className="vendor-navbar">
-        <a className="vendor-logo" href="/" aria-label="Pawdigree home">
+        <a className="vendor-logo" href="#home" aria-label="Pawdigree home">
           <img src={logo} alt="Pawdigree" />
         </a>
 
@@ -476,7 +476,7 @@ function VendorLandingPage() {
           <div className="vendor-footer-brand">
             <a
               className="vendor-logo vendor-footer-logo"
-              href="/"
+              href="#home"
               aria-label="Pawdigree home"
             >
               <img src={logo} alt="Pawdigree" />
@@ -490,7 +490,7 @@ function VendorLandingPage() {
 
           <div className="vendor-footer-column">
             <h3>Platform</h3>
-            <a href="/">About Pawdigree</a>
+            <a href="#home">About Pawdigree</a>
             <a href="#benefits">Why Pawdigree</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#footer-contact">Contact</a>
