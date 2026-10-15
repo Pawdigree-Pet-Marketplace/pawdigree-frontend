@@ -11,16 +11,11 @@ import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VendorLandingPage from "./pages/VendorLandingPage";
 import VendorDashboardPage from "./pages/VendorDashboardPage";
 import VendorLoginPage from "./pages/VendorLoginPage";
-import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+
 
 function App() {
   const path = window.location.pathname;
-
-  if (path === "/terms") {
-    return <TermsPage />;
-  }
-
   if (path === "/terms-and-conditions") {
     return <TermsAndConditionsPage />;
   }
