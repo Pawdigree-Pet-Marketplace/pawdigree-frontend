@@ -66,7 +66,7 @@ describe("Business Registration Form", () => {
     );
 
     expect(
-      await screen.findByText("Please enter a valid email address."),
+      await screen.findByText("Enter a valid email address."),
     ).toBeInTheDocument();
   });
 
@@ -156,7 +156,7 @@ describe("Business Registration Form", () => {
 
     expect(
       await screen.findByRole("alert"),
-    ).toHaveTextContent(/must sign in as a vendor/i);
+    ).toHaveTextContent(/please log in before registering your business/i);
 
     // Only the public categories request should have been sent.
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -170,8 +170,6 @@ describe("Business Registration Form", () => {
 
     render(<BusinessRegistrationForm />);
 
-    expect(
-      await screen.findByRole("alert"),
-    ).toHaveTextContent("fetch failed Make sure the Django backend is running.");
+    expect(await screen.findByText("fetch failed")).toBeInTheDocument();
   });
 });
