@@ -510,7 +510,7 @@ function VendorLandingPage() {
             <div>
               <a href="/privacy">Privacy Policy</a>
               <span aria-hidden="true"> · </span>
-              <a href="/terms">Terms of Service</a>
+              <a href="/terms-and-conditions">Terms of Service</a>
             </div>
           </div>
         </div>
