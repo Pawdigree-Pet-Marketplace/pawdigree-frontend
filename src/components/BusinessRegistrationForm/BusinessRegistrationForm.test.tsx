@@ -1,5 +1,5 @@
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import BusinessRegistrationForm from "./BusinessRegistrationForm";
@@ -128,7 +128,7 @@ describe("Business Registration Form", () => {
     );
 
     await user.type(
-      screen.getByLabelText(/city \/ district/i),
+      screen.getByLabelText(/city or district/i),
       "Kampala",
     );
 
