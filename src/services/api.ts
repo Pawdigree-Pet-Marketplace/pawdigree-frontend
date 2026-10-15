@@ -1,13 +1,15 @@
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 type ApiErrorData = Record<string, string[] | string>;
 
-if (!API_BASE_URL) {
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.MODE === "test" ? "https://pawdigree-bckd.onrender.com" : undefined);
+
+if (!API_BASE_URL && import.meta.env.MODE !== "test") {
   throw new Error(
     "VITE_API_BASE_URL is missing. Check your frontend .env file.",
   );
 }
+
 
 export async function apiRequest<T>(
   endpoint: string,
