@@ -299,7 +299,7 @@ describe("Vendor Registration Form", () => {
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        "http://127.0.0.1:8000/api/auth/register/vendor/",
+        "https://pawdigree-bckd.onrender.com/api/auth/register/vendor/",
         expect.objectContaining({
           method: "POST",
           headers: expect.objectContaining({

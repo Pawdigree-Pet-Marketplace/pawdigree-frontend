@@ -1,8 +1,7 @@
 type ApiErrorData = Record<string, string[] | string>;
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.MODE === "test" ? "https://pawdigree-bckd.onrender.com" : undefined);
+  import.meta.env.VITE_API_BASE_URL 
 
 if (!API_BASE_URL && import.meta.env.MODE !== "test") {
   throw new Error(
