@@ -4,6 +4,7 @@ import { FilterIcon, SearchIcon } from "../icons";
 import useScrollReveal from "../../hooks/useScrollReveal";
 import "./Hero.css";
 
+
 type HeroProps = {
   isLoggedIn?: boolean;
 };
