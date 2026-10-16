@@ -127,9 +127,7 @@ export default function Hero({ isLoggedIn = false }: HeroProps) {
     <path d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
       stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
   </svg>
-</div>
-
-     
-    </section>
+</div>  
+</section>
   );
 }
