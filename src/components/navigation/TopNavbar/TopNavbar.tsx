@@ -8,6 +8,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import Button from "../../Button/Button";
 import "./TopNavbar.css";
 
@@ -22,9 +23,32 @@ const TopNavbar = ({
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const isLandingPage = window.location.pathname === "/";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 30);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navbarClass = [
+    "top-navbar",
+    isLandingPage ? "top-navbar--transparent" : "",
+    isLandingPage && isScrolled ? "top-navbar--scrolled" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <header className="top-navbar">
+    <header className={navbarClass}>
       <img src={logo} alt="Pawdigree" className="logo-img" />
+
       <nav className="desktop-links">
         <a href="#pets">Browse Pets</a>
         <a href="#services">Services</a>
@@ -32,6 +56,7 @@ const TopNavbar = ({
         <a href="/vendor">Become a Vendor</a>
         <a href="#">Help Center</a>
       </nav>
+
       <div className="desktop-actions">
         {!isLoggedIn ? (
           <>
@@ -61,8 +86,11 @@ const TopNavbar = ({
             <UserRound size={22} strokeWidth={1.6} />
           </div>
         )}
+
         <button
           className="hamburger"
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -71,4 +99,5 @@ const TopNavbar = ({
     </header>
   );
 };
+
 export default TopNavbar;

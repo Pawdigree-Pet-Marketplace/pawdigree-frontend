@@ -82,20 +82,25 @@
 .hero-content {
   position: absolute;
   right: 0;
-  bottom: var(--space-8);
+  bottom: clamp(40px, 8vh, 88px);
   left: 0;
   z-index: 2;
-  max-width: 720px;
+  max-width: 760px;
   margin-inline: auto;
-  padding-inline: var(--space-2);
+  padding-inline: 24px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .hero-content h1 {
-  margin: 0;
-  color: #171C1B;
-  font-size: 56px;
-  line-height: 1.15;
+  max-width: 720px;
+  margin: 0 auto;
+  color: var(--white);
+  font-size: clamp(44px, 5.5vw, 72px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  text-wrap: balance;
 }
 
 .hero-content h1 span {
@@ -103,18 +108,26 @@
 }
 
 .hero-content p {
-  margin: var(--space-2) 0 var(--space-3);
-  color: #2C302F;
-  font-size: 18px;
+  max-width: 540px;
+  margin: 20px auto 26px;
+  color: var(--white);
+  font-size: 17px;
   line-height: 1.6;
+  text-wrap: balance;
+}
+
+.hero-content .hero-search {
+  margin: 0 auto 20px;
+}
+
+.hero-content .btn {
+  margin-top: 4px;
 }
 
 .hero-content .hero-login {
-  position: relative;
-  z-index: 2;
-  margin: var(--space-2) 0 0;
-  color: var(--gray);
-  font-size: 16px;
+  margin: 16px 0 0;
+  color: var(--white);
+  font-size: 14px;
 }
 
 .hero-login a {
@@ -263,5 +276,172 @@
   .hero-content h1.reveal,
   .hero-content p.reveal {
     animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-content {
+    bottom: 56px;
+    padding-inline: 24px;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(40px, 6vw, 54px);
+    letter-spacing: -1.5px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-content {
+    bottom: 28px;
+    padding-inline: 20px;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(34px, 9vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -1px;
+  }
+
+  .hero-content p {
+    margin: 14px auto 20px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+}
+
+
+/* Pawdigree's outline-only floating decorations */
+.hero-floaties {
+  position: absolute;
+  inset: auto 0 0;
+  height: 180px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floaty {
+  position: absolute;
+  bottom: -75px;
+  width: 42px;
+  height: 42px;
+  opacity: 0;
+  animation: floaty-drift 10s ease-in-out infinite;
+}
+
+.floaty-paw {
+  width: 66px;
+  height: 66px;
+  color: #216C68;
+}
+
+.floaty-bone {
+  width: 48px;
+  height: 30px;
+  color: #FB8665;
+}
+
+.floaty-heart {
+  width: 25px;
+  height: 25px;
+  color: #FB8665;
+}
+
+.floaty-sparkle {
+  width: 22px;
+  height: 22px;
+  color: #216C68;
+}
+
+/* Position and stagger each decoration */
+.paw-a {
+  left: 8%;
+  animation-delay: 0s;
+}
+
+.bone-a {
+  left: 23%;
+  animation-delay: 2.4s;
+}
+
+.heart-a {
+  left: 39%;
+  animation-delay: 4.5s;
+}
+
+.sparkle-a {
+  left: 52%;
+  animation-delay: 1.4s;
+}
+
+.paw-b {
+  right: 22%;
+  animation-delay: 5.5s;
+}
+
+.sparkle-b {
+  right: 11%;
+  animation-delay: 3.2s;
+}
+
+.bone-b {
+  right: 5%;
+  animation-delay: 6.5s;
+}
+
+.heart-b {
+  right: 40%;
+  animation-delay: 7.5s;
+}
+
+@keyframes floaty-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-8deg);
+  }
+
+  20% {
+    opacity: 0.75;
+  }
+
+  65% {
+    opacity: 0.65;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(16px, -210px, 0) rotate(10deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-floaties {
+    height: 120px;
+  }
+
+  .floaty-paw {
+    width: 48px;
+    height: 48px;
+  }
+
+  .floaty-bone {
+    width: 36px;
+    height: 24px;
+  }
+
+  .floaty-heart,
+  .floaty-sparkle {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floaty {
+    animation: none;
+    opacity: 0.45;
+    bottom: 16px;
+    transform: none;
   }
 }
