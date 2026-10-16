@@ -8,15 +8,49 @@
   padding: 0 32px;
   background: var(--white);
   border-bottom: 1px solid var(--cream);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
   box-sizing: border-box;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-.logo-img { width: auto; height: 34px; object-fit: contain; }
+/* Landing page: transparent before scrolling */
+.top-navbar--transparent {
+  background: transparent;
+  border-bottom-color: transparent;
+}
 
-.desktop-links { display: flex; gap: 24px; align-items: center; }
+/* Landing page: white after scrolling */
+.top-navbar--scrolled {
+  background: var(--white);
+  border-bottom: 1px solid var(--cream);
+  box-shadow: 0 2px 10px rgba(44, 48, 47, 0.08);
+}
+
+.logo-img {
+  width: auto;
+  height: 44px;
+  object-fit: contain;
+  transform-origin: left center;
+  transition:
+    height 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* Logo shrinks when the navbar turns white */
+.top-navbar--scrolled .logo-img {
+  height: 32px;
+}
+
+.desktop-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
 .desktop-links a {
   text-decoration: none;
   color: var(--charcoal);
@@ -25,27 +59,41 @@
   line-height: 1;
   transition: color 0.2s ease;
 }
-.desktop-links a:hover { color: var(--teal); }
 
-.desktop-actions { display: flex; align-items: center; gap: 12px; }
+.desktop-links a:hover {
+  color: var(--teal);
+}
 
-.topnav-icons { display: flex; align-items: center; gap: 18px; overflow: visible; color: var(--charcoal); }
+.desktop-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topnav-icons {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  overflow: visible;
+  color: var(--charcoal);
+}
+
 .topnav-icons svg {
   cursor: pointer;
   overflow: visible;
   display: block;
   width: 20px;
   height: 20px;
-  padding: 8;
+  padding: 8px;
   border-radius: 50%;
   box-sizing: content-box;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
 .topnav-icons svg:hover {
   color: var(--teal);
   background: var(--teal-light);
 }
-
 
 .hamburger {
   display: none;
@@ -66,9 +114,63 @@
 }
 
 @media (max-width: 768px) {
-  .top-navbar {height: 56px; min-height: 56px; padding: 0 16px}
-  .desktop-links { display: none; }
-  .desktop-actions .btn { display: none; }
-  .topnav-icons { display: none; }
-  .hamburger { display: flex; align-items: center; justify-content: center; }
+  .top-navbar {
+    height: 56px;
+    min-height: 56px;
+    padding: 0 16px;
+  }
+
+  .desktop-links {
+    display: none;
+  }
+
+  .desktop-actions .btn {
+    display: none;
+  }
+
+  .topnav-icons {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+/* White text and icons over the hero image */
+.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a {
+  color: var(--white);
+}
+
+.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a:hover {
+  color: var(--coral);
+}
+
+.top-navbar--transparent:not(.top-navbar--scrolled) .topnav-icons {
+  color: var(--white);
+}
+
+/* Keep the hamburger visible over the hero */
+.top-navbar--transparent:not(.top-navbar--scrolled) .hamburger {
+  color: var(--white);
+  background: transparent;
+}
+
+/* Restore dark text and icons when the navbar turns white */
+.top-navbar--scrolled .desktop-links a {
+  color: var(--charcoal);
+}
+
+.top-navbar--scrolled .desktop-links a:hover {
+  color: var(--teal);
+}
+
+.top-navbar--scrolled .topnav-icons {
+  color: var(--charcoal);
+}
+
+.top-navbar--scrolled .hamburger {
+  color: var(--charcoal);
+  background: var(--white);
 }
