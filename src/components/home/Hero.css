@@ -93,7 +93,7 @@
 
 .hero-content h1 {
   margin: 0;
-  color: var(--ink);
+  color: #171C1B;
   font-size: 56px;
   line-height: 1.15;
 }
@@ -104,7 +104,7 @@
 
 .hero-content p {
   margin: var(--space-2) 0 var(--space-3);
-  color: var(--gray);
+  color: #2C302F;
   font-size: 18px;
   line-height: 1.6;
 }
@@ -193,6 +193,75 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hero-photo .hero-photo-fill {
+    animation: none;
+  }
+}
+.hero {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100vh;
+  margin-top: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(33, 108, 104, 0.08) 0%,
+      rgba(33, 108, 104, 0.12) 45%,
+      var(--paper) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(44, 48, 47, 0.72) 0%,
+      rgba(44, 48, 47, 0.42) 48%,
+      transparent 100%
+    );
+}
+
+.hero-photo .hero-photo-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  animation: heroImageReveal 1.4s ease-out both;
+}
+.hero-content h1.reveal {
+  animation: heroTextReveal 0.8s ease-out both;
+}
+
+.hero-content p.reveal {
+  animation: heroTextReveal 0.8s ease-out 0.2s both;
+}
+
+@keyframes heroTextReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content h1.reveal,
+  .hero-content p.reveal {
     animation: none;
   }
 }
