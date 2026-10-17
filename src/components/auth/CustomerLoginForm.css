@@ -386,3 +386,48 @@
     animation: none !important;
   }
 }
+
+/* Google sign-in button polish */
+.google-login-button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.google-login-button > div {
+  width: 100%;
+  max-width: 100%;
+}
+
+.google-login-button iframe {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.google-login-button button {
+  border-radius: 10px !important;
+}
+
+.google-login-button .btn-outline {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
