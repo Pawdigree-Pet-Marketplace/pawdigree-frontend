@@ -1,3 +1,4 @@
+import AdminAdd from "./pages/AdminAdd";
 import LandingPage from "./pages/LandingPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -14,8 +15,12 @@ import VendorLoginPage from "./pages/VendorLoginPage";
 import PrivacyPage from "./pages/PrivacyPage";
 
 
+
 function App() {
   const path = window.location.pathname;
+  if (path === "/admin/add") {
+  return <AdminAdd />;
+}
   if (path === "/terms-and-conditions") {
     return <TermsAndConditionsPage />;
   }
@@ -73,5 +78,4 @@ function App() {
 
   return <LandingPage />;
 }
-
 export default App;
