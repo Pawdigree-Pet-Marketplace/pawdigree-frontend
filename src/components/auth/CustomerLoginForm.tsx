@@ -147,7 +147,7 @@ export default function CustomerLoginForm() {
 
       <h1>Welcome back!</h1>
       <p className="login-subtitle">
-        Sign in to continue your Pawdigree journey.
+        Login to continue your Pawdigree journey.
       </p>
 
       {loginError && (
@@ -257,7 +257,7 @@ export default function CustomerLoginForm() {
           className="btn-primary full"
           disabled={isSubmitting || isGoogleLoading}
         >
-          {isSubmitting ? "Signing in..." : "Sign in"}
+          {isSubmitting ? "Logging in..." : "Login"}
         </button>
       </form>
 
@@ -284,14 +284,25 @@ export default function CustomerLoginForm() {
             }
             text="signin_with"
             theme="outline"
-            shape="rectangular"
-            width="320"
+            shape="pill"
+            width="100%"
           />
         )}
       </div>
 
       <p className="login-register-link">
         Don't have an account? <a href="/register">Sign up</a>
+      </p>
+
+     <p className="login-terms">
+          By continuing you agree to Pawdigree's{" "}
+        <a href="https://pawdigree-frontend.onrender.com/terms" target="_blank" rel="noopener noreferrer">
+           <strong>T&Cs</strong>
+        </a>{" "}
+            and{" "}
+        <a href="https://pawdigree-frontend.onrender.com/privacy" target="_blank" rel="noopener noreferrer">
+           <strong>Privacy Policy</strong>
+        </a>
       </p>
     </div>
   );
