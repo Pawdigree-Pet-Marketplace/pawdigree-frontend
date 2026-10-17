@@ -1,0 +1,49 @@
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  min-height: 88px;
+  padding: 16px 32px;
+
+  background: var(--dashboard-white);
+  border-bottom: 1px solid var(--dashboard-border);
+}
+
+.dashboard-header .vendor-page-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-header {
+    padding-right: 23px;
+    padding-left: 23px;
+  }
+}
+
+@media (max-width: 950px) {
+  .dashboard-header {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    position: relative;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 15px;
+    padding: 18px 17px;
+  }
+}

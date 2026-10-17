@@ -99,7 +99,7 @@ function VendorRegistrationForm() {
     setIsLoading(true);
     try {
     const response = await fetch(
-        `${API_BASE_URL}/api/auth/register/vendor/`,
+        `${API_BASE_URL}/auth/register/vendor/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

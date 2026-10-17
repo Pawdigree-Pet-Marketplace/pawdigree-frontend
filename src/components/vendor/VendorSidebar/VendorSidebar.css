@@ -1,0 +1,365 @@
+/* VendorSidebar uses the theme variables from .vendor-dashboard. */
+
+.dashboard-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  display: flex;
+  flex: 0 0 250px;
+  flex-direction: column;
+
+  width: 250px;
+  height: 100vh;
+  min-height: 600px;
+  padding: 26px 16px 18px;
+
+  background: var(--dashboard-sidebar);
+  border-right: 1px solid var(--dashboard-border);
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0 4px 28px;
+  text-decoration: none;
+}
+
+.dashboard-brand-logo {
+  display: block;
+  width: 170px;
+  max-width: 100%;
+  height: 42px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.dashboard-brand-icon-logo {
+  display: none;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.dashboard-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dashboard-brand strong {
+  color: var(--dashboard-teal-dark);
+  font-family: "Fredoka", sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.dashboard-brand small {
+  color: var(--dashboard-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.25px;
+}
+
+.dashboard-navigation {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 17px;
+
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e4d7d0 transparent;
+}
+
+.dashboard-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dashboard-nav-heading {
+  margin: 0 0 5px;
+  padding: 0 10px;
+
+  color: #929792;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.1px;
+}
+
+.dashboard-nav-item {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  min-height: 42px;
+  padding: 10px 11px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  color: #68716c;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.dashboard-nav-item:hover {
+  background: #f4f1ec;
+  color: var(--dashboard-teal-dark);
+}
+
+.dashboard-nav-item:focus-visible,
+.dashboard-logout:focus-visible {
+  outline: 3px solid #9acfc5;
+  outline-offset: 2px;
+}
+
+.dashboard-nav-item.active {
+  background: #e6f3ef;
+  border-color: #d7ebe5;
+  color: var(--dashboard-teal-dark);
+  font-weight: 900;
+}
+
+.dashboard-nav-item.active::before {
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: -1px;
+
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--dashboard-coral);
+  content: "";
+}
+
+.dashboard-nav-icon {
+  flex: 0 0 18px;
+}
+
+.dashboard-nav-item.active .dashboard-nav-icon {
+  color: var(--dashboard-teal);
+}
+
+.dashboard-nav-item > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-nav-chevron {
+  flex: 0 0 auto;
+  color: var(--dashboard-teal);
+}
+
+.dashboard-sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding-top: 14px;
+  border-top: 1px solid var(--dashboard-border);
+}
+
+.dashboard-sidebar-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: #f4f1ec;
+
+  color: var(--dashboard-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dashboard-sidebar-note svg {
+  flex-shrink: 0;
+  color: var(--dashboard-teal);
+}
+
+.dashboard-logout {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+
+  color: #777d79;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.dashboard-logout:hover {
+  background: #fff0e9;
+  color: #b95138;
+}
+
+/* Tablet: compact icon rail. */
+@media (max-width: 950px) {
+  .dashboard-sidebar {
+    flex-basis: 76px;
+    width: 76px;
+    padding: 20px 9px 14px;
+  }
+ 
+ 
+  .dashboard-brand {
+  justify-content: center;
+  margin: 0 0 24px;
+}
+
+.dashboard-brand-logo {
+  display: none;
+}
+
+.dashboard-brand-icon-logo {
+  display: block;
+  width: 38px;
+  height: 38px;
+}
+
+  .dashboard-brand-copy,
+  .dashboard-nav-heading,
+  .dashboard-nav-item > span,
+  .dashboard-nav-chevron,
+  .dashboard-sidebar-note,
+  .dashboard-logout > span {
+    display: none;
+  }
+
+  .dashboard-nav-group {
+    align-items: center;
+  }
+
+  .dashboard-nav-item {
+    justify-content: center;
+    width: 48px;
+    padding: 10px 5px;
+  }
+
+  .dashboard-nav-icon {
+    flex-basis: auto;
+  }
+
+  .dashboard-sidebar-footer {
+    align-items: center;
+  }
+
+  .dashboard-logout {
+    justify-content: center;
+    padding: 10px 5px;
+  }
+}
+
+/* Mobile: horizontally scrollable navigation. */
+@media (max-width: 600px) {
+  .dashboard-sidebar {
+    position: relative;
+    top: auto;
+
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 14px 16px 10px;
+
+    border-right: 0;
+    border-bottom: 1px solid var(--dashboard-border);
+  }
+
+.dashboard-brand {
+  justify-content: flex-start;
+  margin: 0 0 12px;
+}
+
+.dashboard-brand-logo {
+  display: block;
+  width: 170px;
+  max-width: 100%;
+  height: 38px;
+}
+
+.dashboard-brand-icon-logo {
+  display: none;
+}
+
+  .dashboard-navigation {
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 7px;
+  }
+
+  .dashboard-nav-group {
+    flex-direction: row;
+    flex-shrink: 0;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .dashboard-nav-heading {
+    display: none;
+  }
+
+  .dashboard-nav-item {
+    justify-content: center;
+    gap: 7px;
+
+    width: auto;
+    min-height: 36px;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  .dashboard-nav-item > span {
+    display: inline;
+    font-size: 11px;
+  }
+
+  .dashboard-nav-icon {
+    flex-basis: auto;
+    width: 16px;
+  }
+
+  .dashboard-nav-chevron {
+    display: none;
+  }
+
+  .dashboard-sidebar-footer {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-sidebar *,
+  .dashboard-sidebar *::before,
+  .dashboard-sidebar *::after {
+    transition: none !important;
+  }
+}
