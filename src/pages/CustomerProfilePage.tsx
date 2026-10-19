@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import TopNavbar from '../components/navigation/TopNavbar/TopNavbar'
-import SideMenu from '../components/navigation/SideMenu/SideMenu'
-import BottomNavbar from '../components/navigation/BottomNavbar/BottomNavbar'
-import ProfileCard from '../components/profile/ProfileCard'
-import ProfileMenu from '../components/profile/ProfileMenu'
-import { loadProfile } from '../data/profile'
-import './ProfilePage.css'
+import { useState } from "react";
+import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import ProfileCard from "../components/profile/ProfileCard";
+import ProfileMenu from "../components/profile/ProfileMenu";
+import { loadProfile } from "../data/profile";
+import "./CustomerProfilePage.css";
 
 export default function ProfilePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [profile] = useState(loadProfile)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [profile] = useState(loadProfile);
 
   return (
     <>
@@ -40,5 +40,5 @@ export default function ProfilePage() {
 
       <BottomNavbar />
     </>
-  )
+  );
 }

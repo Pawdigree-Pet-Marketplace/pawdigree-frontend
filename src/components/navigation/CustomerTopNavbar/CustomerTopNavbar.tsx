@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Button from "../../Button/Button";
-import "./TopNavbar.css";
+import "./CustomerTopNavbar.css";
 
 type TopNavbarProps = {
   isLoggedIn: boolean;
@@ -61,6 +61,7 @@ const TopNavbar = ({
         {!isLoggedIn ? (
           <>
             <Button
+              className="auth-btn"
               variant="primary"
               onClick={() => {
                 window.location.href = "/customer-login";
@@ -69,6 +70,7 @@ const TopNavbar = ({
               Log In
             </Button>
             <Button
+              className="auth-btn"
               variant="secondary"
               onClick={() => {
                 window.location.href = "/registration";

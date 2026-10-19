@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import EditProfileForm from '../components/profile/EditProfileForm'
-import TopNavbar from '../components/navigation/TopNavbar/TopNavbar'
-import SideMenu from '../components/navigation/SideMenu/SideMenu'
-import BottomNavbar from '../components/navigation/BottomNavbar/BottomNavbar'
-import { loadProfile, saveProfile } from '../data/profile'
-import type { ProfileFormValues } from '../utils/validateProfile'
-import './ProfilePage.css'
+import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import EditProfileForm from "../components/profile/EditProfileForm";
+import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import { loadProfile, saveProfile } from "../data/profile";
+import type { ProfileFormValues } from "../utils/validateProfile";
+import "./CustomerProfilePage.css";
 
 export default function EditProfilePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [profile] = useState(loadProfile)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [profile] = useState(loadProfile);
 
   // TODO: send the changes to the backend API instead of local storage
   const handleSubmit = (values: ProfileFormValues) => {
-    saveProfile({ ...profile, ...values })
-    window.location.href = '/profile'
-  }
+    saveProfile({ ...profile, ...values });
+    window.location.href = "/profile";
+  };
 
   return (
     <>
@@ -58,5 +58,5 @@ export default function EditProfilePage() {
 
       <BottomNavbar />
     </>
-  )
+  );
 }
