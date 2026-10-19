@@ -70,6 +70,10 @@
   gap: 12px;
 }
 
+.desktop-actions .auth-btn {
+  width:120px;
+}
+
 .topnav-icons {
   display: flex;
   align-items: center;

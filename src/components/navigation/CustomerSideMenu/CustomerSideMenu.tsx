@@ -13,7 +13,7 @@ import {
   Package,
 } from "lucide-react";
 import { ConfirmLogout } from "../../layout/ConfirmLogout";
-import "./Sidemenu.css";
+import "./CustomerSidemenu.css";
 
 type SideMenuProps = {
   isOpen: boolean;

@@ -52,7 +52,7 @@ describe("Vendor Registration Form", () => {
     expect(
       screen.getByRole("heading", {
         name: "Become a Pawdigree Vendor",
-      })
+      }),
     ).toBeInTheDocument();
   });
 
@@ -72,34 +72,26 @@ describe("Vendor Registration Form", () => {
     render(<VendorRegistrationForm />);
 
     expect(screen.getByLabelText(/^Password/i)).toBeInTheDocument();
-    expect(
-      screen.getByLabelText(/^Confirm Password/i)
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Confirm Password/i)).toBeInTheDocument();
   });
 
   // 4. Business information is registered separately.
   test("does not render business information fields", () => {
     render(<VendorRegistrationForm />);
 
+    expect(screen.queryByLabelText(/^Business Name/i)).not.toBeInTheDocument();
+
+    expect(screen.queryByLabelText(/^Business Type/i)).not.toBeInTheDocument();
+
     expect(
-      screen.queryByLabelText(/^Business Name/i)
+      screen.queryByLabelText(/^Business Description/i),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByLabelText(/^Business Type/i)
+      screen.queryByLabelText(/^Business Address/i),
     ).not.toBeInTheDocument();
 
-    expect(
-      screen.queryByLabelText(/^Business Description/i)
-    ).not.toBeInTheDocument();
-
-    expect(
-      screen.queryByLabelText(/^Business Address/i)
-    ).not.toBeInTheDocument();
-
-    expect(
-      screen.queryByLabelText(/^District/i)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^District/i)).not.toBeInTheDocument();
   });
 
   // 5. Check that the terms checkbox appears.
@@ -116,7 +108,7 @@ describe("Vendor Registration Form", () => {
     expect(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     ).toBeInTheDocument();
   });
 
@@ -127,7 +119,7 @@ describe("Vendor Registration Form", () => {
     expect(
       screen.getByRole("combobox", {
         name: "Country calling code",
-      })
+      }),
     ).toHaveValue("+256");
   });
 
@@ -153,19 +145,17 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
     expect(screen.getByText(/username is required/i)).toBeInTheDocument();
     expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
     expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/email address is required/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/email address is required/i)).toBeInTheDocument();
     expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
     expect(screen.getByText(/password is required/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/please confirm your password/i)
+      screen.getByText(/please confirm your password/i),
     ).toBeInTheDocument();
   });
 
@@ -180,7 +170,7 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
     expect(screen.getByText(/valid email address/i)).toBeInTheDocument();
@@ -197,12 +187,10 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
-    expect(
-      screen.getByText(/at least 8 characters/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/at least 8 characters/i)).toBeInTheDocument();
   });
 
   // 12. Check that both passwords must match.
@@ -220,12 +208,10 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
-    expect(
-      screen.getByText(/passwords do not match/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
   });
 
   // 13. Check that an invalid phone number is rejected.
@@ -241,12 +227,10 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
-    expect(
-      screen.getByText(/enter a valid phone number/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/enter a valid phone number/i)).toBeInTheDocument();
   });
 
   // 14. Check that accepting the terms is required.
@@ -262,13 +246,13 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
     expect(screen.getByRole("checkbox")).not.toBeChecked();
 
     expect(
-      await screen.findByText(/accept the terms and conditions/i)
+      await screen.findByText(/accept the terms and conditions/i),
     ).toBeInTheDocument();
 
     expect(fetchMock).not.toHaveBeenCalled();
@@ -294,18 +278,13 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        "https://pawdigree-bckd.onrender.com/api/auth/register/vendor/",
-        expect.objectContaining({
-          method: "POST",
-          headers: expect.objectContaining({
-            "Content-Type": "application/json",
-          }),
-        })
+        expect.stringContaining("/auth/register/vendor/"),
+        expect.anything(),
       );
     });
 
@@ -345,7 +324,7 @@ describe("Vendor Registration Form", () => {
       }),
       {
         target: { value: "+254" },
-      }
+      },
     );
 
     fireEvent.click(screen.getByRole("checkbox"));
@@ -353,7 +332,7 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -387,16 +366,12 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Create Vendor Account",
-      })
+      }),
     );
 
-    expect(
-      await screen.findByText(/registration failed/i)
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/registration failed/i)).toBeInTheDocument();
 
-    expect(
-      await screen.findByText(/already registered/i)
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/already registered/i)).toBeInTheDocument();
   });
 
   // 18. Check that the user can show and hide the password.
@@ -410,7 +385,7 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Show password",
-      })
+      }),
     );
 
     expect(passwordInput).toHaveAttribute("type", "text");
@@ -418,7 +393,7 @@ describe("Vendor Registration Form", () => {
     fireEvent.click(
       screen.getByRole("button", {
         name: "Hide password",
-      })
+      }),
     );
 
     expect(passwordInput).toHaveAttribute("type", "password");

@@ -1,7 +1,7 @@
 import AdminAdd from "./pages/AdminAdd";
-import LandingPage from "./pages/LandingPage";
+import LandingPage from "./pages/CustomerLandingPage";
 import RegistrationPage from "./pages/RegistrationPage";
-import ProfilePage from "./pages/ProfilePage";
+import ProfilePage from "./pages/CustomerProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
@@ -16,13 +16,11 @@ import PrivacyPage from "./pages/PrivacyPage";
 import VendorAddPetPage from "./pages/VendorAddPetPage";
 import VendorCataloguePage from "./pages/VendorCataloguePage";
 
-
-
 function App() {
   const path = window.location.pathname;
   if (path === "/admin/add") {
-  return <AdminAdd />;
-}
+    return <AdminAdd />;
+  }
   if (path === "/terms-and-conditions") {
     return <TermsAndConditionsPage />;
   }

@@ -11,9 +11,9 @@ import Services from "../components/home/Services";
 import Stats from "../components/home/Stats";
 import Testimonials from "../components/home/Testimonials";
 
-import TopNavbar from "../components/navigation/TopNavbar/TopNavbar";
-import SideMenu from "../components/navigation/SideMenu/SideMenu";
-import BottomNavbar from "../components/navigation/BottomNavbar/BottomNavbar";
+import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
