@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import EditProfileForm from "../components/profile/EditProfileForm";
-import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
-import { loadProfile, saveProfile } from "../data/profile";
-import type { ProfileFormValues } from "../utils/validateProfile";
+import EditProfileForm from "../../components/profile/EditProfileForm";
+import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import { loadProfile, saveProfile } from "../../data/profile";
+import type { ProfileFormValues } from "../../utils/validateProfile";
 import "./CustomerProfilePage.css";
 
 export default function EditProfilePage() {

@@ -6,7 +6,7 @@ import {
   ShoppingCart,
   Wallet,
 } from "lucide-react";
-import VendorLayout from "../layouts/VendorLayout/VendorLayout";
+import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorDashboardPage.css";
 
 const metrics = [

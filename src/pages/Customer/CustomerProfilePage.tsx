@@ -1,10 +1,10 @@
 import { useState } from "react";
-import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
-import ProfileCard from "../components/profile/ProfileCard";
-import ProfileMenu from "../components/profile/ProfileMenu";
-import { loadProfile } from "../data/profile";
+import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import ProfileCard from "../../components/profile/ProfileCard";
+import ProfileMenu from "../../components/profile/ProfileMenu";
+import { loadProfile } from "../../data/profile";
 import "./CustomerProfilePage.css";
 
 export default function ProfilePage() {

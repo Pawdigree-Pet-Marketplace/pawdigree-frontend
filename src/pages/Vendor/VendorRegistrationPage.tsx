@@ -1,5 +1,5 @@
-import VendorRegistrationForm from "../components/VendorRegistrationForm/VendorRegistrationForm";
-import lightLogo from "../assets/logos/lightmode-logo.svg";
+import VendorRegistrationForm from "../../components/VendorRegistrationForm/VendorRegistrationForm";
+import lightLogo from "../../assets/logos/lightmode-logo.svg";
 import "./VendorRegistrationPage.css";
 
 function VendorRegistrationPage() {
@@ -25,7 +25,7 @@ function VendorRegistrationPage() {
           <a href="/terms">Terms of Service</a> and{" "}
           <a href="/privacy">Privacy Policy</a>. <br />
           Terms and conditions apply. All vendor accounts are subject to
-verification.
+          verification.
         </p>
       </footer>
     </div>

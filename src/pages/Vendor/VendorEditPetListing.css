@@ -1,0 +1,183 @@
+.vendor-pet-page {
+  padding: var(--space-3) var(--space-4) var(--space-5);
+  max-width: 1120px;
+  margin: 0 auto;
+  color: var(--charcoal);
+  font-family: var(--font-body);
+}
+
+.pet-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-3);
+  color: var(--teal);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: var(--font-body);
+}
+.pet-back-link:hover { text-decoration: underline; }
+
+.pet-listing-form { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.pet-form-section {
+  padding: 28px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.pet-section-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.pet-section-icon {
+  display: grid; place-items: center;
+  width: 44px; height: 44px; flex-shrink: 0;
+  color: var(--teal); background: var(--teal-light);
+  border-radius: 12px; overflow: hidden;
+}
+.pet-section-icon.has-photo { padding: 0; background: var(--sand); }
+.pet-section-icon.has-photo img { width: 100%; height: 100%; object-fit: cover; }
+.pet-section-heading h2 { margin: 0 0 4px; font-family: var(--font-heading); font-size: 19px; font-weight: 600; color: var(--charcoal); }
+.pet-section-heading p { margin: 0; color: var(--gray); font-size: 13px; line-height: 1.6; font-family: var(--font-body); }
+
+.pet-field { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; font-size: 14px; font-weight: 700; font-family: var(--font-body); }
+.pet-field > span, .pet-label > span { color: var(--coral); }
+
+.brand-input, .pet-field textarea {
+  box-sizing: border-box; width: 100%; min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--charcoal);
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  transition: all 0.15s ease;
+}
+.brand-input:focus, .pet-field textarea:focus { outline: 2px solid var(--teal-light); border-color: var(--teal); }
+.brand-input::placeholder, .pet-field textarea::placeholder { color: var(--gray); font-weight: 400; }
+.pet-field textarea.brand-input { min-height: 120px; resize: vertical; }
+
+.pet-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+
+/* RADIO - NO BOX */
+.pet-choice-group {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 24px;
+  border: none !important; outline: none !important; box-shadow: none !important;
+}
+.pet-choice-group label {
+  display: inline-flex !important; align-items: center; gap: 8px;
+  padding: 0 !important; margin: 0 !important;
+  border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important;
+  color: var(--charcoal); cursor: pointer; font-size: 14px; font-weight: 500; font-family: var(--font-body); line-height: 1;
+}
+.pet-choice-group label.selected { color: var(--teal); font-weight: 700; }
+.pet-choice-group input[type="radio"] {
+  width: 16px !important; height: 16px !important; min-width: 16px !important;
+  margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; box-shadow: none !important;
+  accent-color: var(--teal); cursor: pointer;
+}
+
+/* UPLOAD */
+.pet-upload-area {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 32px 16px; border: 1.5px dashed var(--teal);
+  border-radius: 16px; background: var(--teal-light);
+  color: var(--teal); text-align: center; cursor: pointer;
+  transition: all 0.15s ease;
+}
+.pet-upload-area:hover { background: var(--white); border-color: var(--teal-dark); }
+.pet-upload-area strong { color: var(--charcoal); font-family: var(--font-heading); font-size: 14px; font-weight: 600; }
+.pet-upload-area span { color: var(--gray); font-size: 12px; }
+.pet-upload-btn {
+  margin-top: 4px; padding: 8px 16px; border-radius: 999px;
+  background: var(--teal); color: var(--white); font-size: 12px; font-weight: 700; font-family: var(--font-body);
+}
+
+/* PHOTOS */
+.pet-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 14px; margin-top: 20px; }
+.pet-photo-card { position: relative; overflow: hidden; aspect-ratio: 1; border: 1px solid var(--border); border-radius: 12px; background: var(--sand); }
+.pet-photo-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pet-photo-card > button { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 32px; height: 32px; border: none; border-radius: 999px; background: var(--white); color: var(--coral-dark); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.pet-photo-card > button:hover { background: var(--coral-light); }
+.pet-primary-badge, .badge-new { position: absolute; bottom: 8px; left: 8px; padding: 5px 10px; border-radius: 999px; color: var(--white); font-size: 10px; font-weight: 700; font-family: var(--font-body); letter-spacing: 0.02em; }
+.pet-primary-badge { background: var(--teal); } .badge-new { background: var(--charcoal); }
+.pet-photo-count { margin: 14px 0 0; color: var(--gray); font-size: 12px; }
+
+/* BRANDED DROPDOWN - NO GREY BOXY */
+.brand-dropdown { position: relative; width: 100%; }
+.brand-dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; min-height: 46px; padding: 12px 14px;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--white); color: var(--charcoal);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  text-align: left; cursor: pointer; transition: all 0.15s ease;
+}
+.brand-dropdown-trigger:hover { border-color: var(--teal); }
+.brand-dropdown-trigger.open { border-color: var(--teal); outline: 2px solid var(--teal-light); }
+.brand-dropdown-trigger .placeholder { color: var(--gray); font-weight: 400; }
+.brand-dropdown-trigger .has-value { color: var(--charcoal); font-weight: 600; }
+.brand-dropdown-chevron { color: var(--teal); flex-shrink: 0; transition: transform 0.2s ease; }
+.brand-dropdown-chevron.rotated { transform: rotate(180deg); }
+.brand-dropdown-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 20;
+  background: var(--white); border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(44, 48, 47, 0.12), 0 4px 12px rgba(33,108,104,0.08);
+  padding: 6px; animation: dropdownIn 0.16s ease; overflow: hidden;
+}
+@keyframes dropdownIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.brand-dropdown-option {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 12px 14px; border: none; border-radius: 10px;
+  background: transparent; color: var(--charcoal);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; transition: all 0.12s ease;
+}
+.brand-dropdown-option:hover { background: var(--teal-light); color: var(--teal); }
+.brand-dropdown-option.selected { background: var(--teal); color: var(--white); }
+.brand-dropdown-option.selected:hover { background: var(--teal-dark); color: var(--white); }
+
+.pet-form-message { padding: 13px 15px; border-radius: 12px; font-size: 13px; line-height: 1.6; white-space: pre-line; font-family: var(--font-body); }
+.pet-form-message.error { background: var(--coral-light); color: var(--coral-dark); }
+.pet-form-message.success { background: var(--success-tint); color: var(--success); }
+
+.pet-form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+.pet-cancel-button, .pet-submit-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 0 22px; border-radius: 999px;
+  font-family: var(--font-body); font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; transition: all 0.15s ease;
+}
+.pet-cancel-button { border: 1px solid var(--border); background: var(--white); color: var(--charcoal); }
+.pet-cancel-button:hover { border-color: var(--charcoal); }
+.pet-submit-button { gap: 9px; border: 1px solid var(--teal); background: var(--teal); color: var(--white); }
+.pet-submit-button:hover:not(:disabled) { background: var(--teal-dark); border-color: var(--teal-dark); }
+.pet-submit-button:disabled { opacity: 0.6; cursor: not-allowed; }
+.pet-spinner { animation: pet-spin 1s linear infinite; }
+@keyframes pet-spin { to { transform: rotate(360deg); } }
+
+.pet-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  color: var(--coral); 
+  line-height: 1;
+}
+
+.pet-field-label i {
+  font-style: normal;
+  color: #D92D20; 
+  font-weight: 800;
+  line-height: 1;
+}
+
+@media (max-width: 700px) {
+  .vendor-pet-page { padding: 20px 16px 32px; }
+  .pet-form-section { padding: 20px 16px; }
+  .pet-form-grid { grid-template-columns: 1fr; }
+  .pet-choice-group { flex-direction: column; align-items: flex-start; }
+  .pet-form-actions { flex-direction: column-reverse; align-items: stretch; }
+  .pet-cancel-button, .pet-submit-button { width: 100%; box-sizing: border-box; }
+}

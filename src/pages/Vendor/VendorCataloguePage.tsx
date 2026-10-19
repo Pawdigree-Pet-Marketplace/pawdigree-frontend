@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, PawPrint, RefreshCw, Image as ImageIcon } from "lucide-react";
-import API_BASE_URL from "../services/api";
-import VendorLayout from "../layouts/VendorLayout/VendorLayout";
+import API_BASE_URL from "../../services/api";
+import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorCataloguePage.css";
 
 type PetImage = {
@@ -109,7 +109,10 @@ export default function VendorCataloguePage() {
 
   useEffect(() => {
     document.title = "My Catalogue - Pawdigree";
-    void loadPets();
+    const init = async () => {
+      await loadPets();
+    };
+    init();
   }, []);
 
   return (
