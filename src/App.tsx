@@ -1,4 +1,3 @@
-import AdminAdd from "./pages/AdminAdd";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
@@ -15,12 +14,11 @@ import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
+import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 
 function App() {
   const path = window.location.pathname;
-  if (path === "/admin/add") {
-    return <AdminAdd />;
-  }
+
   if (path === "/terms-and-conditions") {
     return <TermsAndConditionsPage />;
   }
@@ -43,6 +41,10 @@ function App() {
 
   if (path === "/vendor/listings/new") {
     return <VendorAddPetPage />;
+  }
+
+  if (path.startsWith("/vendor/edit-pet/")) {
+    return <VendorEditPetListing />;
   }
 
   if (path === "/vendor") {
