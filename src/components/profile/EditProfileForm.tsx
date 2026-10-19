@@ -1,3 +1,4 @@
+
 import { useRef, useState } from 'react'
 import type { ChangeEvent, FocusEvent, FormEvent } from 'react'
 import { parsePhoneNumber } from 'libphonenumber-js'
@@ -5,14 +6,16 @@ import { validateProfile } from '../../utils/validateProfile'
 import type { ProfileFormValues } from '../../utils/validateProfile'
 import './EditProfileForm.css'
 
+
 const countries = [
-  { code: 'UG', name: 'Uganda', dialCode: '+256' },
-  { code: 'KE', name: 'Kenya', dialCode: '+254' },
-  { code: 'TZ', name: 'Tanzania', dialCode: '+255' },
-  { code: 'RW', name: 'Rwanda', dialCode: '+250' },
-  { code: 'BI', name: 'Burundi', dialCode: '+257' },
-  { code: 'SS', name: 'South Sudan', dialCode: '+211' },
+  { code: 'UG', name: 'Uganda', dialCode: '+256', flag: '🇺🇬' },
+  { code: 'KE', name: 'Kenya', dialCode: '+254', flag: '🇰🇪' },
+  { code: 'TZ', name: 'Tanzania', dialCode: '+255', flag: '🇹🇿' },
+  { code: 'RW', name: 'Rwanda', dialCode: '+250', flag: '🇷🇼' },
+  { code: 'BI', name: 'Burundi', dialCode: '+257', flag: '🇧🇮' },
+  { code: 'SS', name: 'South Sudan', dialCode: '+211', flag: '🇸🇸' },
 ] as const
+
 
 type SupportedCountry = (typeof countries)[number]['code']
 type FieldName = keyof ProfileFormValues
@@ -185,9 +188,9 @@ export default function EditProfileForm({
             aria-label="Country calling code"
           >
             {countries.map((item) => (
-              <option key={item.code} value={item.code}>
-                {item.name} ({item.dialCode})
-              </option>
+             <option key={item.code} value={item.code}>
+               {item.flag} {item.name} ({item.dialCode})
+             </option>
             ))}
           </select>
 

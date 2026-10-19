@@ -1,6 +1,6 @@
-import { Check, MapPin, Phone } from 'lucide-react'
-import type { Profile } from '../../data/profile'
-import './ProfileCard.css'
+import { Check, MapPin, Phone } from "lucide-react";
+import type { Profile } from "../../data/profile";
+import "./ProfileCard.css";
 
 function getInitials(name: string) {
   return name
@@ -8,12 +8,12 @@ function getInitials(name: string) {
     .split(/\s+/)
     .slice(0, 2)
     .map((word) => word.charAt(0).toUpperCase())
-    .join('')
+    .join("");
 }
 
 type ProfileCardProps = {
-  profile: Profile
-}
+  profile: Profile;
+};
 
 export default function ProfileCard({ profile }: ProfileCardProps) {
   return (
@@ -26,6 +26,7 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
         <div className="profile-card-info">
           <h2 className="profile-name">{profile.fullName}</h2>
           <p className="profile-email">{profile.email}</p>
+
           {profile.verified && (
             <span className="profile-verified">
               <Check size={14} strokeWidth={3} aria-hidden="true" /> Verified
@@ -39,19 +40,24 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
       </div>
 
       <dl className="profile-details">
-        <div>
-          <dt>
-            <Phone size={16} aria-hidden="true" /> Phone
-          </dt>
-          <dd>{profile.phone}</dd>
-        </div>
-        <div>
-          <dt>
-            <MapPin size={16} aria-hidden="true" /> Location
-          </dt>
-          <dd>{profile.location}</dd>
-        </div>
+        {profile.phone && (
+          <div>
+            <dt>
+              <Phone size={16} aria-hidden="true" /> Phone
+            </dt>
+            <dd>{profile.phone}</dd>
+          </div>
+        )}
+
+        {profile.location && (
+          <div>
+            <dt>
+              <MapPin size={16} aria-hidden="true" /> Location
+            </dt>
+            <dd>{profile.location}</dd>
+          </div>
+        )}
       </dl>
     </section>
-  )
+  );
 }

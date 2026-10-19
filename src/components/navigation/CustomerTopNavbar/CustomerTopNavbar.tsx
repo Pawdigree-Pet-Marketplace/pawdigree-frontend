@@ -47,8 +47,10 @@ const TopNavbar = ({
 
   return (
     <header className={navbarClass}>
-      <img src={logo} alt="Pawdigree" className="logo-img" />
-
+      <a href="/" aria-label="Pawdigree home">
+          <img src={logo} alt="Pawdigree" className="logo-img" />
+      </a>
+      
       <nav className="desktop-links">
         <a href="#pets">Browse Pets</a>
         <a href="#services">Services</a>
@@ -80,13 +82,24 @@ const TopNavbar = ({
             </Button>
           </>
         ) : (
+          
           <div className="topnav-icons">
             <Heart size={22} strokeWidth={1.6} />
             <ShoppingCart size={22} strokeWidth={1.6} />
             <Bell size={22} strokeWidth={1.6} />
             <MessageCircle size={22} strokeWidth={1.6} />
-            <UserRound size={22} strokeWidth={1.6} />
+            <button
+              type="button"
+              className="topnav-icon-button"
+              aria-label="Open profile"
+              onClick={() => {
+                window.location.href = "/profile";
+              }}
+            >
+              <UserRound size={22} strokeWidth={1.6} />
+            </button>
           </div>
+
         )}
 
         <button
