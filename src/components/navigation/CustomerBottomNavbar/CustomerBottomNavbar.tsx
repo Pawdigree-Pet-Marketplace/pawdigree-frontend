@@ -1,5 +1,5 @@
 import { Home, ShoppingBag, MessageSquare, User } from "lucide-react";
-import "./BottomNavbar.css";
+import "./CustomerBottomNavbar.css";
 
 const navItems = [
   { label: "Home", icon: Home },
