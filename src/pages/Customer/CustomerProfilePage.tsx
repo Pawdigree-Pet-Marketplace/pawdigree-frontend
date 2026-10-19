@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
-import ProfileCard from "../components/profile/ProfileCard";
-import ProfileMenu from "../components/profile/ProfileMenu";
-import type { Profile } from "../data/profile";
-import API_BASE_URL from "../services/api";
+import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import ProfileCard from "../../components/profile/ProfileCard";
+import ProfileMenu from "../../components/profile/ProfileMenu";
+import type { Profile } from "../../data/profile";
+import API_BASE_URL from "../../services/api";
 import "./CustomerProfilePage.css";
 
 type CustomerProfileResponse = {

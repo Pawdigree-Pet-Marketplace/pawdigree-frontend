@@ -1,8 +1,8 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, Eye, EyeOff, Store } from "lucide-react";
-import { apiRequest } from "../services/api";
-import logo from "../assets/logos/lightmode-logo.svg";
+import { apiRequest } from "../../services/api";
+import logo from "../../assets/logos/lightmode-logo.svg";
 import "./VendorLoginPage.css";
 
 type LoginResponse = {

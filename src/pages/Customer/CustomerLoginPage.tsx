@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import "./CustomerLoginPage.css";
-import logo from "../assets/logos/icon-logo.svg";
-import CustomerLoginForm from "../components/auth/CustomerLoginForm";
+import logo from "../../assets/logos/icon-logo.svg";
+import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
 
 type Step = "welcome" | "password" | "phone";
 

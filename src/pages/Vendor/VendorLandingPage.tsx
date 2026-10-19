@@ -1,9 +1,9 @@
 
 import { useEffect } from "react";
 import "./VendorLandingPage.css";
-import vendorHero from "../assets/images/vendor-hero.jpg";
-import vendorHero2 from "../assets/images/vendor-hero2.jpg";
-import logo from "../assets/logos/lightmode-logo.svg";
+import vendorHero from "../../assets/images/vendor-hero.jpg";
+import vendorHero2 from "../../assets/images/vendor-hero2.jpg";
+import logo from "../../assets/logos/lightmode-logo.svg";
 
 import {
   ArrowUpRight,
