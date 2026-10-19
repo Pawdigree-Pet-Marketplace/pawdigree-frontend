@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, PawPrint, RefreshCw, Image as ImageIcon } from "lucide-react";
-import API_BASE_URL from "../services/api";
-import VendorLayout from "../layouts/VendorLayout/VendorLayout";
+import API_BASE_URL from "../../services/api";
+import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorCataloguePage.css";
 
 type PetImage = {

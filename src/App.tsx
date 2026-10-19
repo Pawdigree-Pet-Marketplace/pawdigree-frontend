@@ -1,20 +1,20 @@
 import AdminAdd from "./pages/AdminAdd";
-import LandingPage from "./pages/CustomerLandingPage";
+import LandingPage from "./pages/Customer/CustomerLandingPage";
 import RegistrationPage from "./pages/RegistrationPage";
-import ProfilePage from "./pages/CustomerProfilePage";
-import EditProfilePage from "./pages/EditProfilePage";
-import CustomerLoginPage from "./pages/CustomerLoginPage";
+import ProfilePage from "./pages/Customer/CustomerProfilePage";
+import EditProfilePage from "./pages/Customer/EditProfilePage";
+import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import VendorRegistrationPage from "./pages/VendorRegistrationPage";
+import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
+import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
-import VendorLandingPage from "./pages/VendorLandingPage";
-import VendorDashboardPage from "./pages/VendorDashboardPage";
-import VendorLoginPage from "./pages/VendorLoginPage";
+import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
+import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
+import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import PrivacyPage from "./pages/PrivacyPage";
-import VendorAddPetPage from "./pages/VendorAddPetPage";
-import VendorCataloguePage from "./pages/VendorCataloguePage";
+import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
+import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 
 function App() {
   const path = window.location.pathname;
@@ -37,13 +37,13 @@ function App() {
     return <VendorDashboardPage />;
   }
 
-if (path === "/vendor/listings") {
-  return <VendorCataloguePage />;
-}
+  if (path === "/vendor/listings") {
+    return <VendorCataloguePage />;
+  }
 
-if (path === "/vendor/listings/new") {
-  return <VendorAddPetPage />;
-}
+  if (path === "/vendor/listings/new") {
+    return <VendorAddPetPage />;
+  }
 
   if (path === "/vendor") {
     return <VendorLandingPage />;

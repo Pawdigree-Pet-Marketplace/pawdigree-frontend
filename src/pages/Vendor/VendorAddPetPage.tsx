@@ -6,8 +6,8 @@ import {
   PawPrint,
   Trash2,
 } from "lucide-react";
-import API_BASE_URL from "../services/api";
-import VendorLayout from "../layouts/VendorLayout/VendorLayout";
+import API_BASE_URL from "../../services/api";
+import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorAddPetPage.css";
 
 type Business = {
@@ -15,9 +15,11 @@ type Business = {
   name: string;
 };
 
-type BusinessResponse = Business[] | {
-  results: Business[];
-};
+type BusinessResponse =
+  | Business[]
+  | {
+      results: Business[];
+    };
 
 type PetPhoto = {
   file: File;
@@ -30,14 +32,16 @@ async function readError(response: Response): Promise<string> {
   const data = await response.json().catch(() => null);
 
   if (data && typeof data === "object") {
-    return Object.entries(data as Record<string, unknown>)
-      .map(([field, value]) => {
-        const messages = Array.isArray(value)
-          ? value.join(" ")
-          : String(value);
-        return `${field}: ${messages}`;
-      })
-      .join("\n") || `Request failed (${response.status}).`;
+    return (
+      Object.entries(data as Record<string, unknown>)
+        .map(([field, value]) => {
+          const messages = Array.isArray(value)
+            ? value.join(" ")
+            : String(value);
+          return `${field}: ${messages}`;
+        })
+        .join("\n") || `Request failed (${response.status}).`
+    );
   }
 
   return `Request failed (${response.status}).`;
@@ -46,8 +50,7 @@ async function readError(response: Response): Promise<string> {
 export default function VendorAddPetPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessId, setBusinessId] = useState("");
-  const [listingType, setListingType] =
-    useState<ListingType>("ADOPTION");
+  const [listingType, setListingType] = useState<ListingType>("ADOPTION");
   const [name, setName] = useState("");
   const [species, setSpecies] = useState("Dog");
   const [breed, setBreed] = useState("");
@@ -66,11 +69,8 @@ export default function VendorAddPetPage() {
     document.title = "Add Pet Listing - Pawdigree";
 
     const token =
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("token");
-    const role =
-      localStorage.getItem("role") ||
-      sessionStorage.getItem("role");
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const role = localStorage.getItem("role") || sessionStorage.getItem("role");
 
     if (!token || role !== "VENDOR") {
       window.location.href = "/vendor/login";
@@ -79,14 +79,11 @@ export default function VendorAddPetPage() {
 
     async function loadBusinesses() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/businesses/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch(`${API_BASE_URL}/businesses/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         if (!response.ok) {
           throw new Error(await readError(response));
@@ -131,9 +128,7 @@ export default function VendorAddPetPage() {
       return;
     }
 
-    const tooLarge = selected.find(
-      (file) => file.size > 5 * 1024 * 1024,
-    );
+    const tooLarge = selected.find((file) => file.size > 5 * 1024 * 1024);
 
     if (tooLarge) {
       setError("Each photo must be 5 MB or smaller.");
@@ -165,9 +160,7 @@ export default function VendorAddPetPage() {
     setSuccess("");
 
     if (!businessId) {
-      setError(
-        "You need a registered business before adding a pet listing.",
-      );
+      setError("You need a registered business before adding a pet listing.");
       return;
     }
 
@@ -182,8 +175,7 @@ export default function VendorAddPetPage() {
     }
 
     const token =
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("token");
+      localStorage.getItem("token") || sessionStorage.getItem("token");
 
     if (!token) {
       window.location.href = "/vendor/login";
@@ -296,12 +288,9 @@ export default function VendorAddPetPage() {
 
             {!loadingBusinesses && businesses.length === 0 && (
               <p className="pet-inline-note">
-                No registered business was found. Register your business
-                before creating a listing.
-                {" "}
-                <a href="/business-registration">
-                  Register a business
-                </a>
+                No registered business was found. Register your business before
+                creating a listing.{" "}
+                <a href="/business-registration">Register a business</a>
               </p>
             )}
 
@@ -440,8 +429,8 @@ export default function VendorAddPetPage() {
               <div>
                 <h2>Pet photos</h2>
                 <p>
-                  Upload multiple clear photos. The first photo will be
-                  the primary image.
+                  Upload multiple clear photos. The first photo will be the
+                  primary image.
                 </p>
               </div>
             </div>
@@ -483,7 +472,8 @@ export default function VendorAddPetPage() {
             )}
 
             <p className="pet-photo-count">
-              {photos.length} {photos.length === 1 ? "photo" : "photos"} selected
+              {photos.length} {photos.length === 1 ? "photo" : "photos"}{" "}
+              selected
             </p>
           </section>
 
@@ -506,7 +496,9 @@ export default function VendorAddPetPage() {
             <button
               className="pet-submit-button"
               type="submit"
-              disabled={submitting || loadingBusinesses || businesses.length === 0}
+              disabled={
+                submitting || loadingBusinesses || businesses.length === 0
+              }
             >
               {submitting ? (
                 <>

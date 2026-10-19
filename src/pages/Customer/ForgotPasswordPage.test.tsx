@@ -1,10 +1,9 @@
-
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { apiRequest } from "../services/api";
+import { apiRequest } from "../../services/api";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 
-vi.mock("../services/api", () => ({
+vi.mock("../../services/api", () => ({
   apiRequest: vi.fn(),
 }));
 
@@ -22,9 +21,7 @@ describe("ForgotPasswordPage", () => {
       }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByLabelText("Email address"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Email address")).toBeInTheDocument();
 
     expect(
       screen.getByRole("button", {
@@ -46,9 +43,9 @@ describe("ForgotPasswordPage", () => {
       }),
     );
 
-    expect(
-      screen.getByRole("alert"),
-    ).toHaveTextContent("Please enter a valid email address.");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Please enter a valid email address.",
+    );
 
     expect(apiRequest).not.toHaveBeenCalled();
   });
@@ -71,15 +68,12 @@ describe("ForgotPasswordPage", () => {
     );
 
     await waitFor(() => {
-      expect(apiRequest).toHaveBeenCalledWith(
-        "/auth/password-reset/request/",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: "person@example.com",
-          }),
-        },
-      );
+      expect(apiRequest).toHaveBeenCalledWith("/auth/password-reset/request/", {
+        method: "POST",
+        body: JSON.stringify({
+          email: "person@example.com",
+        }),
+      });
     });
 
     expect(
@@ -90,9 +84,7 @@ describe("ForgotPasswordPage", () => {
   });
 
   it("shows an error when the API request fails", async () => {
-    vi.mocked(apiRequest).mockRejectedValue(
-      new Error("Network error"),
-    );
+    vi.mocked(apiRequest).mockRejectedValue(new Error("Network error"));
 
     render(<ForgotPasswordPage />);
 
@@ -106,9 +98,7 @@ describe("ForgotPasswordPage", () => {
       }),
     );
 
-    expect(
-      await screen.findByRole("alert"),
-    ).toHaveTextContent(
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       "We couldn't process your request right now. Please try again later.",
     );
   });

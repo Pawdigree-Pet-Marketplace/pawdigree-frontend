@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
-import Adoption from "../components/home/Adoption";
-import Footer from "../components/layout/Footer";
-import Categories from "../components/home/Categories";
-import CtaBanner from "../components/home/CtaBanner";
-import Hero from "../components/home/Hero";
-import HowItWorks from "../components/home/HowItWorks";
-import Listings from "../components/home/Listings";
-import Merchandise from "../components/home/Merchandise";
-import Services from "../components/home/Services";
-import Stats from "../components/home/Stats";
-import Testimonials from "../components/home/Testimonials";
+import Adoption from "../../components/home/Adoption";
+import Footer from "../../components/layout/Footer";
+import Categories from "../../components/home/Categories";
+import CtaBanner from "../../components/home/CtaBanner";
+import Hero from "../../components/home/Hero";
+import HowItWorks from "../../components/home/HowItWorks";
+import Listings from "../../components/home/Listings";
+import Merchandise from "../../components/home/Merchandise";
+import Services from "../../components/home/Services";
+import Stats from "../../components/home/Stats";
+import Testimonials from "../../components/home/Testimonials";
 
-import TopNavbar from "../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
 import "./ForgotPasswordPage.css";
-import logo from "../assets/logos/icon-logo.svg";
-import { apiRequest } from "../services/api";
+import logo from "../../assets/logos/icon-logo.svg";
+import { apiRequest } from "../../services/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -37,11 +37,11 @@ export default function ForgotPasswordPage() {
       });
 
       setMessage(
-        "If an account exists for this email, password reset instructions will be sent."
+        "If an account exists for this email, password reset instructions will be sent.",
       );
     } catch {
       setError(
-        "We couldn't process your request right now. Please try again later."
+        "We couldn't process your request right now. Please try again later.",
       );
     } finally {
       setIsSubmitting(false);
