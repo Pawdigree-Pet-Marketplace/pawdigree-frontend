@@ -109,7 +109,10 @@ export default function VendorCataloguePage() {
 
   useEffect(() => {
     document.title = "My Catalogue - Pawdigree";
-    void loadPets();
+    const init = async () => {
+      await loadPets();
+    };
+    init();
   }, []);
 
   return (

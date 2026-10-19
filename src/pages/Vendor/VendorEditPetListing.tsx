@@ -16,6 +16,12 @@ type Business = { id: string; name: string };
 type BusinessResponse = Business[] | { results: Business[] };
 type ListingType = "ADOPTION" | "SALE";
 type Option = { value: string; label: string };
+type ExistingPhoto = {
+  id?: string | number;
+  image?: string;
+  image_url?: string;
+  url?: string;
+};
 
 async function readError(response: Response): Promise<string> {
   const data = await response.json().catch(() => null);
@@ -116,7 +122,7 @@ export default function VendorEditPetListing() {
   const [size, setSize] = useState("MEDIUM");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [existingPhotos, setExistingPhotos] = useState<any[]>([]);
+  const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([]);
   const [newPhotos, setNewPhotos] = useState<{ file: File; preview: string }[]>(
     [],
   );
@@ -198,8 +204,8 @@ export default function VendorEditPetListing() {
         setLoadingPet(false);
       }
     }
-    void loadBusinesses();
-    void loadPet();
+    loadBusinesses();
+    loadPet();
   }, [id, isIdMissing]);
 
   if (isIdMissing) {
