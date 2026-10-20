@@ -79,7 +79,7 @@ export default function VendorAddPetPage() {
 
     async function loadBusinesses() {
       try {
-        const response = await fetch(`${API_BASE_URL}/businesses/`, {
+        const response = await fetch(`${API_BASE_URL}/api/businesses/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -204,7 +204,7 @@ export default function VendorAddPetPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/pets/`, {
+      const response = await fetch(`${API_BASE_URL}/api/pets/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

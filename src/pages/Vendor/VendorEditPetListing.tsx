@@ -160,7 +160,7 @@ export default function VendorEditPetListing() {
       localStorage.getItem("token") || sessionStorage.getItem("token");
     async function loadBusinesses() {
       try {
-        const res = await fetch(`${API_BASE_URL}/businesses/`, {
+        const res = await fetch(`${API_BASE_URL}/api/businesses/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(await readError(res));
@@ -173,7 +173,7 @@ export default function VendorEditPetListing() {
     }
     async function loadPet() {
       try {
-        const res = await fetch(`${API_BASE_URL}/pets/${id}/`, {
+        const res = await fetch(`${API_BASE_URL}/api/pets/${id}/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(await readError(res));
@@ -280,7 +280,7 @@ export default function VendorEditPetListing() {
     });
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/pets/${id}/`, {
+      const res = await fetch(`${API_BASE_URL}/api/pets/${id}/`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
