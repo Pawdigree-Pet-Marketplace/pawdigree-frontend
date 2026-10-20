@@ -15,14 +15,13 @@ import PrivacyPage from "./pages/PrivacyPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
-
+import DocumentUpload from './pages/Vendor/DocumentUpload';
 function App() {
   const path = window.location.pathname;
 
   if (path === "/terms-and-conditions") {
     return <TermsAndConditionsPage />;
   }
-
   if (path === "/privacy") {
     return <PrivacyPage />;
   }
@@ -50,6 +49,9 @@ function App() {
   if (path === "/vendor") {
     return <VendorLandingPage />;
   }
+  if (path === "/vendor/documents") {
+  return <DocumentUpload />;
+}
 
   if (path === "/business-registration") {
     return <BusinessRegistrationForm />;
@@ -65,7 +67,7 @@ function App() {
   ) {
     return <VendorRegistrationPage />;
   }
-
+ 
   if (path === "/registration") {
     return <RegistrationPage />;
   }
@@ -87,5 +89,9 @@ function App() {
   }
 
   return <LandingPage />;
+  <a href="/" className="document-brand" aria-label="Pawdigree home">
+  <img src="/logo.png" alt="Pawdigree" />
+</a>
+  
 }
 export default App;
