@@ -89,7 +89,7 @@ function BusinessRegistrationForm() {
           headers.Authorization = `Bearer ${accessToken}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/categories/`, {
+        const response = await fetch(`${API_BASE_URL}/api/categories/`, {
           method: "GET",
           headers,
           signal: controller.signal,
@@ -308,7 +308,7 @@ function BusinessRegistrationForm() {
       );
 
       const response = await fetch(
-        `${API_BASE_URL}/auth/businesses/register/`,
+        `${API_BASE_URL}/api/auth/businesses/register/`,
         {
           method: "POST",
           headers: {

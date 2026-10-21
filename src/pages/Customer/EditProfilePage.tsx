@@ -40,7 +40,7 @@ export default function EditProfilePage() {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -105,7 +105,7 @@ export default function EditProfilePage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile/`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

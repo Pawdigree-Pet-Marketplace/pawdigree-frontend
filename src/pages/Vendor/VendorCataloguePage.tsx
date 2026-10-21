@@ -84,7 +84,7 @@ export default function VendorCataloguePage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/pets/`, {
+      const response = await fetch(`${API_BASE_URL}/api/pets/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

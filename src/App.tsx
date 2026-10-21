@@ -89,9 +89,5 @@ function App() {
   }
 
   return <LandingPage />;
-  <a href="/" className="document-brand" aria-label="Pawdigree home">
-  <img src="/logo.png" alt="Pawdigree" />
-</a>
-  
 }
 export default App;
