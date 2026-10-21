@@ -15,7 +15,9 @@ import PrivacyPage from "./pages/PrivacyPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
-import DocumentUpload from './pages/Vendor/DocumentUpload';
+import DocumentUpload from "./pages/Vendor/DocumentUpload";
+import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
+
 function App() {
   const path = window.location.pathname;
 
@@ -50,8 +52,8 @@ function App() {
     return <VendorLandingPage />;
   }
   if (path === "/vendor/documents") {
-  return <DocumentUpload />;
-}
+    return <DocumentUpload />;
+  }
 
   if (path === "/business-registration") {
     return <BusinessRegistrationForm />;
@@ -61,13 +63,17 @@ function App() {
     return <VendorRegistrationForm />;
   }
 
+  if (path === "/vendor/business-profile") {
+    return <VendorBusinessProfilePage />;
+  }
+
   if (
     path.startsWith("/vendor/register") ||
     path.startsWith("/register.vendor")
   ) {
     return <VendorRegistrationPage />;
   }
- 
+
   if (path === "/registration") {
     return <RegistrationPage />;
   }
