@@ -152,7 +152,7 @@ export default function DocumentUpload() {
     <div className="document-page">
       <header className="document-header">
         <Link to="/" className="document-brand" aria-label="Pawdigree home">
-          <img src="/logo.png" alt="Pawdigree" />
+          <img src="/logo.png"alt="src\assets\logo.png Pawdigree" />
         </Link>
 
         <nav className="document-nav" aria-label="Main navigation">
