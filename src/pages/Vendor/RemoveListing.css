@@ -1,0 +1,270 @@
+
+/* Listing action buttons */
+.catalogue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.catalogue-actions button {
+  display: inline-flex;
+  flex: 1 1 145px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.catalogue-deactivate-button {
+  color: #216c68;
+  background: #e8f3f1;
+  border-color: #c7e1dd !important;
+}
+
+.catalogue-deactivate-button:hover:not(:disabled) {
+  background: #d6eae6;
+}
+
+.catalogue-remove-button {
+  color: #a33e35;
+  background: #fff0ed;
+  border-color: #f1cbc5 !important;
+}
+
+.catalogue-remove-button:hover:not(:disabled) {
+  background: #ffe1dc;
+}
+
+.catalogue-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Inactive listing badge */
+.catalogue-status.is-inactive {
+  color: #555d5b;
+  background: #e8eae9;
+}
+
+/* Success message */
+.catalogue-success {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 13px 16px;
+  color: #185b43;
+  background: #e8f5ed;
+  border: 1px solid #b9dfc8;
+  border-radius: 10px;
+}
+
+.catalogue-success button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Confirmation dialog backdrop */
+.catalogue-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(25 34 32 / 55%);
+}
+
+/* Confirmation dialog */
+.catalogue-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  padding: 30px;
+  color: #2c302f;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 65px rgb(0 0 0 / 20%);
+  animation: catalogue-dialog-appear 0.18s ease-out;
+}
+
+.catalogue-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #555d5b;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.catalogue-dialog-close:hover:not(:disabled) {
+  background: #f1f3f2;
+}
+
+.catalogue-dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 18px;
+  color: #216c68;
+  background: #e8f3f1;
+  border-radius: 14px;
+}
+
+.catalogue-dialog h2 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+  line-height: 1.3;
+}
+
+.catalogue-dialog p {
+  margin: 0;
+  color: #606765;
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+
+.catalogue-dialog p strong {
+  color: #2c302f;
+}
+
+.catalogue-dialog-error {
+  margin-top: 16px;
+  padding: 12px;
+  color: #963b32;
+  background: #fff0ed;
+  border: 1px solid #f1cbc5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.catalogue-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.catalogue-dialog-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 43px;
+  padding: 11px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.catalogue-dialog-actions button:disabled,
+.catalogue-dialog-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.catalogue-cancel-button {
+  color: #2c302f;
+  background: #ffffff;
+  border-color: #d9dddb !important;
+}
+
+.catalogue-cancel-button:hover:not(:disabled) {
+  background: #f5f6f5;
+}
+
+.catalogue-confirm-deactivate {
+  color: #ffffff;
+  background: #216c68;
+}
+
+.catalogue-confirm-deactivate:hover:not(:disabled) {
+  background: #195955;
+}
+
+.catalogue-confirm-remove {
+  color: #ffffff;
+  background: #b54138;
+}
+
+.catalogue-confirm-remove:hover:not(:disabled) {
+  background: #96352e;
+}
+
+/* Loading spinner for action buttons and catalogue */
+.catalogue-spinner {
+  animation: catalogue-spin 1s linear infinite;
+}
+
+@keyframes catalogue-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes catalogue-dialog-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .catalogue-dialog {
+    padding: 24px 20px;
+  }
+
+  .catalogue-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .catalogue-dialog-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalogue-spinner,
+  .catalogue-dialog {
+    animation: none;
+  }
+}

@@ -22,6 +22,7 @@ type Pet = {
   price?: string | number | null;
   adoption_status?: "AVAILABLE" | "PENDING" | "ADOPTED";
   approved: boolean;
+   is_active: boolean;
   images?: (PetImage | string)[];
 };
 
