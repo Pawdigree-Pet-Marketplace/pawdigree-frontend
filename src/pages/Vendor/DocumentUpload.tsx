@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 import { Link } from 'react-router-dom';
 import './DocumentUpload.css';
-
+import logo from '../../assets/logo.png';
 type DocumentId = 'idFront' | 'idBack' | 'license' | 'certificate' | 'supporting';
 
 type DocumentItem = {
@@ -152,7 +152,9 @@ export default function DocumentUpload() {
     <div className="document-page">
       <header className="document-header">
         <Link to="/" className="document-brand" aria-label="Pawdigree home">
-          <img src="/logo.png"alt="src\assets\logo.png Pawdigree" />
+          <a href="/" className="document-brand" aria-label="Pawdigree home">
+  <img src={logo} alt="Pawdigree" />
+          </a>
         </Link>
 
         <nav className="document-nav" aria-label="Main navigation">
