@@ -1,5 +1,9 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { parsePhoneNumberFromString } from "libphonenumber-js";
+import {
+  parsePhoneNumberFromString,
+  type CountryCode,
+} from "libphonenumber-js";
+import CountryFlag from "../CountryFlag/CountryFlag";
 import "./BusinessRegistrationForm.css";
 
 import API_BASE_URL from "../../services/api";
@@ -7,6 +11,12 @@ import API_BASE_URL from "../../services/api";
 interface Category {
   id: number;
   name: string;
+}
+
+interface CountryOption {
+  country: string;
+  iso_code: string;
+  dial_code: string;
 }
 
 interface DayHours {
@@ -62,6 +72,10 @@ const initialFormData: FormData = {
 function BusinessRegistrationForm() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [countries, setCountries] = useState<CountryOption[]>([]);
+  const [selectedCountry, setSelectedCountry] =
+    useState<CountryCode>("UG");
+  const [loadingCountries, setLoadingCountries] = useState(true);
   const [businessHours, setBusinessHours] =
     useState<BusinessHours>(initialBusinessHours);
 
@@ -70,6 +84,56 @@ function BusinessRegistrationForm() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error">("error");
+
+  // Load available phone countries from the backend.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadCountries() {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/country-codes/`,
+          {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Unable to load phone country codes.");
+        }
+
+        const data = await response.json();
+        const countryList: CountryOption[] = Array.isArray(data)
+          ? data
+          : Array.isArray(data.results)
+            ? data.results
+            : [];
+
+        setCountries(countryList);
+
+        const defaultCountry =
+          countryList.find((item) => item.iso_code === "UG") ??
+          countryList[0];
+
+        if (defaultCountry) {
+          setSelectedCountry(defaultCountry.iso_code as CountryCode);
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
+        console.error("Unable to load phone country codes:", error);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingCountries(false);
+        }
+      }
+    }
+
+    loadCountries();
+    return () => controller.abort();
+  }, []);
 
   // Load the categories already created in the backend.
   useEffect(() => {
@@ -236,14 +300,14 @@ function BusinessRegistrationForm() {
     if (!formData.businessPhone.trim()) {
       newErrors.businessPhone = "Business phone number is required.";
     } else {
-      const phone = parsePhoneNumberFromString(
-        formData.businessPhone,
-        "UG"
-      );
+      const phoneInput = formData.businessPhone.trim();
+      const phone = phoneInput.startsWith("+")
+        ? parsePhoneNumberFromString(phoneInput)
+        : parsePhoneNumberFromString(phoneInput, selectedCountry);
 
       if (!phone || !phone.isValid()) {
         newErrors.businessPhone =
-          "Enter a valid Ugandan phone number.";
+          "Enter a valid phone number for the selected country.";
       }
     }
 
@@ -302,10 +366,14 @@ function BusinessRegistrationForm() {
     setSubmitting(true);
 
     try {
-      const phone = parsePhoneNumberFromString(
-        formData.businessPhone,
-        "UG"
-      );
+      const phoneInput = formData.businessPhone.trim();
+      const phone = phoneInput.startsWith("+")
+        ? parsePhoneNumberFromString(phoneInput)
+        : parsePhoneNumberFromString(phoneInput, selectedCountry);
+
+      if (!phone || !phone.isValid()) {
+        throw new Error("Please enter a valid business phone number.");
+      }
 
       const response = await fetch(
         `${API_BASE_URL}/api/auth/businesses/register/`,
@@ -480,16 +548,40 @@ function BusinessRegistrationForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="businessPhone">Business phone *</label>
-            <input
-              id="businessPhone"
-              name="businessPhone"
-              type="tel"
-              placeholder="+256..."
-              value={formData.businessPhone}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.businessPhone)}
-            />
+            <label htmlFor="businessPhone">Business phone*</label>
+            <div className="business-phone-row">
+              <div className="business-country-select">
+                <CountryFlag countryCode={selectedCountry} />
+                <select
+                  aria-label="Phone country"
+                  value={selectedCountry}
+                  disabled={loadingCountries || countries.length === 0}
+                  onChange={(event) => {
+                    setSelectedCountry(event.target.value as CountryCode);
+                    setErrors((previous) => {
+                      const updated = { ...previous };
+                      delete updated.businessPhone;
+                      return updated;
+                    });
+                  }}
+                >
+                  {countries.map((item) => (
+                    <option key={item.iso_code} value={item.iso_code}>
+                      {item.country} ({item.dial_code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <input
+                id="businessPhone"
+                name="businessPhone"
+                type="tel"
+                placeholder="+256..."
+                value={formData.businessPhone}
+                onChange={handleChange}
+                aria-invalid={Boolean(errors.businessPhone)}
+              />
+            </div>
             {errors.businessPhone && (
               <p className="field-error">{errors.businessPhone}</p>
             )}
