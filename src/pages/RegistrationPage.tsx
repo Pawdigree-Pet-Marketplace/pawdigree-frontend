@@ -1,19 +1,17 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FocusEvent, FormEvent } from "react";
-import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
+import { isValidPhoneNumber, parsePhoneNumber, type CountryCode } from "libphonenumber-js";
 import "../App.css";
 import { apiRequest } from "../services/api";
+import CountryFlag from "../components/CountryFlag/CountryFlag";
 
-const countries = [
-  { code: "UG", name: "Uganda", dialCode: "+256" },
-  { code: "KE", name: "Kenya", dialCode: "+254" },
-  { code: "TZ", name: "Tanzania", dialCode: "+255" },
-  { code: "RW", name: "Rwanda", dialCode: "+250" },
-  { code: "BI", name: "Burundi", dialCode: "+257" },
-  { code: "SS", name: "South Sudan", dialCode: "+211" },
-] as const;
+type CountryOption = {
+  country: string;
+  iso_code: string;
+  dial_code: string;
+};
 
-type SupportedCountry = (typeof countries)[number]["code"];
+type SupportedCountry = CountryCode;
 
 type RegistrationField =
   | "first_name"
@@ -45,7 +43,10 @@ export default function RegistrationPage() {
     confirmPassword: "",
   });
 
+  const [countries, setCountries] = useState<CountryOption[]>([]);
   const [country, setCountry] = useState<SupportedCountry>("UG");
+  const [countriesLoading, setCountriesLoading] = useState(true);
+  const [countryLoadError, setCountryLoadError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [touched, setTouched] = useState<
@@ -55,6 +56,40 @@ export default function RegistrationPage() {
   const [success, setSuccess] = useState("");
   const [apiError, setApiError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+  useEffect(() => {
+    let cancelled = false;
+
+    apiRequest<CountryOption[]>("/country-codes/")
+      .then((items) => {
+        if (cancelled) return;
+
+        setCountries(items);
+        const initialCountry =
+          items.find((item) => item.iso_code === "UG") ?? items[0];
+
+        if (initialCountry) {
+          setCountry(initialCountry.iso_code as SupportedCountry);
+        } else {
+          setCountryLoadError("No country calling codes are available.");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCountryLoadError(
+            "Country calling codes could not be loaded. Please refresh and try again.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setCountriesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -86,11 +121,11 @@ export default function RegistrationPage() {
 
     phone: !formData.phone.trim()
       ? "Please enter your phone number."
-      : !/^[1-9]\d+$/.test(cleanedPhone)
-        ? "Enter your number without the country code or leading zero."
-        : !isValidPhoneNumber(cleanedPhone, country)
-          ? "Enter a valid phone number for the selected country."
-          : undefined,
+      : !(cleanedPhone.startsWith("+")
+          ? isValidPhoneNumber(cleanedPhone)
+          : isValidPhoneNumber(cleanedPhone, country))
+        ? "Enter a valid phone number for the selected country."
+        : undefined,
 
     password: !formData.password
       ? "Please enter a password."
@@ -125,9 +160,15 @@ export default function RegistrationPage() {
     const firstInvalid = fieldOrder.find((field) => errors[field]);
 
     if (firstInvalid) {
+      const invalidField =
+        firstInvalid === "confirmPassword"
+          ? "confirmPassword"
+          : firstInvalid;
+
       formRef.current
-        ?.querySelector<HTMLInputElement>(`[name="${firstInvalid}"]`)
+        ?.querySelector<HTMLInputElement>(`[name="${invalidField}"]`)
         ?.focus();
+
       return;
     }
 
@@ -155,7 +196,9 @@ export default function RegistrationPage() {
         body: JSON.stringify(registrationData),
       });
 
-      setSuccess("Your account was created successfully! You can now log in.");
+      setSuccess(
+        "Your account was created successfully! You can now log in.",
+      );
 
       setFormData({
         first_name: "",
@@ -349,31 +392,47 @@ export default function RegistrationPage() {
             <label htmlFor="phone">Phone number</label>
 
             <div className="registration-phone-row">
-              <select
-                id="country"
-                value={country}
-                onChange={(e) => {
-                  setCountry(e.target.value as SupportedCountry);
-                  setTouched((current) => ({ ...current, phone: true }));
-                  setSuccess("");
-                  setApiError("");
-                }}
-                aria-label="Country calling code"
-              >
-                {countries.map((item) => (
-                  <option key={item.code} value={item.code}>
-                    {item.name} ({item.dialCode})
-                  </option>
-                ))}
-              </select>
+              <div className="registration-country-select">
+                <CountryFlag
+                  countryCode={country}
+                  className="country-flag"
+                />
+
+                <select
+                  id="country"
+                  value={country}
+                  disabled={countriesLoading || countries.length === 0}
+                  onChange={(e) => {
+                    setCountry(e.target.value as SupportedCountry);
+                    setTouched((current) => ({
+                      ...current,
+                      phone: true,
+                    }));
+                    setSuccess("");
+                    setApiError("");
+                  }}
+                  aria-label="Country calling code"
+                >
+                  {countries.map((item) => (
+                    <option key={item.iso_code} value={item.iso_code}>
+                      {item.country} ({item.dial_code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {countryLoadError && (
+                <p className="field-error" role="alert">
+                  {countryLoadError}
+                </p>
+              )}
 
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                inputMode="tel"
                 autoComplete="tel-national"
-                placeholder="772 123 456"
+                placeholder="Enter your phone number"
                 value={formData.phone}
                 onChange={(e) => updateField("phone", e.target.value)}
                 onBlur={handleBlur}
@@ -382,8 +441,9 @@ export default function RegistrationPage() {
                     ? "has-error"
                     : undefined
                 }
-                aria-label="Phone number without country code"
-                aria-invalid={(touched.phone || submitted) && !!errors.phone}
+                aria-invalid={
+                  (touched.phone || submitted) && !!errors.phone
+                }
                 aria-describedby={
                   (touched.phone || submitted) && errors.phone
                     ? "phone-error"
@@ -398,7 +458,7 @@ export default function RegistrationPage() {
               </p>
             ) : (
               <small id="phone-help">
-                Enter your number without the country code or leading zero.
+                Enter your local number, or include + and the full country code.
               </small>
             )}
           </div>
@@ -460,7 +520,9 @@ export default function RegistrationPage() {
                 autoComplete="new-password"
                 placeholder="Enter your password again"
                 value={formData.confirmPassword}
-                onChange={(e) => updateField("confirmPassword", e.target.value)}
+                onChange={(e) =>
+                  updateField("confirmPassword", e.target.value)
+                }
                 onBlur={handleBlur}
                 className={
                   (touched.confirmPassword || submitted) &&
@@ -482,7 +544,9 @@ export default function RegistrationPage() {
 
               <button
                 type="button"
-                onClick={() => setShowConfirmPassword((current) => !current)}
+                onClick={() =>
+                  setShowConfirmPassword((current) => !current)
+                }
                 aria-label={
                   showConfirmPassword
                     ? "Hide confirmation password"
