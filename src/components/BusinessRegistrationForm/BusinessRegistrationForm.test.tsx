@@ -158,8 +158,12 @@ describe("Business Registration Form", () => {
       await screen.findByRole("alert"),
     ).toHaveTextContent(/please log in before registering your business/i);
 
-    // Only the public categories request should have been sent.
-    expect(fetch).toHaveBeenCalledTimes(1);
+    // Public categories and phone country codes may load,
+    // but business registration must not be submitted while logged out.
+    expect(fetch).not.toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/businesses/register/"),
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 
   test("shows an error if categories cannot be loaded", async () => {

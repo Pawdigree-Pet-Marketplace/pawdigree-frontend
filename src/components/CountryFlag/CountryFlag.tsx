@@ -3,7 +3,7 @@ import * as flags from "country-flag-icons/react/3x2";
 
 type FlagComponent = ComponentType<SVGProps<SVGSVGElement>>;
 type CountryFlagProps = {
-  countryCode: string;
+  countryCode?: string | null;
   className?: string;
 };
 
@@ -11,7 +11,10 @@ export default function CountryFlag({
   countryCode,
   className,
 }: CountryFlagProps) {
-  const code = countryCode.toUpperCase();
+  const code = countryCode?.trim().toUpperCase();
+
+  if (!code) return null;
+
   const Flag = flags[code as keyof typeof flags] as FlagComponent | undefined;
 
   if (!Flag) return null;
