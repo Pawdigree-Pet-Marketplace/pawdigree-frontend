@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
   cleanup,
   fireEvent,
@@ -8,58 +8,93 @@ import {
 } from "@testing-library/react";
 import VendorRegistrationForm from "./VendorRegistrationForm";
 
-afterEach(() => {
-  cleanup();
-  vi.unstubAllGlobals();
-});
+const countries = [
+  { country: "Uganda", iso_code: "UG", dial_code: "+256" },
+  { country: "Kenya", iso_code: "KE", dial_code: "+254" },
+  { country: "Tanzania", iso_code: "TZ", dial_code: "+255" },
+];
 
-// Fill in the form with valid information for testing.
+function mockCountryResponse() {
+  return {
+    ok: true,
+    json: async () => countries,
+  };
+}
+
+function mockFetch(
+  registrationResponse: {
+    ok: boolean;
+    json: () => Promise<Record<string, unknown>>;
+  } = {
+    ok: true,
+    json: async () => ({ message: "Registration successful" }),
+  },
+  ) {
+  const fetchMock = vi.fn().mockImplementation((url: string) => {
+    if (String(url).includes("/api/country-codes/")) {
+      return Promise.resolve(mockCountryResponse());
+    }
+
+    if (String(url).includes("/auth/register/vendor/")) {
+      return Promise.resolve(registrationResponse);
+    }
+
+    return Promise.reject(new Error(`Unexpected request: ${url}`));
+  });
+
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+}
+
 function fillValidForm() {
   fireEvent.change(screen.getByLabelText(/^Username/i), {
     target: { value: "pawdigreevendor" },
   });
-
   fireEvent.change(screen.getByLabelText(/^First Name/i), {
     target: { value: "Jane" },
   });
-
   fireEvent.change(screen.getByLabelText(/^Last Name/i), {
     target: { value: "Namara" },
   });
-
   fireEvent.change(screen.getByLabelText(/^Email Address/i), {
     target: { value: "jane@example.com" },
   });
-
   fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
     target: { value: "0771234567" },
   });
-
   fireEvent.change(screen.getByLabelText(/^Password/i), {
     target: { value: "SecurePass123" },
   });
-
   fireEvent.change(screen.getByLabelText(/^Confirm Password/i), {
     target: { value: "SecurePass123" },
   });
 }
 
+function getRegistrationCall(fetchMock: ReturnType<typeof vi.fn>) {
+  return fetchMock.mock.calls.find(([url]) =>
+    String(url).includes("/auth/register/vendor/"),
+  );
+}
+
+beforeEach(() => {
+  mockFetch();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
+
 describe("Vendor Registration Form", () => {
-  // 1. Check that the heading appears.
   test("renders the vendor registration heading", () => {
     render(<VendorRegistrationForm />);
-
     expect(
-      screen.getByRole("heading", {
-        name: "Become a Pawdigree Vendor",
-      }),
+      screen.getByRole("heading", { name: "Become a Pawdigree Vendor" }),
     ).toBeInTheDocument();
   });
 
-  // 2. Check that all account information fields appear.
   test("renders the account information fields", () => {
     render(<VendorRegistrationForm />);
-
     expect(screen.getByLabelText(/^Username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Email Address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^First Name/i)).toBeInTheDocument();
@@ -67,229 +102,125 @@ describe("Vendor Registration Form", () => {
     expect(screen.getByLabelText(/^Phone Number/i)).toBeInTheDocument();
   });
 
-  // 3. Check that both password fields appear.
   test("renders both password fields", () => {
     render(<VendorRegistrationForm />);
-
     expect(screen.getByLabelText(/^Password/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Confirm Password/i)).toBeInTheDocument();
   });
 
-  // 4. Business information is registered separately.
   test("does not render business information fields", () => {
     render(<VendorRegistrationForm />);
-
     expect(screen.queryByLabelText(/^Business Name/i)).not.toBeInTheDocument();
-
     expect(screen.queryByLabelText(/^Business Type/i)).not.toBeInTheDocument();
-
-    expect(
-      screen.queryByLabelText(/^Business Description/i),
-    ).not.toBeInTheDocument();
-
-    expect(
-      screen.queryByLabelText(/^Business Address/i),
-    ).not.toBeInTheDocument();
-
+    expect(screen.queryByLabelText(/^Business Description/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Business Address/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/^District/i)).not.toBeInTheDocument();
   });
 
-  // 5. Check that the terms checkbox appears.
   test("renders the terms acceptance checkbox", () => {
     render(<VendorRegistrationForm />);
-
     expect(screen.getByRole("checkbox")).toBeInTheDocument();
   });
 
-  // 6. Check that the submit button appears.
   test("renders the vendor account submit button", () => {
     render(<VendorRegistrationForm />);
-
     expect(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
+      screen.getByRole("button", { name: "Create Vendor Account" }),
     ).toBeInTheDocument();
   });
 
-  // 7. Check that Uganda is selected by default.
-  test("defaults to Uganda's country calling code", () => {
+  test("defaults to Uganda's country calling code", async () => {
     render(<VendorRegistrationForm />);
-
     expect(
-      screen.getByRole("combobox", {
-        name: "Country calling code",
-      }),
-    ).toHaveValue("+256");
+      await screen.findByRole("combobox", { name: "Country calling code" }),
+    ).toHaveValue("UG");
   });
 
-  // 8. Check that the vendor can change the country code.
-  test("allows the vendor to select another country calling code", () => {
+  test("allows the vendor to select another country calling code", async () => {
     render(<VendorRegistrationForm />);
-
-    const countrySelector = screen.getByRole("combobox", {
+    const selector = await screen.findByRole("combobox", {
       name: "Country calling code",
     });
-
-    fireEvent.change(countrySelector, {
-      target: { value: "+254" },
-    });
-
-    expect(countrySelector).toHaveValue("+254");
+    await waitFor(() => expect(selector).toHaveValue("UG"));
+    fireEvent.change(selector, { target: { value: "KE" } });
+    expect(selector).toHaveValue("KE");
   });
 
-  // 9. Check that required-field validation works.
   test("shows required-field errors when the form is submitted empty", () => {
     render(<VendorRegistrationForm />);
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
     expect(screen.getByText(/username is required/i)).toBeInTheDocument();
     expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
     expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
     expect(screen.getByText(/email address is required/i)).toBeInTheDocument();
     expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
     expect(screen.getByText(/password is required/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/please confirm your password/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/please confirm your password/i)).toBeInTheDocument();
   });
 
-  // 10. Check that an invalid email is rejected.
   test("shows an error for an invalid email address", () => {
     render(<VendorRegistrationForm />);
-
     fireEvent.change(screen.getByLabelText(/^Email Address/i), {
       target: { value: "invalid-email" },
     });
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
     expect(screen.getByText(/valid email address/i)).toBeInTheDocument();
   });
 
-  // 11. Check that short passwords are rejected.
   test("shows an error when the password is too short", () => {
     render(<VendorRegistrationForm />);
-
     fireEvent.change(screen.getByLabelText(/^Password/i), {
       target: { value: "abc123" },
     });
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
     expect(screen.getByText(/at least 8 characters/i)).toBeInTheDocument();
   });
 
-  // 12. Check that both passwords must match.
   test("shows an error when the passwords do not match", () => {
     render(<VendorRegistrationForm />);
-
     fireEvent.change(screen.getByLabelText(/^Password/i), {
       target: { value: "SecurePass123" },
     });
-
     fireEvent.change(screen.getByLabelText(/^Confirm Password/i), {
       target: { value: "DifferentPass123" },
     });
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
     expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
   });
 
-  // 13. Check that an invalid phone number is rejected.
   test("shows an error for a phone number with too few digits", () => {
     render(<VendorRegistrationForm />);
-
     fillValidForm();
-
     fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
       target: { value: "123" },
     });
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
     expect(screen.getByText(/enter a valid phone number/i)).toBeInTheDocument();
   });
 
-  // 14. Check that accepting the terms is required.
   test("does not submit when the terms checkbox is unchecked", async () => {
-    const fetchMock = vi.fn();
-
-    vi.stubGlobal("fetch", fetchMock);
-
+    const fetchMock = mockFetch();
     render(<VendorRegistrationForm />);
-
     fillValidForm();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
-    expect(screen.getByRole("checkbox")).not.toBeChecked();
-
-    expect(
-      await screen.findByText(/accept the terms and conditions/i),
-    ).toBeInTheDocument();
-
-    expect(fetchMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
+    expect(await screen.findByText(/accept the terms and conditions/i)).toBeInTheDocument();
+    expect(getRegistrationCall(fetchMock)).toBeUndefined();
   });
 
-  // 15. Check that valid registration details reach the backend.
   test("submits valid registration information with the country code", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: "Registration successful",
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
-
+    const fetchMock = mockFetch();
     render(<VendorRegistrationForm />);
-
     fillValidForm();
-
     fireEvent.click(screen.getByRole("checkbox"));
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/auth/register/vendor/"),
-        expect.anything(),
-      );
+      expect(getRegistrationCall(fetchMock)).toBeDefined();
     });
 
-    const requestOptions = fetchMock.mock.calls[0][1];
-    const submittedData = JSON.parse(requestOptions.body);
+    const registrationCall = getRegistrationCall(fetchMock);
+    const options = registrationCall?.[1] as RequestInit;
+    const submittedData = JSON.parse(String(options.body));
 
     expect(submittedData).toMatchObject({
       username: "pawdigreevendor",
@@ -299,103 +230,54 @@ describe("Vendor Registration Form", () => {
       phone: "+256771234567",
       password: "SecurePass123",
     });
-
     expect(submittedData).not.toHaveProperty("confirmPassword");
   });
 
-  // 16. Check that changing the country code changes the submitted phone.
-  test("submits the selected country calling code", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: "Registration successful",
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
-
+  test("submits the selected country's calling code", async () => {
+    const fetchMock = mockFetch();
     render(<VendorRegistrationForm />);
-
+    const selector = await screen.findByRole("combobox", {
+      name: "Country calling code",
+    });
+    fireEvent.change(selector, { target: { value: "KE" } });
     fillValidForm();
-
-    fireEvent.change(
-      screen.getByRole("combobox", {
-        name: "Country calling code",
-      }),
-      {
-        target: { value: "+254" },
-      },
-    );
-
     fireEvent.click(screen.getByRole("checkbox"));
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalled();
+      expect(getRegistrationCall(fetchMock)).toBeDefined();
     });
 
-    const requestOptions = fetchMock.mock.calls[0][1];
-    const submittedData = JSON.parse(requestOptions.body);
-
+    const registrationCall = getRegistrationCall(fetchMock);
+    const options = registrationCall?.[1] as RequestInit;
+    const submittedData = JSON.parse(String(options.body));
     expect(submittedData.phone).toBe("+254771234567");
   });
 
-  // 17. Check that backend validation errors are displayed.
   test("displays errors returned by the backend", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = mockFetch({
       ok: false,
       json: async () => ({
         detail: "Registration failed",
         email: ["This email is already registered."],
       }),
     });
-
-    vi.stubGlobal("fetch", fetchMock);
-
     render(<VendorRegistrationForm />);
-
     fillValidForm();
-
     fireEvent.click(screen.getByRole("checkbox"));
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Create Vendor Account",
-      }),
-    );
-
+    fireEvent.click(screen.getByRole("button", { name: "Create Vendor Account" }));
     expect(await screen.findByText(/registration failed/i)).toBeInTheDocument();
-
     expect(await screen.findByText(/already registered/i)).toBeInTheDocument();
+    expect(getRegistrationCall(fetchMock)).toBeDefined();
   });
 
-  // 18. Check that the user can show and hide the password.
   test("allows the user to show and hide the password", () => {
     render(<VendorRegistrationForm />);
-
-    const passwordInput = screen.getByLabelText(/^Password/i);
-
-    expect(passwordInput).toHaveAttribute("type", "password");
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Show password",
-      }),
-    );
-
-    expect(passwordInput).toHaveAttribute("type", "text");
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Hide password",
-      }),
-    );
-
-    expect(passwordInput).toHaveAttribute("type", "password");
+    const password = screen.getByLabelText(/^Password/i);
+    expect(password).toHaveAttribute("type", "password");
+    fireEvent.click(screen.getByRole("button", { name: "Show password" }));
+    expect(password).toHaveAttribute("type", "text");
+    fireEvent.click(screen.getByRole("button", { name: "Hide password" }));
+    expect(password).toHaveAttribute("type", "password");
   });
 });

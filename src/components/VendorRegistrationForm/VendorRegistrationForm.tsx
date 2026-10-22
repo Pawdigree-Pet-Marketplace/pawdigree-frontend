@@ -1,5 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  parsePhoneNumberFromString,
+  type CountryCode,
+} from "libphonenumber-js";
+import CountryFlag from "../CountryFlag/CountryFlag";
 import "./VendorRegistrationForm.css";
 import API_BASE_URL from "../../services/api";
 
@@ -15,19 +20,11 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
-const countries = [
-  { name: "Uganda", code: "+256", flag: "🇺🇬" },
-  { name: "Kenya", code: "+254", flag: "🇰🇪" },
-  { name: "Tanzania", code: "+255", flag: "🇹🇿" },
-  { name: "Rwanda", code: "+250", flag: "🇷🇼" },
-  { name: "Burundi", code: "+257", flag: "🇧🇮" },
-  { name: "South Sudan", code: "+211", flag: "🇸🇸" },
-  { name: "Nigeria", code: "+234", flag: "🇳🇬" },
-  { name: "South Africa", code: "+27", flag: "🇿🇦" },
-  { name: "United Kingdom", code: "+44", flag: "🇬🇧" },
-  { name: "United States", code: "+1", flag: "🇺🇸" },
-  { name: "India", code: "+91", flag: "🇮🇳" },
-];
+type CountryOption = {
+  country: string;
+  iso_code: string;
+  dial_code: string;
+};
 
 function VendorRegistrationForm() {
   const [formData, setFormData] = useState<FormData>({
@@ -39,13 +36,65 @@ function VendorRegistrationForm() {
     password: "",
     confirmPassword: "",
   });
-  const [countryCode, setCountryCode] = useState("+256");
+  const [countries, setCountries] = useState<CountryOption[]>([]);
+  const [selectedCountry, setSelectedCountry] =
+    useState<CountryCode>("UG");
+  const [loadingCountries, setLoadingCountries] = useState(true);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadCountries() {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/country-codes/`,
+          {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Unable to load phone country codes.");
+        }
+
+        const data = await response.json();
+        const countryList: CountryOption[] = Array.isArray(data)
+          ? data
+          : Array.isArray(data.results)
+            ? data.results
+            : [];
+
+        setCountries(countryList);
+
+        const defaultCountry =
+          countryList.find((item) => item.iso_code === "UG") ??
+          countryList[0];
+
+        if (defaultCountry) {
+          setSelectedCountry(defaultCountry.iso_code as CountryCode);
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
+        console.error("Unable to load phone country codes:", error);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingCountries(false);
+        }
+      }
+    }
+
+    loadCountries();
+    return () => controller.abort();
+  }, []);
 
   function handleChange(field: keyof FormData, value: string) {
     setFormData((p) => ({ ...p, [field]: value }));
@@ -67,10 +116,15 @@ function VendorRegistrationForm() {
     if (!formData.email.trim()) newErrors.email = "Email address is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       newErrors.email = "Enter a valid email address.";
-    const phoneDigits = formData.phone.replace(/\D/g, "");
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required.";
-    else if (phoneDigits.length < 7 || phoneDigits.length > 12)
-      newErrors.phone = "Enter a valid phone number.";
+    const phoneInput = formData.phone.trim();
+    const parsedPhone = phoneInput.startsWith("+")
+      ? parsePhoneNumberFromString(phoneInput)
+      : parsePhoneNumberFromString(phoneInput, selectedCountry);
+    if (!phoneInput) {
+      newErrors.phone = "Phone number is required.";
+    } else if (!parsedPhone || !parsedPhone.isValid()) {
+      newErrors.phone = "Enter a valid phone number for the selected country.";
+    };
     if (!formData.password) newErrors.password = "Password is required.";
     else if (formData.password.length < 8)
       newErrors.password = "Password must contain at least 8 characters.";
@@ -94,8 +148,16 @@ function VendorRegistrationForm() {
       setMessage("Please accept the terms and conditions to continue.");
       return;
     }
-    const localPhone = formData.phone.replace(/\D/g, "").replace(/^0+/, "");
-    const internationalPhone = `${countryCode}${localPhone}`;
+    const phoneInput = formData.phone.trim();
+    const parsedPhone = phoneInput.startsWith("+")
+      ? parsePhoneNumberFromString(phoneInput)
+      : parsePhoneNumberFromString(phoneInput, selectedCountry);
+    if (!parsedPhone || !parsedPhone.isValid()) {
+      setErrors((previous) => ({ ...previous, phone: "Enter a valid phone number for the selected country." }));
+      setMessage("Please correct the highlighted fields before continuing.");
+      return;
+    }
+    const internationalPhone = parsedPhone.number;
     setIsLoading(true);
     try {
     const response = await fetch(
@@ -256,23 +318,27 @@ function VendorRegistrationForm() {
                     Phone Number <span className="required-mark">*</span>
                   </label>
                   <div className="phone-input-row">
-                    <select
-                      id="countryCode"
-                      aria-label="Country calling code"
-                      className="country-code-select"
-                      value={countryCode}
-                      onChange={(e) => {
-                        setCountryCode(e.target.value);
-                        setErrors((p) => ({ ...p, phone: "" }));
-                        setMessage("");
-                      }}
-                    >
-                      {countries.map((c) => (
-                        <option key={c.code} value={c.code}>
-                          {c.flag} {c.name} ({c.code})
-                        </option>
-                      ))}
-                    </select>
+                    <div className="vendor-country-picker">
+                      <CountryFlag countryCode={selectedCountry} />
+                      <select
+                        id="countryCode"
+                        aria-label="Country calling code"
+                        className="country-code-select"
+                        value={selectedCountry}
+                        disabled={loadingCountries || countries.length === 0}
+                        onChange={(e) => {
+                          setSelectedCountry(e.target.value as CountryCode);
+                          setErrors((p) => ({ ...p, phone: "" }));
+                          setMessage("");
+                        }}
+                      >
+                        {countries.map((country) => (
+                          <option key={country.iso_code} value={country.iso_code}>
+                            {country.country} ({country.dial_code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <input
                       id="phone"
                       type="tel"
