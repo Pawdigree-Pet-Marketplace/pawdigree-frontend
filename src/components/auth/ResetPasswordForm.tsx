@@ -1,7 +1,12 @@
-import { useState, useMemo } from "react";
-import { Eye, EyeOff, Check, X } from "lucide-react";
+
+import { useMemo, useState } from "react";
+import { Check, Eye, EyeOff, X } from "lucide-react";
+import { apiRequest } from "../../services/api";
+import "./ResetPasswordForm.css";
+import pawdigreeLogo from "../../assets/logo.png";
 
 const ResetPasswordForm = () => {
+  const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -10,8 +15,8 @@ const ResetPasswordForm = () => {
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const conditions = useMemo(() => {
-    return [
+  const conditions = useMemo(
+    () => [
       { ok: newPassword.length >= 8, text: "At least 8 characters" },
       { ok: /[A-Z]/.test(newPassword), text: "At least one uppercase letter" },
       { ok: /[a-z]/.test(newPassword), text: "At least one lowercase letter" },
@@ -20,291 +25,248 @@ const ResetPasswordForm = () => {
         ok: /[^A-Za-z0-9]/.test(newPassword),
         text: "At least one symbol (!@#$...)",
       },
-    ];
-  }, [newPassword]);
+    ],
+    [newPassword],
+  );
 
   const allConditionsMet =
-    conditions.every((c) => c.ok) && newPassword.length > 0;
-  const unmetConditions = conditions.filter((c) => !c.ok);
-  const passwordsMatch = newPassword !== "" && newPassword === confirmPassword;
-  const isButtonDisabled = isLoading || !allConditionsMet || !passwordsMatch;
+    conditions.every((condition) => condition.ok) && newPassword.length > 0;
 
-  const getPasswordBorder = () => {
-    if (!newPassword)
-      return { borderColor: "", outline: "none", boxShadow: "none" };
-    if (!allConditionsMet)
-      return { borderColor: "#e5484d", outline: "none", boxShadow: "none" };
-    return { borderColor: "#30a46c", outline: "none", boxShadow: "none" };
-  };
+  const passwordsMatch =
+    newPassword.length > 0 && newPassword === confirmPassword;
 
-  const getConfirmBorder = () => {
-    if (!confirmPassword)
-      return { borderColor: "", outline: "none", boxShadow: "none" };
-    if (newPassword !== confirmPassword)
-      return { borderColor: "#e5484d", outline: "none", boxShadow: "none" };
-    return { borderColor: "#30a46c", outline: "none", boxShadow: "none" };
-  };
+  const isButtonDisabled =
+    isLoading || !allConditionsMet || !passwordsMatch || !email.trim();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
     if (!allConditionsMet) {
-      setError("Please fix your password to meet all requirements");
+      setError("Please make sure your password meets all the requirements.");
       return;
     }
+
     if (!passwordsMatch) {
-      setError("Passwords don't match");
+      setError("Your passwords do not match.");
       return;
     }
+
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get("uid");
+    const token = params.get("token");
+
+    if (!uid || !token) {
+      setError("This reset link is invalid or expired. Please request a new one.");
+      return;
+    }
+
     setIsLoading(true);
+
     try {
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
-      console.log("Reset token:", token);
-      await new Promise((r) => setTimeout(r, 1000));
+      await apiRequest(
+        `/auth/password-reset/confirm/${encodeURIComponent(uid)}/${encodeURIComponent(token)}/`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: email.trim(),
+            token,
+            new_password: newPassword,
+          }),
+        },
+      );
+
       setSuccess(
-        "Password reset successfully! You can now log in with your new password.",
+        "Your password has been reset successfully. You can now log in with your new password.",
       );
     } catch (err: unknown) {
-      const message =
+      setError(
         err instanceof Error
           ? err.message
-          : "Failed to reset password. Link may be expired.";
-      setError(message);
+          : "Unable to reset your password. The link may have expired.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (success) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "440px",
-          margin: "0 auto",
-          background: "white",
-          borderRadius: "16px",
-          padding: "24px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-        }}
-      >
-        <div className="registration-form" style={{ margin: 0 }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "12px",
-              padding: "16px",
-              background: "rgba(48,164,108,0.08)",
-              borderRadius: "12px",
-              border: "1px solid #30a46c",
-              color: "#30a46c",
-              textAlign: "center",
-            }}
-          >
-            <Check size={32} strokeWidth={2.5} />
-            <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.5" }}>
-              {success}
-            </p>
-          </div>
-          <a
-            href="/login"
-            className="register-button"
-            style={{
-              display: "block",
-              textAlign: "center",
-              textDecoration: "none",
-              marginTop: "16px",
-              borderRadius: "999px",
-            }}
-          >
-            Go to Login
-          </a>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    // THIS wrapper fixes the full-screen problem
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "440px",
-        margin: "0 auto",
-        background: "white",
-        borderRadius: "16px",
-        padding: "28px",
-        boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="registration-form"
-        style={{ width: "100%", margin: 0 }}
-      >
-        {error && <p className="form-error">{error}</p>}
+    <main className="reset-password-page">
+      <section className="reset-password-card">
+        <img
+  src={pawdigreeLogo}
+  alt="Pawdigree logo"
+  className="reset-password-logo"
+/>
 
-        <div className="form-group">
-          <label>New Password</label>
-          <div style={{ position: "relative" }}>
-            <input
-              type={showPassword ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password"
-              required
-              style={{
-                ...getPasswordBorder(),
-                transition: "border-color 0.2s ease",
-              }}
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                color: "var(--charcoal)",
-              }}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-          </div>
-          {newPassword && !allConditionsMet && (
-            <div
-              style={{
-                marginTop: "10px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "6px",
-              }}
-            >
-              {unmetConditions.map((item) => (
-                <div
-                  key={item.text}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "0.78rem",
-                    color: "#8a8f98",
-                  }}
-                >
-                  <X size={14} />
-                  <span>{item.text}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          {allConditionsMet && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                marginTop: "10px",
-                fontSize: "0.82rem",
-                color: "#30a46c",
-                fontWeight: 500,
-              }}
-            >
-              <Check size={14} strokeWidth={3} />
-              <span>Strong password</span>
-            </div>
-          )}
-        </div>
+        {success ? (
+          <>
+            <h1>Password Updated!</h1>
+            <p className="reset-password-description">
+              You're all set. Use your new password to access your account.
+            </p>
 
-        <div className="form-group">
-          <label>Confirm New Password</label>
-          <div style={{ position: "relative" }}>
-            <input
-              type={showConfirm ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              required
-              disabled={!allConditionsMet}
-              style={{
-                ...getConfirmBorder(),
-                transition: "border-color 0.2s ease",
-                opacity: allConditionsMet ? 1 : 0.6,
-                cursor: allConditionsMet ? "text" : "not-allowed",
-                backgroundColor: allConditionsMet ? "" : "#f5f5f5",
-              }}
-            />
-            <span
-              onClick={() => allConditionsMet && setShowConfirm(!showConfirm)}
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: allConditionsMet ? "pointer" : "not-allowed",
-                color: "var(--charcoal)",
-                opacity: allConditionsMet ? 1 : 0.4,
-              }}
+            <div className="reset-password-success" role="status">
+              <Check size={32} strokeWidth={2.5} />
+              <p>{success}</p>
+              <a className="reset-password-login-link" href="/login">
+                Go to Login
+              </a>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1>Reset Your Password</h1>
+            <p className="reset-password-description">
+              Choose a strong new password to get back to your Pawdigree account.
+            </p>
+
+            <form
+              className="reset-password-form"
+              onSubmit={handleSubmit}
+              noValidate
             >
-              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-          </div>
-          {confirmPassword &&
-            newPassword !== confirmPassword &&
-            allConditionsMet && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  marginTop: "6px",
-                  fontSize: "0.78rem",
-                  color: "#e5484d",
-                }}
-              >
-                <X size={14} />
-                <span>Passwords do not match</span>
+              {error && (
+                <p className="reset-password-error" role="alert">
+                  {error}
+                </p>
+              )}
+
+              <div className="reset-password-group">
+                <label htmlFor="reset-email">Email Address</label>
+                <input
+                  className="reset-password-input"
+                  id="reset-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your account email"
+                  autoComplete="email"
+                  required
+                />
               </div>
-            )}
-          {passwordsMatch && allConditionsMet && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                marginTop: "6px",
-                fontSize: "0.82rem",
-                color: "#30a46c",
-                fontWeight: 500,
-              }}
-            >
-              <Check size={14} strokeWidth={3} />
-              <span>Passwords match</span>
-            </div>
-          )}
-        </div>
 
-        <button
-          type="submit"
-          className="register-button"
-          disabled={isButtonDisabled}
-          style={{
-            opacity: isButtonDisabled ? 0.5 : 1,
-            cursor: isButtonDisabled ? "not-allowed" : "pointer",
-            borderRadius: "999px",
-          }}
-        >
-          {isLoading ? "Resetting..." : "Reset Password"}
-        </button>
-        <p className="login-link">
-          Remembered your password? <a href="/login">Back to Login</a>
-        </p>
-      </form>
-    </div>
+              <div className="reset-password-group">
+                <label htmlFor="new-password">New Password</label>
+
+                <div className="reset-password-input-wrapper">
+                  <input
+                    className={`reset-password-input ${
+                      newPassword
+                        ? allConditionsMet
+                          ? "password-valid"
+                          : "password-invalid"
+                        : ""
+                    }`}
+                    id="new-password"
+                    type={showPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    autoComplete="new-password"
+                    required
+                  />
+
+                  <button
+                    className="reset-password-toggle"
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword((visible) => !visible)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                {newPassword && (
+                  <ul className="reset-password-requirements">
+                    {conditions.map((condition) => (
+                      <li
+                        className={`reset-password-requirement ${
+                          condition.ok ? "met" : ""
+                        }`}
+                        key={condition.text}
+                      >
+                        {condition.ok ? (
+                          <Check size={14} />
+                        ) : (
+                          <X size={14} />
+                        )}
+                        <span>{condition.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="reset-password-group">
+                <label htmlFor="confirm-password">Confirm New Password</label>
+
+                <div className="reset-password-input-wrapper">
+                  <input
+                    className={`reset-password-input ${
+                      confirmPassword
+                        ? passwordsMatch
+                          ? "password-valid"
+                          : "password-invalid"
+                        : ""
+                    }`}
+                    id="confirm-password"
+                    type={showConfirm ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    autoComplete="new-password"
+                    disabled={!allConditionsMet}
+                    required
+                  />
+
+                  <button
+                    className="reset-password-toggle"
+                    type="button"
+                    aria-label={
+                      showConfirm
+                        ? "Hide confirmation password"
+                        : "Show confirmation password"
+                    }
+                    disabled={!allConditionsMet}
+                    onClick={() => setShowConfirm((visible) => !visible)}
+                  >
+                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                {confirmPassword && (
+                  <p
+                    className={`reset-password-match ${
+                      passwordsMatch ? "valid" : ""
+                    }`}
+                  >
+                    {passwordsMatch
+                      ? "✓ Passwords match"
+                      : "✕ Passwords do not match"}
+                  </p>
+                )}
+              </div>
+
+              <button
+                className="reset-password-button"
+                type="submit"
+                disabled={isButtonDisabled}
+              >
+                {isLoading ? "Resetting Password..." : "Reset Password"}
+              </button>
+            </form>
+
+            <p className="reset-password-footer">
+              Remembered your password?
+              <br />
+              <a href="/login">Back to Login</a>
+            </p>
+          </>
+        )}
+      </section>
+    </main>
   );
 };
 
