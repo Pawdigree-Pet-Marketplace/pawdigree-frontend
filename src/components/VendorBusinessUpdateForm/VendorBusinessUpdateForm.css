@@ -1,0 +1,177 @@
+/* BusinessUpdateForm */
+
+.vendor-business-form-wrapper {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: var(--space-4);
+}
+
+.vendor-business-form-header h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  color: var(--teal);
+  font-size: 20px;
+}
+
+.vendor-business-form-header p {
+  margin: 0 0 var(--space-3);
+  color: var(--gray);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.vendor-business-form-wrapper .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-2);
+}
+
+.vendor-business-form-wrapper .form-group label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.vendor-business-form-wrapper .form-group input,
+.vendor-business-form-wrapper .form-group textarea,
+.vendor-business-form-wrapper .form-group select {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.vendor-business-form-wrapper .form-group input:focus,
+.vendor-business-form-wrapper .form-group textarea:focus,
+.vendor-business-form-wrapper .form-group select:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-light);
+}
+
+.vendor-business-form-wrapper .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.vendor-business-form-wrapper .field-error {
+  color: var(--coral-dark);
+  font-size: 12px;
+  margin: 0;
+}
+
+.vendor-business-form-wrapper .form-message {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: var(--space-3);
+  font-size: 14px;
+}
+
+.vendor-business-form-wrapper .form-message.error {
+  background: var(--coral-light);
+  color: var(--coral-dark);
+  border: 1px solid var(--coral-soft);
+}
+
+.vendor-business-form-wrapper .business-hours {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.vendor-business-form-wrapper .business-hours legend {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--teal);
+  padding: 0 8px;
+}
+
+.vendor-business-form-wrapper .business-hours-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.vendor-business-form-wrapper .business-hours-row:last-child {
+  border-bottom: 0;
+}
+
+.vendor-business-form-wrapper .business-hours-row label {
+  min-width: 90px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.vendor-business-form-wrapper .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.vendor-business-form-wrapper .primary-btn {
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: 999px;
+  background: var(--teal);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vendor-business-form-wrapper .primary-btn:hover {
+  background: var(--teal-dark);
+  color: var(--white);
+}
+
+.vendor-business-form-wrapper .req-star {
+  color: #e11d48;
+  font-weight: 700;
+}
+
+.vendor-business-form-wrapper .ghost-btn {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--white);
+  border-color: var(--teal);
+  color: var(--teal);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.vendor-business-form-wrapper .ghost-btn:hover {
+  background: var(--teal-light);
+  color: var(--teal);
+  border-color: var(--teal);
+
+}
+
+@media (max-width: 600px) {
+  .vendor-business-form-wrapper .form-row {
+    grid-template-columns: 1fr;
+  }
+  .vendor-business-form-wrapper .business-hours-row {
+    flex-wrap: wrap;
+  }
+  .vendor-business-form-wrapper .form-actions {
+    flex-direction: column-reverse;
+  }
+  .vendor-business-form-wrapper .primary-btn,
+  .vendor-business-form-wrapper .ghost-btn {
+    width: 100%;
+  }
+}
