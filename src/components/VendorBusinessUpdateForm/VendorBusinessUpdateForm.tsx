@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState, useCallback, type ChangeEvent } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import API_BASE_URL from "../../services/api";
 import "./VendorBusinessUpdateForm.css";
@@ -18,7 +18,7 @@ const weekdays = [
   "friday",
   "saturday",
   "sunday",
-];
+] as const;
 
 const initialHours: BusinessHours = {
   monday: { is_open: true, open: "09:00", close: "17:00" },
@@ -30,9 +30,28 @@ const initialHours: BusinessHours = {
   sunday: { is_open: false, open: "09:00", close: "17:00" },
 };
 
+interface Business {
+  id?: number;
+  business_name?: string;
+  name?: string;
+  description?: string;
+  category?: number;
+  category_id?: number | string;
+  category_name?: string;
+  vendor_category?: string;
+  address?: string;
+  city_district?: string;
+  location_district?: string;
+  city?: string;
+  contact?: string;
+  phone?: string;
+  email?: string;
+  business_hours?: BusinessHours;
+}
+
 interface Props {
-  business?: any;
-  onSaved: (business: any) => void;
+  business?: Business;
+  onSaved: (business: Business) => void;
   onCancel: () => void;
 }
 
@@ -59,61 +78,61 @@ export default function VendorBusinessUpdateForm({
 
   const [hours, setHours] = useState<BusinessHours>(initialHours);
 
-  useEffect(() => {
+  const fetchCategories = useCallback(() => {
     const token =
       localStorage.getItem("access") || localStorage.getItem("access_token");
-    const headers: any = {
+    const headers: Record<string, string> = {
       Accept: "application/json",
       Authorization: `Bearer ${token}`,
     };
     setLoadingCategories(true);
     fetch(`${API_BASE_URL}/categories/`, { headers })
       .then((r) => r.json())
-      .then((d) => {
-        const list = Array.isArray(d) ? d : d.results || [];
+      .then((d: unknown) => {
+        const data = d as { results?: Category[] };
+        const list = Array.isArray(d) ? (d as Category[]) : data.results || [];
         setCategories(list);
       })
       .catch(() => {})
       .finally(() => setLoadingCategories(false));
   }, []);
 
-  // FIXED: PRELOAD EXISTING DATA + HANDLE MOCK CATEGORY_NAME
   useEffect(() => {
-    if (business) {
-      // try to find category id from name if only name is given (for mock)
-      let categoryId = "";
-      if (business.category) categoryId = String(business.category);
-      else if (business.category_id) categoryId = String(business.category_id);
-      else if (business.category_name || business.vendor_category) {
-        const name = (
-          business.category_name || business.vendor_category
-        ).toLowerCase();
-        const found = categories.find(
-          (c) =>
-            c.name.toLowerCase() === name ||
-            c.name.toLowerCase().includes(name),
-        );
-        if (found) categoryId = String(found.id);
-        // if categories not loaded yet, keep name as fallback, will be fixed when categories load
-        else if (categories.length === 0) categoryId = "";
-      }
+    fetchCategories();
+  }, [fetchCategories]);
 
-      setForm({
-        businessName: business.business_name || business.name || "",
-        description: business.description || "",
-        businessType: categoryId,
-        address: business.address || "",
-        cityDistrict:
-          business.city_district ||
-          business.location_district ||
-          business.city ||
-          "",
-        businessPhone: business.contact || business.phone || "",
-        businessEmail: business.email || "",
-      });
-      if (business.business_hours) {
-        setHours(business.business_hours);
-      }
+  useEffect(() => {
+    if (!business) return;
+
+    let categoryId = "";
+    if (business.category) categoryId = String(business.category);
+    else if (business.category_id) categoryId = String(business.category_id);
+    else if (business.category_name || business.vendor_category) {
+      const name = String(
+        business.category_name || business.vendor_category || "",
+      ).toLowerCase();
+      const found = categories.find(
+        (c) =>
+          c.name.toLowerCase() === name || c.name.toLowerCase().includes(name),
+      );
+      if (found) categoryId = String(found.id);
+    }
+
+    setForm({
+      businessName: business.business_name || business.name || "",
+      description: business.description || "",
+      businessType: categoryId,
+      address: business.address || "",
+      cityDistrict:
+        business.city_district ||
+        business.location_district ||
+        business.city ||
+        "",
+      businessPhone: business.contact || business.phone || "",
+      businessEmail: business.email || "",
+    });
+    if (business.business_hours) {
+      setHours(business.business_hours);
     }
   }, [business, categories]);
 
@@ -212,16 +231,23 @@ export default function VendorBusinessUpdateForm({
         },
         body: JSON.stringify(payload),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as Record<
+        string,
+        unknown
+      >;
       if (!res.ok) {
         const details = Object.entries(data)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(" ") : v}`)
+          .map(
+            ([k, v]) =>
+              `${k}: ${Array.isArray(v) ? (v as string[]).join(" ") : String(v)}`,
+          )
           .join(" ");
         throw new Error(details || "Save failed.");
       }
-      onSaved(data);
-    } catch (e: any) {
-      setMessage(e.message || "Something went wrong.");
+      onSaved(data as Business);
+    } catch (e) {
+      const err = e as Error;
+      setMessage(err.message || "Something went wrong.");
     } finally {
       setSaving(false);
     }
@@ -427,11 +453,7 @@ export default function VendorBusinessUpdateForm({
           onClick={handleSubmit}
           disabled={saving}
         >
-          {saving
-            ? "Saving..."
-            : business?.id && business.id !== 1
-              ? "Update Business"
-              : "Update Business"}
+          {saving ? "Saving..." : "Update Business"}
         </button>
       </div>
     </div>
