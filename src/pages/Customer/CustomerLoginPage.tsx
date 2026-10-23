@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, PawPrint, Store } from "lucide-react";
 import "./CustomerLoginPage.css";
 import logo from "../../assets/logos/icon-logo.svg";
 import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
@@ -30,24 +30,39 @@ export default function CustomerLoginPage() {
   };
 
   return (
-    <div className="login-page">
+    <div className={`login-page ${step === "welcome" ? "login-page--role-selection" : ""}`}>
       <div className="top-bar">
-        <button
-          type="button"
-          className="back-btn"
-          onClick={handleBack}
-          aria-label="Go back"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <span className="top-bar-title">
-          {step === "welcome"
-            ? "Customer Login"
-            : step === "password"
-              ? "Welcome back"
-              : "Verify Phone"}
-        </span>
-        <div className="spacer" />
+        {step === "welcome" ? (
+          <>
+            <div className="role-brand">
+              <img src={logo} alt="" className="role-brand-logo" />
+              <span>Pawdigree</span>
+            </div>
+            <button
+              type="button"
+              className="back-btn"
+              onClick={handleBack}
+              aria-label="Go back"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="back-btn"
+              onClick={handleBack}
+              aria-label="Go back"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <span className="top-bar-title">
+              {step === "password" ? "Welcome back" : "Verify Phone"}
+            </span>
+            <div className="spacer" />
+          </>
+        )}
       </div>
 
       <div className="login-card">
@@ -56,37 +71,58 @@ export default function CustomerLoginPage() {
             <div className="login-logo">
               <img src={logo} alt="Pawdigree logo" className="real-logo" />
             </div>
-            <h1>Login</h1>
-            <p className="subtitle">Log in or create an account to continue.</p>
 
-            <div className="login-illustration">
-              <img
-                src="/pets-illustration.svg"
-                alt="pets"
-                onError={(e) => (e.currentTarget.style.display = "none")}
-              />
-            </div>
+            <p className="role-eyebrow">WELCOME TO PAWDIGREE</p>
+            <h1>How would you like to continue?</h1>
+            <p className="subtitle">
+              One home for pet lovers and pet businesses.
+            </p>
 
-            <div className="login-actions">
+            <div className="role-options">
               <button
                 type="button"
-                className="btn-primary"
+                className="role-card"
                 onClick={() => setStep("password")}
               >
-                Login
+                <span className="role-icon" aria-hidden="true">
+                  <PawPrint size={26} strokeWidth={1.8} />
+                </span>
+                <span className="role-title">I'm here for the pets!</span>
+                <span className="role-description">
+                  Discover pets, shop, and explore services.
+                </span>
+                <span className="role-action">Continue as Customer →</span>
               </button>
+
               <button
                 type="button"
-                className="btn-outline"
-                onClick={() => (window.location.href = "/registration")}
+                className="role-card"
+                onClick={() => {
+                  window.location.href = "/vendor/login";
+                }}
               >
-                Create account
+                <span className="role-icon" aria-hidden="true">
+                  <Store size={26} strokeWidth={1.8} />
+                </span>
+                <span className="role-title">
+                  I'm here to grow my pet business!
+                </span>
+                <span className="role-description">
+                  Manage your pet business and listings.
+                </span>
+                <span className="role-action">Continue as Vendor <ArrowRight size={16} /></span>
               </button>
             </div>
 
+            <p className="bottom-link">
+              New to Pawdigree?{" "}
+              <a href="/registration">Create an account</a>
+            </p>
+
             <p className="terms">
-              By continuing you agree to Pawdigree's <a href="#">T&Cs</a> and{" "}
-              <a href="#">Privacy Policy</a>
+              By continuing you agree to Pawdigree's{" "}
+              <a href="/terms-and-conditions">Terms &amp; Conditions</a> and{" "}
+              <a href="/privacy">Privacy Policy</a>.
             </p>
           </div>
         )}
