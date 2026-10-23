@@ -392,7 +392,7 @@ function VendorRegistrationForm() {
                     </p>
                   )}
                 </div>
-                <div className="form-group full-width">
+                <div className="form-group">
                   <label htmlFor="confirmPassword">
                     Confirm Password <span className="required-mark">*</span>
                   </label>
