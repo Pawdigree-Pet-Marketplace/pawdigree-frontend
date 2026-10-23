@@ -1,5 +1,5 @@
 import LandingPage from "./pages/Customer/CustomerLandingPage";
-import RegistrationPage from "./pages/RegistrationPage";
+import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";

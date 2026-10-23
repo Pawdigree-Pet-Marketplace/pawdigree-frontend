@@ -1,0 +1,158 @@
+
+.registration-page.registration-page--layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+  align-items: center;
+  justify-content: initial;
+  gap: clamp(32px, 5vw, 80px);
+
+  min-height: 100vh;
+  padding: 112px clamp(24px, 6vw, 88px) 64px;
+  box-sizing: border-box;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(247, 243, 232, 0.20),
+      rgba(247, 243, 232, 0.10)
+    ),
+    url("/dog-background.jpg") center / cover no-repeat;
+}
+
+.registration-intro {
+  width: 100%;
+  max-width: 540px;
+  justify-self: center;
+}
+
+.registration-eyebrow {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.registration-intro > h1 {
+  margin: 0 0 20px;
+  color: var(--charcoal);
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(36px, 4vw, 58px);
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+.registration-intro > p {
+  max-width: 480px;
+  margin: 0;
+  color: var(--charcoal);
+  font-family: "Nunito", sans-serif;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.registration-benefits {
+  display: grid;
+  gap: 24px;
+  margin-top: 36px;
+}
+
+.registration-benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.benefit-icon {
+  display: flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--teal);
+  font-size: 22px;
+  box-shadow: 0 4px 14px rgba(44, 48, 47, 0.06);
+}
+
+.registration-benefit h2 {
+  margin: 0 0 5px;
+  color: var(--charcoal);
+  font-family: "Fredoka", sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.registration-benefit p {
+  margin: 0;
+  color: var(--charcoal);
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.registration-form-container {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.registration-form-container .registration-card {
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .registration-page.registration-page--layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    padding: 96px 24px 48px;
+  }
+
+  .registration-intro {
+    max-width: 620px;
+    text-align: center;
+  }
+
+  .registration-intro > p {
+    margin: 0 auto;
+  }
+
+  .registration-benefits {
+    max-width: 480px;
+    margin: 28px auto 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .registration-page.registration-page--layout {
+    gap: 28px;
+    padding: 80px 12px 32px;
+  }
+
+  .registration-intro > h1 {
+    font-size: 34px;
+  }
+
+  .registration-intro > p {
+    font-size: 15px;
+  }
+
+  .registration-benefits {
+    gap: 18px;
+  }
+
+  .registration-benefit h2 {
+    font-size: 17px;
+  }
+
+  .registration-benefit p {
+    font-size: 13px;
+  }
+}

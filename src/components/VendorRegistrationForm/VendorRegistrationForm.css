@@ -184,9 +184,38 @@
   align-items: stretch;
 }
 
-.vendor-registration-form .phone-input-row .country-code-select {
+.vendor-registration-form .phone-input-row .vendor-country-picker {
   flex: 0 0 190px;
   max-width: 50%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid #D5DAD7;
+  border-radius: 8px;
+  background: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.vendor-registration-form .vendor-country-picker svg {
+  display: block;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 16px;
+}
+
+.vendor-registration-form .phone-input-row .vendor-country-picker .country-code-select {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  border: none;
+  outline-offset: 2px;
+  background: transparent;
+  box-sizing: border-box;
 }
 
 .vendor-registration-form .phone-input-row input {
@@ -391,8 +420,9 @@
     flex-direction: column;
   }
 
-  .vendor-registration-form .phone-input-row .country-code-select {
+  .vendor-registration-form .phone-input-row .vendor-country-picker {
     max-width: 100%;
     flex: 1;
+    width: 100%;
   }
 }
