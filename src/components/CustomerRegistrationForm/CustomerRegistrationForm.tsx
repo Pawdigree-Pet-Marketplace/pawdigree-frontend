@@ -215,6 +215,7 @@ export default function CustomerRegistrationForm() {
         : undefined,
   };
 
+  const isFormValid = fieldOrder.every((field) => !errors[field]);
   const updateField = (name: RegistrationField, value: string) => {
     setFormData((current) => ({ ...current, [name]: value }));
     setSuccess("");
@@ -759,7 +760,7 @@ export default function CustomerRegistrationForm() {
             ) : (
               <button
                 type="submit"
-                className="register-button"
+                className={`register-button ${isFormValid ? "register-button-ready" : ""}`}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Creating account..." : "Create account"}
