@@ -1,14 +1,60 @@
-import { useEffect, useState, useCallback, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import API_BASE_URL from "../../services/api";
 import "./VendorBusinessUpdateForm.css";
+
+export type DayHours = { is_open: boolean; open: string; close: string };
+export type BusinessHours = Record<string, DayHours>;
+
+export interface BusinessStats {
+  listings_count?: number;
+  orders_completed?: number;
+  response_rate?: number;
+  member_since?: number;
+}
+
+export interface Business {
+  id?: number;
+  business_name?: string;
+  name?: string;
+  description?: string;
+  category?: number;
+  category_id?: number | string;
+  category_name?: string;
+  vendor_category?: string;
+  address?: string;
+  city_district?: string;
+  location_district?: string;
+  city?: string;
+  contact?: string;
+  phone?: string;
+  email?: string;
+  business_hours?: BusinessHours;
+  working_hours?: unknown;
+  created_at?: string;
+  cover_image?: string;
+  logo?: string;
+  stats?: BusinessStats;
+  listings_count?: number;
+  orders_completed?: number;
+  total_orders?: number;
+  response_rate?: number;
+}
 
 interface Category {
   id: number;
   name: string;
 }
-type DayHours = { is_open: boolean; open: string; close: string };
-type BusinessHours = Record<string, DayHours>;
+
+type FormState = {
+  businessName: string;
+  description: string;
+  businessType: string;
+  address: string;
+  cityDistrict: string;
+  businessPhone: string;
+  businessEmail: string;
+};
 
 const weekdays = [
   "monday",
@@ -30,27 +76,8 @@ const initialHours: BusinessHours = {
   sunday: { is_open: false, open: "09:00", close: "17:00" },
 };
 
-interface Business {
-  id?: number;
-  business_name?: string;
-  name?: string;
-  description?: string;
-  category?: number;
-  category_id?: number | string;
-  category_name?: string;
-  vendor_category?: string;
-  address?: string;
-  city_district?: string;
-  location_district?: string;
-  city?: string;
-  contact?: string;
-  phone?: string;
-  email?: string;
-  business_hours?: BusinessHours;
-}
-
 interface Props {
-  business?: Business;
+  business?: Business | null;
   onSaved: (business: Business) => void;
   onCancel: () => void;
 }
@@ -66,48 +93,14 @@ export default function VendorBusinessUpdateForm({
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [form, setForm] = useState({
-    businessName: "",
-    description: "",
-    businessType: "",
-    address: "",
-    cityDistrict: "",
-    businessPhone: "",
-    businessEmail: "",
-  });
-
-  const [hours, setHours] = useState<BusinessHours>(initialHours);
-
-  const fetchCategories = useCallback(() => {
-    const token =
-      localStorage.getItem("access") || localStorage.getItem("access_token");
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-    setLoadingCategories(true);
-    fetch(`${API_BASE_URL}/categories/`, { headers })
-      .then((r) => r.json())
-      .then((d: unknown) => {
-        const data = d as { results?: Category[] };
-        const list = Array.isArray(d) ? (d as Category[]) : data.results || [];
-        setCategories(list);
-      })
-      .catch(() => {})
-      .finally(() => setLoadingCategories(false));
-  }, []);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  useEffect(() => {
-    if (!business) return;
-
+  // The form values shown on screen = values derived from `business`
+  // (and the loaded categories) + whatever the user has typed so far.
+  // Deriving them during render means no setState inside an effect.
+  const baseForm = useMemo<FormState>(() => {
     let categoryId = "";
-    if (business.category) categoryId = String(business.category);
-    else if (business.category_id) categoryId = String(business.category_id);
-    else if (business.category_name || business.vendor_category) {
+    if (business?.category) categoryId = String(business.category);
+    else if (business?.category_id) categoryId = String(business.category_id);
+    else if (business?.category_name || business?.vendor_category) {
       const name = String(
         business.category_name || business.vendor_category || "",
       ).toLowerCase();
@@ -118,29 +111,62 @@ export default function VendorBusinessUpdateForm({
       if (found) categoryId = String(found.id);
     }
 
-    setForm({
-      businessName: business.business_name || business.name || "",
-      description: business.description || "",
+    return {
+      businessName: business?.business_name || business?.name || "",
+      description: business?.description || "",
       businessType: categoryId,
-      address: business.address || "",
+      address: business?.address || "",
       cityDistrict:
-        business.city_district ||
-        business.location_district ||
-        business.city ||
+        business?.city_district ||
+        business?.location_district ||
+        business?.city ||
         "",
-      businessPhone: business.contact || business.phone || "",
-      businessEmail: business.email || "",
-    });
-    if (business.business_hours) {
-      setHours(business.business_hours);
-    }
+      businessPhone: business?.contact || business?.phone || "",
+      businessEmail: business?.email || "",
+    };
   }, [business, categories]);
+
+  const [edits, setEdits] = useState<Partial<FormState>>({});
+  const form: FormState = { ...baseForm, ...edits };
+
+  const baseHours = useMemo<BusinessHours>(
+    () => ({ ...initialHours, ...(business?.business_hours ?? {}) }),
+    [business],
+  );
+  const [hoursEdits, setHoursEdits] = useState<BusinessHours | null>(null);
+  const hours = hoursEdits ?? baseHours;
+
+  useEffect(() => {
+    let cancelled = false;
+    const token =
+      localStorage.getItem("access") || localStorage.getItem("access_token");
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    fetch(`${API_BASE_URL}/categories/`, { headers })
+      .then((r) => r.json())
+      .then((d: unknown) => {
+        const data = d as { results?: Category[] };
+        const list = Array.isArray(d) ? (d as Category[]) : data.results || [];
+        if (!cancelled) setCategories(list);
+      })
+      .catch(() => {
+        // Leave the category list empty if the request fails
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCategories(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setEdits((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => {
       const n = { ...prev };
       delete n[name];
@@ -153,7 +179,10 @@ export default function VendorBusinessUpdateForm({
     field: keyof DayHours,
     value: string | boolean,
   ) => {
-    setHours((prev) => ({ ...prev, [day]: { ...prev[day], [field]: value } }));
+    setHoursEdits((prev) => {
+      const base = prev ?? baseHours;
+      return { ...base, [day]: { ...base[day], [field]: value } };
+    });
     setErrors((prev) => {
       const n = { ...prev };
       delete n.businessHours;

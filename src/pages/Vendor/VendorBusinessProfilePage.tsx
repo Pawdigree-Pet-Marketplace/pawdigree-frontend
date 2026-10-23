@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, type ChangeEvent } from "react";
 import {
   Phone,
   Mail,
@@ -11,110 +11,243 @@ import {
 import VendorSidebar from "../../components/vendor/VendorSidebar/VendorSidebar";
 import VendorTopbar from "../../components/vendor/VendorTopbar/VendorTopbar";
 import VendorPageHeader from "../../components/vendor/VendorPageHeader/VendorPageHeader";
-import VendorBusinessUpdateForm from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
+import VendorBusinessUpdateForm, {
+  type Business,
+} from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
 import API_BASE_URL from "../../services/api";
 import "./VendorBusinessProfilePage.css";
 
+interface Verification {
+  status?: string;
+  last_verified?: string;
+}
+
+interface Listing {
+  id: number;
+  name?: string;
+  title?: string;
+  price?: number;
+  image?: string;
+  cover_image?: string;
+  photo?: string;
+}
+
+type CatTab = "all" | "pets" | "products" | "services";
+
+// MOCK BUSINESS - FOR UI PREVIEW ONLY to show fields and UI instantly
+// When using real data, delete this constant and getInitialBusiness below
+const MOCK_BUSINESS: Business = {
+  id: 1,
+  business_name: "Pawdigree Vet Clinic",
+  name: "Pawdigree Vet Clinic",
+  description:
+    "We provide quality veterinary services, including checkups, vaccinations, and pet wellness care. Trusted since 2024. We are committed to keeping your furry friends healthy and happy.",
+  category_name: "Vet Clinic",
+  vendor_category: "Vet Clinic",
+  city_district: "Kampala",
+  location_district: "Kampala",
+  address: "Plot 12, Lumumba Avenue, Kampala, Uganda",
+  contact: "+256 700 123456",
+  phone: "+256 700 123456",
+  email: "info@pawdigree.vet",
+  business_hours: {
+    monday: { is_open: true, open: "09:00", close: "18:00" },
+    tuesday: { is_open: true, open: "09:00", close: "18:00" },
+    wednesday: { is_open: true, open: "09:00", close: "18:00" },
+    thursday: { is_open: true, open: "09:00", close: "18:00" },
+    friday: { is_open: true, open: "09:00", close: "18:00" },
+    saturday: { is_open: true, open: "09:00", close: "14:00" },
+    sunday: { is_open: false, open: "09:00", close: "17:00" },
+  },
+  created_at: "2024-01-15",
+  cover_image:
+    "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200",
+  logo: "",
+  stats: { listings_count: 69, orders_completed: 412, response_rate: 96 },
+};
+
+const MOCK_PETS: Listing[] = [
+  {
+    id: 101,
+    name: "German Shepherd Puppy",
+    price: 800000,
+    image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400",
+  },
+  {
+    id: 102,
+    name: "Persian Cat",
+    price: 500000,
+    image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400",
+  },
+  {
+    id: 103,
+    name: "Labrador Retriever",
+    price: 750000,
+    image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400",
+  },
+  {
+    id: 104,
+    name: "Bulldog",
+    price: 650000,
+    image: "https://images.unsplash.com/photo-1583512603807-63cc1dc8889b?w=400",
+  },
+  {
+    id: 105,
+    name: "Beagle Puppy",
+    price: 600000,
+    image: "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400",
+  },
+  {
+    id: 106,
+    name: "Golden Retriever",
+    price: 900000,
+    image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400",
+  },
+  {
+    id: 107,
+    name: "Siamese Kitten",
+    price: 450000,
+    image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=400",
+  },
+];
+
+const MOCK_PRODUCTS: Listing[] = [
+  {
+    id: 201,
+    name: "Dog Food - 10kg",
+    price: 120000,
+    image: "https://images.unsplash.com/photo-1589924691995-c10e5725a7d0?w=400",
+  },
+  {
+    id: 202,
+    name: "Cat Litter Box",
+    price: 80000,
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400",
+  },
+  {
+    id: 203,
+    name: "Pet Shampoo",
+    price: 35000,
+    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400",
+  },
+];
+
+const MOCK_SERVICES: Listing[] = [
+  {
+    id: 301,
+    name: "Vaccination Service",
+    price: 50000,
+    image: "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400",
+  },
+  {
+    id: 302,
+    name: "Grooming Full Package",
+    price: 70000,
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400",
+  },
+];
+
+// Mock data shown instantly, with any locally saved images applied.
+// Used as the initial state so no setState is needed inside an effect.
+function getInitialBusiness(): Business {
+  const savedCover = localStorage.getItem("pawdigree_cover_image");
+  const savedLogo = localStorage.getItem("pawdigree_logo");
+  return {
+    ...MOCK_BUSINESS,
+    ...(savedCover ? { cover_image: savedCover } : {}),
+    ...(savedLogo ? { logo: savedLogo } : {}),
+  };
+}
+
+const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T> =>
+  Promise.race([
+    p,
+    new Promise<never>((_, rej) =>
+      setTimeout(() => rej(new Error("timeout")), ms),
+    ),
+  ]);
+
+function extractList<T>(d: unknown): T[] {
+  if (Array.isArray(d)) return d as T[];
+  const results = (d as { results?: unknown } | null)?.results;
+  return Array.isArray(results) ? (results as T[]) : [];
+}
+
+type BusinessListResponse = Business[] | (Business & { results?: Business[] });
+
 export default function VendorBusinessProfilePage() {
   const [tab, setTab] = useState<"view" | "edit">("view");
-  const [catTab, setCatTab] = useState<
-    "all" | "pets" | "products" | "services"
-  >("all");
-  const [business, setBusiness] = useState<any>(null);
-  const [verification, setVerification] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [catTab, setCatTab] = useState<CatTab>("all");
+  const [business, setBusiness] = useState<Business | null>(getInitialBusiness);
+  const [verification, setVerification] = useState<Verification | null>({
+    status: "verified",
+    last_verified: "2024-12-01",
+  });
 
-  // MOCK BUSINESS - FOR UI PREVIEW ONLY to show fields and UI instantly
-  // When using real, Comment/ delete out this whole function
-  const MOCK_BUSINESS = {
-    id: 1,
-    business_name: "Pawdigree Vet Clinic",
-    name: "Pawdigree Vet Clinic",
-    description:
-      "We provide quality veterinary services, including checkups, vaccinations, and pet wellness care. Trusted since 2024. We are committed to keeping your furry friends healthy and happy.",
-    category_name: "Vet Clinic",
-    vendor_category: "Vet Clinic",
-    city_district: "Kampala",
-    location_district: "Kampala",
-    address: "Plot 12, Lumumba Avenue, Kampala, Uganda",
-    contact: "+256 700 123456",
-    phone: "+256 700 123456",
-    email: "info@pawdigree.vet",
-    business_hours: {
-      monday: { is_open: true, open: "09:00", close: "18:00" },
-      tuesday: { is_open: true, open: "09:00", close: "18:00" },
-      wednesday: { is_open: true, open: "09:00", close: "18:00" },
-      thursday: { is_open: true, open: "09:00", close: "18:00" },
-      friday: { is_open: true, open: "09:00", close: "18:00" },
-      saturday: { is_open: true, open: "09:00", close: "14:00" },
-      sunday: { is_open: false, open: "09:00", close: "17:00" },
-    },
-    created_at: "2024-01-15",
-    cover_image:
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200",
-    logo: "",
-    stats: { listings_count: 69, orders_completed: 412, response_rate: 96 },
-  };
+  // ACTIVE NOW: tries the real backend after the mock data is already showing.
+  // All setState calls here happen after an await, never synchronously.
+  // To use real data only, delete the mock pieces above and use the
+  // commented production version below.
+  useEffect(() => {
+    let cancelled = false;
 
-  // (LoadData function) ACTIVE NOW: MOCK version to show UI instantly
-  // To use real, Comment out/ delete this whole function and uncomment the one below it
-  const loadData = async () => {
-    // ADDED FOR PERSISTENT SAVE: load custom images
-    const savedCover = localStorage.getItem("pawdigree_cover_image");
-    const savedLogo = localStorage.getItem("pawdigree_logo");
-    const businessWithSaved = {
-      ...MOCK_BUSINESS,
-      ...(savedCover ? { cover_image: savedCover } : {}),
-      ...(savedLogo ? { logo: savedLogo } : {}),
-    };
-    setBusiness(businessWithSaved);
-    setVerification({ status: "verified", last_verified: "2024-12-01" });
-    setLoading(false);
-    const token =
-      localStorage.getItem("access") || localStorage.getItem("access_token");
-    if (!token) return;
-    const headers: any = {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-    const withTimeout = (p: Promise<any>, ms = 3500) =>
-      Promise.race([
-        p,
-        new Promise((_, rej) =>
-          setTimeout(() => rej(new Error("timeout")), ms),
-        ),
-      ]);
-    try {
-      const listRes: any = await withTimeout(
-        fetch(`${API_BASE_URL}/businesses/`, { headers }),
-        4000,
-      );
-      if (listRes?.ok) {
-        const data = await listRes.json();
-        const first = Array.isArray(data) ? data[0] : data.results?.[0] || data;
-        if (first?.id && first.id !== 1) {
-          setBusiness({
-            ...first,
-            cover_image: savedCover || first.cover_image,
-            logo: savedLogo || first.logo,
-          });
+    const loadData = async () => {
+      const token =
+        localStorage.getItem("access") || localStorage.getItem("access_token");
+      if (!token) return;
+      const headers: Record<string, string> = {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const savedCover = localStorage.getItem("pawdigree_cover_image");
+      const savedLogo = localStorage.getItem("pawdigree_logo");
+      try {
+        const listRes = await withTimeout(
+          fetch(`${API_BASE_URL}/businesses/`, { headers }),
+          4000,
+        );
+        if (listRes.ok) {
+          const data = (await listRes.json()) as BusinessListResponse;
+          const first = Array.isArray(data)
+            ? data[0]
+            : (data.results?.[0] ?? data);
+          if (!cancelled && first?.id && first.id !== 1) {
+            setBusiness({
+              ...first,
+              cover_image: savedCover || first.cover_image,
+              logo: savedLogo || first.logo,
+            });
+          }
         }
+        const vRes = await withTimeout(
+          fetch(`${API_BASE_URL}/businesses/verification-status/`, {
+            headers,
+          }),
+          3000,
+        ).catch(() => null);
+        if (vRes?.ok) {
+          const vData = (await vRes.json()) as Verification;
+          if (!cancelled) setVerification(vData);
+        }
+      } catch {
+        // Backend unreachable or timed out: keep showing the mock data
       }
-      const vRes: any = await withTimeout(
-        fetch(`${API_BASE_URL}/businesses/verification-status/`, { headers }),
-        3000,
-      ).catch(() => null);
-      if (vRes?.ok) setVerification(await vRes.json());
-    } catch {}
-  };
+    };
+
+    loadData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // REAL PRODUCTION VERSION FOR loadData - COMMENTED
+  // (would also need a `loading` state, initialised to true, and no
+  // setLoading(true) at the top of the function)
   /*
   const loadData = async () => {
-    setLoading(true);
     const token = localStorage.getItem("access") || localStorage.getItem("access_token");
     if (!token) { setLoading(false); return; }
-    const headers: any = { Accept: "application/json", Authorization: `Bearer ${token}` };
+    const headers: Record<string, string> = { Accept: "application/json", Authorization: `Bearer ${token}` };
     try {
       const res = await fetch(`${API_BASE_URL}/businesses/`, { headers });
       if (!res.ok) throw new Error("Failed to fetch businesses");
@@ -133,10 +266,6 @@ export default function VendorBusinessProfilePage() {
     } finally { setLoading(false); }
   };
   */
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   return (
     <div className="vendor-layout">
@@ -162,17 +291,15 @@ export default function VendorBusinessProfilePage() {
               Edit
             </button>
           </div>
-          {loading ? (
-            <p className="bp-loading">Loading...</p>
-          ) : tab === "view" ? (
+          {tab === "view" ? (
             <VendorProfileView
               business={business}
               verification={verification}
               catTab={catTab}
               setCatTab={setCatTab}
               onEdit={() => setTab("edit")}
-              onBusinessUpdate={(updates: any) =>
-                setBusiness((prev: any) => ({ ...prev, ...updates }))
+              onBusinessUpdate={(updates) =>
+                setBusiness((prev) => ({ ...prev, ...updates }))
               }
             />
           ) : (
@@ -191,6 +318,15 @@ export default function VendorBusinessProfilePage() {
   );
 }
 
+interface VendorProfileViewProps {
+  business: Business | null;
+  verification: Verification | null;
+  catTab: CatTab;
+  setCatTab: (tab: CatTab) => void;
+  onEdit: () => void;
+  onBusinessUpdate: (updates: Partial<Business>) => void;
+}
+
 function VendorProfileView({
   business,
   verification,
@@ -198,7 +334,7 @@ function VendorProfileView({
   setCatTab,
   onEdit,
   onBusinessUpdate,
-}: any) {
+}: VendorProfileViewProps) {
   const formatDate = (d: string) => {
     if (!d) return "";
     try {
@@ -214,42 +350,43 @@ function VendorProfileView({
   const cap = (s: string) =>
     s ? s.charAt(0).toUpperCase() + s.slice(1) : "Pending";
 
-  const formatHours = (hours: any) => {
+  const formatHours = (hours: unknown): { day: string; time: string }[] => {
     if (!hours) return [];
-    try {
-      // Case: object like { Monday: {open, close} } or { Monday: "09:00-18:00" }
-      if (typeof hours === "object" && !Array.isArray(hours)) {
-        return Object.entries(hours).map(([day, val]: [string, any]) => {
+    // Case: object like { Monday: {open, close} } or { Monday: "09:00-18:00" }
+    if (typeof hours === "object" && !Array.isArray(hours)) {
+      return Object.entries(hours as Record<string, unknown>).map(
+        ([day, val]) => {
           let timeStr = "";
           if (!val) timeStr = "Closed";
           else if (typeof val === "string") timeStr = val;
           else if (typeof val === "object") {
-            if (val.is_closed || val.closed || val.isClosed) timeStr = "Closed";
-            else if (val.open && val.close)
-              timeStr = `${val.open} - ${val.close}`;
-            else if (val.start && val.end)
-              timeStr = `${val.start} - ${val.end}`;
-            else if (val.from && val.to) timeStr = `${val.from} - ${val.to}`;
-            else if (val.time) timeStr = String(val.time);
-            else timeStr = Object.values(val).join(" - ");
+            const v = val as Record<string, unknown>;
+            if (v.is_open === false || v.is_closed || v.closed || v.isClosed)
+              timeStr = "Closed";
+            else if (v.open && v.close)
+              timeStr = `${String(v.open)} - ${String(v.close)}`;
+            else if (v.start && v.end)
+              timeStr = `${String(v.start)} - ${String(v.end)}`;
+            else if (v.from && v.to)
+              timeStr = `${String(v.from)} - ${String(v.to)}`;
+            else if (v.time) timeStr = String(v.time);
+            else timeStr = Object.values(v).join(" - ");
           }
           return { day, time: timeStr };
-        });
-      }
-      // Case: string like "monday:09:00-18:00, tuesday:..."
-      if (typeof hours === "string" && hours.includes(":")) {
-        return hours
-          .split(",")
-          .map((s) => {
-            const parts = s.trim().split(":");
-            const day = parts[0] || "";
-            const time = parts.slice(1).join(":").trim();
-            return { day: day.trim(), time };
-          })
-          .filter((h) => h.day);
-      }
-    } catch (e) {
-      console.log("hours parse error", e);
+        },
+      );
+    }
+    // Case: string like "monday:09:00-18:00, tuesday:..."
+    if (typeof hours === "string" && hours.includes(":")) {
+      return hours
+        .split(",")
+        .map((s) => {
+          const parts = s.trim().split(":");
+          const day = parts[0] || "";
+          const time = parts.slice(1).join(":").trim();
+          return { day: day.trim(), time };
+        })
+        .filter((h) => h.day);
     }
     return [];
   };
@@ -258,9 +395,9 @@ function VendorProfileView({
     s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 
   const [copied, setCopied] = useState(false);
-  const [pets, setPets] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
+  const [pets, setPets] = useState<Listing[]>([]);
+  const [products, setProducts] = useState<Listing[]>([]);
+  const [services, setServices] = useState<Listing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -273,100 +410,17 @@ function VendorProfileView({
     "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200";
   const DEFAULT_AVATAR = `https://ui-avatars.com/api/?name=${encodeURIComponent(business?.name || business?.business_name || "Business")}&background=E7F1F0&color=216C68`;
 
-  const MOCK_PETS = [
-    {
-      id: 101,
-      name: "German Shepherd Puppy",
-      price: 800000,
-      image:
-        "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400",
-    },
-    {
-      id: 102,
-      name: "Persian Cat",
-      price: 500000,
-      image:
-        "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400",
-    },
-    {
-      id: 103,
-      name: "Labrador Retriever",
-      price: 750000,
-      image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400",
-    },
-    {
-      id: 104,
-      name: "Bulldog",
-      price: 650000,
-      image:
-        "https://images.unsplash.com/photo-1583512603807-63cc1dc8889b?w=400",
-    },
-    {
-      id: 105,
-      name: "Beagle Puppy",
-      price: 600000,
-      image:
-        "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400",
-    },
-    {
-      id: 106,
-      name: "Golden Retriever",
-      price: 900000,
-      image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400",
-    },
-    {
-      id: 107,
-      name: "Siamese Kitten",
-      price: 450000,
-      image:
-        "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=400",
-    },
-  ];
-  const MOCK_PRODUCTS = [
-    {
-      id: 201,
-      name: "Dog Food - 10kg",
-      price: 120000,
-      image:
-        "https://images.unsplash.com/photo-1589924691995-c10e5725a7d0?w=400",
-    },
-    {
-      id: 202,
-      name: "Cat Litter Box",
-      price: 80000,
-      image:
-        "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400",
-    },
-    {
-      id: 203,
-      name: "Pet Shampoo",
-      price: 35000,
-      image:
-        "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400",
-    },
-  ];
-  const MOCK_SERVICES = [
-    {
-      id: 301,
-      name: "Vaccination Service",
-      price: 50000,
-      image:
-        "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400",
-    },
-    {
-      id: 302,
-      name: "Grooming Full Package",
-      price: 70000,
-      image:
-        "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400",
-    },
-  ];
+  // Changing the tab also collapses the list, done here instead of in an effect
+  const handleCatTabChange = (next: CatTab) => {
+    setCatTab(next);
+    setShowAll(false);
+  };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/business/${business.id}`;
+    const shareUrl = `${window.location.origin}/business/${business?.id}`;
     const shareData = {
-      title: business.name || business.business_name,
-      text: `Check out ${business.name || business.business_name} on Pawdigree`,
+      title: business?.name || business?.business_name,
+      text: `Check out ${business?.name || business?.business_name} on Pawdigree`,
       url: shareUrl,
     };
     try {
@@ -382,7 +436,9 @@ function VendorProfileView({
         await navigator.clipboard.writeText(shareUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      } catch {}
+      } catch {
+        // Clipboard not available: nothing more we can do
+      }
     }
   };
 
@@ -408,7 +464,9 @@ function VendorProfileView({
       localStorage.setItem(`pawdigree_${field}`, base64);
 
       // 3. Update parent business state - updates UI instantly and stays
-      onBusinessUpdate({ [field]: base64 });
+      onBusinessUpdate(
+        field === "cover_image" ? { cover_image: base64 } : { logo: base64 },
+      );
 
       // 4. Try backend upload (when ready, it will use real URL)
       const token =
@@ -417,8 +475,8 @@ function VendorProfileView({
         const formData = new FormData();
         formData.append(field, file);
         const endpoints = [
-          `${API_BASE_URL}/businesses/${business.id}/`,
-          `${API_BASE_URL}/businesses/${business.id}/update/`,
+          `${API_BASE_URL}/businesses/${business?.id}/`,
+          `${API_BASE_URL}/businesses/${business?.id}/update/`,
           `${API_BASE_URL}/businesses/update/`,
           `${API_BASE_URL}/businesses/me/`,
         ];
@@ -430,7 +488,9 @@ function VendorProfileView({
               body: formData,
             });
             if (res.ok) {
-              const updated = await res.json().catch(() => null);
+              const updated = (await res
+                .json()
+                .catch(() => null)) as Business | null;
               if (updated) {
                 if (updated.cover_image) {
                   localStorage.setItem(
@@ -446,7 +506,9 @@ function VendorProfileView({
               }
               break;
             }
-          } catch {}
+          } catch {
+            // This endpoint failed: try the next one
+          }
         }
       }
     } finally {
@@ -455,14 +517,14 @@ function VendorProfileView({
     }
   };
 
-  const onCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     uploadImage(file, "cover_image");
     e.target.value = ""; // allow same file to be selected again
   };
 
-  const onLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     uploadImage(file, "logo");
@@ -470,34 +532,31 @@ function VendorProfileView({
   };
 
   useEffect(() => {
-    setShowAll(false);
-  }, [catTab]);
-
-  useEffect(() => {
     if (!business?.id) return;
+    let cancelled = false;
     const token =
       localStorage.getItem("access") || localStorage.getItem("access_token");
-    const headers: any = {
+    const headers: Record<string, string> = {
       Accept: "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    const fetchList = async (url: string) => {
+    const fetchList = async (url: string): Promise<Listing[] | null> => {
       try {
         const r = await fetch(url, { headers });
         if (!r.ok) return null;
-        const d = await r.json();
-        return Array.isArray(d) ? d : d.results || [];
+        const d: unknown = await r.json();
+        return extractList<Listing>(d);
       } catch {
         return null;
       }
     };
     const loadListings = async () => {
-      setLoadingListings(true);
       const [petsData, productsData, servicesData] = await Promise.all([
         fetchList(`${API_BASE_URL}/pets/?business=${business.id}`),
         fetchList(`${API_BASE_URL}/products/?business=${business.id}`),
         fetchList(`${API_BASE_URL}/services/?business=${business.id}`),
       ]);
+      if (cancelled) return;
       setPets(petsData && petsData.length ? petsData : MOCK_PETS);
       setProducts(
         productsData && productsData.length ? productsData : MOCK_PRODUCTS,
@@ -508,6 +567,9 @@ function VendorProfileView({
       setLoadingListings(false);
     };
     loadListings();
+    return () => {
+      cancelled = true;
+    };
   }, [business?.id]);
 
   const allCombined = [...pets, ...products, ...services];
@@ -803,7 +865,7 @@ function VendorProfileView({
                   <div className="bp-hours-grid">
                     {formatHours(
                       business.working_hours || business.business_hours,
-                    ).map((h: any, i: number) => (
+                    ).map((h, i) => (
                       <div key={i} className="bp-hour-item">
                         <span className="bp-hour-day">{capDay(h.day)}</span>
                         <span className="bp-hour-time">{h.time}</span>
@@ -821,25 +883,25 @@ function VendorProfileView({
             <div className="category-switcher">
               <button
                 className={catTab === "all" ? "active" : ""}
-                onClick={() => setCatTab("all")}
+                onClick={() => handleCatTabChange("all")}
               >
                 All
               </button>
               <button
                 className={catTab === "pets" ? "active" : ""}
-                onClick={() => setCatTab("pets")}
+                onClick={() => handleCatTabChange("pets")}
               >
                 Pets
               </button>
               <button
                 className={catTab === "products" ? "active" : ""}
-                onClick={() => setCatTab("products")}
+                onClick={() => handleCatTabChange("products")}
               >
                 Merchandise
               </button>
               <button
                 className={catTab === "services" ? "active" : ""}
-                onClick={() => setCatTab("services")}
+                onClick={() => handleCatTabChange("services")}
               >
                 Services
               </button>
@@ -856,7 +918,7 @@ function VendorProfileView({
               </div>
             ) : (
               <div className="listings-grid">
-                {visible.map((item: any) => (
+                {visible.map((item) => (
                   <div key={item.id} className="listing-card">
                     <div className="listing-img">
                       <img
