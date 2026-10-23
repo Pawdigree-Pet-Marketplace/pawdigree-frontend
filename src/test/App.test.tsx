@@ -1,21 +1,29 @@
-import { render, screen } from '@testing-library/react'
+
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
-import RegistrationPage from '../pages/RegistrationPage'
+import RegistrationPage from '../pages/Customer/RegistrationPage'
 
 describe('Customer Registration Page', () => {
-  test('renders the registration form', () => {
+  test('allows the customer to move through the registration steps', async () => {
     render(<RegistrationPage />)
 
+    // Step 1: Personal details
     expect(screen.getByText('Create your account')).toBeInTheDocument()
-    expect(screen.getByLabelText('Username')).toBeInTheDocument()
-    expect(screen.getByLabelText('First name')).toBeInTheDocument()
-    expect(screen.getByLabelText('Last name')).toBeInTheDocument()
-    expect(screen.getByLabelText('Email address')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText('First name'), {
+      target: { value: 'Jane' },
+    })
+    fireEvent.change(screen.getByLabelText('Last name'), {
+      target: { value: 'Doe' },
+    })
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: '@janedoe' },
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }))
+
+    // Step 2: Contact details
+    expect(await screen.findByLabelText('Email address')).toBeInTheDocument()
     expect(screen.getByLabelText('Phone number')).toBeInTheDocument()
-    expect(screen.getByLabelText('Password')).toBeInTheDocument()
-    expect(screen.getByLabelText('Confirm password')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Create account' }),
-    ).toBeInTheDocument()
   })
 })
