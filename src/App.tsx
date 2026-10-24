@@ -1,5 +1,5 @@
 import LandingPage from "./pages/Customer/CustomerLandingPage";
-import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard/CustomerDashboardLayout";
+import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
