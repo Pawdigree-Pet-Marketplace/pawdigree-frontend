@@ -101,11 +101,23 @@ function VendorRegistrationForm() {
     setErrors((p) => ({ ...p, [field]: "" }));
     setMessage("");
   }
-  function fieldClass(field: keyof FormData): string {
-    if (errors[field]) return "input-error";
-    if (formData[field].trim().length > 0) return "input-valid";
-    return "";
-  }
+  function fieldClass(fieldName: string): string {
+  return errors[fieldName as keyof typeof errors]
+    ? "input-error"
+    : "";
+}
+  function getPasswordRequirements(password: string) {
+  return [
+    { label: "At least 8 characters", met: password.length >= 8 },
+    { label: "One uppercase letter (A–Z)", met: /[A-Z]/.test(password) },
+    { label: "One lowercase letter (a–z)", met: /[a-z]/.test(password) },
+    { label: "One number (0–9)", met: /[0-9]/.test(password) },
+    {
+      label: "One special character",
+      met: /[^A-Za-z0-9]/.test(password),
+    },
+  ];
+}
   function validateForm(): FormErrors {
     const newErrors: FormErrors = {};
     if (!formData.username.trim()) newErrors.username = "Username is required.";
@@ -125,9 +137,19 @@ function VendorRegistrationForm() {
     } else if (!parsedPhone || !parsedPhone.isValid()) {
       newErrors.phone = "Enter a valid phone number for the selected country.";
     };
-    if (!formData.password) newErrors.password = "Password is required.";
-    else if (formData.password.length < 8)
-      newErrors.password = "Password must contain at least 8 characters.";
+    const password = formData.password;
+    if (!password) {
+      newErrors.password = "Please enter a password.";
+    } else if (
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password)
+    ) {
+      newErrors.password =
+      "Your password must meet all the requirements listed below.";
+}
     if (!formData.confirmPassword)
       newErrors.confirmPassword = "Please confirm your password.";
     else if (formData.password !== formData.confirmPassword)
@@ -141,7 +163,7 @@ function VendorRegistrationForm() {
     const validationErrors = validateForm();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
-      setMessage("Please correct the highlighted fields before continuing.");
+    setMessage("");
       return;
     }
     if (!acceptTerms) {
@@ -154,7 +176,7 @@ function VendorRegistrationForm() {
       : parsePhoneNumberFromString(phoneInput, selectedCountry);
     if (!parsedPhone || !parsedPhone.isValid()) {
       setErrors((previous) => ({ ...previous, phone: "Enter a valid phone number for the selected country." }));
-      setMessage("Please correct the highlighted fields before continuing.");
+      setMessage("");
       return;
     }
     const internationalPhone = parsedPhone.number;
@@ -201,8 +223,8 @@ function VendorRegistrationForm() {
         return;
       }
       setMessage(
-        "Your vendor account was created successfully! You can now proceed to the next step.",
-      );
+  "Registration successful! Please check your email for a confirmation message and follow the instructions to continue."
+);
     } catch {
       setMessage(
         "Could not connect to the server. Make sure the Django backend is running and try again.",
@@ -386,13 +408,29 @@ function VendorRegistrationForm() {
                       {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                     </button>
                   </div>
+                 {formData.password && (
+                  <ul className="password-requirements" aria-label="Password requirements">
+                  {getPasswordRequirements(formData.password).map((requirement) => (
+                  <li
+                  key={requirement.label}
+                  className={requirement.met ? "requirement-met" : "requirement-unmet"}
+                >
+                <span aria-hidden="true">
+                {requirement.met ? "✓" : "○"}
+               </span>
+               {requirement.label}
+               </li>
+                ))}
+               </ul>
+                )}
+
                   {errors.password && (
-                    <p className="field-message error-message">
-                      {errors.password}
-                    </p>
-                  )}
+                <p className="field-message error-message" role="alert">
+                {errors.password}
+                </p>
+                )}
                 </div>
-                <div className="form-group full-width">
+                <div className="form-group">
                   <label htmlFor="confirmPassword">
                     Confirm Password <span className="required-mark">*</span>
                   </label>
@@ -453,12 +491,24 @@ function VendorRegistrationForm() {
               </label>
               {message && (
                 <div
-                  className={`form-message ${message.toLowerCase().includes("successfully") ? "form-message--success" : "form-message--error"}`}
-                  role="status"
-                  aria-live="polite"
-                >
-                  {message}
-                </div>
+  className={`form-message ${
+    message.toLowerCase().includes("successfully") ||
+    message.toLowerCase().includes("registration successful")
+      ? "form-message--success"
+      : "form-message--error"
+  }`}
+  role="status"
+  aria-live="polite"
+>
+  <p>{message}</p>
+
+  {(message.toLowerCase().includes("successfully") ||
+    message.toLowerCase().includes("registration successful")) && (
+    <a href="/login" className="login-after-registration">
+      Log in to your account
+    </a>
+  )}
+</div>
               )}
               <button
                 type="submit"
