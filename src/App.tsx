@@ -19,6 +19,7 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
+import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
 
 function App() {
   const path = window.location.pathname;
@@ -36,6 +37,14 @@ function App() {
 
   if (path === "/vendor/login" || path === "/vendor-login") {
     return <VendorLoginPage />;
+  }
+
+  if (path === "/vendor") {
+    return <VendorLandingPage />;
+  }
+
+  if (path.startsWith("/vendors/")) {
+    return <CustomerVendorProfilePage />;
   }
 
   if (path === "/vendor/dashboard") {
@@ -101,8 +110,8 @@ function App() {
   }
 
   if (path === "/reset-password" || path === "/reset-password/") {
-  return <ResetPasswordForm />;
-}
+    return <ResetPasswordForm />;
+  }
 
   return <LandingPage />;
 }
