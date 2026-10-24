@@ -14,8 +14,8 @@ import catsImage from "../../../assets/images/cats.jpg";
 import birdsImage from "../../../assets/images/birds.jpg";
 import livestockImage from "../../../assets/images/livestock.jpg";
 import rabbitImage from "../../../assets/images/rabbit.jpg";
-import { apiRequest } from "../../../services/api";
-import Categories from "../../../components/home/Categories";
+import { apiRequest } from "../../services/api";
+import Categories from "../../components/home/Categories";
 import "./CustomerDashboard.css";
 
 type Pet = {
