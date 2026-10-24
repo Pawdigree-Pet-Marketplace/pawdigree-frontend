@@ -1,4 +1,5 @@
 import LandingPage from "./pages/Customer/CustomerLandingPage";
+import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard/CustomerDashboardLayout";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
@@ -21,6 +22,10 @@ import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 
 function App() {
   const path = window.location.pathname;
+
+  if (path === "/customer/dashboard") {
+    return <CustomerDashboardLayout />;
+  }
 
   if (path === "/terms-and-conditions") {
     return <TermsAndConditionsPage />;
