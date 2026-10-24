@@ -1,0 +1,425 @@
+.customer-dashboard-layout {
+  --dashboard-teal: #216c68;
+  --dashboard-ink: #2c302f;
+  --dashboard-muted: #68716d;
+  --dashboard-paper: #fbfaf7;
+  --dashboard-border: #e7e5de;
+  display: grid;
+  grid-template-columns: 228px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(22px, 3vw, 40px);
+  width: min(100%, 1720px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px clamp(18px, 2.6vw, 42px) 0;
+}
+
+.customer-dashboard-main {
+  min-width: 0;
+}
+
+.customer-dash-sidebar {
+  position: sticky;
+  top: 24px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 48px);
+  min-height: 540px;
+  max-height: 860px;
+  padding: 24px 15px 14px;
+  border: 1px solid rgb(44 48 47 / 7%);
+  border-radius: 22px;
+  background: var(--dashboard-paper);
+  box-shadow: 0 10px 34px rgb(44 48 47 / 7%);
+}
+
+.customer-dash-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 64px;
+  margin: 0 6px 24px;
+}
+
+.customer-dash-logo {
+  display: block;
+  width: 172px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.customer-dash-links {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #c8d9d2 transparent;
+}
+
+.customer-dash-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 10px 12px;
+  color: #5e6763;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.customer-dash-link svg {
+  flex: 0 0 auto;
+  color: #7b8d86;
+  transition: color 160ms ease;
+}
+
+.customer-dash-link:hover,
+.customer-dash-link.is-active {
+  color: var(--dashboard-teal);
+  background: #e8f2ed;
+}
+
+.customer-dash-link:hover svg,
+.customer-dash-link.is-active svg {
+  color: var(--dashboard-teal);
+}
+
+.customer-dash-account-area {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--dashboard-border);
+}
+
+.customer-dash-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 6px 10px;
+  color: var(--dashboard-ink);
+  border-radius: 12px;
+  text-decoration: none;
+}
+
+.customer-dash-account:hover {
+  background: #f1f5f1;
+}
+
+.customer-dash-avatar {
+  display: grid;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  color: #fff;
+  background: var(--dashboard-teal);
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.customer-dash-account-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.customer-dash-account-label {
+  color: var(--dashboard-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.customer-dash-account-name {
+  overflow: hidden;
+  color: var(--dashboard-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.customer-dash-logout-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  color: #8d4641;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  text-align: left;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.customer-dash-logout-option:hover,
+.customer-dash-logout-option:focus-visible {
+  background: #fff0ed;
+}
+
+.customer-dash-mobile-header {
+  display: none;
+}
+
+.customer-dash-menu-toggle,
+.customer-dash-drawer-close {
+  display: grid;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: var(--dashboard-ink);
+  background: #fff;
+  border: 1px solid var(--dashboard-border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.customer-dash-menu-toggle:focus-visible,
+.customer-dash-drawer-close:focus-visible,
+.customer-dash-link:focus-visible,
+.customer-dash-account:focus-visible,
+.customer-dash-logout-option:focus-visible {
+  outline: 3px solid rgb(33 108 104 / 40%);
+  outline-offset: 2px;
+}
+
+.customer-dash-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  background: rgb(25 35 32 / 48%);
+}
+
+.customer-dash-side-drawer {
+  display: flex;
+  flex-direction: column;
+  width: min(86vw, 340px);
+  max-width: 100%;
+  height: 100%;
+  padding: 20px 16px max(18px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--dashboard-paper);
+  box-shadow: 12px 0 36px rgb(0 0 0 / 14%);
+  overscroll-behavior: contain;
+}
+
+.customer-dash-drawer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 2px 2px 18px;
+  border-bottom: 1px solid var(--dashboard-border);
+}
+
+.customer-dash-drawer-logo {
+  display: block;
+  width: min(180px, calc(100% - 52px));
+  height: auto;
+}
+
+.customer-dash-links-mobile {
+  flex: 1 0 auto;
+  gap: 6px;
+  padding: 18px 0;
+  overflow: visible;
+}
+
+.customer-dash-links-mobile .customer-dash-link {
+  min-height: 48px;
+  font-size: 0.96rem;
+}
+
+.customer-dash-side-drawer .customer-dash-account-area {
+  margin-top: auto;
+}
+
+@media (max-width: 1050px) and (min-width: 861px) {
+  .customer-dashboard-layout {
+    grid-template-columns: 204px minmax(0, 1fr);
+    gap: 20px;
+    padding-inline: 18px;
+  }
+
+  .customer-dash-sidebar {
+    padding-inline: 12px;
+  }
+}
+
+@media (max-width: 860px) {
+  .customer-dashboard-layout {
+    display: block;
+    padding: 0;
+  }
+
+  .customer-dash-sidebar {
+    display: none;
+  }
+
+  .customer-dash-mobile-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 72px;
+    padding: 10px 18px;
+    background: rgb(251 250 247 / 96%);
+    border-bottom: 1px solid rgb(44 48 47 / 7%);
+    box-shadow: 0 4px 18px rgb(44 48 47 / 5%);
+    backdrop-filter: blur(12px);
+  }
+
+  .customer-dash-mobile-header > a {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .customer-dash-mobile-header .customer-dash-logo {
+    width: 158px;
+  }
+
+  .customer-dashboard-main {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .customer-dash-link,
+  .customer-dash-link svg {
+    transition: none;
+  }
+}
+
+/* Dashboard refinements */
+.customer-dashboard-layout {
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: clamp(24px, 2vw, 36px);
+  width: 100%;
+  max-width: 1920px;
+  padding-right: clamp(20px, 2vw, 36px);
+  padding-left: clamp(20px, 2vw, 36px);
+}
+
+.customer-dash-sidebar {
+  background: #fff0eb;
+  border-color: rgb(196 105 81 / 12%);
+  box-shadow: 0 12px 34px rgb(95 58 46 / 9%);
+}
+
+.customer-dash-brand {
+  margin-bottom: 22px;
+}
+
+.customer-dash-links {
+  scrollbar-color: #e8b9aa transparent;
+}
+
+.customer-dash-link {
+  color: #503b35;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.customer-dash-link svg {
+  color: #805b50;
+}
+
+.customer-dash-link:hover {
+  color: #56362d;
+  background: #ffe3da;
+  transform: translateX(2px);
+}
+
+.customer-dash-link.is-active,
+.customer-dash-link.is-active:hover {
+  color: #553329;
+  background: #ffd9cc;
+  box-shadow: inset 3px 0 #c86b50;
+}
+
+.customer-dash-link.is-active svg,
+.customer-dash-link:hover svg {
+  color: #814b3c;
+}
+
+.customer-dash-account-area {
+  border-top-color: rgb(171 100 79 / 19%);
+}
+
+.customer-dash-account:hover {
+  background: rgb(255 255 255 / 56%);
+}
+
+.customer-dash-account-label {
+  color: #72584f;
+}
+
+.customer-dash-logout-option {
+  color: #774437;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.customer-dash-logout-option:hover,
+.customer-dash-logout-option:focus-visible {
+  background: #ffded4;
+}
+
+@media (max-width: 1050px) and (min-width: 861px) {
+  .customer-dashboard-layout {
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 22px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 860px) {
+  .customer-dashboard-layout {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+}
+
+@media (max-height: 620px) and (min-width: 761px) {
+  .customer-dash-sidebar {
+    height: calc(100vh - 32px);
+    min-height: 0;
+    top: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .customer-dash-link,
+  .customer-dash-link svg {
+    transition: none;
+  }
+}
+
+

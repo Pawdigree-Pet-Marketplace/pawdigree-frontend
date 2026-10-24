@@ -78,7 +78,7 @@ export default function CustomerLoginForm() {
       storage.setItem("refresh", data.refresh);
       storage.setItem("role", "CUSTOMER");
 
-      window.location.href = "/";
+      window.location.href = "/customer/dashboard";
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Login failed";
@@ -126,7 +126,7 @@ export default function CustomerLoginForm() {
       storage.setItem("refresh", data.refresh);
       storage.setItem("role", "CUSTOMER");
 
-      window.location.href = "/";
+      window.location.href = "/customer/dashboard";
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Google login failed";
