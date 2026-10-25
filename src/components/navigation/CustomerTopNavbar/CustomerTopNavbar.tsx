@@ -1,4 +1,5 @@
-import logo from "../../../assets/logos/lightmode-logo.svg";
+import darkLogo from "../../../assets/logos/darkmode-logo.svg";
+import lightLogo from "../../../assets/logos/lightmode-logo.svg";
 import {
   Heart,
   ShoppingCart,
@@ -18,13 +19,23 @@ type TopNavbarProps = {
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+const navLinks = [
+  { label: "Browse Pets", href: "#pets" },
+  { label: "Services", href: "#services" },
+  { label: "Merchandise", href: "#merchandise" },
+  { label: "Become a Vendor", href: "/vendor" },
+  { label: "Help Center", href: "#" },
+];
+
 const TopNavbar = ({
   isLoggedIn,
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const isLandingPage = window.location.pathname === "/";
+  const [hash, setHash] = useState(window.location.hash);
+  const path = window.location.pathname;
+  const isLandingPage = path === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +48,21 @@ const TopNavbar = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleHashChange = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const isActive = (href: string) => {
+    if (href === "#") return false;
+    if (href.startsWith("#")) return isLandingPage && hash === href;
+    return path === href || path.startsWith(`${href}/`);
+  };
+
+  // Dark logo only while the navbar is transparent over the hero
+  const useDarkLogo = isLandingPage && !isScrolled;
+
   const navbarClass = [
     "top-navbar",
     isLandingPage ? "top-navbar--transparent" : "",
@@ -48,16 +74,24 @@ const TopNavbar = ({
   return (
     <header className={navbarClass}>
       <a href="/" aria-label="Pawdigree home">
-          <img src={logo} alt="Pawdigree" className="logo-img" />
+        <img
+          src={useDarkLogo ? darkLogo : lightLogo}
+          alt="Pawdigree"
+          className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
+        />
       </a>
-      
+
       <nav className="desktop-links">
-        <a href="#pets">Browse Pets</a>
-        <a href="#services">Services</a>
-        <a href="#merchandise">Merchandise</a>
-        <a href="/vendors">Vendors</a>
-        <a href="/vendor">Become a Vendor</a>
-        <a href="#">Help Center</a>
+        {navLinks.map((link) => (
+          <a
+            key={link.label}
+            href={link.href}
+            className={isActive(link.href) ? "is-active" : undefined}
+            aria-current={isActive(link.href) ? "page" : undefined}
+          >
+            {link.label}
+          </a>
+        ))}
       </nav>
 
       <div className="desktop-actions">
@@ -83,7 +117,6 @@ const TopNavbar = ({
             </Button>
           </>
         ) : (
-          
           <div className="topnav-icons">
             <Heart size={22} strokeWidth={1.6} />
             <ShoppingCart size={22} strokeWidth={1.6} />
@@ -100,7 +133,6 @@ const TopNavbar = ({
               <UserRound size={22} strokeWidth={1.6} />
             </button>
           </div>
-
         )}
 
         <button
