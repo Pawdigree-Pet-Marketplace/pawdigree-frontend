@@ -1,0 +1,35 @@
+.vendors-shell { min-height: 100vh; }
+.vendors-page { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 112px 0 88px; }
+.vendors-intro { text-align: center; padding: 28px 16px 36px; }
+.vendors-eyebrow { display: inline-flex; align-items: center; gap: 7px; color: var(--coral-dark); font-size: 12px; font-weight: 800; letter-spacing: .12em; }
+.vendors-intro h1 { margin: 12px 0 4px; color: var(--charcoal); font-size: clamp(32px, 5vw, 48px); }
+.vendors-intro > p { margin: 0; color: var(--gray); font-size: 17px; }
+.vendors-search { display: flex; align-items: center; gap: 12px; width: min(600px, 100%); margin: 28px auto 0; padding: 0 18px; height: 54px; border: 1px solid var(--border); border-radius: 999px; background: var(--white); color: var(--gray); box-shadow: 0 8px 24px rgba(44,48,47,.06); }
+.vendors-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 15px; }
+.vendors-search:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+.vendors-results { min-height: 260px; }
+.vendors-count { margin: 0 0 16px; color: var(--gray); font-size: 14px; }
+.vendors-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.vendor-card { display: flex; flex-direction: column; overflow: hidden; min-width: 0; color: inherit; text-decoration: none; border: 1px solid var(--border); border-radius: 18px; background: var(--white); box-shadow: 0 5px 18px rgba(44,48,47,.05); transition: transform .18s ease, box-shadow .18s ease; }
+.vendor-card:hover, .vendor-card:focus-visible { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(44,48,47,.12); }
+.vendor-card-cover { height: 132px; background: linear-gradient(135deg, var(--teal-light), var(--coral-light)); }
+.vendor-card-cover img { width: 100%; height: 100%; object-fit: cover; }
+.vendor-card-body { position: relative; padding: 39px 20px 18px; }
+.vendor-card-logo { position: absolute; top: -31px; left: 18px; display: grid; place-items: center; width: 62px; height: 62px; overflow: hidden; border: 3px solid white; border-radius: 50%; background: var(--teal-light); color: var(--teal); }
+.vendor-card-logo img { width: 100%; height: 100%; object-fit: cover; }
+.vendor-card-body h2 { margin: 0 0 5px; overflow: hidden; color: var(--charcoal); font-size: 21px; text-overflow: ellipsis; white-space: nowrap; }
+.vendor-location { display: flex; align-items: center; gap: 5px; margin: 0 0 10px; color: var(--gray); font-size: 13px; }
+.vendor-categories { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; padding: 0; list-style: none; }
+.vendor-categories li { padding: 4px 9px; border-radius: 999px; background: var(--teal-light); color: var(--teal-dark); font-size: 11px; font-weight: 700; }
+.vendor-description { display: -webkit-box; min-height: 42px; margin: 0 0 15px; overflow: hidden; color: var(--gray); font-size: 13px; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.vendor-card-link { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border); color: var(--teal); font-size: 13px; font-weight: 800; }
+.vendors-state { padding: 48px 20px; border: 1px dashed var(--border); border-radius: 18px; background: var(--white); text-align: center; }
+.vendors-state h2 { margin: 0 0 8px; color: var(--charcoal); }
+.vendors-state p { margin: 0; color: var(--gray); }
+.vendors-state button { margin-top: 18px; padding: 10px 22px; border: 0; border-radius: 999px; background: var(--teal); color: white; font-weight: 800; cursor: pointer; }
+.vendor-skeleton { height: 320px; border-radius: 18px; background: linear-gradient(90deg, #eee 25%, #f7f7f7 50%, #eee 75%); background-size: 200% 100%; animation: vendor-shimmer 1.3s infinite; }
+@keyframes vendor-shimmer { to { background-position: -200% 0; } }
+@media (max-width: 900px) { .vendors-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .vendors-page { width: calc(100% - 32px); padding-top: 84px; } .vendors-intro { padding: 22px 0 28px; } .vendors-intro > p { font-size: 15px; } .vendors-grid { grid-template-columns: 1fr; gap: 14px; } .vendor-card-cover { height: 115px; } }
+@media (prefers-reduced-motion: reduce) { .vendor-card, .vendor-skeleton { transition: none; animation: none; } }
