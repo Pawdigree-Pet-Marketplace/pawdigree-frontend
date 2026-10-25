@@ -305,6 +305,9 @@ describe("Vendor Registration Form", () => {
     fireEvent.change(selector, { target: { value: "KE" } });
 
     fillValidForm();
+    fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
+      target: { value: "0712345678" },
+    });
 
     fireEvent.click(screen.getByRole("checkbox"));
 
@@ -320,7 +323,7 @@ describe("Vendor Registration Form", () => {
     const options = registrationCall?.[1] as RequestInit;
     const submittedData = JSON.parse(String(options.body));
 
-    expect(submittedData.phone).toBe("+254771234567");
+    expect(submittedData.phone).toBe("+254712345678");
   });
 
   test("displays errors returned by the backend", async () => {

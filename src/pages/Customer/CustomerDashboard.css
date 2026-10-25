@@ -549,116 +549,6 @@
   background: #e8f2ed;
 }
 
-@media (max-width: 1200px) {
-  .dashboard-pet-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .dashboard-marketplace-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 900px) {
-  .customer-dashboard {
-    padding: 22px 18px 56px;
-  }
-
-  .dashboard-welcome {
-    grid-template-columns: minmax(0, 1fr) minmax(190px, 0.75fr);
-    gap: 20px;
-  }
-
-  .dashboard-welcome-image-wrap {
-    height: 190px;
-  }
-
-  .dashboard-pet-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .customer-dashboard {
-    padding: 18px 16px 48px;
-  }
-
-  .dashboard-welcome {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-    padding: 21px;
-    border-radius: 20px;
-  }
-
-  .dashboard-welcome h1 {
-    font-size: clamp(1.95rem, 8.8vw, 2.55rem);
-  }
-
-  .dashboard-welcome-image-wrap {
-    height: 185px;
-  }
-
-  .dashboard-search {
-    margin-bottom: 28px;
-    padding: 15px;
-  }
-
-  .dashboard-search-row {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .dashboard-search-row > svg {
-    display: none;
-  }
-
-  .dashboard-search-row input {
-    flex-basis: 100%;
-  }
-
-  .dashboard-search-row button {
-    width: 100%;
-  }
-
-  .dashboard-section-heading {
-    align-items: flex-start;
-  }
-
-  .dashboard-marketplace-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .dashboard-marketplace-card {
-    gap: 8px;
-    min-height: 65px;
-    padding: 9px;
-  }
-
-  .dashboard-marketplace-icon {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
-  }
-
-  .dashboard-marketplace-card-copy > span {
-    display: none;
-  }
-
-  .dashboard-pet-grid {
-    gap: 11px;
-  }
-
-  .dashboard-pet-card > img,
-  .dashboard-pet-image-placeholder {
-    height: 132px;
-  }
-
-  .dashboard-pet-card-content {
-    padding: 11px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .customer-dashboard *,
   .customer-dashboard *::before,
@@ -1746,4 +1636,181 @@
   .customer-dashboard .dashboard-category-carousel::after {
     background-size: 22px 22px, 18px 18px, 0 0, 0 0, 0 0, 0 0;
   }
+}
+
+
+.customer-dashboard .dashboard-filters {
+  margin: 16px 0 38px;
+  padding: 22px 24px 24px;
+  background: var(--dashboard-paper);
+  border: 1px solid var(--dashboard-border);
+  border-radius: 20px;
+  box-shadow: 0 5px 18px rgb(44 48 47 / 5%);
+  animation: dashboard-filters-in .35s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+@keyframes dashboard-filters-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.customer-dashboard .dashboard-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px 18px;
+}
+
+.customer-dashboard .dashboard-filter-grid label {
+  display: grid;
+  gap: 7px;
+  color: var(--dashboard-ink);
+  font-size: .82rem;
+  font-weight: 750;
+}
+
+.customer-dashboard .dashboard-filter-grid input,
+.customer-dashboard .dashboard-filter-grid select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  color: var(--dashboard-ink);
+  background: #fff;
+  border: 1px solid var(--dashboard-border);
+  border-radius: 12px;
+  font: inherit;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.customer-dashboard .dashboard-filter-grid input:hover,
+.customer-dashboard .dashboard-filter-grid select:hover {
+  border-color: rgb(33 108 104 / 45%);
+}
+
+.customer-dashboard .dashboard-filter-grid input:focus-visible,
+.customer-dashboard .dashboard-filter-grid select:focus-visible {
+  outline: none;
+  border-color: var(--dashboard-teal);
+  box-shadow: 0 0 0 4px rgb(33 108 104 / 16%);
+}
+
+.customer-dashboard .dashboard-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--dashboard-border);
+}
+
+.customer-dashboard .dashboard-filter-actions button {
+  min-height: 42px;
+  padding: 9px 20px;
+  color: #fff;
+  background: var(--dashboard-teal);
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.customer-dashboard .dashboard-filter-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgb(33 108 104 / 25%);
+}
+
+.customer-dashboard .dashboard-filter-actions button:active {
+  transform: translateY(0) scale(.98);
+  box-shadow: none;
+}
+
+.customer-dashboard .dashboard-filter-actions button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgb(33 108 104 / 22%);
+}
+
+.customer-dashboard .dashboard-filter-actions .dashboard-filter-clear {
+  color: var(--dashboard-teal-dark);
+  background: #e8f2ed;
+}
+
+.customer-dashboard .dashboard-filter-actions .dashboard-filter-clear:hover {
+  box-shadow: none;
+  background: #dcebe4;
+}
+
+.customer-dashboard .dashboard-filter-error {
+  margin: 12px 0 0;
+  color: #a43425;
+  font-size: .9rem;
+}
+
+@media (max-width: 900px) {
+  .customer-dashboard .dashboard-filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .customer-dashboard .dashboard-filters { margin-top: 14px; padding: 16px; border-radius: 18px; }
+  .customer-dashboard .dashboard-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .customer-dashboard .dashboard-filter-grid label:last-child { grid-column: 1 / -1; }
+  .customer-dashboard .dashboard-filter-actions button { flex: 1 1 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .customer-dashboard .dashboard-filters { animation: none; }
+  .customer-dashboard .dashboard-filter-grid input,
+  .customer-dashboard .dashboard-filter-grid select,
+  .customer-dashboard .dashboard-filter-actions button { transition: none; }
+  .customer-dashboard .dashboard-filter-actions button:hover,
+  .customer-dashboard .dashboard-filter-actions button:active { transform: none; }
+}
+/* 1. Staggered field entrance: each control eases in one after another */
+.customer-dashboard .dashboard-filter-grid label {
+  animation: dashboard-field-in .4s cubic-bezier(.2, .7, .2, 1) both;
+}
+.customer-dashboard .dashboard-filter-grid label:nth-child(1) { animation-delay: .04s; }
+.customer-dashboard .dashboard-filter-grid label:nth-child(2) { animation-delay: .08s; }
+.customer-dashboard .dashboard-filter-grid label:nth-child(3) { animation-delay: .12s; }
+.customer-dashboard .dashboard-filter-grid label:nth-child(4) { animation-delay: .16s; }
+.customer-dashboard .dashboard-filter-grid label:nth-child(5) { animation-delay: .20s; }
+
+.customer-dashboard .dashboard-filter-actions {
+  animation: dashboard-field-in .4s cubic-bezier(.2, .7, .2, 1) .26s both;
+}
+
+@keyframes dashboard-field-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. Label turns teal when its field is focused */
+.customer-dashboard .dashboard-filter-grid label {
+  transition: color .18s ease;
+}
+.customer-dashboard .dashboard-filter-grid label:focus-within {
+  color: var(--dashboard-teal);
+}
+
+/* 3. Validation error slides in softly (also gives age errors a small nudge) */
+.customer-dashboard .dashboard-filter-error {
+  animation: dashboard-error-in .28s ease both;
+}
+@keyframes dashboard-error-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 4. Coral accent line on the Apply button's hover (coral used sparingly) */
+.customer-dashboard .dashboard-filter-actions button:not(.dashboard-filter-clear):hover {
+  box-shadow: 0 6px 14px rgb(33 108 104 / 25%), 0 0 0 3px rgb(251 134 101 / 18%);
+}
+
+/* Keep reduced-motion users comfortable */
+@media (prefers-reduced-motion: reduce) {
+  .customer-dashboard .dashboard-filter-grid label,
+  .customer-dashboard .dashboard-filter-actions,
+  .customer-dashboard .dashboard-filter-error { animation: none; }
+  .customer-dashboard .dashboard-filter-grid label { transition: none; }
 }
