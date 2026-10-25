@@ -1,0 +1,119 @@
+
+.verification-card {
+  width: 100%;
+  padding: 24px;
+  border: 1px solid #e4e8e5;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #2c302f;
+  box-sizing: border-box;
+}
+
+.verification-card__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.verification-card__heading > svg {
+  flex-shrink: 0;
+  color: #216c68;
+  margin-top: 2px;
+}
+
+.verification-card__heading h2 {
+  margin: 0 0 6px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.verification-card__heading p {
+  margin: 0;
+  color: #626a66;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.verification-card__status {
+  margin-top: 20px;
+}
+
+.verification-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-family: "Nunito", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.verification-status-badge--pending {
+  background: #fff3d9;
+  color: #875b00;
+}
+
+.verification-status-badge--approved {
+  background: #e1f3e9;
+  color: #216744;
+}
+
+.verification-status-badge--rejected {
+  background: #fde8e5;
+  color: #a32d24;
+}
+
+.verification-status-badge--changes-requested {
+  background: #fff0e8;
+  color: #a34b27;
+}
+
+.verification-status-badge--draft {
+  background: #eeeeee;
+  color: #535956;
+}
+
+.verification-card__date {
+  margin: 14px 0 0;
+  color: #626a66;
+  font-family: "Nunito", sans-serif;
+  font-size: 13px;
+}
+
+.verification-card__reason {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid #f5c8c2;
+  border-radius: 12px;
+  background: #fff5f3;
+}
+
+.verification-card__reason-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a32d24;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+}
+
+.verification-card__reason p {
+  margin: 10px 0 0;
+  color: #63342f;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .verification-card {
+    padding: 18px;
+  }
+
+  .verification-card__heading h2 {
+    font-size: 18px;
+  }
+}
