@@ -19,6 +19,7 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function App() {
   const path = window.location.pathname;
@@ -98,6 +99,10 @@ function App() {
 
   if (path === "/forgot-password") {
     return <ForgotPasswordPage />;
+  }
+
+  if (path === "/verify-email") {
+    return <VerifyEmailPage />;
   }
 
   if (path === "/reset-password" || path === "/reset-password/") {
