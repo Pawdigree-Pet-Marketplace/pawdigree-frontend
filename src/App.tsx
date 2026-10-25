@@ -2,6 +2,7 @@ import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
+import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
