@@ -2,6 +2,7 @@ import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
+import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
@@ -19,7 +20,8 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
-
+import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
+import VendorLayout from './layouts/VendorLayout/VendorLayout';
 function App() {
   const path = window.location.pathname;
 
