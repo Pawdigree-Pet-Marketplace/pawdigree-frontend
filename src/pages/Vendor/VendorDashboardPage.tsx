@@ -7,6 +7,7 @@ import {
   Wallet,
 } from "lucide-react";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import BusinessVerificationStatus from "../../components/BusinessVerificationStatus/BusinessVerificationStatus";
 import "./VendorDashboardPage.css";
 
 const metrics = [
@@ -106,6 +107,8 @@ function VendorDashboardPage() {
       businessName="Happy Paws Kennel"
     >
       <div className="dashboard-content">
+        {/* BUSINESS VERIFICATION STATUS */}
+        <BusinessVerificationStatus />
         {/* METRIC CARDS */}
         <section
           className="dashboard-metrics"

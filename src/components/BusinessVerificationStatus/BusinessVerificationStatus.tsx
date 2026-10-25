@@ -4,18 +4,24 @@ import { BadgeCheck, Clock, FileWarning, RefreshCw } from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import "./BusinessVerificationStatus.css";
 
-interface VerificationResponse {
-  status?: string;
-  last_verified?: string;
-  rejection_reason?: string;
-  reason?: string;
-  review_notes?: string;
+interface BusinessVerification {
+  id: string;
+  name: string;
+  verification_status: string;
+  decision_reason: string | null;
+  reviewed_at: string | null;
+  is_active: boolean;
+  can_sell: boolean;
+}
+
+interface ApiResponse {
+  results?: BusinessVerification[];
 }
 
 type LoadState = "loading" | "success" | "error";
 
-const getStatusLabel = (status?: string) => {
-  const normalized = status?.toLowerCase().replace(/[\s-]+/g, "_");
+function getStatusLabel(status: string) {
+  const normalized = status.toLowerCase().replace(/[\s-]+/g, "_");
 
   const labels: Record<string, string> = {
     pending: "Pending review",
@@ -27,14 +33,14 @@ const getStatusLabel = (status?: string) => {
     draft: "Draft",
   };
 
-  return normalized
-    ? labels[normalized] ??
-        normalized.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
-    : "Status unavailable";
-};
+  return (
+    labels[normalized] ??
+    normalized.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+  );
+}
 
-const getStatusClass = (status?: string) => {
-  const normalized = status?.toLowerCase().replace(/[\s-]+/g, "_");
+function getStatusClass(status: string) {
+  const normalized = status.toLowerCase().replace(/[\s-]+/g, "_");
 
   if (normalized === "approved" || normalized === "verified") {
     return "approved";
@@ -53,17 +59,16 @@ const getStatusClass = (status?: string) => {
   }
 
   return "pending";
-};
+}
 
 export default function BusinessVerificationStatus() {
-  const [verification, setVerification] =
-    useState<VerificationResponse | null>(null);
+  const [businesses, setBusinesses] = useState<BusinessVerification[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
 
   useEffect(() => {
     const controller = new AbortController();
 
-    const loadVerification = async () => {
+    async function loadVerification() {
       const token =
         localStorage.getItem("access") ||
         localStorage.getItem("access_token");
@@ -89,10 +94,17 @@ export default function BusinessVerificationStatus() {
           throw new Error("Unable to load verification status.");
         }
 
-        const data: VerificationResponse = await response.json();
+        const data: BusinessVerification[] | ApiResponse =
+          await response.json();
+
+        const results = Array.isArray(data) ? data : data.results;
+
+        if (!Array.isArray(results)) {
+          throw new Error("Unexpected verification response.");
+        }
 
         if (!controller.signal.aborted) {
-          setVerification(data);
+          setBusinesses(results);
           setLoadState("success");
         }
       } catch {
@@ -100,7 +112,7 @@ export default function BusinessVerificationStatus() {
           setLoadState("error");
         }
       }
-    };
+    }
 
     void loadVerification();
 
@@ -145,54 +157,74 @@ export default function BusinessVerificationStatus() {
     );
   }
 
-  const status = verification?.status;
-  const isRejected = status?.toLowerCase() === "rejected";
-  const rejectionReason =
-    verification?.rejection_reason ||
-    verification?.reason ||
-    verification?.review_notes;
+  if (businesses.length === 0) {
+    return (
+      <section
+        className="verification-card"
+        aria-label="Business verification status"
+      >
+        <div className="verification-card__heading">
+          <Clock size={22} aria-hidden="true" />
+          <div>
+            <h2>Business verification</h2>
+            <p>You haven't registered a business yet.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section
-      className="verification-card"
-      aria-label="Business verification status"
-    >
-      <div className="verification-card__heading">
-        <BadgeCheck size={22} aria-hidden="true" />
-        <div>
-          <h2>Business verification</h2>
-          <p>Track the review progress of your business application.</p>
-        </div>
-      </div>
+    <div className="verification-list">
+      {businesses.map((business) => {
+        const status = business.verification_status;
+        const isRejected = status.toLowerCase() === "rejected";
 
-      <div className="verification-card__status">
-        <span
-          className={`verification-status-badge verification-status-badge--${getStatusClass(status)}`}
-        >
-          {getStatusLabel(status)}
-        </span>
-      </div>
+        return (
+          <section
+            className="verification-card"
+            aria-label={`${business.name} verification status`}
+            key={business.id}
+          >
+            <div className="verification-card__heading">
+              <BadgeCheck size={22} aria-hidden="true" />
+              <div>
+                <h2>{business.name}</h2>
+                <p>Business verification</p>
+              </div>
+            </div>
 
-      {verification?.last_verified && (
-        <p className="verification-card__date">
-          Last verified:{" "}
-          {new Date(verification.last_verified).toLocaleDateString()}
-        </p>
-      )}
+            <div className="verification-card__status">
+              <span
+                className={`verification-status-badge verification-status-badge--${getStatusClass(status)}`}
+              >
+                {getStatusLabel(status)}
+              </span>
+            </div>
 
-      {isRejected && (
-        <div className="verification-card__reason" role="alert">
-          <div className="verification-card__reason-heading">
-            <RefreshCw size={18} aria-hidden="true" />
-            <strong>Application rejected</strong>
-          </div>
+            {business.reviewed_at && (
+              <p className="verification-card__date">
+                Reviewed on:{" "}
+                {new Date(business.reviewed_at).toLocaleDateString()}
+              </p>
+            )}
 
-          <p>
-            {rejectionReason ||
-              "A rejection reason was not provided in the available response. Please contact support for clarification."}
-          </p>
-        </div>
-      )}
-    </section>
+            {isRejected && (
+              <div className="verification-card__reason" role="alert">
+                <div className="verification-card__reason-heading">
+                  <RefreshCw size={18} aria-hidden="true" />
+                  <strong>Application rejected</strong>
+                </div>
+
+                <p>
+                  {business.decision_reason ||
+                    "No rejection reason was provided. Please contact support for clarification."}
+                </p>
+              </div>
+            )}
+          </section>
+        );
+      })}
+    </div>
   );
 }
