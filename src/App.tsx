@@ -2,6 +2,7 @@ import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
+import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
@@ -19,8 +20,10 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
-import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
+import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
+import VendorLayout from './layouts/VendorLayout/VendorLayout';
 function App() {
   const path = window.location.pathname;
 
@@ -82,6 +85,17 @@ function App() {
     return <VendorBusinessProfilePage />;
   }
 
+  if (path === "/vendor/categories") {
+    return (
+      <VendorLayout
+        title="Vendor Categories"
+        description="Manage your pet categories and listings."
+      >
+        <VendorCategorySelector />
+      </VendorLayout>
+    );
+  }
+
   if (
     path.startsWith("/vendor/register") ||
     path.startsWith("/register.vendor")
@@ -107,6 +121,10 @@ function App() {
 
   if (path === "/forgot-password") {
     return <ForgotPasswordPage />;
+  }
+
+  if (path === "/verify-email") {
+    return <VerifyEmailPage />;
   }
 
   if (path === "/reset-password" || path === "/reset-password/") {
