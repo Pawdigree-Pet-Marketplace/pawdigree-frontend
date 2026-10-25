@@ -1,14 +1,13 @@
-type ApiErrorData = Record<string, string[] | string>;
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL 
+export type ApiErrorData = Record<string, string[] | string>;
 
-if (!API_BASE_URL && import.meta.env.MODE !== "test") {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+if (!API_BASE_URL && import.meta.env.MODE !== 'test') {
   throw new Error(
-    "VITE_API_BASE_URL is missing. Check your frontend .env file.",
+    'VITE_API_BASE_URL is missing. Check your frontend .env file.',
   );
 }
-
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -17,7 +16,7 @@ export async function apiRequest<T>(
   const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -35,15 +34,15 @@ export async function apiRequest<T>(
       ? Object.entries(errors)
           .map(([field, messages]) => {
             const readableMessages = Array.isArray(messages)
-              ? messages.join(" ")
+              ? messages.join(' ')
               : messages;
 
             return `${field}: ${readableMessages}`;
           })
-          .join("\n")
+          .join('\n')
       : `Request failed with status ${response.status}.`;
 
-    throw new Error(message || "Something went wrong.");
+    throw new Error(message || 'Something went wrong.');
   }
 
   return data as T;

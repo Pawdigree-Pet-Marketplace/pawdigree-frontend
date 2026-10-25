@@ -19,6 +19,8 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
+import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
+import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 
 function App() {
   const path = window.location.pathname;
@@ -71,6 +73,17 @@ function App() {
 
   if (path === "/vendor/business-profile") {
     return <VendorBusinessProfilePage />;
+  }
+
+  if (path === "/vendor/categories") {
+    return (
+      <VendorLayout
+        title="Vendor Categories"
+        description="Manage your pet categories and listings."
+      >
+        <VendorCategorySelector />
+      </VendorLayout>
+    );
   }
 
   if (
