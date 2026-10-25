@@ -41,6 +41,19 @@
   color: var(--dashboard-muted);
 }
 
+
+.vendor-hamburger-btn {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--dashboard-border);
+  border-radius: 50%;
+  background: #fff;
+  place-items: center;
+  cursor: pointer;
+}
+
+
 .dashboard-notification-button,
 .dashboard-avatar {
   display: grid;
@@ -83,6 +96,12 @@
   outline-offset: 2px;
 }
 
+
+@media (max-width: 768px) {
+  .vendor-hamburger-btn {
+    display: grid;
+  }
+}
 @media (max-width: 950px) {
   .dashboard-search {
     width: 160px;
