@@ -20,7 +20,8 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
-
+import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
+import VendorLayout from './layouts/VendorLayout/VendorLayout';
 function App() {
   const path = window.location.pathname;
 
