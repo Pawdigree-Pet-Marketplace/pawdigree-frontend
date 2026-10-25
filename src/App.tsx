@@ -3,6 +3,7 @@ import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
+import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
@@ -44,6 +45,10 @@ function App() {
 
   if (path === "/vendor") {
     return <VendorLandingPage />;
+  }
+
+  if (path === "/vendors" || path === "/vendors/") {
+    return <CustomerVendorsPage />;
   }
 
   if (path.startsWith("/vendors/")) {

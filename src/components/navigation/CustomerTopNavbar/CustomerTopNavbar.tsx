@@ -55,6 +55,7 @@ const TopNavbar = ({
         <a href="#pets">Browse Pets</a>
         <a href="#services">Services</a>
         <a href="#merchandise">Merchandise</a>
+        <a href="/vendors">Vendors</a>
         <a href="/vendor">Become a Vendor</a>
         <a href="#">Help Center</a>
       </nav>
