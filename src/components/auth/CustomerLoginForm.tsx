@@ -59,8 +59,14 @@ export default function CustomerLoginForm() {
 
     try {
       const data = await apiRequest<{
-        access: string;
-        refresh: string;
+        access?: string;
+        refresh?: string;
+        verification_required?: boolean;
+        verification_token?: string;
+        email?: string;
+        masked_email?: string;
+        expires_in?: number;
+        resend_available_in?: number;
       }>("/auth/login/customer/", {
         method: "POST",
         body: JSON.stringify({
@@ -68,6 +74,32 @@ export default function CustomerLoginForm() {
           password,
         }),
       });
+
+      if (data.verification_required) {
+        if (!data.verification_token) {
+          throw new Error("The verification response was incomplete. Please try logging in again.");
+        }
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("role");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("refresh");
+        sessionStorage.removeItem("role");
+        sessionStorage.setItem("pawdigree_email_verification", JSON.stringify({
+          verificationToken: data.verification_token,
+          email: data.masked_email ?? data.email ?? identifier.trim(),
+          role: "CUSTOMER",
+          keepLoggedIn,
+          expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
+          resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
+        }));
+        window.location.href = "/verify-email";
+        return;
+      }
+
+      if (!data.access || !data.refresh) {
+        throw new Error("The login response was incomplete. Please try again.");
+      }
 
       const storage = keepLoggedIn ? localStorage : sessionStorage;
 

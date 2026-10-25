@@ -20,6 +20,8 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+
 import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
 import VendorLayout from './layouts/VendorLayout/VendorLayout';
 function App() {
@@ -119,6 +121,10 @@ function App() {
 
   if (path === "/forgot-password") {
     return <ForgotPasswordPage />;
+  }
+
+  if (path === "/verify-email") {
+    return <VerifyEmailPage />;
   }
 
   if (path === "/reset-password" || path === "/reset-password/") {
