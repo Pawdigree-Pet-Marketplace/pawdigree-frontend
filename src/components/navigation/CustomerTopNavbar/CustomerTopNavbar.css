@@ -2,10 +2,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: clamp(8px, 1.5vw, 24px);
   overflow: visible;
   height: 72px;
   min-height: 64px;
-  padding: 0 32px;
+  padding: 0 clamp(16px, 2.5vw, 32px);
   background: var(--white);
   border-bottom: 1px solid var(--cream);
   position: fixed;
@@ -30,14 +31,31 @@
   box-shadow: 0 2px 10px rgba(44, 48, 47, 0.08);
 }
 
+/* =========================
+   LOGO
+========================= */
+
 .logo-img {
+  display: block;
   width: auto;
   height: 44px;
   object-fit: contain;
+  flex-shrink: 0;
   transform-origin: left center;
   transition:
     height 0.25s ease,
-    transform 0.25s ease;
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    padding 0.25s ease;
+}
+
+/* Subtle backing so the dark logo stays readable over the hero photo */
+.logo-img--dark {
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(44, 48, 47, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 /* Logo shrinks when the navbar turns white */
@@ -45,18 +63,26 @@
   height: 32px;
 }
 
+/* =========================
+   NAV LINKS
+========================= */
+
 .desktop-links {
   display: flex;
-  gap: 24px;
+  flex-shrink: 0;
+  gap: clamp(12px, 1.8vw, 24px);
   align-items: center;
 }
 
 .desktop-links a {
+  position: relative;
+  padding: 6px 0;
   text-decoration: none;
   color: var(--charcoal);
-  font-size: 14px;
+  font-size: clamp(12px, 1.25vw, 14px);
   font-weight: 500;
   line-height: 1;
+  white-space: nowrap; /* never wrap to 2 lines */
   transition: color 0.2s ease;
 }
 
@@ -64,20 +90,45 @@
   color: var(--teal);
 }
 
+/* Underline: hidden by default, shown on hover and when active */
+.desktop-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--coral);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.2s ease;
+}
+
+.desktop-links a:hover::after,
+.desktop-links a.is-active::after {
+  transform: scaleX(1);
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
 .desktop-actions {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  gap: 12px;
+  gap: clamp(6px, 1vw, 12px);
 }
 
 .desktop-actions .auth-btn {
-  width:120px;
+  width: clamp(88px, 9vw, 120px);
 }
 
 .topnav-icons {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: clamp(0px, 1.2vw, 18px);
   overflow: visible;
   color: var(--charcoal);
 }
@@ -86,9 +137,9 @@
   cursor: pointer;
   overflow: visible;
   display: block;
-  width: 20px;
-  height: 20px;
-  padding: 8px;
+  width: clamp(16px, 1.6vw, 20px);
+  height: clamp(16px, 1.6vw, 20px);
+  padding: clamp(4px, 0.6vw, 8px);
   border-radius: 50%;
   box-sizing: content-box;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -97,6 +148,17 @@
 .topnav-icons svg:hover {
   color: var(--teal);
   background: var(--teal-light);
+}
+
+.topnav-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
 }
 
 .hamburger {
@@ -117,11 +179,80 @@
   color: var(--teal-dark);
 }
 
+/* =========================
+   TRANSPARENT (over hero)
+========================= */
+
+.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a {
+  color: var(--white);
+}
+
+.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a:hover {
+  color: var(--coral);
+}
+
+.top-navbar--transparent:not(.top-navbar--scrolled) .topnav-icons {
+  color: var(--white);
+}
+
+.top-navbar--transparent:not(.top-navbar--scrolled) .hamburger {
+  color: var(--white);
+  background: transparent;
+}
+
+/* =========================
+   SCROLLED (white)
+========================= */
+
+.top-navbar--scrolled .desktop-links a {
+  color: var(--charcoal);
+}
+
+.top-navbar--scrolled .desktop-links a:hover {
+  color: var(--teal);
+}
+
+.top-navbar--scrolled .topnav-icons {
+  color: var(--charcoal);
+}
+
+.top-navbar--scrolled .hamburger {
+  color: var(--charcoal);
+  background: var(--white);
+}
+
+/* =========================
+   ACTIVE LINK COLOR
+   (must come after the colour rules above, same or higher specificity)
+========================= */
+
+.desktop-links a.is-active,
+.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a.is-active,
+.top-navbar--scrolled .desktop-links a.is-active {
+  color: var(--coral);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
 @media (max-width: 768px) {
   .top-navbar {
     height: 56px;
     min-height: 56px;
     padding: 0 16px;
+  }
+
+  .logo-img {
+    height: 30px;
+  }
+
+  .top-navbar--scrolled .logo-img {
+    height: 26px;
+  }
+
+  .logo-img--dark {
+    padding: 4px 10px;
   }
 
   .desktop-links {
@@ -141,50 +272,4 @@
     align-items: center;
     justify-content: center;
   }
-}
-/* White text and icons over the hero image */
-.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a {
-  color: var(--white);
-}
-
-.top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a:hover {
-  color: var(--coral);
-}
-
-.top-navbar--transparent:not(.top-navbar--scrolled) .topnav-icons {
-  color: var(--white);
-}
-
-/* Keep the hamburger visible over the hero */
-.top-navbar--transparent:not(.top-navbar--scrolled) .hamburger {
-  color: var(--white);
-  background: transparent;
-}
-
-/* Restore dark text and icons when the navbar turns white */
-.top-navbar--scrolled .desktop-links a {
-  color: var(--charcoal);
-}
-
-.top-navbar--scrolled .desktop-links a:hover {
-  color: var(--teal);
-}
-
-.top-navbar--scrolled .topnav-icons {
-  color: var(--charcoal);
-}
-
-.top-navbar--scrolled .hamburger {
-  color: var(--charcoal);
-  background: var(--white);
-}
-.topnav-icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
 }
