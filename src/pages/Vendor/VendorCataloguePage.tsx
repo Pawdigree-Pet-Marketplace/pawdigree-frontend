@@ -1,5 +1,14 @@
+
 import { useEffect, useState } from "react";
-import { Plus, PawPrint, RefreshCw, Image as ImageIcon } from "lucide-react";
+import {
+  Plus,
+  PawPrint,
+  RefreshCw,
+  Image as ImageIcon,
+  Power,
+  Trash2,
+  X,
+} from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorCataloguePage.css";
@@ -22,6 +31,7 @@ type Pet = {
   price?: string | number | null;
   adoption_status?: "AVAILABLE" | "PENDING" | "ADOPTED";
   approved: boolean;
+  is_active?: boolean;
   images?: (PetImage | string)[];
 };
 
@@ -34,12 +44,15 @@ type PetResponse =
       results: Pet[];
     };
 
+type ListingAction = "deactivate" | "remove";
+
 function getToken() {
   return localStorage.getItem("token") || sessionStorage.getItem("token");
 }
 
 function imageUrl(image: PetImage | string | undefined): string {
   if (!image) return "";
+
   const path =
     typeof image === "string"
       ? image
@@ -55,11 +68,18 @@ function imageUrl(image: PetImage | string | undefined): string {
 }
 
 function listingStatus(pet: Pet) {
+  if (pet.is_active === false) return "Inactive";
   if (!pet.approved) return "Pending approval";
-  if (pet.listing_type === "ADOPTION" && pet.adoption_status === "ADOPTED") {
+
+  if (
+    pet.listing_type === "ADOPTION" &&
+    pet.adoption_status === "ADOPTED"
+  ) {
     return "Adopted";
   }
+
   if (pet.adoption_status === "PENDING") return "Pending";
+
   return "Active";
 }
 
@@ -67,6 +87,12 @@ export default function VendorCataloguePage() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [pendingAction, setPendingAction] =
+    useState<ListingAction | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function loadPets() {
     const token = getToken();
@@ -109,11 +135,94 @@ export default function VendorCataloguePage() {
 
   useEffect(() => {
     document.title = "My Catalogue - Pawdigree";
-    const init = async () => {
-      await loadPets();
-    };
-    init();
+    void loadPets();
   }, []);
+
+  function openConfirmation(pet: Pet, action: ListingAction) {
+    setSelectedPet(pet);
+    setPendingAction(action);
+    setActionError("");
+    setSuccessMessage("");
+  }
+
+  function closeConfirmation() {
+    if (isSubmitting) return;
+
+    setSelectedPet(null);
+    setPendingAction(null);
+    setActionError("");
+  }
+
+  async function confirmAction() {
+    if (!selectedPet || !pendingAction || isSubmitting) return;
+
+    const token = getToken();
+
+    if (!token) {
+      setActionError("Your session has expired. Please log in again.");
+      return;
+    }
+
+    const petId = selectedPet.pet_id;
+    const action = pendingAction;
+
+    setIsSubmitting(true);
+    setActionError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/pets/${petId}/`,
+        {
+          method: action === "deactivate" ? "PATCH" : "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(action === "deactivate"
+              ? { "Content-Type": "application/json" }
+              : {}),
+          },
+          ...(action === "deactivate"
+            ? { body: JSON.stringify({ is_active: false }) }
+            : {}),
+        },
+      );
+
+      if (!response.ok) {
+        const details = await response.text();
+
+        throw new Error(
+          details ||
+            `Couldn't ${action === "deactivate" ? "deactivate" : "remove"} this listing (${response.status}).`,
+        );
+      }
+
+      // Update the page only after the backend confirms success.
+      if (action === "remove") {
+        setPets((currentPets) =>
+          currentPets.filter((pet) => pet.pet_id !== petId),
+        );
+        setSuccessMessage(`${selectedPet.name} was removed successfully.`);
+      } else {
+        setPets((currentPets) =>
+          currentPets.map((pet) =>
+            pet.pet_id === petId ? { ...pet, is_active: false } : pet,
+          ),
+        );
+        setSuccessMessage(`${selectedPet.name} was deactivated successfully.`);
+      }
+
+      setSelectedPet(null);
+      setPendingAction(null);
+    } catch (err) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <VendorLayout
@@ -143,6 +252,19 @@ export default function VendorCataloguePage() {
             <button type="button" onClick={() => void loadPets()}>
               <RefreshCw size={15} />
               Try again
+            </button>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="catalogue-success" role="status">
+            {successMessage}
+            <button
+              type="button"
+              aria-label="Dismiss success message"
+              onClick={() => setSuccessMessage("")}
+            >
+              <X size={16} />
             </button>
           </div>
         )}
@@ -188,7 +310,8 @@ export default function VendorCataloguePage() {
             {pets.map((pet) => {
               const firstImage =
                 pet.images?.find(
-                  (image) => typeof image !== "string" && image.is_primary,
+                  (image) =>
+                    typeof image !== "string" && image.is_primary,
                 ) || pet.images?.[0];
 
               const photo = imageUrl(firstImage);
@@ -205,13 +328,16 @@ export default function VendorCataloguePage() {
                         <span>No photo available</span>
                       </div>
                     )}
+
                     <span
                       className={`catalogue-status ${
                         status === "Active"
                           ? "is-active"
                           : status === "Adopted"
                             ? "is-adopted"
-                            : "is-pending"
+                            : status === "Inactive"
+                              ? "is-inactive"
+                              : "is-pending"
                       }`}
                     >
                       {status}
@@ -221,7 +347,9 @@ export default function VendorCataloguePage() {
                   <div className="catalogue-card-content">
                     <div className="catalogue-card-heading">
                       <h3>{pet.name}</h3>
-                      <span className="catalogue-pet-id">#{pet.pet_id}</span>
+                      <span className="catalogue-pet-id">
+                        #{pet.pet_id}
+                      </span>
                     </div>
 
                     <p className="catalogue-pet-details">
@@ -243,10 +371,136 @@ export default function VendorCataloguePage() {
                         </strong>
                       )}
                     </div>
+
+                    <div className="catalogue-actions">
+                      <button
+                        type="button"
+                        className="catalogue-deactivate-button"
+                        disabled={
+                          pet.is_active === false || !pet.approved
+                        }
+                        onClick={() =>
+                          openConfirmation(pet, "deactivate")
+                        }
+                      >
+                        <Power size={16} />
+                        {pet.is_active === false
+                          ? "Inactive"
+                          : "Deactivate Listing"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="catalogue-remove-button"
+                        onClick={() => openConfirmation(pet, "remove")}
+                      >
+                        <Trash2 size={16} />
+                        Remove Listing
+                      </button>
+                    </div>
                   </div>
                 </article>
               );
             })}
+          </div>
+        )}
+
+        {selectedPet && pendingAction && (
+          <div
+            className="catalogue-dialog-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                closeConfirmation();
+              }
+            }}
+          >
+            <section
+              className="catalogue-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="catalogue-dialog-title"
+              aria-describedby="catalogue-dialog-description"
+            >
+              <button
+                type="button"
+                className="catalogue-dialog-close"
+                aria-label="Close confirmation dialog"
+                disabled={isSubmitting}
+                onClick={closeConfirmation}
+              >
+                <X size={20} />
+              </button>
+
+              <div className="catalogue-dialog-icon">
+                {pendingAction === "deactivate" ? (
+                  <Power size={25} />
+                ) : (
+                  <Trash2 size={25} />
+                )}
+              </div>
+
+              <h2 id="catalogue-dialog-title">
+                {pendingAction === "deactivate"
+                  ? "Deactivate listing?"
+                  : "Remove listing?"}
+              </h2>
+
+              <p id="catalogue-dialog-description">
+                {pendingAction === "deactivate" ? (
+                  <>
+                    Are you sure you want to deactivate{" "}
+                    <strong>{selectedPet.name}</strong>? Customers should no
+                    longer see this pet as available. You can keep the listing
+                    in your catalogue.
+                  </>
+                ) : (
+                  <>
+                    Are you sure you want to permanently remove{" "}
+                    <strong>{selectedPet.name}</strong>? This action may not
+                    be reversible.
+                  </>
+                )}
+              </p>
+
+              {actionError && (
+                <div className="catalogue-dialog-error" role="alert">
+                  {actionError}
+                </div>
+              )}
+
+              <div className="catalogue-dialog-actions">
+                <button
+                  type="button"
+                  className="catalogue-cancel-button"
+                  disabled={isSubmitting}
+                  onClick={closeConfirmation}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    pendingAction === "remove"
+                      ? "catalogue-confirm-remove"
+                      : "catalogue-confirm-deactivate"
+                  }
+                  disabled={isSubmitting}
+                  onClick={() => void confirmAction()}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <RefreshCw size={16} className="catalogue-spinner" />
+                      Processing...
+                    </>
+                  ) : pendingAction === "deactivate" ? (
+                    "Yes, deactivate"
+                  ) : (
+                    "Yes, remove"
+                  )}
+                </button>
+              </div>
+            </section>
           </div>
         )}
       </div>
