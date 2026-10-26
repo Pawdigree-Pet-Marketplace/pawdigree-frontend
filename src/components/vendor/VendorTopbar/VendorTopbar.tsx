@@ -1,17 +1,27 @@
-import { Bell, Search, Store } from "lucide-react";
+import { Bell, Search, Store, Menu } from "lucide-react";
 import "./VendorTopbar.css";
 
 type VendorTopbarProps = {
   businessName?: string;
   onSearch?: (query: string) => void;
+  onMenuToggle?: () => void;
 };
 
 export default function VendorTopbar({
   businessName = "Your store",
   onSearch,
+  onMenuToggle,
 }: VendorTopbarProps) {
   return (
     <div className="dashboard-header-actions">
+      <button
+        type="button"
+        className="vendor-hamburger-btn"
+        aria-label="Open menu"
+        onClick={onMenuToggle}
+      >
+        <Menu size={20} />
+      </button>
       <label className="dashboard-search">
         <Search size={17} aria-hidden="true" />
         <input

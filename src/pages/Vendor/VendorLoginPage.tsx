@@ -6,8 +6,14 @@ import logo from "../../assets/logos/lightmode-logo.svg";
 import "./VendorLoginPage.css";
 
 type LoginResponse = {
-  access: string;
-  refresh: string;
+  access?: string;
+  refresh?: string;
+  verification_required?: boolean;
+  verification_token?: string;
+  email?: string;
+  masked_email?: string;
+  expires_in?: number;
+  resend_available_in?: number;
 };
 
 export default function VendorLoginPage() {

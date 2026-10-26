@@ -13,7 +13,6 @@ import {
   MapPin,
   BadgeCheck,
   Share2,
-  Heart,
   ShoppingCart,
   MessageCircle,
   Flag,
@@ -59,159 +58,8 @@ interface Review {
 }
 
 /* ------------------------------------------------------------------ */
-/* Mock data (UI preview only; real data replaces it when the API      */
-/* responds). Images are Unsplash links for preview only; if a link     */
-/* fails, the on-brand illustrated placeholder shows instead.          */
+/* Reporting options                                                   */
 /* ------------------------------------------------------------------ */
-
-const MOCK_BUSINESS: Business = {
-  id: 1,
-  business_name: "Pawdigree Vet Clinic",
-  name: "Pawdigree Vet Clinic",
-  description:
-    "We provide quality veterinary services, including checkups, vaccinations, and pet wellness care. Trusted since 2024. We are committed to keeping your furry friends healthy and happy.",
-  category_name: "Vet Clinic",
-  vendor_category: "Vet Clinic",
-  city_district: "Kampala",
-  location_district: "Kampala",
-  address: "Plot 12, Lumumba Avenue, Kampala, Uganda",
-  contact: "+256 700 123456",
-  phone: "+256 700 123456",
-  email: "info@pawdigree.vet",
-  business_hours: {
-    monday: { is_open: true, open: "09:00", close: "18:00" },
-    tuesday: { is_open: true, open: "09:00", close: "18:00" },
-    wednesday: { is_open: true, open: "09:00", close: "18:00" },
-    thursday: { is_open: true, open: "09:00", close: "18:00" },
-    friday: { is_open: true, open: "09:00", close: "18:00" },
-    saturday: { is_open: true, open: "09:00", close: "14:00" },
-    sunday: { is_open: false, open: "09:00", close: "17:00" },
-  },
-  created_at: "2024-01-15",
-  cover_image:
-    "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=80&auto=format&fit=crop",
-  logo: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=200&q=80&auto=format&fit=crop",
-  stats: { listings_count: 69, orders_completed: 412, response_rate: 96 },
-};
-
-const MOCK_PETS: Listing[] = [
-  {
-    id: 101,
-    name: "German Shepherd Puppy",
-    price: 800000,
-    image:
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 102,
-    name: "Persian Cat",
-    price: 500000,
-    image:
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 103,
-    name: "Labrador Retriever",
-    price: 750000,
-    image:
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 104,
-    name: "Bulldog",
-    price: 650000,
-    image:
-      "https://images.unsplash.com/photo-1583512603807-63cc1dc8889b?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 105,
-    name: "Beagle Puppy",
-    price: 600000,
-    image:
-      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 106,
-    name: "Golden Retriever",
-    price: 900000,
-    image:
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 107,
-    name: "Siamese Kitten",
-    price: 450000,
-    image:
-      "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=400&q=80&auto=format&fit=crop",
-  },
-];
-
-const MOCK_PRODUCTS: Listing[] = [
-  {
-    id: 201,
-    name: "Dog Food - 10kg",
-    price: 120000,
-    image:
-      "https://images.unsplash.com/photo-1589924691995-c10e5725a7d0?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 202,
-    name: "Cat Litter Box",
-    price: 80000,
-    image:
-      "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 203,
-    name: "Pet Shampoo",
-    price: 35000,
-    image:
-      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&q=80&auto=format&fit=crop",
-  },
-];
-
-const MOCK_SERVICES: Listing[] = [
-  {
-    id: 301,
-    name: "Vaccination Service",
-    price: 50000,
-    image:
-      "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400&q=80&auto=format&fit=crop",
-  },
-  {
-    id: 302,
-    name: "Grooming Full Package",
-    price: 70000,
-    image:
-      "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400&q=80&auto=format&fit=crop",
-  },
-];
-
-const MOCK_REVIEWS: Review[] = [
-  {
-    id: "m1",
-    author: "Grace N.",
-    rating: 5,
-    comment:
-      "Very caring staff. My puppy's vaccination was quick and stress free.",
-    date: "2026-09-18",
-  },
-  {
-    id: "m2",
-    author: "David K.",
-    rating: 4,
-    comment: "Good service and fair prices. Waiting time was a bit long.",
-    date: "2026-08-30",
-  },
-  {
-    id: "m3",
-    author: "Aisha M.",
-    rating: 5,
-    comment:
-      "Bought my Persian cat here. Healthy, and the papers were in order.",
-    date: "2026-08-02",
-  },
-];
 
 const REPORT_REASONS = [
   "Fake or misleading listings",
@@ -226,13 +74,8 @@ const REPORT_REASONS = [
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-// there are no
-// pets/products/services/reviews endpoints, these keep sample cards and
-// reviews on screen. Set each to false once its endpoint ships.
-const MOCK_LISTINGS_FALLBACK = true;
-const MOCK_REVIEWS_FALLBACK = true;
+// The pet preview remains until the pet profile endpoint is available.
 
-const FAV_KEY = "pawdigree_favorites";
 const CART_KEY = "pawdigree_cart";
 
 const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T> =>
@@ -352,25 +195,6 @@ function formatHours(hours: unknown): { day: string; time: string }[] {
       .filter((h) => h.day);
   }
   return [];
-}
-
-function normalizeReview(raw: unknown, index: number): Review {
-  const r = (raw ?? {}) as Record<string, unknown>;
-  const pick = (...keys: string[]) => {
-    for (const k of keys) {
-      const v = r[k];
-      if (typeof v === "string" && v) return v;
-    }
-    return "";
-  };
-  return {
-    id: (r.id as number | string | undefined) ?? `r${index}`,
-    author:
-      pick("author", "user_name", "reviewer", "customer_name") || "Customer",
-    rating: Math.max(1, Math.min(5, Number(r.rating) || 5)),
-    comment: pick("comment", "text", "review", "body"),
-    date: pick("created_at", "date"),
-  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -509,37 +333,6 @@ function Stars({ value, size = 16 }: { value: number; size?: number }) {
   );
 }
 
-function StarInput({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (n: number) => void;
-}) {
-  const [hover, setHover] = useState(0);
-  return (
-    <div className="cvp-star-input" role="radiogroup" aria-label="Your rating">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          key={n}
-          type="button"
-          role="radio"
-          aria-checked={value === n}
-          aria-label={`${n} star${n > 1 ? "s" : ""}`}
-          onMouseEnter={() => setHover(n)}
-          onMouseLeave={() => setHover(0)}
-          onClick={() => onChange(n)}
-        >
-          <Star
-            size={30}
-            className={n <= (hover || value) ? "cvp-star on" : "cvp-star"}
-          />
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function Modal({
   title,
   onClose,
@@ -592,23 +385,22 @@ export default function CustomerVendorProfilePage() {
   const navigate = useNavigate();
   const vendorId = id ?? "1";
 
-  const [business, setBusiness] = useState<Business>(MOCK_BUSINESS);
-  const [verified, setVerified] = useState(true);
+  const [business, setBusiness] = useState<Business>({});
+  const [verified, setVerified] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [pets, setPets] = useState<Listing[]>([]);
   const [products, setProducts] = useState<Listing[]>([]);
   const [services, setServices] = useState<Listing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
-  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [reviews] = useState<Review[]>([]);
 
   const [catTab, setCatTab] = useState<CatTab>("all");
   const [showAll, setShowAll] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>(() => readKeys(FAV_KEY));
   const [cart, setCart] = useState<string[]>(() => readKeys(CART_KEY));
 
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState("");
-  const [modal, setModal] = useState<"report" | "review" | "book" | null>(null);
+  const [modal, setModal] = useState<"report" | "book" | null>(null);
   const [bookingItem, setBookingItem] = useState<Item | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -631,7 +423,7 @@ export default function CustomerVendorProfilePage() {
           fetch(`${API_BASE_URL}/businesses/${vendorId}/`, { headers }),
           4000,
         );
-        if (res.status === 404 && !cancelled) setNotFound(true);
+        if (!res.ok && !cancelled) setNotFound(true);
         if (res.ok) {
           const data = (await res.json()) as Business;
           if (!cancelled && data?.id) {
@@ -639,12 +431,12 @@ export default function CustomerVendorProfilePage() {
             const raw = data as unknown as Record<string, unknown>;
             setVerified(
               raw.is_verified === true ||
-                raw.verification_status === "verified",
+                raw.verification_status === "approved",
             );
           }
         }
       } catch {
-        // Backend unreachable or timed out: keep showing the mock data
+        if (!cancelled) setNotFound(true);
       }
     };
     load();
@@ -671,22 +463,11 @@ export default function CustomerVendorProfilePage() {
       }
     };
     const run = async () => {
-      const [p, pr, s, rv] = await Promise.all([
-        fetchList<Listing>(`${API_BASE_URL}/pets/?business=${vendorId}`),
-        fetchList<Listing>(`${API_BASE_URL}/products/?business=${vendorId}`),
-        fetchList<Listing>(`${API_BASE_URL}/services/?business=${vendorId}`),
-        fetchList<unknown>(`${API_BASE_URL}/businesses/${vendorId}/reviews/`),
-      ]);
+      const p = await fetchList<Listing>(`${API_BASE_URL}/pets/?business=${vendorId}`);
       if (cancelled) return;
-      setPets(p && p.length ? p : MOCK_LISTINGS_FALLBACK ? MOCK_PETS : []);
-      setProducts(
-        pr && pr.length ? pr : MOCK_LISTINGS_FALLBACK ? MOCK_PRODUCTS : [],
-      );
-      setServices(
-        s && s.length ? s : MOCK_LISTINGS_FALLBACK ? MOCK_SERVICES : [],
-      );
-      if (rv && rv.length) setReviews(rv.map(normalizeReview));
-      else if (!MOCK_REVIEWS_FALLBACK) setReviews([]);
+      setPets(p || []);
+      setProducts([]);
+      setServices([]);
       setLoadingListings(false);
     };
     run();
@@ -733,22 +514,6 @@ export default function CustomerVendorProfilePage() {
     setShowAll(false);
   };
 
-  const toggleFavorite = (item: Item) => {
-    const key = itemKey(item);
-    const has = favorites.includes(key);
-    const next = has ? favorites.filter((k) => k !== key) : [...favorites, key];
-    setFavorites(next);
-    writeKeys(FAV_KEY, next);
-    showToast(has ? "Removed from favorites" : "Added to favorites");
-    // Endpoint paths are assumptions: adjust to match the backend
-    if (has) callApi(`/favorites/${item.kind}/${item.id}/`, "DELETE");
-    else
-      callApi("/favorites/", "POST", {
-        item_type: item.kind,
-        item_id: item.id,
-      });
-  };
-
   const toggleCart = (item: Item) => {
     const key = itemKey(item);
     const has = cart.includes(key);
@@ -767,7 +532,7 @@ export default function CustomerVendorProfilePage() {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/business/${business.id}`;
+    const url = `${window.location.origin}/vendors/${encodeURIComponent(String(business.id))}`;
     try {
       if (navigator.share) {
         await navigator.share({
@@ -808,28 +573,6 @@ export default function CustomerVendorProfilePage() {
     showToast("Report sent. Thank you for keeping Pawdigree safe.");
   };
 
-  const submitReview = async (rating: number, comment: string) => {
-    setSubmitting(true);
-    await callApi(`/businesses/${business.id}/reviews/`, "POST", {
-      rating,
-      comment,
-    });
-    // Shown locally right away so the UI works before the backend is wired up
-    setReviews((prev) => [
-      {
-        id: `local-${Date.now()}`,
-        author: "You",
-        rating,
-        comment,
-        date: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
-    setSubmitting(false);
-    closeModal();
-    showToast("Thanks for your review!");
-  };
-
   const submitBooking = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!bookingItem) return;
@@ -868,9 +611,9 @@ export default function CustomerVendorProfilePage() {
           />
           <main className="cvp-page">
             <div className="cvp-card cvp-not-found">
-              <h3>Vendor not found</h3>
+              <h3>Vendor profile unavailable</h3>
               <p>
-                This vendor profile doesn't exist or is no longer available.
+                Public vendor details are not available from the backend yet.
               </p>
               <button
                 type="button"
@@ -1122,7 +865,6 @@ export default function CustomerVendorProfilePage() {
                   <div className="cvp-listings">
                     {visible.map((item) => {
                       const key = itemKey(item);
-                      const isFav = favorites.includes(key);
                       const inCart = cart.includes(key);
                       return (
                         <article key={key} className="cvp-listing">
@@ -1139,19 +881,6 @@ export default function CustomerVendorProfilePage() {
                                   ? "Merch"
                                   : "Service"}
                             </span>
-                            <button
-                              type="button"
-                              className={`cvp-fav ${isFav ? "on" : ""}`}
-                              onClick={() => toggleFavorite(item)}
-                              aria-pressed={isFav}
-                              aria-label={
-                                isFav
-                                  ? "Remove from favorites"
-                                  : "Add to favorites"
-                              }
-                            >
-                              <Heart size={16} />
-                            </button>
                           </div>
                           <div className="cvp-listing-info">
                             <h5 title={itemName(item)}>{itemName(item)}</h5>
@@ -1203,13 +932,7 @@ export default function CustomerVendorProfilePage() {
               <section className="cvp-card" id="cvp-reviews">
                 <div className="cvp-reviews-head">
                   <h4>Ratings &amp; reviews</h4>
-                  <button
-                    type="button"
-                    className="cvp-btn primary sm"
-                    onClick={() => setModal("review")}
-                  >
-                    <Star size={14} /> Rate this vendor
-                  </button>
+                  <span className="cvp-form-note">Reviews are unavailable until review data is supported.</span>
                 </div>
 
                 <div className="cvp-summary">
@@ -1241,7 +964,7 @@ export default function CustomerVendorProfilePage() {
 
                 {reviews.length === 0 ? (
                   <div className="cvp-empty">
-                    No reviews yet. Be the first to review!
+                    Reviews will appear here when a review API is available.
                   </div>
                 ) : (
                   <ul className="cvp-review-list">
@@ -1320,16 +1043,6 @@ export default function CustomerVendorProfilePage() {
           </form>
         </Modal>
       )}
-
-      {modal === "review" && (
-        <ReviewForm
-          name={name}
-          submitting={submitting}
-          onCancel={closeModal}
-          onSubmit={submitReview}
-        />
-      )}
-
       {modal === "book" && bookingItem && (
         <Modal title={`Book: ${itemName(bookingItem)}`} onClose={closeModal}>
           <form onSubmit={submitBooking} className="cvp-form">
@@ -1377,53 +1090,3 @@ export default function CustomerVendorProfilePage() {
 }
 
 /* ------------------------------------------------------------------ */
-
-function ReviewForm({
-  name,
-  submitting,
-  onCancel,
-  onSubmit,
-}: {
-  name: string;
-  submitting: boolean;
-  onCancel: () => void;
-  onSubmit: (rating: number, comment: string) => void;
-}) {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-
-  return (
-    <Modal title={`Rate ${name}`} onClose={onCancel}>
-      <form
-        className="cvp-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (rating > 0) onSubmit(rating, comment.trim());
-        }}
-      >
-        <label>Your rating</label>
-        <StarInput value={rating} onChange={setRating} />
-        <label htmlFor="cvp-comment">Your review</label>
-        <textarea
-          id="cvp-comment"
-          rows={4}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Share your experience with this vendor"
-        />
-        <div className="cvp-form-actions">
-          <button type="button" className="cvp-btn ghost" onClick={onCancel}>
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="cvp-btn primary"
-            disabled={rating === 0 || submitting}
-          >
-            {submitting ? "Submitting..." : "Submit review"}
-          </button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
