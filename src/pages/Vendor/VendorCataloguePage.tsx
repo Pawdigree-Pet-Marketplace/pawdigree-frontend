@@ -134,9 +134,14 @@ export default function VendorCataloguePage() {
   }
 
   useEffect(() => {
-    document.title = "My Catalogue - Pawdigree";
+  document.title = "My Catalogue - Pawdigree";
+
+  const timer = window.setTimeout(() => {
     void loadPets();
-  }, []);
+  }, 0);
+
+  return () => window.clearTimeout(timer);
+}, []);
 
   function openConfirmation(pet: Pet, action: ListingAction) {
     setSelectedPet(pet);
