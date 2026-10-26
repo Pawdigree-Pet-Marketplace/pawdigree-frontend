@@ -135,7 +135,6 @@ export default function VendorCataloguePage() {
 
   useEffect(() => {
   document.title = "My Catalogue - Pawdigree";
-
   const timer = window.setTimeout(() => {
     void loadPets();
   }, 0);
