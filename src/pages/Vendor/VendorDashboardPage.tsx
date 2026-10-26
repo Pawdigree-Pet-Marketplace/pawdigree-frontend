@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   CalendarCheck,
   DollarSign,
@@ -7,6 +7,7 @@ import {
   Wallet,
 } from "lucide-react";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { apiRequest } from "../../services/api";
 import "./VendorDashboardPage.css";
 
 const metrics = [
@@ -81,6 +82,7 @@ const sales = [
 ];
 
 function VendorDashboardPage() {
+  const [firstName, setFirstName] = useState("");
   const token =
     localStorage.getItem("token") ||
     sessionStorage.getItem("token");
@@ -95,13 +97,32 @@ function VendorDashboardPage() {
     }
   }, [token, role]);
 
+  useEffect(() => {
+    if (!token || role !== "VENDOR") return;
+
+    let cancelled = false;
+
+    void apiRequest<{ first_name?: string }>("/auth/current-user/", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((user) => {
+        if (!cancelled) setFirstName(user.first_name?.trim() ?? "");
+      })
+      .catch(() => {
+        if (!cancelled) setFirstName("");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, role]);
   if (!token || role !== "VENDOR") {
     return null;
   }
 
   return (
     <VendorLayout
-      title="Welcome back, Happy Paws Kennel"
+      title={`Welcome back, ${firstName || "there"}`}
       description="Here's how your store is doing today"
       businessName="Happy Paws Kennel"
     >
