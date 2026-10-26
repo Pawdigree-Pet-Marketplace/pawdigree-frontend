@@ -137,7 +137,7 @@ export default function VendorCategorySelector({
             aria-label="Search categories"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-          />
+          />   
         </label>
       </header>
 
