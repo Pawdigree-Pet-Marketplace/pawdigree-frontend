@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, Eye, EyeOff, Store } from "lucide-react";
 import { apiRequest } from "../../services/api";
@@ -12,6 +11,7 @@ type LoginResponse = {
   verification_token?: string;
   email?: string;
   masked_email?: string;
+  email_sent?: boolean;
   expires_in?: number;
   resend_available_in?: number;
 };
@@ -45,9 +45,7 @@ export default function VendorLoginPage() {
     if (!email.trim()) {
       setEmailError("Please enter your email address.");
       hasErrors = true;
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-    ) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       hasErrors = true;
     }
@@ -72,8 +70,37 @@ export default function VendorLoginPage() {
           }),
         },
       );
-  
-     // Remove old authentication data before saving the new session.
+
+      // Email verification must happen before tokens are saved.
+      if (data.verification_required) {
+        if (!data.verification_token) {
+          setGeneralError(
+            "We couldn't start email verification. Please try signing in again.",
+          );
+          return;
+        }
+
+        const verificationParams = new URLSearchParams({
+          token: data.verification_token,
+          email: data.email ?? "",
+          role: "VENDOR",
+          keepLoggedIn: String(keepLoggedIn),
+          emailSent: String(data.email_sent ?? false),
+        });
+
+        window.location.href = `/verify-email?${verificationParams.toString()}`;
+        return;
+      }
+
+      // Normal login must return both tokens.
+      if (!data.access || !data.refresh) {
+        setGeneralError(
+          "We couldn't complete sign-in. Please try again.",
+        );
+        return;
+      }
+
+      // Remove old authentication data before saving the new session.
       for (const storage of [localStorage, sessionStorage]) {
         storage.removeItem("token");
         storage.removeItem("refresh");
@@ -88,9 +115,7 @@ export default function VendorLoginPage() {
 
       window.location.href = "/vendor/dashboard";
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "";
-
+      const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();
 
       if (
@@ -104,6 +129,7 @@ export default function VendorLoginPage() {
       } else if (
         normalizedMessage.includes("non_field_errors") ||
         normalizedMessage.includes("invalid credentials") ||
+        normalizedMessage.includes("invalid email or password") ||
         normalizedMessage.includes("no active account") ||
         normalizedMessage.includes("incorrect") ||
         normalizedMessage.includes("not found") ||
@@ -148,9 +174,7 @@ export default function VendorLoginPage() {
           <Store size={28} />
         </div>
 
-        <p className="vendor-login-eyebrow">
-          PAWDIGREE FOR BUSINESS
-        </p>
+        <p className="vendor-login-eyebrow">PAWDIGREE FOR BUSINESS</p>
 
         <h1>Welcome back!</h1>
 
@@ -273,9 +297,7 @@ export default function VendorLoginPage() {
             className="vendor-login-submit"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? "Signing in..."
-              : "Sign in to your store"}
+            {isSubmitting ? "Signing in..." : "Sign in to your store"}
           </button>
         </form>
 
