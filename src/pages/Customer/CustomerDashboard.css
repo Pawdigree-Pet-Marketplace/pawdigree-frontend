@@ -1814,3 +1814,14 @@
   .customer-dashboard .dashboard-filter-error { animation: none; }
   .customer-dashboard .dashboard-filter-grid label { transition: none; }
 }
+
+/* Keep shortcuts with no customer destination from looking clickable. */
+.customer-dashboard .dashboard-marketplace-card--unavailable {
+  cursor: default;
+}
+
+.customer-dashboard .dashboard-marketplace-card--unavailable:hover {
+  border-color: var(--dashboard-border);
+  box-shadow: none;
+  transform: none;
+}

@@ -270,7 +270,7 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="dashboard-marketplace-grid">
-            <a href="/#pets" className="dashboard-marketplace-card">
+            <a href="/pets" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <Heart size={22} />
               </span>
@@ -281,7 +281,7 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </a>
 
-            <a href="/#services" className="dashboard-marketplace-card">
+            <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
               <span className="dashboard-marketplace-icon">
                 <Stethoscope size={22} />
               </span>
@@ -289,10 +289,9 @@ export default function CustomerDashboard() {
                 <strong>Pet services</strong>
                 <span>Explore services for happier, healthier pets.</span>
               </span>
-              <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </div>
 
-            <a href="/#reviews" className="dashboard-marketplace-card">
+            <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
               <span className="dashboard-marketplace-icon">
                 <Sparkles size={22} />
               </span>
@@ -300,8 +299,7 @@ export default function CustomerDashboard() {
                 <strong>Community reviews</strong>
                 <span>Read what people are saying about Pawdigree.</span>
               </span>
-              <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </div>
 
             <a href="/vendor" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
@@ -314,7 +312,7 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </a>
 
-            <a href="/#pets" className="dashboard-marketplace-card">
+            <a href="/pets" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <ShoppingBag size={22} />
               </span>
@@ -332,7 +330,7 @@ export default function CustomerDashboard() {
           title="Browse by category"
           className="dashboard-category-carousel"
           items={dashboardCategories}
-          getHref={() => "#dashboard-listings"}
+          getHref={(category) => `/pets?search=${encodeURIComponent(category.name === "Other pets" ? "rabbit" : category.name.replace(/s$/i, ""))}`}
         />
 
         <section
@@ -345,7 +343,7 @@ export default function CustomerDashboard() {
               <h2>{hasActiveCriteria ? "Pet listings" : "Pets to discover"}</h2>
               {hasActiveCriteria && <p className="dashboard-section-description">{submittedSearch.trim() ? `Results for “${submittedSearch.trim()}”` : "Filtered pet listings"}</p>}
             </div>
-            <a href="/#pets" className="dashboard-text-link">
+            <a href={`/pets?${new URLSearchParams({ ...(submittedSearch.trim() ? { search: submittedSearch.trim() } : {}), ...(appliedFilters.purpose ? { listing_type: appliedFilters.purpose } : {}), ...(appliedFilters.gender ? { gender: appliedFilters.gender } : {}), ...(appliedFilters.breed.trim() ? { breed: appliedFilters.breed.trim() } : {}), ...(appliedFilters.minAge ? { age_min: appliedFilters.minAge } : {}), ...(appliedFilters.maxAge ? { age_max: appliedFilters.maxAge } : {}) }).toString()}`} className="dashboard-text-link">
               Explore more <ArrowRight size={16} />
             </a>
           </div>
