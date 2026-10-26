@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, Eye, EyeOff, Store } from "lucide-react";
 import { apiRequest } from "../../services/api";
@@ -12,6 +11,7 @@ type LoginResponse = {
   verification_token?: string;
   email?: string;
   masked_email?: string;
+  email_sent?: boolean;
   expires_in?: number;
   resend_available_in?: number;
 };
@@ -45,9 +45,7 @@ export default function VendorLoginPage() {
     if (!email.trim()) {
       setEmailError("Please enter your email address.");
       hasErrors = true;
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-    ) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       hasErrors = true;
     }
@@ -73,32 +71,41 @@ export default function VendorLoginPage() {
         },
       );
 
+      // Email verification must happen before authentication tokens are saved.
       if (data.verification_required) {
-        if (!data.verification_token) {
-          throw new Error("The verification response was incomplete. Please try logging in again.");
+        const verificationToken = data.verification_token;
+
+        if (!verificationToken) {
+          setGeneralError(
+            "We couldn't start email verification. Please try signing in again.",
+          );
+          return;
         }
-        for (const storage of [localStorage, sessionStorage]) {
-          storage.removeItem("token");
-          storage.removeItem("refresh");
-          storage.removeItem("role");
-        }
-        sessionStorage.setItem("pawdigree_email_verification", JSON.stringify({
-          verificationToken: data.verification_token,
-          email: data.masked_email ?? data.email ?? email.trim(),
+
+        const verificationParams = new URLSearchParams({
+          token: verificationToken,
+          email: data.email ?? "",
           role: "VENDOR",
-          keepLoggedIn,
-          expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
-          resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
-        }));
-        window.location.href = "/verify-email";
+          keepLoggedIn: String(keepLoggedIn),
+          emailSent: String(data.email_sent ?? false),
+        });
+
+        window.location.href = `/verify-email?${verificationParams.toString()}`;
         return;
       }
 
-      if (!data.access || !data.refresh) {
-        throw new Error("The login response was incomplete. Please try again.");
+      // Normal login must return both authentication tokens.
+      const accessToken = data.access;
+      const refreshToken = data.refresh;
+
+      if (!accessToken || !refreshToken) {
+        setGeneralError(
+          "We couldn't complete sign-in. Please try again.",
+        );
+        return;
       }
 
-      // Remove old authentication data before saving the new session.
+      // Clear any previous session before saving the new one.
       for (const storage of [localStorage, sessionStorage]) {
         storage.removeItem("token");
         storage.removeItem("refresh");
@@ -107,15 +114,13 @@ export default function VendorLoginPage() {
 
       const storage = keepLoggedIn ? localStorage : sessionStorage;
 
-      storage.setItem("token", data.access);
-      storage.setItem("refresh", data.refresh);
+      storage.setItem("token", accessToken);
+      storage.setItem("refresh", refreshToken);
       storage.setItem("role", "VENDOR");
 
       window.location.href = "/vendor/dashboard";
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "";
-
+      const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();
 
       if (
@@ -129,6 +134,7 @@ export default function VendorLoginPage() {
       } else if (
         normalizedMessage.includes("non_field_errors") ||
         normalizedMessage.includes("invalid credentials") ||
+        normalizedMessage.includes("invalid email or password") ||
         normalizedMessage.includes("no active account") ||
         normalizedMessage.includes("incorrect") ||
         normalizedMessage.includes("not found") ||
@@ -173,9 +179,7 @@ export default function VendorLoginPage() {
           <Store size={28} />
         </div>
 
-        <p className="vendor-login-eyebrow">
-          PAWDIGREE FOR BUSINESS
-        </p>
+        <p className="vendor-login-eyebrow">PAWDIGREE FOR BUSINESS</p>
 
         <h1>Welcome back!</h1>
 
@@ -298,9 +302,7 @@ export default function VendorLoginPage() {
             className="vendor-login-submit"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? "Signing in..."
-              : "Sign in to your store"}
+            {isSubmitting ? "Signing in..." : "Sign in to your store"}
           </button>
         </form>
 
