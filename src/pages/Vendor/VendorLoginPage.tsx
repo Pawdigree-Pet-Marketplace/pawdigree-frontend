@@ -71,9 +71,11 @@ export default function VendorLoginPage() {
         },
       );
 
-      // Email verification must happen before tokens are saved.
+      // Email verification must happen before authentication tokens are saved.
       if (data.verification_required) {
-        if (!data.verification_token) {
+        const verificationToken = data.verification_token;
+
+        if (!verificationToken) {
           setGeneralError(
             "We couldn't start email verification. Please try signing in again.",
           );
@@ -81,7 +83,7 @@ export default function VendorLoginPage() {
         }
 
         const verificationParams = new URLSearchParams({
-          token: data.verification_token,
+          token: verificationToken,
           email: data.email ?? "",
           role: "VENDOR",
           keepLoggedIn: String(keepLoggedIn),
@@ -92,15 +94,18 @@ export default function VendorLoginPage() {
         return;
       }
 
-      // Normal login must return both tokens.
-      if (!data.access || !data.refresh) {
+      // Normal login must return both authentication tokens.
+      const accessToken = data.access;
+      const refreshToken = data.refresh;
+
+      if (!accessToken || !refreshToken) {
         setGeneralError(
           "We couldn't complete sign-in. Please try again.",
         );
         return;
       }
 
-      // Remove old authentication data before saving the new session.
+      // Clear any previous session before saving the new one.
       for (const storage of [localStorage, sessionStorage]) {
         storage.removeItem("token");
         storage.removeItem("refresh");
@@ -109,8 +114,8 @@ export default function VendorLoginPage() {
 
       const storage = keepLoggedIn ? localStorage : sessionStorage;
 
-      storage.setItem("token", data.access);
-      storage.setItem("refresh", data.refresh);
+      storage.setItem("token", accessToken);
+      storage.setItem("refresh", refreshToken);
       storage.setItem("role", "VENDOR");
 
       window.location.href = "/vendor/dashboard";
