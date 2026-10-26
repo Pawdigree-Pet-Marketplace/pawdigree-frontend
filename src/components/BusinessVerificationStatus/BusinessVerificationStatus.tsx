@@ -1,7 +1,11 @@
 
 import { useEffect, useState } from "react";
-import { BadgeCheck, Clock, FileWarning, RefreshCw } from "lucide-react";
-import API_BASE_URL from "../../services/api";
+import {
+  BadgeCheck,
+  Clock,
+  FileWarning,
+} from "lucide-react";
+import { apiRequest } from "../../services/api";
 import "./BusinessVerificationStatus.css";
 
 interface BusinessVerification {
@@ -20,8 +24,12 @@ interface ApiResponse {
 
 type LoadState = "loading" | "success" | "error";
 
-function getStatusLabel(status: string) {
-  const normalized = status.toLowerCase().replace(/[\s-]+/g, "_");
+function normalizeStatus(status: string): string {
+  return status.toLowerCase().trim().replace(/[\s-]+/g, "_");
+}
+
+function getStatusLabel(status: string): string {
+  const normalized = normalizeStatus(status);
 
   const labels: Record<string, string> = {
     pending: "Pending review",
@@ -35,12 +43,14 @@ function getStatusLabel(status: string) {
 
   return (
     labels[normalized] ??
-    normalized.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+    normalized.replace(/_/g, " ").replace(/\b\w/g, (char) =>
+      char.toUpperCase(),
+    )
   );
 }
 
-function getStatusClass(status: string) {
-  const normalized = status.toLowerCase().replace(/[\s-]+/g, "_");
+function getStatusClass(status: string): string {
+  const normalized = normalizeStatus(status);
 
   if (normalized === "approved" || normalized === "verified") {
     return "approved";
@@ -61,6 +71,25 @@ function getStatusClass(status: string) {
   return "pending";
 }
 
+function getStoredToken(): string | null {
+  const possibleTokens = [
+    localStorage.getItem("token"),
+    sessionStorage.getItem("token"),
+    localStorage.getItem("access"),
+    localStorage.getItem("access_token"),
+  ];
+
+  return (
+    possibleTokens.find(
+      (token) =>
+        typeof token === "string" &&
+        token.trim() !== "" &&
+        token !== "undefined" &&
+        token !== "null",
+    ) ?? null
+  );
+}
+
 export default function BusinessVerificationStatus() {
   const [businesses, setBusinesses] = useState<BusinessVerification[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
@@ -69,33 +98,27 @@ export default function BusinessVerificationStatus() {
     const controller = new AbortController();
 
     async function loadVerification() {
-      const token =
-        localStorage.getItem("access") ||
-        localStorage.getItem("access_token");
+      const token = getStoredToken();
 
       if (!token) {
+        console.error(
+          "Business verification: no valid authentication token was found.",
+        );
         setLoadState("error");
         return;
       }
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/businesses/verification-status/`,
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            signal: controller.signal,
+        const data = await apiRequest<
+          BusinessVerification[] | ApiResponse
+        >("/businesses/verification-status/", {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        );
-
-        if (!response.ok) {
-          throw new Error("Unable to load verification status.");
-        }
-
-        const data: BusinessVerification[] | ApiResponse =
-          await response.json();
+          signal: controller.signal,
+        });
 
         const results = Array.isArray(data) ? data : data.results;
 
@@ -107,8 +130,12 @@ export default function BusinessVerificationStatus() {
           setBusinesses(results);
           setLoadState("success");
         }
-      } catch {
+      } catch (error) {
         if (!controller.signal.aborted) {
+          console.error(
+            "Business verification request failed:",
+            error,
+          );
           setLoadState("error");
         }
       }
@@ -142,14 +169,15 @@ export default function BusinessVerificationStatus() {
       <section
         className="verification-card"
         aria-label="Business verification status"
+        role="status"
       >
         <div className="verification-card__heading">
           <FileWarning size={22} aria-hidden="true" />
           <div>
             <h2>Business verification</h2>
             <p>
-              We couldn't load your verification status. Please try again
-              later.
+              We couldn't load your verification status. Please log in again
+              if your session has expired, then try refreshing the page.
             </p>
           </div>
         </div>
@@ -167,7 +195,10 @@ export default function BusinessVerificationStatus() {
           <Clock size={22} aria-hidden="true" />
           <div>
             <h2>Business verification</h2>
-            <p>You haven't registered a business yet.</p>
+            <p>
+              You haven't registered a business yet. Register your business
+              and submit the required documents for admin review.
+            </p>
           </div>
         </div>
       </section>
@@ -177,8 +208,10 @@ export default function BusinessVerificationStatus() {
   return (
     <div className="verification-list">
       {businesses.map((business) => {
-        const status = business.verification_status;
-        const isRejected = status.toLowerCase() === "rejected";
+        const status = normalizeStatus(business.verification_status);
+        const decisionReason = business.decision_reason?.trim();
+        const needsAttention =
+          status === "rejected" || status === "changes_requested";
 
         return (
           <section
@@ -209,18 +242,46 @@ export default function BusinessVerificationStatus() {
               </p>
             )}
 
-            {isRejected && (
+            {needsAttention && (
               <div className="verification-card__reason" role="alert">
-                <div className="verification-card__reason-heading">
-                  <RefreshCw size={18} aria-hidden="true" />
-                  <strong>Application rejected</strong>
-                </div>
-
+                <strong>
+                  {status === "rejected"
+                    ? "Reason for rejection"
+                    : "Changes requested"}
+                </strong>
                 <p>
-                  {business.decision_reason ||
-                    "No rejection reason was provided. Please contact support for clarification."}
+                  {decisionReason ||
+                    "Please contact support for more information."}
                 </p>
               </div>
+            )}
+
+            {status === "approved" && (
+              <p className="verification-card__message">
+                Your business has been approved.
+                {business.can_sell
+                  ? " You can sell on Pawdigree."
+                  : " Your selling access is not currently active."}
+              </p>
+            )}
+
+            {status === "pending" && (
+              <p className="verification-card__message">
+                Your application is awaiting admin review.
+              </p>
+            )}
+
+            {status === "draft" && (
+              <p className="verification-card__message">
+                Your business registration is still a draft.
+              </p>
+            )}
+
+            {status === "suspended" && (
+              <p className="verification-card__message">
+                Your business is currently suspended. Please contact support
+                for assistance.
+              </p>
             )}
           </section>
         );

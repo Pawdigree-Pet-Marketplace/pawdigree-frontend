@@ -66,8 +66,8 @@ export default function VendorLoginPage() {
           }),
         },
       );
-
-      // Remove old authentication data before saving the new session.
+  
+     // Remove old authentication data before saving the new session.
       for (const storage of [localStorage, sessionStorage]) {
         storage.removeItem("token");
         storage.removeItem("refresh");
