@@ -423,3 +423,15 @@
 }
 
 
+.customer-dash-link.is-unavailable,
+.customer-dash-link.is-unavailable:hover {
+  color: #503b35;
+  background: transparent;
+  transform: none;
+  cursor: default;
+}
+
+.customer-dash-link.is-unavailable svg,
+.customer-dash-link.is-unavailable:hover svg {
+  color: #805b50;
+}

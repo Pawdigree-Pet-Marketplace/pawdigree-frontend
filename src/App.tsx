@@ -1,5 +1,6 @@
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
+import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
@@ -30,6 +31,10 @@ function App() {
 
   if (path === "/customer/dashboard") {
     return <CustomerDashboardLayout />;
+  }
+
+  if (path === "/pets" || path === "/pets/") {
+    return <CustomerPetCataloguePage />;
   }
 
   if (path === "/terms-and-conditions") {

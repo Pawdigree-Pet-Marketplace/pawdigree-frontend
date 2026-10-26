@@ -1,0 +1,8 @@
+.pet-catalogue .catalogue-heading { margin: 8px 0 24px; padding: clamp(24px, 4vw, 46px); border: 1px solid var(--dashboard-border); border-radius: 22px; background: var(--dashboard-paper); }
+.pet-catalogue .catalogue-heading h1 { margin: 0 0 8px; font-size: clamp(2rem, 4vw, 3rem); }
+.pet-catalogue .catalogue-heading > p:last-child { max-width: 680px; margin: 0; color: var(--dashboard-muted); line-height: 1.6; }
+.pet-catalogue .dashboard-filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pet-catalogue .catalogue-pagination { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 24px 0; color: var(--dashboard-muted); font-weight: 800; }
+.pet-catalogue .catalogue-pagination button { min-height: 40px; padding: 0 15px; border: 1px solid var(--dashboard-border); border-radius: 10px; color: var(--dashboard-teal-dark); background: var(--dashboard-paper); font: inherit; cursor: pointer; }
+.pet-catalogue .catalogue-pagination button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 700px) { .pet-catalogue .dashboard-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
