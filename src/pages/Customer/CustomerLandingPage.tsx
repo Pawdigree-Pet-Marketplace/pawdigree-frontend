@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Adoption from "../../components/home/Adoption";
 import Footer from "../../components/layout/Footer";
 import Categories from "../../components/home/Categories";
@@ -10,49 +10,58 @@ import Merchandise from "../../components/home/Merchandise";
 import Services from "../../components/home/Services";
 import Stats from "../../components/home/Stats";
 import Testimonials from "../../components/home/Testimonials";
-
 import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
 import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
 import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 
+function hasCustomerSession() {
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const role = localStorage.getItem("role") || sessionStorage.getItem("role");
+  return Boolean(token && role === "CUSTOMER");
+}
+
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCustomerSignedIn, setIsCustomerSignedIn] = useState(hasCustomerSession);
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      setIsLoggedIn(!!token);
+    const checkCustomerSession = () => {
+      setIsCustomerSignedIn(hasCustomerSession());
     };
 
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    window.addEventListener("focus", checkAuth);
+    checkCustomerSession();
+    window.addEventListener("storage", checkCustomerSession);
+    window.addEventListener("focus", checkCustomerSession);
 
     return () => {
-      window.removeEventListener("storage", checkAuth);
-      window.removeEventListener("focus", checkAuth);
+      window.removeEventListener("storage", checkCustomerSession);
+      window.removeEventListener("focus", checkCustomerSession);
     };
   }, []);
+
+  useEffect(() => {
+    if (isCustomerSignedIn) {
+      window.location.replace("/customer/dashboard");
+    }
+  }, [isCustomerSignedIn]);
+
+  if (isCustomerSignedIn) return null;
 
   return (
     <>
       <TopNavbar
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={false}
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
       />
-
       <SideMenu
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={false}
         onClose={() => setIsMenuOpen(false)}
       />
-
       <main>
-        <Hero isLoggedIn={isLoggedIn} />
+        <Hero />
         <Stats />
         <Categories />
         <Merchandise />
@@ -61,9 +70,8 @@ export default function LandingPage() {
         <Adoption />
         <Services />
         <Testimonials />
-        <CtaBanner isLoggedIn={isLoggedIn} />
+        <CtaBanner />
       </main>
-
       <Footer />
       <BottomNavbar />
     </>

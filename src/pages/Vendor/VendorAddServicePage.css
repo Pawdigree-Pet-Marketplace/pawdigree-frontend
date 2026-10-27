@@ -1,0 +1,104 @@
+/* Add Service, styled as a page in the shared vendor workspace. */
+.vendor-workspace .vendor-service-page {
+  max-width: none;
+  margin: 0;
+  padding: 22px 2px 28px;
+  color: #2C302F;
+  font-family: "Inter", "Nunito", sans-serif;
+}
+
+.vendor-workspace .service-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 0 0 2px;
+  padding: 9px 13px;
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 999px;
+  background: #FBFAF7;
+  color: #216C68;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.vendor-workspace .service-back-link:hover { transform: translateX(-2px); background: #F3F0EA; }
+.vendor-workspace .service-listing-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(250px, .8fr);
+  align-items: start;
+  gap: 16px;
+}
+.vendor-workspace .service-form-section,
+.vendor-workspace .service-unavailable-note {
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 20px;
+  background: #FBFAF7;
+  box-shadow: 0 10px 26px rgb(44 48 47 / 5%);
+}
+.vendor-workspace .service-form-section { padding: 24px; }
+.vendor-workspace .service-section-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.vendor-workspace .service-section-icon { display: grid; flex: 0 0 46px; width: 46px; height: 46px; place-items: center; border-radius: 15px; background: rgb(33 108 104 / 10%); color: #216C68; animation: service-icon-breathe 4.2s ease-in-out infinite; }
+.vendor-workspace .service-section-heading h2 { margin: 0 0 5px; color: #2C302F; font-family: "Poppins", "Fredoka", sans-serif; font-size: 18px; font-weight: 700; }
+.vendor-workspace .service-section-heading p { margin: 0; color: rgb(44 48 47 / 66%); font-size: 12px; line-height: 1.6; }
+.vendor-workspace .service-field { display: flex; flex-direction: column; gap: 9px; margin-bottom: 19px; color: #2C302F; font-size: 13px; font-weight: 700; }
+.vendor-workspace .service-field > span[aria-hidden="true"] { color: #FB8665; }
+.vendor-workspace .service-field input,
+.vendor-workspace .service-field textarea { box-sizing: border-box; width: 100%; min-height: 46px; padding: 12px 14px; border: 1px solid rgb(44 48 47 / 16%); border-radius: 11px; background: #FBFAF7; color: #2C302F; font: inherit; font-size: 13px; transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease; }
+.vendor-workspace .service-field textarea { min-height: 132px; resize: vertical; }
+.vendor-workspace .service-field input:focus,
+.vendor-workspace .service-field textarea:focus { outline: 0; border-color: #216C68; background: #FBFAF7; box-shadow: 0 0 0 3px rgb(33 108 104 / 12%); }
+.vendor-workspace .service-field input::placeholder,
+.vendor-workspace .service-field textarea::placeholder { color: rgb(44 48 47 / 48%); font-weight: 400; }
+.vendor-workspace .service-field small { align-self: flex-end; color: rgb(44 48 47 / 66%); font-size: 11px; font-weight: 500; }
+.vendor-workspace .service-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.vendor-workspace .service-input-wrap { position: relative; display: flex; align-items: center; }
+.vendor-workspace .service-input-wrap > svg { position: absolute; left: 14px; color: #216C68; pointer-events: none; }
+.vendor-workspace .service-input-wrap input { padding-left: 42px; }
+.vendor-workspace .service-unavailable-note { display: flex; align-items: flex-start; gap: 12px; min-height: 100%; padding: 18px; background: #F3F0EA; color: #2C302F; }
+.vendor-workspace .service-unavailable-note svg { flex: 0 0 auto; margin-top: 1px; color: #FB8665; }
+.vendor-workspace .service-unavailable-note p { margin: 0; font-size: 12px; line-height: 1.7; }
+.vendor-workspace .service-form-actions { display: flex; grid-column: 1 / -1; align-items: center; justify-content: flex-end; gap: 10px; }
+.vendor-workspace .service-cancel-button,
+.vendor-workspace .service-submit-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease; }
+.vendor-workspace .service-cancel-button { border: 1px solid rgb(44 48 47 / 16%); background: #FBFAF7; color: #2C302F; }
+.vendor-workspace .service-cancel-button:hover { transform: translateY(-1px); background: #F3F0EA; }
+.vendor-workspace .service-submit-button { border: 1px solid #216C68; background: #216C68; color: #FBFAF7; cursor: not-allowed; opacity: .55; }
+
+@keyframes service-icon-breathe {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-3px) rotate(-3deg); }
+}
+
+@media (max-width: 950px) {
+  .vendor-workspace .vendor-service-page { padding-top: 18px; }
+  .vendor-workspace .service-listing-form { grid-template-columns: minmax(0, 1.35fr) minmax(210px, .85fr); }
+}
+@media (max-width: 700px) {
+  .vendor-workspace .vendor-service-page { padding: 14px 0 22px; }
+  .vendor-workspace .service-listing-form { grid-template-columns: 1fr; gap: 12px; }
+  .vendor-workspace .service-form-section { padding: 20px 16px; }
+  .vendor-workspace .service-form-grid { grid-template-columns: 1fr; gap: 0; }
+  .vendor-workspace .service-unavailable-note { min-height: 0; }
+  .vendor-workspace .service-form-actions { flex-direction: column-reverse; align-items: stretch; }
+  .vendor-workspace .service-cancel-button,
+  .vendor-workspace .service-submit-button { width: 100%; box-sizing: border-box; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vendor-workspace .service-back-link,
+  .vendor-workspace .service-section-icon,
+  .vendor-workspace .service-field input,
+  .vendor-workspace .service-field textarea,
+  .vendor-workspace .service-cancel-button,
+  .vendor-workspace .service-submit-button { animation: none !important; transition: none !important; }
+  .vendor-workspace .service-back-link:hover,
+  .vendor-workspace .service-cancel-button:hover { transform: none; }
+}
+.vendor-workspace .service-form-section { animation: service-arrive 480ms cubic-bezier(.2, .75, .25, 1) both; }
+.vendor-workspace .service-unavailable-note { animation: service-arrive 480ms cubic-bezier(.2, .75, .25, 1) 90ms both; }
+.vendor-workspace .service-form-actions { animation: service-arrive 480ms cubic-bezier(.2, .75, .25, 1) 160ms both; }
+@keyframes service-arrive {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

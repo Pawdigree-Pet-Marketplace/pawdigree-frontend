@@ -17,6 +17,7 @@ import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
+import VendorAddServicePage from "./pages/Vendor/VendorAddServicePage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
@@ -71,6 +72,10 @@ function App() {
 
   if (path === "/vendor/listings/new") {
     return <VendorAddPetPage />;
+  }
+
+  if (path === "/vendor/services/new") {
+    return <VendorAddServicePage />;
   }
 
   if (path.startsWith("/vendor/edit-pet/")) {
@@ -140,6 +145,10 @@ function App() {
 
   if (path === "/reset-password" || path === "/reset-password/") {
     return <ResetPasswordForm />;
+  }
+
+  if (path.startsWith("/vendor/")) {
+    return <VendorDashboardPage />;
   }
 
   return <LandingPage />;

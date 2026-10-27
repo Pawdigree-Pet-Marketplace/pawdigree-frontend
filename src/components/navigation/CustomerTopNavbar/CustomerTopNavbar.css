@@ -125,40 +125,10 @@
   width: clamp(88px, 9vw, 120px);
 }
 
-.topnav-icons {
-  display: flex;
-  align-items: center;
-  gap: clamp(0px, 1.2vw, 18px);
-  overflow: visible;
-  color: var(--charcoal);
-}
-
-.topnav-icons svg {
-  cursor: pointer;
-  overflow: visible;
-  display: block;
-  width: clamp(16px, 1.6vw, 20px);
-  height: clamp(16px, 1.6vw, 20px);
-  padding: clamp(4px, 0.6vw, 8px);
-  border-radius: 50%;
-  box-sizing: content-box;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.topnav-icons svg:hover {
-  color: var(--teal);
-  background: var(--teal-light);
-}
-
-.topnav-icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+.desktop-actions .dashboard-redirect-btn {
+  width: auto;
+  min-width: 132px;
+  white-space: nowrap;
 }
 
 .hamburger {
@@ -191,9 +161,6 @@
   color: var(--coral);
 }
 
-.top-navbar--transparent:not(.top-navbar--scrolled) .topnav-icons {
-  color: var(--white);
-}
 
 .top-navbar--transparent:not(.top-navbar--scrolled) .hamburger {
   color: var(--white);
@@ -212,9 +179,6 @@
   color: var(--teal);
 }
 
-.top-navbar--scrolled .topnav-icons {
-  color: var(--charcoal);
-}
 
 .top-navbar--scrolled .hamburger {
   color: var(--charcoal);
@@ -263,9 +227,6 @@
     display: none;
   }
 
-  .topnav-icons {
-    display: none;
-  }
 
   .hamburger {
     display: flex;
