@@ -35,7 +35,7 @@ function App() {
     return <CustomerDashboardLayout />;
   }
 
-  if (path === "./explore-pets" || path === "/explore-pets/") {
+  if (path === "/explore-pets" || path === "/explore-pets/") {
     return <ExplorePets />;
   }
 
