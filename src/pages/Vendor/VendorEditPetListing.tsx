@@ -9,6 +9,7 @@ import {
   Check,
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
+import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorEditPetListing.css";
 
@@ -18,12 +19,31 @@ type ListingType = "ADOPTION" | "SALE";
 type Option = { value: string; label: string };
 type ExistingPhoto = {
   id?: string | number;
+  image_id?: number;
   image?: string;
   image_url?: string;
   url?: string;
 };
+type VendorPet = {
+  pet_id: number;
+  name?: string;
+  species?: string;
+  breed?: string;
+  age?: number | null;
+  gender?: string;
+  size?: string;
+  description?: string;
+  price?: string | number | null;
+  listing_type?: ListingType;
+  business?: number | string | null;
+  images?: ExistingPhoto[];
+};
+type VendorPetResponse = VendorPet[] | { results: VendorPet[] };
 
 async function readError(response: Response): Promise<string> {
+  if (response.status === 401) {
+    return "Your session has expired. Please log in again.";
+  }
   const data = await response.json().catch(() => null);
   if (data && typeof data === "object") {
     const entries = Object.entries(data as Record<string, unknown>);
@@ -123,6 +143,7 @@ export default function VendorEditPetListing() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([]);
+  const [removedPhotoIds, setRemovedPhotoIds] = useState<number[]>([]);
   const [newPhotos, setNewPhotos] = useState<{ file: File; preview: string }[]>(
     [],
   );
@@ -156,13 +177,9 @@ export default function VendorEditPetListing() {
 
   useEffect(() => {
     if (isIdMissing) return;
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
     async function loadBusinesses() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/businesses/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
         if (!res.ok) throw new Error(await readError(res));
         const data = (await res.json()) as BusinessResponse;
         const items = Array.isArray(data) ? data : data.results;
@@ -173,11 +190,14 @@ export default function VendorEditPetListing() {
     }
     async function loadPet() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/pets/${id}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // The backend exposes listing detail through the vendor-owned list route;
+        // /api/pets/{id}/edit/ accepts PATCH/PUT only.
+        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`);
         if (!res.ok) throw new Error(await readError(res));
-        const pet = await res.json();
+        const data = (await res.json()) as VendorPetResponse;
+        const pets = Array.isArray(data) ? data : data.results;
+        const pet = pets.find((listing) => String(listing.pet_id) === id);
+        if (!pet) throw new Error("Pet not found.");
         setName(pet.name || "");
         setSpecies(pet.species || "Dog");
         setBreed(pet.breed || "");
@@ -187,17 +207,12 @@ export default function VendorEditPetListing() {
         setDescription(pet.description || "");
         setPrice(pet.price != null ? String(pet.price) : "");
         setListingType(
-          pet.listing_type === "FOR_SALE"
+          pet.listing_type === "SALE"
             ? "SALE"
             : pet.listing_type || "ADOPTION",
         );
-        const bId = pet.business?.id
-          ? String(pet.business.id)
-          : pet.business
-            ? String(pet.business)
-            : "";
-        setBusinessId(bId);
-        setExistingPhotos(pet.images || pet.photos || pet.pet_images || []);
+        setBusinessId(pet.business != null ? String(pet.business) : "");
+        setExistingPhotos(pet.images || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Pet not found.");
       } finally {
@@ -210,8 +225,8 @@ export default function VendorEditPetListing() {
 
   if (isIdMissing) {
     return (
-      <VendorLayout title="Edit pet listing" description="No pet selected">
-        <div className="vendor-pet-page">
+      <VendorLayout title="Edit pet listing" description="No pet selected" vendorWorkspace>
+        <div className="dashboard-content vendor-pet-page">
           <div className="pet-form-section">
             <h2>No Pet ID</h2>
             <p>
@@ -258,13 +273,11 @@ export default function VendorEditPetListing() {
       setError("Keep at least 1 photo");
       return;
     }
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
     const formData = new FormData();
     formData.append("business", businessId);
     formData.append(
       "listing_type",
-      listingType === "SALE" ? "FOR_SALE" : "ADOPTION",
+      listingType,
     );
     formData.append("name", name.trim());
     formData.append("species", species.trim());
@@ -274,15 +287,16 @@ export default function VendorEditPetListing() {
     formData.append("size", size);
     formData.append("description", description.trim());
     if (listingType === "SALE") formData.append("price", price);
-    formData.append("existing_images", JSON.stringify(existingPhotos));
+    removedPhotoIds.forEach((photoId) => {
+      formData.append("remove_image_ids", String(photoId));
+    });
     newPhotos.forEach(function (item) {
       formData.append("images", item.file);
     });
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/pets/${id}/`, {
+      const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/${id}/edit/`, {
         method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
       if (!res.ok) throw new Error(await readError(res));
@@ -302,8 +316,9 @@ export default function VendorEditPetListing() {
       <VendorLayout
         title="Edit pet listing"
         description={"Loading " + id + "..."}
+        vendorWorkspace
       >
-        <div className="vendor-pet-page">Loading...</div>
+        <div className="dashboard-content vendor-pet-page">Loading...</div>
       </VendorLayout>
     );
   }
@@ -312,8 +327,9 @@ export default function VendorEditPetListing() {
     <VendorLayout
       title="Edit pet listing"
       description="Update your pet listing details."
+      vendorWorkspace
     >
-      <div className="vendor-pet-page">
+      <div className="dashboard-content vendor-pet-page">
         <a className="pet-back-link" href="/vendor/listings">
           <ArrowLeft size={17} /> Back to catalogue
         </a>
@@ -519,11 +535,18 @@ export default function VendorEditPetListing() {
                     <img src={ph.image || ph.image_url || ph.url} alt="" />
                     <button
                       type="button"
-                      onClick={() =>
-                        setExistingPhotos((curr) =>
-                          curr.filter((_, i) => i !== idx),
-                        )
-                      }
+                      onClick={() => {
+                        const photoId = ph.image_id ?? ph.id;
+                        if (photoId !== undefined) {
+                          setRemovedPhotoIds((current) => [
+                            ...current,
+                            Number(photoId),
+                          ]);
+                        }
+                        setExistingPhotos((current) =>
+                          current.filter((_, i) => i !== idx),
+                        );
+                      }}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -579,3 +602,4 @@ export default function VendorEditPetListing() {
     </VendorLayout>
   );
 }
+

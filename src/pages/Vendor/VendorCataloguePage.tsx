@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import {
   Plus,
   PawPrint,
+  Pencil,
   RefreshCw,
   Image as ImageIcon,
   Power,
-  Trash2,
   X,
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
+import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorCataloguePage.css";
 
@@ -44,7 +45,7 @@ type PetResponse =
       results: Pet[];
     };
 
-type ListingAction = "deactivate" | "remove";
+type ListingAction = "deactivate";
 
 function getToken() {
   return localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -110,13 +111,13 @@ export default function VendorCataloguePage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/pets/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`);
 
       if (!response.ok) {
         throw new Error(
-          `Couldn't load your catalogue (${response.status}). Please try again.`,
+          response.status === 401
+            ? "Your session has expired. Please log in again."
+            : `Couldn't load your catalogue (${response.status}). Please try again.`,
         );
       }
 
@@ -168,52 +169,34 @@ export default function VendorCataloguePage() {
     }
 
     const petId = selectedPet.pet_id;
-    const action = pendingAction;
 
     setIsSubmitting(true);
     setActionError("");
     setSuccessMessage("");
 
     try {
-      const response = await fetch(
+      const response = await vendorAuthenticatedFetch(
         `${API_BASE_URL}/api/pets/${petId}/`,
-        {
-          method: action === "deactivate" ? "PATCH" : "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...(action === "deactivate"
-              ? { "Content-Type": "application/json" }
-              : {}),
-          },
-          ...(action === "deactivate"
-            ? { body: JSON.stringify({ is_active: false }) }
-            : {}),
-        },
+        { method: "DELETE" },
       );
 
       if (!response.ok) {
         const details = await response.text();
 
         throw new Error(
-          details ||
-            `Couldn't ${action === "deactivate" ? "deactivate" : "remove"} this listing (${response.status}).`,
+          response.status === 401
+            ? "Your session has expired. Please log in again."
+            : details || `Could not deactivate this listing (${response.status}).`,
         );
       }
 
-      // Update the page only after the backend confirms success.
-      if (action === "remove") {
-        setPets((currentPets) =>
-          currentPets.filter((pet) => pet.pet_id !== petId),
-        );
-        setSuccessMessage(`${selectedPet.name} was removed successfully.`);
-      } else {
-        setPets((currentPets) =>
-          currentPets.map((pet) =>
-            pet.pet_id === petId ? { ...pet, is_active: false } : pet,
-          ),
-        );
-        setSuccessMessage(`${selectedPet.name} was deactivated successfully.`);
-      }
+      // Reflect the change only after the backend confirms deactivation.
+      setPets((currentPets) =>
+        currentPets.map((pet) =>
+          pet.pet_id === petId ? { ...pet, is_active: false } : pet,
+        ),
+      );
+      setSuccessMessage(`${selectedPet.name} was deactivated successfully.`);
 
       setSelectedPet(null);
       setPendingAction(null);
@@ -232,8 +215,9 @@ export default function VendorCataloguePage() {
     <VendorLayout
       title="My catalogue"
       description="Manage the pets you've listed on Pawdigree."
+      vendorWorkspace
     >
-      <div className="vendor-catalogue">
+      <div className="dashboard-content vendor-catalogue">
         <div className="catalogue-toolbar">
           <div>
             <h2>Your pet listings</h2>
@@ -393,14 +377,10 @@ export default function VendorCataloguePage() {
                           : "Deactivate Listing"}
                       </button>
 
-                      <button
-                        type="button"
-                        className="catalogue-remove-button"
-                        onClick={() => openConfirmation(pet, "remove")}
-                      >
-                        <Trash2 size={16} />
-                        Remove Listing
-                      </button>
+                      <a className="catalogue-edit-button" href={"/vendor/edit-pet/" + pet.pet_id}>
+                        <Pencil size={16} />
+                        Edit listing
+                      </a>
                     </div>
                   </div>
                 </article>
@@ -435,35 +415,14 @@ export default function VendorCataloguePage() {
                 <X size={20} />
               </button>
 
-              <div className="catalogue-dialog-icon">
-                {pendingAction === "deactivate" ? (
-                  <Power size={25} />
-                ) : (
-                  <Trash2 size={25} />
-                )}
-              </div>
+              <div className="catalogue-dialog-icon"><Power size={25} /></div>
 
-              <h2 id="catalogue-dialog-title">
-                {pendingAction === "deactivate"
-                  ? "Deactivate listing?"
-                  : "Remove listing?"}
-              </h2>
+              <h2 id="catalogue-dialog-title">Deactivate listing?</h2>
 
               <p id="catalogue-dialog-description">
-                {pendingAction === "deactivate" ? (
-                  <>
-                    Are you sure you want to deactivate{" "}
-                    <strong>{selectedPet.name}</strong>? Customers should no
-                    longer see this pet as available. You can keep the listing
-                    in your catalogue.
-                  </>
-                ) : (
-                  <>
-                    Are you sure you want to permanently remove{" "}
-                    <strong>{selectedPet.name}</strong>? This action may not
-                    be reversible.
-                  </>
-                )}
+                Are you sure you want to deactivate <strong>{selectedPet.name}</strong>?
+                Customers will no longer see it as available, and you can keep
+                the listing in your catalogue.
               </p>
 
               {actionError && (
@@ -484,11 +443,7 @@ export default function VendorCataloguePage() {
 
                 <button
                   type="button"
-                  className={
-                    pendingAction === "remove"
-                      ? "catalogue-confirm-remove"
-                      : "catalogue-confirm-deactivate"
-                  }
+                  className="catalogue-confirm-deactivate"
                   disabled={isSubmitting}
                   onClick={() => void confirmAction()}
                 >
@@ -497,10 +452,8 @@ export default function VendorCataloguePage() {
                       <RefreshCw size={16} className="catalogue-spinner" />
                       Processing...
                     </>
-                  ) : pendingAction === "deactivate" ? (
-                    "Yes, deactivate"
                   ) : (
-                    "Yes, remove"
+                    "Yes, deactivate"
                   )}
                 </button>
               </div>

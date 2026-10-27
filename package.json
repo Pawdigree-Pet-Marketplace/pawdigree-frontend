@@ -13,6 +13,8 @@
   "dependencies": {
     "@fontsource-variable/fredoka": "^5.3.0",
     "@fontsource-variable/nunito": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0",
     "@react-oauth/google": "^0.13.5",
     "country-flag-icons": "^1.6.20",
     "dependencies": "^0.0.1",

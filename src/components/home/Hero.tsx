@@ -4,11 +4,7 @@ import useScrollReveal from "../../hooks/useScrollReveal";
 import "./Hero.css";
 
 
-type HeroProps = {
-  isLoggedIn?: boolean;
-};
-
-export default function Hero({ isLoggedIn = false }: HeroProps) {
+export default function Hero() {
   const contentRef = useScrollReveal<HTMLDivElement>();
 
   return (
@@ -47,29 +43,18 @@ export default function Hero({ isLoggedIn = false }: HeroProps) {
           </button>
         </form>
 
-        {!isLoggedIn ? (
-          <>
-            <button
-              type="button"
-              className="btn reveal reveal-delay-2"
-              onClick={() => (window.location.href = "/registration")}
-            >
-              Create Account
-            </button>
-
-            <p className="hero-login reveal reveal-delay-3">
-              Already have an account? <a href="/customer-login">Log In</a>
-            </p>
-          </>
-        ) : (
+        <>
           <button
             type="button"
             className="btn reveal reveal-delay-2"
-            onClick={() => (window.location.href = "/marketplace")}
+            onClick={() => (window.location.href = "/registration")}
           >
-            Browse Pets
+            Create Account
           </button>
-        )}
+          <p className="hero-login reveal reveal-delay-3">
+            Already have an account? <a href="/customer-login">Log In</a>
+          </p>
+        </>
       </div>
 
 

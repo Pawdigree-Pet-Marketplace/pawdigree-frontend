@@ -47,3 +47,26 @@
     padding: 18px 17px;
   }
 }
+
+/* Shared vendor page shell. Dashboard home adds its own transparent, paw-backed treatment. */
+.vendor-dashboard:not(.vendor-workspace) {
+  --dashboard-teal: #216C68;
+  --dashboard-border: rgb(44 48 47 / 12%);
+  --dashboard-white: #FBFAF7;
+  --dashboard-sidebar: #FBFAF7;
+  --dashboard-text: #2C302F;
+  --dashboard-muted: rgb(44 48 47 / 66%);
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: #fff3ee;
+  color: #2C302F;
+  font-family: "Nunito", sans-serif;
+}
+@media (max-width: 680px) {
+  .vendor-dashboard:not(.vendor-workspace) {
+    display: block;
+    padding: 10px;
+  }
+}

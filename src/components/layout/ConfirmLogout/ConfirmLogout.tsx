@@ -40,6 +40,8 @@ export const ConfirmLogout = ({ isOpen, onClose }: Props) => {
         "user_email",
         "user_name",
         "user_picture",
+        "username",
+        "first_name",
       ];
 
       authKeys.forEach((key) => {
