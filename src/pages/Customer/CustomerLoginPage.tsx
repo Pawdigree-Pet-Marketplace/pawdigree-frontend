@@ -26,48 +26,26 @@ export default function CustomerLoginPage() {
   };
 
   return (
-    <div className={`login-page ${step === "welcome" ? "login-page--role-selection" : ""}`}>
+    <div className={`login-page ${step === "welcome" ? "login-page--role-selection" : "login-page--auth"}`}>
       <div className="top-bar">
-        {step === "welcome" ? (
-          <>
-            <div className="role-brand">
-              <img src={logo} alt="" className="role-brand-logo" />
-              <span>Pawdigree</span>
-            </div>
-            <button
-              type="button"
-              className="back-btn"
-              onClick={handleBack}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={20} />
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              className="back-btn"
-              onClick={handleBack}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <span className="top-bar-title">
-              {step === "password" ? "Welcome back" : "Verify Phone"}
-            </span>
-            <div className="spacer" />
-          </>
+        <button type="button" className="back-btn" onClick={handleBack} aria-label="Go back">
+          <ArrowLeft size={18} />
+          <span>Back</span>
+        </button>
+        <div className="role-brand">
+          <img src={logo} alt="Pawdigree" className="role-brand-logo" />
+          <span>Pawdigree</span>
+        </div>
+        {step !== "welcome" && (
+          <span className="top-bar-title">
+            {step === "password" ? "Welcome back" : "Verify Phone"}
+          </span>
         )}
       </div>
 
       <div className="login-card">
         {step === "welcome" && (
           <div className="welcome-content">
-            <div className="login-logo">
-              <img src={logo} alt="Pawdigree logo" className="real-logo" />
-            </div>
-
             <p className="role-eyebrow">WELCOME TO PAWDIGREE</p>
             <h1>How would you like to continue?</h1>
             <p className="subtitle">
@@ -148,6 +126,20 @@ export default function CustomerLoginPage() {
           </div>
         )}
       </div>
+
+      {step !== "welcome" && (
+        <aside className="login-welcome-panel login-welcome-panel--customer">
+          <div className="login-welcome-copy">
+            <span className="login-welcome-kicker">A LITTLE MORE JOY, EVERY DAY</span>
+            <h1>Good things are waiting for you and your pet.</h1>
+            <p>Find trusted care, discover lovely local businesses, and make more happy memories together.</p>
+            <div className="login-fact-card">
+              <span className="login-fact-icon" aria-hidden="true"><PawPrint size={20} /></span>
+              <span><strong>Made for pet people</strong><small>Explore services and pet-friendly finds in one welcoming place.</small></span>
+            </div>
+          </div>
+        </aside>
+      )}
     </div>
   );
 }

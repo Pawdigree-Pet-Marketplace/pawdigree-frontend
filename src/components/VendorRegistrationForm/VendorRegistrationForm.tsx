@@ -1,24 +1,17 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { Eye, EyeOff } from "lucide-react";
+
+import { useEffect, useRef, useState } from "react";
+import type { FocusEvent, FormEvent } from "react";
 import {
-  parsePhoneNumberFromString,
+  isValidPhoneNumber,
+  parsePhoneNumber,
   type CountryCode,
 } from "libphonenumber-js";
-import CountryFlag from "../CountryFlag/CountryFlag";
+import { Eye, EyeOff } from "lucide-react";
+
+import "../../App.css";
 import "./VendorRegistrationForm.css";
-import API_BASE_URL from "../../services/api";
-
-type FormData = {
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-};
-
-type FormErrors = Partial<Record<keyof FormData, string>>;
+import { apiRequest } from "../../services/api";
+import CountryFlag from "../CountryFlag/CountryFlag";
 
 type CountryOption = {
   country: string;
@@ -26,504 +19,762 @@ type CountryOption = {
   dial_code: string;
 };
 
-function VendorRegistrationForm() {
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
+type RegistrationField =
+  | "first_name"
+  | "last_name"
+  | "username"
+  | "email"
+  | "phone"
+  | "password"
+  | "confirmPassword";
+
+type FormData = Record<RegistrationField, string>;
+
+const initialFormData: FormData = {
+  first_name: "",
+  last_name: "",
+  username: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+};
+
+const steps = [
+  {
+    title: "Your details",
+    description: "Enter your name and choose a username.",
+  },
+  {
+    title: "Contact details",
+    description: "Provide your email address and phone number.",
+  },
+  {
+    title: "Review and create account",
+    description:
+      "Review your information, make any necessary changes, and secure your account.",
+  },
+];
+
+const stepFields: RegistrationField[][] = [
+  ["first_name", "last_name", "username"],
+  ["email", "phone"],
+  ["password", "confirmPassword"],
+];
+
+const fieldOrder: RegistrationField[] = [
+  "first_name",
+  "last_name",
+  "username",
+  "email",
+  "phone",
+  "password",
+  "confirmPassword",
+];
+
+export default function VendorRegistrationForm() {
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [countries, setCountries] = useState<CountryOption[]>([]);
-  const [selectedCountry, setSelectedCountry] =
-    useState<CountryCode>("UG");
-  const [loadingCountries, setLoadingCountries] = useState(true);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [country, setCountry] = useState<CountryCode>("UG");
+  const [countriesLoading, setCountriesLoading] = useState(true);
+  const [countryLoadError, setCountryLoadError] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [step, setStep] = useState(0);
+  const [touched, setTouched] = useState<
+    Partial<Record<RegistrationField, boolean>>
+  >({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const [success, setSuccess] = useState("");
+  const [apiError, setApiError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formRef = useRef<HTMLFormElement>(null);
+
   useEffect(() => {
-    const controller = new AbortController();
+    let cancelled = false;
 
-    async function loadCountries() {
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/country-codes/`,
-          {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-          }
-        );
+    apiRequest<CountryOption[]>("/country-codes/")
+      .then((items) => {
+        if (cancelled) return;
 
-        if (!response.ok) {
-          throw new Error("Unable to load phone country codes.");
+        setCountries(items);
+
+        const initialCountry =
+          items.find((item) => item.iso_code === "UG") ?? items[0];
+
+        if (initialCountry) {
+          setCountry(initialCountry.iso_code as CountryCode);
+        } else {
+          setCountryLoadError(
+            "Country calling codes are currently unavailable.",
+          );
         }
-
-        const data = await response.json();
-        const countryList: CountryOption[] = Array.isArray(data)
-          ? data
-          : Array.isArray(data.results)
-            ? data.results
-            : [];
-
-        setCountries(countryList);
-
-        const defaultCountry =
-          countryList.find((item) => item.iso_code === "UG") ??
-          countryList[0];
-
-        if (defaultCountry) {
-          setSelectedCountry(defaultCountry.iso_code as CountryCode);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCountryLoadError(
+            "Unable to load country calling codes. Please refresh the page and try again.",
+          );
         }
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
-        }
-        console.error("Unable to load phone country codes:", error);
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoadingCountries(false);
-        }
-      }
-    }
+      })
+      .finally(() => {
+        if (!cancelled) setCountriesLoading(false);
+      });
 
-    loadCountries();
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  function handleChange(field: keyof FormData, value: string) {
-    setFormData((p) => ({ ...p, [field]: value }));
-    setErrors((p) => ({ ...p, [field]: "" }));
-    setMessage("");
-  }
-  function fieldClass(fieldName: string): string {
-  return errors[fieldName as keyof typeof errors]
-    ? "input-error"
-    : "";
-}
-  function getPasswordRequirements(password: string) {
-  return [
-    { label: "At least 8 characters", met: password.length >= 8 },
-    { label: "One uppercase letter (A–Z)", met: /[A-Z]/.test(password) },
-    { label: "One lowercase letter (a–z)", met: /[a-z]/.test(password) },
-    { label: "One number (0–9)", met: /[0-9]/.test(password) },
-    {
-      label: "One special character",
-      met: /[^A-Za-z0-9]/.test(password),
-    },
-  ];
-}
-  function validateForm(): FormErrors {
-    const newErrors: FormErrors = {};
-    if (!formData.username.trim()) newErrors.username = "Username is required.";
-    if (!formData.first_name.trim())
-      newErrors.first_name = "First name is required.";
-    if (!formData.last_name.trim())
-      newErrors.last_name = "Last name is required.";
-    if (!formData.email.trim()) newErrors.email = "Email address is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Enter a valid email address.";
-    const phoneInput = formData.phone.trim();
-    const parsedPhone = phoneInput.startsWith("+")
-      ? parsePhoneNumberFromString(phoneInput)
-      : parsePhoneNumberFromString(phoneInput, selectedCountry);
-    if (!phoneInput) {
-      newErrors.phone = "Phone number is required.";
-    } else if (!parsedPhone || !parsedPhone.isValid()) {
-      newErrors.phone = "Enter a valid phone number for the selected country.";
-    };
-    const password = formData.password;
-    if (!password) {
-      newErrors.password = "Please enter a password.";
-    } else if (
-      password.length < 8 ||
-      !/[A-Z]/.test(password) ||
-      !/[a-z]/.test(password) ||
-      !/[0-9]/.test(password) ||
-      !/[^A-Za-z0-9]/.test(password)
-    ) {
-      newErrors.password =
-      "Your password must meet all the requirements listed below.";
-}
-    if (!formData.confirmPassword)
-      newErrors.confirmPassword = "Please confirm your password.";
-    else if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "The passwords do not match.";
-    return newErrors;
-  }
+  const cleanedPhone = formData.phone.replace(/[\s()-]/g, "");
+  const trimmedUsername = formData.username.trim();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setMessage("");
-    const validationErrors = validateForm();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) {
-    setMessage("");
-      return;
-    }
-    if (!acceptTerms) {
-      setMessage("Please accept the terms and conditions to continue.");
-      return;
-    }
-    const phoneInput = formData.phone.trim();
-    const parsedPhone = phoneInput.startsWith("+")
-      ? parsePhoneNumberFromString(phoneInput)
-      : parsePhoneNumberFromString(phoneInput, selectedCountry);
-    if (!parsedPhone || !parsedPhone.isValid()) {
-      setErrors((previous) => ({ ...previous, phone: "Enter a valid phone number for the selected country." }));
-      setMessage("");
-      return;
-    }
-    const internationalPhone = parsedPhone.number;
-    setIsLoading(true);
+  const firstNameForUsername = formData.first_name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  const lastNameForUsername = formData.last_name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  const usernameSuggestions =
+    firstNameForUsername && lastNameForUsername
+      ? [
+          `@${firstNameForUsername}${lastNameForUsername}`,
+          `@${firstNameForUsername}.${lastNameForUsername}`,
+          `@${lastNameForUsername}${firstNameForUsername}`,
+        ].filter(
+          (suggestion, index, all) =>
+            all.indexOf(suggestion) === index,
+        )
+      : [];
+
+  const phoneIsValid = () => {
     try {
-    const response = await fetch(
-        `${API_BASE_URL}/api/auth/register/vendor/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: formData.username.trim(),
-            first_name: formData.first_name.trim(),
-            last_name: formData.last_name.trim(),
-            email: formData.email.trim(),
-            phone: internationalPhone,
-            password: formData.password,
-          }),
-        },
-      );
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        const backendErrors: FormErrors = {};
-        for (const field of [
-          "username",
-          "first_name",
-          "last_name",
-          "email",
-          "phone",
-          "password",
-        ] as const) {
-          const errorValue = result[field];
-          if (Array.isArray(errorValue))
-            backendErrors[field] = errorValue.join(" ");
-          else if (typeof errorValue === "string")
-            backendErrors[field] = errorValue;
-        }
-        setErrors((p) => ({ ...p, ...backendErrors }));
-        setMessage(
-          result.detail ||
-            result.message ||
-            "Registration failed. Please check your information.",
-        );
-        return;
-      }
-      setMessage(
-  "Registration successful! Please check your email for a confirmation message and follow the instructions to continue."
-);
+      return cleanedPhone.startsWith("+")
+        ? isValidPhoneNumber(cleanedPhone)
+        : isValidPhoneNumber(cleanedPhone, country);
     } catch {
-      setMessage(
-        "Could not connect to the server. Make sure the Django backend is running and try again.",
+      return false;
+    }
+  };
+
+  const errors: Record<RegistrationField, string | undefined> = {
+    first_name: !formData.first_name.trim()
+      ? "Please enter your first name."
+      : undefined,
+
+    last_name: !formData.last_name.trim()
+      ? "Please enter your last name."
+      : undefined,
+
+    username: !trimmedUsername
+      ? "Please choose a username."
+      : !trimmedUsername.startsWith("@")
+        ? "Your username must start with @."
+        : trimmedUsername.length < 2
+          ? "Enter a username after @."
+          : undefined,
+
+    email: !formData.email.trim()
+      ? "Please enter your email address."
+      : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+        ? "Please enter a valid email address."
+        : undefined,
+
+    phone: !formData.phone.trim()
+      ? "Please enter your phone number."
+      : !phoneIsValid()
+        ? "Enter a valid phone number for the selected country."
+        : undefined,
+
+    password: !formData.password
+      ? "Please create a password."
+      : formData.password.length < 8
+        ? "Your password must contain at least 8 characters."
+        : !/[A-Z]/.test(formData.password)
+          ? "Include at least one uppercase letter."
+          : !/[a-z]/.test(formData.password)
+            ? "Include at least one lowercase letter."
+            : !/[0-9]/.test(formData.password)
+              ? "Include at least one number."
+              : !/[^A-Za-z0-9]/.test(formData.password)
+                ? "Include at least one special character."
+                : undefined,
+
+    confirmPassword: !formData.confirmPassword
+      ? "Please confirm your password."
+      : formData.password !== formData.confirmPassword
+        ? "The passwords do not match."
+        : undefined,
+  };
+
+  const isFormValid = fieldOrder.every((field) => !errors[field]);
+  const updateField = (name: RegistrationField, value: string) => {
+    setFormData((current) => ({ ...current, [name]: value }));
+    setSuccess("");
+    setApiError("");
+  };
+
+  const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+    const name = event.target.name as RegistrationField;
+    setTouched((current) => ({ ...current, [name]: true }));
+  };
+
+  const showError = (field: RegistrationField) =>
+    (touched[field] || submitted) && Boolean(errors[field]);
+
+  const validateFields = (fields: RegistrationField[]) => {
+    setTouched((current) => ({
+      ...current,
+      ...Object.fromEntries(fields.map((field) => [field, true])),
+    }));
+
+    const firstInvalid = fields.find((field) => errors[field]);
+
+    if (firstInvalid) {
+      requestAnimationFrame(() => {
+        formRef.current
+          ?.querySelector<HTMLInputElement>(`[name="${firstInvalid}"]`)
+          ?.focus();
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNext = () => {
+    if (!validateFields(stepFields[step])) return;
+
+    setApiError("");
+    setStep((current) => Math.min(current + 1, steps.length - 1));
+  };
+
+  const handleBack = () => {
+    setApiError("");
+    setStep((current) => Math.max(current - 1, 0));
+  };
+
+  const editSection = (targetStep: number) => {
+    setApiError("");
+    setSubmitted(false);
+    setStep(targetStep);
+    setTouched({});
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (step < steps.length - 1) {
+      handleNext();
+      return;
+    }
+
+    setSubmitted(true);
+    setSuccess("");
+    setApiError("");
+
+    if (!validateFields(fieldOrder)) {
+      const invalidStep = stepFields.findIndex((fields) =>
+        fields.some((field) => errors[field]),
+      );
+
+      if (invalidStep >= 0) setStep(invalidStep);
+      return;
+    }
+
+    let parsedPhone;
+
+    try {
+      parsedPhone = cleanedPhone.startsWith("+")
+        ? parsePhoneNumber(cleanedPhone)
+        : parsePhoneNumber(cleanedPhone, country);
+    } catch {
+      parsedPhone = undefined;
+    }
+
+    if (!parsedPhone) {
+      setApiError("Please enter a valid phone number.");
+      setStep(1);
+      return;
+    }
+
+    const registrationData = {
+      username: trimmedUsername,
+      first_name: formData.first_name.trim(),
+      last_name: formData.last_name.trim(),
+      email: formData.email.trim(),
+      phone: parsedPhone.number,
+      password: formData.password,
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      await apiRequest("/auth/register/vendor/", {
+        method: "POST",
+        body: JSON.stringify(registrationData),
+      });
+
+      setSuccess(
+        "Your Pawdigree vendor account has been created successfully. Please check your inbox for your email verification instructions.",
+      );
+
+      setFormData(initialFormData);
+      setTouched({});
+      setSubmitted(false);
+      setStep(0);
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+    } catch (error) {
+      setApiError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't complete your registration. Please try again.",
       );
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
-  }
+  };
+
+  const displayPhone = () => {
+    if (!cleanedPhone) return "Not provided";
+
+    try {
+      return cleanedPhone.startsWith("+")
+        ? parsePhoneNumber(cleanedPhone)?.formatInternational() ??
+            cleanedPhone
+        : parsePhoneNumber(cleanedPhone, country)?.formatInternational() ??
+            cleanedPhone;
+    } catch {
+      return cleanedPhone;
+    }
+  };
 
   return (
-    <main className="vendor-registration-form">
-      <div className="form-container">
-        <header className="page-heading">
-          <h1>Become a Pawdigree Vendor</h1>
-          <p>
-            Join Uganda's pet marketplace and connect with customers looking for
-            trusted pet products and services. Create your vendor account to get
-            started.
+    <section className="registration-card">
+      <div className="registration-header">
+        <h1>Create your vendor account</h1>
+        <p>Join Pawdigree to connect with Pet Lovers.</p>
+      </div>
+
+      {!success && (
+        <div
+          className="registration-progress"
+          aria-label={`Step ${step + 1} of ${steps.length}`}
+        >
+          <div className="registration-progress-track">
+            <div
+              className="registration-progress-fill"
+              style={{
+                width: `${((step + 1) / steps.length) * 100}%`,
+              }}
+            />
+          </div>
+          <p className="registration-step-count">
+            Step {step + 1} of {steps.length}
           </p>
-        </header>
-        <div className="form-card">
-          <form onSubmit={handleSubmit} noValidate>
-            <section className="form-section">
-              <h2>Vendor Account Information</h2>
-              <p className="section-description">
-                Create the login details you will use to access your Pawdigree
-                vendor account. You can register your businesses separately
-                after creating your account.
-              </p>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="username">
-                    Username <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    id="username"
-                    type="text"
-                    autoComplete="username"
-                    value={formData.username}
-                    className={fieldClass("username")}
-                    placeholder="Choose a username"
-                    aria-invalid={Boolean(errors.username)}
-                    onChange={(e) => handleChange("username", e.target.value)}
-                  />
-                  {errors.username && (
-                    <p className="field-message error-message">
-                      {errors.username}
-                    </p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">
-                    Email Address <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    value={formData.email}
-                    className={fieldClass("email")}
-                    placeholder="you@example.com"
-                    aria-invalid={Boolean(errors.email)}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                  />
-                  {errors.email && (
-                    <p className="field-message error-message">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="first_name">
-                    First Name <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    id="first_name"
-                    type="text"
-                    autoComplete="given-name"
-                    value={formData.first_name}
-                    className={fieldClass("first_name")}
-                    placeholder="Enter first name"
-                    aria-invalid={Boolean(errors.first_name)}
-                    onChange={(e) => handleChange("first_name", e.target.value)}
-                  />
-                  {errors.first_name && (
-                    <p className="field-message error-message">
-                      {errors.first_name}
-                    </p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="last_name">
-                    Last Name <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    id="last_name"
-                    type="text"
-                    autoComplete="family-name"
-                    value={formData.last_name}
-                    className={fieldClass("last_name")}
-                    placeholder="Enter last name"
-                    aria-invalid={Boolean(errors.last_name)}
-                    onChange={(e) => handleChange("last_name", e.target.value)}
-                  />
-                  {errors.last_name && (
-                    <p className="field-message error-message">
-                      {errors.last_name}
-                    </p>
-                  )}
-                </div>
-                <div className="form-group full-width">
-                  <label htmlFor="phone">
-                    Phone Number <span className="required-mark">*</span>
-                  </label>
-                  <div className="phone-input-row">
-                    <div className="vendor-country-picker">
-                      <CountryFlag countryCode={selectedCountry} />
-                      <select
-                        id="countryCode"
-                        aria-label="Country calling code"
-                        className="country-code-select"
-                        value={selectedCountry}
-                        disabled={loadingCountries || countries.length === 0}
-                        onChange={(e) => {
-                          setSelectedCountry(e.target.value as CountryCode);
-                          setErrors((p) => ({ ...p, phone: "" }));
-                          setMessage("");
-                        }}
-                      >
-                        {countries.map((country) => (
-                          <option key={country.iso_code} value={country.iso_code}>
-                            {country.country} ({country.dial_code})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <input
-                      id="phone"
-                      type="tel"
-                      autoComplete="tel-national"
-                      value={formData.phone}
-                      className={fieldClass("phone")}
-                      placeholder="e.g. 712 345 678"
-                      aria-invalid={Boolean(errors.phone)}
-                      onChange={(e) => handleChange("phone", e.target.value)}
-                    />
-                  </div>
-                  <p className="field-hint">
-                    Select your country code and enter your number without the
-                    country code. You may include a leading zero.
-                  </p>
-                  {errors.phone && (
-                    <p className="field-message error-message">
-                      {errors.phone}
-                    </p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="password">
-                    Password <span className="required-mark">*</span>
-                  </label>
-                  <div className="password-input-wrapper">
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="new-password"
-                      value={formData.password}
-                      className={fieldClass("password")}
-                      placeholder="At least 8 characters"
-                      aria-invalid={Boolean(errors.password)}
-                      onChange={(e) => handleChange("password", e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowPassword((p) => !p)}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
-                    </button>
-                  </div>
-                 {formData.password && (
-                  <ul className="password-requirements" aria-label="Password requirements">
-                  {getPasswordRequirements(formData.password).map((requirement) => (
-                  <li
-                  key={requirement.label}
-                  className={requirement.met ? "requirement-met" : "requirement-unmet"}
-                >
-                <span aria-hidden="true">
-                {requirement.met ? "✓" : "○"}
-               </span>
-               {requirement.label}
-               </li>
-                ))}
-               </ul>
-                )}
+          <h2 className="registration-step-title">{steps[step].title}</h2>
+          <p className="registration-step-description">
+            {steps[step].description}
+          </p>
+        </div>
+      )}
 
-                  {errors.password && (
-                <p className="field-message error-message" role="alert">
-                {errors.password}
-                </p>
-                )}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="confirmPassword">
-                    Confirm Password <span className="required-mark">*</span>
-                  </label>
-                  <div className="password-input-wrapper">
-                    <input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      autoComplete="new-password"
-                      value={formData.confirmPassword}
-                      className={fieldClass("confirmPassword")}
-                      placeholder="Enter your password again"
-                      aria-invalid={Boolean(errors.confirmPassword)}
-                      onChange={(e) =>
-                        handleChange("confirmPassword", e.target.value)
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowConfirmPassword((p) => !p)}
-                      aria-label={
-                        showConfirmPassword
-                          ? "Hide confirmation password"
-                          : "Show confirmation password"
-                      }
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff size={19} />
-                      ) : (
-                        <Eye size={19} />
-                      )}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="field-message error-message">
-                      {errors.confirmPassword}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </section>
-            <section className="form-section">
-              <h2>Review and Submit</h2>
-              <p className="section-description">
-                Check your details before creating your vendor account. You can
-                register one or more businesses separately.
-              </p>
-              <label className="terms-option">
+      {success && (
+        <div className="form-success" role="status">
+          <h2>Vendor registration successful</h2>
+          <p>{success}</p>
+          <p>
+            <a href="/vendor-login">Continue to log in</a>
+          </p>
+        </div>
+      )}
+
+      {apiError && (
+        <p className="field-error" role="alert">
+          {apiError}
+        </p>
+      )}
+
+      {!success && (
+        <form
+          className="registration-form"
+          onSubmit={handleSubmit}
+          ref={formRef}
+          noValidate
+        >
+          {step === 0 && (
+            <div className="registration-step-fields">
+              <div className="form-group">
+                <label htmlFor="first_name">First name</label>
                 <input
-                  type="checkbox"
-                  checked={acceptTerms}
-                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  id="first_name"
+                  name="first_name"
+                  autoComplete="given-name"
+                  placeholder="Enter your first name"
+                  value={formData.first_name}
+                  onChange={(e) => updateField("first_name", e.target.value)}
+                  onBlur={handleBlur}
+                  className={showError("first_name") ? "has-error" : undefined}
+                  aria-invalid={showError("first_name")}
                 />
-                <span>
-                  I confirm that the information I have provided is accurate and
-                  agree to the Pawdigree terms and conditions.
-                </span>
-              </label>
-              {message && (
-                <div
-  className={`form-message ${
-    message.toLowerCase().includes("successfully") ||
-    message.toLowerCase().includes("registration successful")
-      ? "form-message--success"
-      : "form-message--error"
-  }`}
-  role="status"
-  aria-live="polite"
->
-  <p>{message}</p>
+                {showError("first_name") && (
+                  <p className="field-error" role="alert">
+                    {errors.first_name}
+                  </p>
+                )}
+              </div>
 
-  {(message.toLowerCase().includes("successfully") ||
-    message.toLowerCase().includes("registration successful")) && (
-    <a href="/login" className="login-after-registration">
-      Log in to your account
-    </a>
-  )}
-</div>
-              )}
+              <div className="form-group">
+                <label htmlFor="last_name">Last name</label>
+                <input
+                  id="last_name"
+                  name="last_name"
+                  autoComplete="family-name"
+                  placeholder="Enter your last name"
+                  value={formData.last_name}
+                  onChange={(e) => updateField("last_name", e.target.value)}
+                  onBlur={handleBlur}
+                  className={showError("last_name") ? "has-error" : undefined}
+                  aria-invalid={showError("last_name")}
+                />
+                {showError("last_name") && (
+                  <p className="field-error" role="alert">
+                    {errors.last_name}
+                  </p>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input
+                  id="username"
+                  name="username"
+                  autoComplete="username"
+                  placeholder="@yourusername"
+                  value={formData.username}
+                  onChange={(e) => updateField("username", e.target.value)}
+                  onBlur={handleBlur}
+                  className={showError("username") ? "has-error" : undefined}
+                  aria-invalid={showError("username")}
+                />
+
+                {showError("username") ? (
+                  <p className="field-error" role="alert">
+                    {errors.username}
+                  </p>
+                ) : (
+                  <small>
+                    Choose a suggestion or create a username starting with @.
+                  </small>
+                )}
+
+                {usernameSuggestions.length > 0 && (
+                  <div className="username-suggestions">
+                    <small>Username suggestions</small>
+                    <div className="username-suggestion-list">
+                      {usernameSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          className="username-suggestion"
+                          aria-pressed={formData.username === suggestion}
+                          onClick={() => {
+                            updateField("username", suggestion);
+                            setTouched((current) => ({
+                              ...current,
+                              username: true,
+                            }));
+                          }}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === 1 && (
+            <div className="registration-step-fields">
+              <div className="form-group">
+                <label htmlFor="email">Email address</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={(e) => updateField("email", e.target.value)}
+                  onBlur={handleBlur}
+                  className={showError("email") ? "has-error" : undefined}
+                  aria-invalid={showError("email")}
+                />
+                {showError("email") && (
+                  <p className="field-error" role="alert">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="phone">Phone number</label>
+                <div className="registration-phone-row">
+                  <div className="registration-country-select">
+                    <CountryFlag
+                      countryCode={country}
+                      className="country-flag"
+                    />
+                    <select
+                      id="country"
+                      value={country}
+                      disabled={countriesLoading || countries.length === 0}
+                      onChange={(e) => {
+                        setCountry(e.target.value as CountryCode);
+                        setTouched((current) => ({
+                          ...current,
+                          phone: true,
+                        }));
+                        setApiError("");
+                      }}
+                      aria-label="Country calling code"
+                    >
+                      {countries.map((item) => (
+                        <option key={item.iso_code} value={item.iso_code}>
+                          {item.country} ({item.dial_code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel-national"
+                    placeholder="Enter your phone number"
+                    value={formData.phone}
+                    onChange={(e) => updateField("phone", e.target.value)}
+                    onBlur={handleBlur}
+                    className={showError("phone") ? "has-error" : undefined}
+                    aria-invalid={showError("phone")}
+                  />
+                </div>
+
+                {countryLoadError && (
+                  <p className="field-error" role="alert">
+                    {countryLoadError}
+                  </p>
+                )}
+
+                {showError("phone") ? (
+                  <p className="field-error" role="alert">
+                    {errors.phone}
+                  </p>
+                ) : (
+                  <small>
+                    Enter your local number or include + and the full country
+                    code.
+                  </small>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="registration-step-fields">
+              <div className="registration-review">
+                <section className="registration-review-section">
+                  <div className="registration-review-heading">
+                    <h3>Personal details</h3>
+                    <button
+                      type="button"
+                      className="registration-edit-button"
+                      onClick={() => editSection(0)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <dl className="registration-review-list">
+                    <div>
+                      <dt>First name</dt>
+                      <dd>{formData.first_name.trim()}</dd>
+                    </div>
+                    <div>
+                      <dt>Last name</dt>
+                      <dd>{formData.last_name.trim()}</dd>
+                    </div>
+                    <div>
+                      <dt>Username</dt>
+                      <dd>{trimmedUsername}</dd>
+                    </div>
+                  </dl>
+                </section>
+
+                <section className="registration-review-section">
+                  <div className="registration-review-heading">
+                    <h3>Contact details</h3>
+                    <button
+                      type="button"
+                      className="registration-edit-button"
+                      onClick={() => editSection(1)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <dl className="registration-review-list">
+                    <div>
+                      <dt>Email address</dt>
+                      <dd>{formData.email.trim()}</dd>
+                    </div>
+                    <div>
+                      <dt>Phone number</dt>
+                      <dd>{displayPhone()}</dd>
+                    </div>
+                  </dl>
+                </section>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <div className="password-field">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={(e) => updateField("password", e.target.value)}
+                    onBlur={handleBlur}
+                    className={showError("password") ? "has-error" : undefined}
+                    aria-invalid={showError("password")}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword((current) => !current)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} aria-hidden="true" />
+                    ) : (
+                      <Eye size={18} aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+
+                {showError("password") ? (
+                  <p className="field-error" role="alert">
+                    {errors.password}
+                  </p>
+                ) : (
+                  <small>
+                    Use at least 8 characters, including uppercase and
+                    lowercase letters, a number, and a special character.
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm password</label>
+                <div className="password-field">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="Enter your password again"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      updateField("confirmPassword", e.target.value)
+                    }
+                    onBlur={handleBlur}
+                    className={
+                      showError("confirmPassword") ? "has-error" : undefined
+                    }
+                    aria-invalid={showError("confirmPassword")}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() =>
+                      setShowConfirmPassword((current) => !current)
+                    }
+                    aria-label={
+                      showConfirmPassword
+                        ? "Hide confirmation password"
+                        : "Show confirmation password"
+                    }
+                    aria-pressed={showConfirmPassword}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} aria-hidden="true" />
+                    ) : (
+                      <Eye size={18} aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+
+                {showError("confirmPassword") && (
+                  <p className="field-error" role="alert">
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="registration-step-actions">
+            {step > 0 && (
+              <button
+                type="button"
+                className="registration-back-button"
+                onClick={handleBack}
+                disabled={isSubmitting}
+              >
+                Back
+              </button>
+            )}
+
+            {step < steps.length - 1 ? (
+              <button
+                type="button"
+                className="register-button"
+                onClick={handleNext}
+              >
+                Continue
+              </button>
+            ) : (
               <button
                 type="submit"
-                className="submit-button"
-                disabled={isLoading}
+                className={`register-button ${isFormValid ? "register-button-ready" : ""}`}
+                disabled={isSubmitting}
               >
-                {isLoading
-                  ? "Creating Your Account..."
-                  : "Create Vendor Account"}
+                {isSubmitting ? "Creating account..." : "Create account"}
               </button>
-            </section>
-          </form>
-        </div>
-      </div>
-    </main>
+            )}
+          </div>
+        </form>
+      )}
+
+      {!success && (
+        <p className="login-link">
+          Already have an account? <a href="/customer-login">Log in</a>
+        </p>
+      )}
+    </section>
   );
 }
-export default VendorRegistrationForm;

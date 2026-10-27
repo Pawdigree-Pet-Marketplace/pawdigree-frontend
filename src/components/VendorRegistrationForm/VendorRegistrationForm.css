@@ -1,537 +1,706 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+/* Customer registration form only.
+   Page background and outer layout remain in RegistrationPage.css. */
 
-/* PAGE - BREATHING SPACE ON DESKTOP */
-.vendor-registration-form {
-  min-height: 100vh;
-  padding: 50px 64px 70px;
-  background-color: #F7F3E8;
-  background-image:
-    radial-gradient(circle at 10% 10%, rgba(33, 108, 104, 0.08), transparent 30%),
-    radial-gradient(circle at 90% 80%, rgba(251, 134, 101, 0.10), transparent 30%);
-  color: #2C302F;
-  font-family: 'Nunito', sans-serif;
-}
-
-.vendor-registration-form .form-container {
+.registration-card {
   width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 560px;
+  padding: 32px;
+  background: var(--white, #fff);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(44, 48, 47, 0.08);
+  color: var(--charcoal, #2c302f);
+  box-sizing: border-box;
 }
 
-.vendor-registration-form .page-heading {
-  margin-bottom: 30px;
+.registration-card *,
+.registration-card *::before,
+.registration-card *::after {
+  box-sizing: border-box;
+}
+
+.registration-header {
+  margin-bottom: 28px;
   text-align: center;
 }
 
-.vendor-registration-form .page-heading h1 {
-  margin: 0 0 12px;
-  color: #216C68;
-  font-family: 'Fredoka', sans-serif;
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 600;
-  line-height: 1.2;
+.registration-header h1 {
+  margin: 0 0 10px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 2rem;
+  color: var(--charcoal, #2c302f);
 }
 
-.vendor-registration-form .page-heading p {
-  max-width: 650px;
-  margin: 0 auto;
-  color: #626967;
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-.vendor-registration-form .form-card {
-  width: 100%;
-  padding: 38px;
-  border: 1px solid rgba(33, 108, 104, 0.12);
-  border-radius: 20px;
-  background-color: #FFFFFF;
-  box-shadow: 0 12px 35px rgba(44, 48, 47, 0.08);
-}
-
-.vendor-registration-form .form-section {
-  margin-bottom: 35px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid #E8EDE9;
-}
-
-.vendor-registration-form .form-section:last-of-type {
-  margin-bottom: 25px;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.vendor-registration-form .form-section h2 {
-  margin: 0 0 8px;
-  color: #216C68;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 1.45rem;
-  font-weight: 500;
-}
-
-.vendor-registration-form .section-description {
-  margin: 0 0 22px;
-  color: #737A77;
-  font-size: 0.93rem;
+.registration-header p {
+  margin: 0;
   line-height: 1.6;
+  color: var(--charcoal, #2c302f);
 }
 
-.vendor-registration-form .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Step progress */
+
+.registration-progress {
+  margin-bottom: 28px;
+}
+
+.registration-progress-track {
+  height: 7px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #e7e9e5;
+}
+
+.registration-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--teal, #216c68);
+  transition: width 0.25s ease;
+}
+
+.registration-step-count {
+  margin: 0 0 6px;
+  color: var(--teal, #216c68);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.registration-step-title {
+  margin: 0 0 5px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.45rem;
+}
+
+.registration-step-description {
+  margin: 0;
+  color: #626964;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Form and fields */
+
+.registration-form {
+  display: flex;
+  flex-direction: column;
   gap: 22px;
 }
 
-.vendor-registration-form .form-group {
+.registration-step-fields {
   display: flex;
   flex-direction: column;
+  gap: 19px;
   min-width: 0;
 }
 
-.vendor-registration-form .form-group.full-width,
-.vendor-registration-form .full-width {
-  grid-column: 1 / -1;
+.registration-card .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
-.vendor-registration-form .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #2C302F;
+.registration-card .form-group label {
+  color: var(--charcoal, #2c302f);
   font-size: 0.94rem;
   font-weight: 800;
 }
 
-.vendor-registration-form .required-mark {
-  color: #D95F45;
-}
-
-/* INPUTS, SELECTS AND TEXTAREAS */
-.vendor-registration-form input:not([type='checkbox']):not([type='file']),
-.vendor-registration-form select,
-.vendor-registration-form textarea {
-  box-sizing: border-box;
+.registration-card .form-group input,
+.registration-card .registration-phone-row select {
   width: 100%;
+  min-width: 0;
   min-height: 48px;
-  padding: 12px 14px;
-  border: 1px solid #D7DEDA;
+  padding: 12px 13px;
+  border: 1px solid #d5d9d5;
   border-radius: 9px;
   outline: none;
-  background-color: #FFFFFF;
-  color: #2C302F;
-  font-family: 'Nunito', sans-serif;
-  font-size: 0.96rem;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  background: var(--white, #fff);
+  color: var(--charcoal, #2c302f);
+  font: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.vendor-registration-form textarea {
-  min-height: 125px;
-  resize: vertical;
-  line-height: 1.6;
+.registration-card .form-group input::placeholder {
+  color: #929994;
 }
 
-.vendor-registration-form input::placeholder,
-.vendor-registration-form textarea::placeholder {
-  color: #A0A7A3;
-  opacity: 1;
-}
-
-.vendor-registration-form input:not([type='checkbox']):not([type='file']):focus,
-.vendor-registration-form select:focus,
-.vendor-registration-form textarea:focus {
-  border-color: #216C68;
+.registration-card .form-group input:focus,
+.registration-card .registration-phone-row select:focus {
+  border-color: var(--teal, #216c68);
   box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
 }
 
-/* VALIDATION STYLES */
-.vendor-registration-form .input-error {
-  border-color: #D94F4F !important;
-  background-color: #FFF9F9;
+.registration-card .form-group input.has-error,
+.registration-card .form-group select.has-error {
+  border-color: #b42318;
 }
 
-.vendor-registration-form .input-error:focus {
-  box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.12) !important;
+.registration-card .form-group input[aria-invalid="true"] {
+  border-color: #b42318;
 }
 
-.vendor-registration-form .input-valid {
-  border-color: #80B8A4;
-}
-
-.vendor-registration-form .field-message {
-  margin: 6px 0 0;
-  font-size: 0.83rem;
-  line-height: 1.4;
-}
-
-.vendor-registration-form .error-message {
-  color: #C0392B;
-}
-
-.vendor-registration-form .field-hint {
-  margin: 7px 0 0;
-  color: #737A77;
-  font-size: 0.84rem;
+.registration-card .form-group small {
+  color: #69716c;
+  font-size: 0.82rem;
   line-height: 1.5;
 }
 
-/* PHONE NUMBER INPUT */
-.vendor-registration-form .phone-input-row {
+/* Field validation and API errors */
+
+.registration-card .field-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.registration-card > .field-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #fff0ed;
+}
+
+/* Username suggestions */
+
+.username-suggestions {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.username-suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.username-suggestion {
+  padding: 7px 11px;
+  border: 1px solid #c8ded8;
+  border-radius: 8px;
+  background: #f0f7f4;
+  color: var(--teal, #216c68);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.username-suggestion:hover,
+.username-suggestion[aria-pressed="true"] {
+  border-color: var(--teal, #216c68);
+  background: var(--teal, #216c68);
+  color: #fff;
+}
+
+/* Country selector and phone input */
+
+.registration-phone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
   gap: 10px;
   align-items: stretch;
 }
 
-.vendor-registration-form .phone-input-row .vendor-country-picker {
-  flex: 0 0 190px;
-  max-width: 50%;
-  min-width: 0;
+.registration-country-select {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  min-height: 48px;
   padding: 0 10px;
-  border: 1px solid #D5DAD7;
-  border-radius: 8px;
-  background: #FFFFFF;
-  box-sizing: border-box;
+  border: 1px solid #d5d9d5;
+  border-radius: 9px;
+  background: #fff;
 }
 
-.vendor-registration-form .vendor-country-picker svg {
+.registration-country-select:focus-within {
+  border-color: var(--teal, #216c68);
+  box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
+}
+
+.registration-country-select .country-flag {
   display: block;
-  flex: 0 0 24px;
-  width: 24px;
-  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 2px;
 }
 
-.vendor-registration-form .phone-input-row .vendor-country-picker .country-code-select {
-  flex: 1;
+.registration-card .registration-country-select select {
   width: 100%;
   min-width: 0;
-  max-width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-  border: none;
-  outline-offset: 2px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
   background: transparent;
-  box-sizing: border-box;
+  box-shadow: none;
+  color: var(--charcoal, #2c302f);
+  font: inherit;
+  font-size: 0.83rem;
 }
 
-.vendor-registration-form .phone-input-row input {
-  flex: 1;
-}
+/* Password visibility controls */
 
-/* PASSWORD AND CONFIRM PASSWORD - MATCHING WIDTH */
-.vendor-registration-form .password-input-wrapper {
-  position: relative;
+.registration-card .password-field {
   display: flex;
   align-items: center;
-  width: 100%;
+  gap: 8px;
   min-width: 0;
-  box-sizing: border-box;
 }
 
-.vendor-registration-form .password-input-wrapper input {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  padding-right: 50px;
+.registration-card .password-field input {
+  flex: 1;
+  width: 0;
 }
 
-.vendor-registration-form .password-toggle {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  display: flex;
+.registration-card .password-field .password-toggle {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  flex: 0 0 44px;
+  min-height: 44px;
   padding: 0;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: #216C68;
+  border: 1px solid #d5d9d5;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--teal, #216c68);
   cursor: pointer;
-  transform: translateY(-50%);
-  transition: background-color 0.2s ease;
 }
 
-.vendor-registration-form .password-toggle:hover {
-  background-color: #EDF6F4;
+.registration-card .password-field .password-toggle:hover {
+  background: #f7f3e8;
 }
 
-/* TERMS AND CONDITIONS */
-.vendor-registration-form .terms-option {
+.registration-card .password-field .password-toggle:focus-visible,
+.registration-card button:focus-visible {
+  outline: 3px solid rgba(33, 108, 104, 0.3);
+  outline-offset: 2px;
+}
+
+/* Step 3 review cards */
+
+.registration-review {
   display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  margin: 10px 0 24px;
-  color: #515954;
-  font-size: 0.92rem;
-  line-height: 1.6;
-  cursor: pointer;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.vendor-registration-form .terms-option input[type='checkbox'] {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  margin: 3px 0 0;
-  accent-color: #216C68;
-  cursor: pointer;
+.registration-review-section {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #e2e6e1;
+  border-radius: 12px;
+  background: #fcfcfa;
 }
 
-/* SUBMIT BUTTON */
-.vendor-registration-form .submit-button {
+.registration-review-heading {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 50%;
-  min-height: 52px;
-  padding: 14px 22px;
-  margin: 0 auto;
-  border: none;
-  border-radius: 999px;
-  background-color: #216C68;
-  color: #FFFFFF;
-  font-family: 'Nunito', sans-serif;
-  font-size: 1rem;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.registration-review-heading h3 {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.08rem;
+  color: var(--charcoal, #2c302f);
+}
+
+.registration-edit-button {
+  flex: 0 0 auto;
+  padding: 6px 13px;
+  border: 1px solid var(--teal, #216c68);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--teal, #216c68);
+  font: inherit;
+  font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
 }
 
-.vendor-registration-form .submit-button:hover:not(:disabled) {
-  background-color: #195653;
-  box-shadow: 0 6px 16px rgba(33, 108, 104, 0.2);
+.registration-edit-button:hover {
+  background: var(--teal, #216c68);
+  color: #fff;
+}
+
+.registration-review-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.registration-review-list > div {
+  min-width: 0;
+}
+
+.registration-review-list dt {
+  margin-bottom: 4px;
+  color: #727a74;
+  font-size: 0.82rem;
+}
+
+.registration-review-list dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: var(--charcoal, #2c302f);
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+/* Navigation actions */
+
+.registration-step-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.registration-card .register-button,
+.registration-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.registration-card .register-button {
+  flex: 1;
+  background: var(--coral, #fb8665);
+  color: #fff;
+}
+
+.registration-card .register-button:hover:not(:disabled) {
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 
-.vendor-registration-form .submit-button:disabled {
-  background-color: #A7B8B1;
+.registration-card .register-button:disabled,
+.registration-back-button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  opacity: 0.8;
 }
 
-/* SUCCESS AND ERROR MESSAGES */
-.vendor-registration-form .form-message {
-  margin: 0 0 22px;
-  padding: 14px 16px;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  font-size: 0.93rem;
+.registration-back-button {
+  border: 1px solid #d5d9d5;
+  background: #fff;
+  color: var(--charcoal, #2c302f);
+}
+
+.registration-back-button:hover:not(:disabled) {
+  background: #f7f3e8;
+}
+
+/* Success message */
+
+.registration-card .form-success {
+  padding: 20px;
+  border: 1px solid #c6e3d6;
+  border-radius: 12px;
+  background: #edf8f2;
+  color: var(--teal, #216c68);
+  text-align: center;
+}
+
+.registration-card .form-success h2 {
+  margin: 0 0 10px;
+  font-family: "Fredoka", sans-serif;
+}
+
+.registration-card .form-success p {
   line-height: 1.6;
 }
 
-.vendor-registration-form .form-message--error {
-  border-color: #F0C4C0;
-  background-color: #FFF4F2;
-  color: #A93226;
-}
-
-.vendor-registration-form .form-message--success {
-  border-color: #B8DCCB;
-  background-color: #F0F8F3;
-  color: #216C68;
-}
-
-/* LINKS */
-.vendor-registration-form a {
-  color: #216C68;
+.registration-card .form-success a,
+.registration-card .login-link a {
+  color: var(--teal, #216c68);
   font-weight: 800;
+  text-decoration: none;
+}
+
+.registration-card .form-success a:hover,
+.registration-card .login-link a:hover {
   text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
-.vendor-registration-form a:hover {
-  color: #195653;
+/* Login link */
+
+.registration-card .login-link {
+  margin: 24px 0 0;
+  color: var(--charcoal, #2c302f);
+  text-align: center;
+  font-size: 0.92rem;
 }
 
-/* TABLETS */
-@media (max-width: 1024px) {
-  .vendor-registration-form {
-    padding: 40px 32px 60px;
-  }
-}
+/* Responsive layout */
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .vendor-registration-form {
-    padding: 35px 20px 50px;
+@media (max-width: 600px) {
+  .registration-card {
+    padding: 24px 17px;
+    border-radius: 15px;
   }
 
-  .vendor-registration-form .form-card {
-    padding: 28px 22px;
-    border-radius: 16px;
-  }
-
-  .vendor-registration-form .form-grid {
-    gap: 18px;
-  }
-}
-
-/* SMALL MOBILE */
-@media (max-width: 540px) {
-  .vendor-registration-form {
-    padding: 24px 14px 40px;
-  }
-
-  .vendor-registration-form .page-heading {
-    margin-bottom: 20px;
-  }
-
-  .vendor-registration-form .page-heading h1 {
+  .registration-header h1 {
     font-size: 1.65rem;
-    line-height: 1.25;
-    margin-bottom: 10px;
   }
 
-  .vendor-registration-form .page-heading p {
-    font-size: 0.94rem;
-    line-height: 1.6;
-    padding: 0 4px;
+  .registration-step-title {
+    font-size: 1.3rem;
   }
 
-  .vendor-registration-form .form-card {
-    padding: 20px 16px;
-    border-radius: 13px;
+  .registration-phone-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 7px;
   }
 
-  .vendor-registration-form .form-section h2 {
-    font-size: 1.2rem;
+  .registration-country-select {
+    gap: 5px;
+    padding: 0 7px;
   }
 
-  .vendor-registration-form .section-description {
-    font-size: 0.88rem;
+  .registration-review-section {
+    padding: 14px;
   }
 
-  .vendor-registration-form .form-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-  }
-
-  .vendor-registration-form .phone-input-row {
-    flex-direction: column;
-  }
-
-  .vendor-registration-form .phone-input-row .vendor-country-picker {
-    max-width: 100%;
-    flex: 1;
-    width: 100%;
+  .registration-review-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
-/* COMPACT PASSWORD REQUIREMENTS */
-.vendor-registration-form .password-requirements {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px 10px;
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.76rem;
-  line-height: 1.4;
-}
-
-.vendor-registration-form .password-requirements li {
-  display: flex;
-  align-items: flex-start;
-  gap: 5px;
-  min-width: 0;
-}
-
-.vendor-registration-form .requirement-met {
-  color: #216C68;
-}
-
-.vendor-registration-form .requirement-unmet {
-  color: #737A77;
-}
-
-.vendor-registration-form .password-requirements span {
-  flex-shrink: 0;
-  font-weight: 800;
-}
-
-/* REDUCE UNNECESSARY DESKTOP SPACING */
-@media (min-width: 769px) {
-  .vendor-registration-form {
-    padding: 24px 32px 32px;
+@media (max-width: 360px) {
+  .registration-phone-row {
+    grid-template-columns: 1fr;
   }
 
-  .vendor-registration-form .page-heading {
-    margin-bottom: 18px;
-  }
-
-  .vendor-registration-form .page-heading h1 {
-    margin-bottom: 6px;
-    font-size: clamp(1.8rem, 3vw, 2.3rem);
-  }
-
-  .vendor-registration-form .page-heading p {
-    font-size: 0.92rem;
-    line-height: 1.45;
-  }
-
-  .vendor-registration-form .form-card {
-    padding: 24px 28px;
-  }
-
-  .vendor-registration-form .form-section {
-    margin-bottom: 22px;
-    padding-bottom: 20px;
-  }
-
-  .vendor-registration-form .form-section:last-of-type {
-    margin-bottom: 16px;
-  }
-
-  .vendor-registration-form .form-section h2 {
-    margin-bottom: 5px;
-    font-size: 1.25rem;
-  }
-
-  .vendor-registration-form .section-description {
-    margin-bottom: 14px;
-    font-size: 0.86rem;
-    line-height: 1.45;
-  }
-
-  .vendor-registration-form .form-grid {
-    gap: 14px 18px;
-  }
-
-  .vendor-registration-form .form-group label {
-    margin-bottom: 5px;
-    font-size: 0.88rem;
-  }
-
-  .vendor-registration-form input:not([type='checkbox']):not([type='file']),
-  .vendor-registration-form select {
-    min-height: 42px;
-    padding: 9px 12px;
+  .registration-card .registration-country-select select {
     font-size: 0.9rem;
   }
+}
 
-  .vendor-registration-form .field-hint {
-    margin-top: 4px;
-    font-size: 0.76rem;
-    line-height: 1.35;
+
+/* =========================================
+   COMPACT CUSTOMER REGISTRATION LAYOUT
+   ========================================= */
+
+/* A wider card allows fields to share rows. */
+.registration-card {
+  max-width: 760px;
+  padding: 24px 28px;
+}
+
+.registration-header {
+  margin-bottom: 16px;
+}
+
+.registration-header h1 {
+  margin-bottom: 5px;
+  font-size: 1.8rem;
+}
+
+.registration-progress {
+  margin-bottom: 18px;
+}
+
+.registration-step-title {
+  font-size: 1.3rem;
+}
+
+.registration-step-description {
+  font-size: 0.88rem;
+}
+
+.registration-form {
+  gap: 14px;
+}
+
+.registration-step-fields {
+  gap: 12px;
+}
+
+/* Step 1: first and last names side by side;
+   username uses the full row. */
+.registration-step-fields:has(#first_name) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.registration-step-fields:has(#first_name) > .form-group:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+/* Step 2: email and phone side by side. */
+.registration-step-fields:has(#email) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+/* Slightly shorter fields. */
+.registration-card .form-group {
+  gap: 5px;
+}
+
+.registration-card .form-group input,
+.registration-card .registration-phone-row select {
+  min-height: 42px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.registration-country-select {
+  min-height: 42px;
+}
+
+.registration-card .form-group small {
+  display: block;
+  width: 100%;
+  margin-left: 0;
+  padding-left: 0;
+  text-align: left;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.username-suggestions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 5px;
+}
+
+.username-suggestion-list {
+  gap: 5px;
+}
+
+.username-suggestion {
+  padding: 5px 8px;
+  font-size: 0.8rem;
+}
+
+/* Step 3: place review cards side by side,
+   then place password fields side by side. */
+.registration-step-fields:has(.registration-review) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.registration-review {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.registration-review-section {
+  padding: 12px;
+}
+
+.registration-review-heading {
+  margin-bottom: 9px;
+}
+
+.registration-review-heading h3 {
+  font-size: 0.98rem;
+}
+
+.registration-review-list {
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.registration-review-list dt {
+  margin-bottom: 2px;
+  font-size: 0.76rem;
+}
+
+.registration-review-list dd {
+  font-size: 0.86rem;
+}
+
+/* Keep password controls compact and aligned. */
+.registration-card .password-field {
+  gap: 5px;
+}
+
+.registration-card .password-field .password-toggle {
+  flex-basis: 40px;
+  min-height: 42px;
+}
+
+.registration-step-actions {
+  gap: 10px;
+}
+
+.registration-card .register-button,
+.registration-back-button {
+  min-height: 42px;
+  padding: 9px 16px;
+}
+
+/* Smaller screens: preserve readable fields. */
+@media (max-width: 600px) {
+  .registration-card {
+    padding: 20px 16px;
   }
 
-  .vendor-registration-form .password-requirements {
-    font-size: 0.72rem;
+  .registration-step-fields:has(#first_name),
+  .registration-step-fields:has(#email),
+  .registration-step-fields:has(.registration-review) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .registration-step-fields:has(#first_name) > .form-group:nth-child(3),
+  .registration-review {
+    grid-column: auto;
+  }
+
+  .registration-review {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .registration-review-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 540px) {
-  .vendor-registration-form .password-requirements {
-    grid-template-columns: minmax(0, 1fr);
-  }
+/* Pawdigree brand fonts */
+.vendor-registration-form {
+  font-family: 'Nunito', sans-serif;
+}
+
+.vendor-registration-form h1,
+.vendor-registration-form h2,
+.vendor-registration-form h3 {
+  font-family: 'Fredoka', sans-serif;
+}
+
+.vendor-registration-form input,
+.vendor-registration-form select,
+.vendor-registration-form textarea,
+.vendor-registration-form button,
+.vendor-registration-form label,
+.vendor-registration-form p,
+.vendor-registration-form span {
+  font-family: 'Nunito', sans-serif;
 }

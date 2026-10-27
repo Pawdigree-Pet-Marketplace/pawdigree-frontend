@@ -7,7 +7,6 @@ import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePag
 import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
-import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
@@ -23,9 +22,10 @@ import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-
+import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
 import VendorLayout from './layouts/VendorLayout/VendorLayout';
+import { Route } from "react-router-dom";
 function App() {
   const path = window.location.pathname;
 
@@ -43,7 +43,7 @@ function App() {
   if (path === "/privacy") {
     return <PrivacyPage />;
   }
-
+     <Route path="/pets/:petId" element={<PetsDetailPage />} />
   if (path === "/vendor/login" || path === "/vendor-login") {
     return <VendorLoginPage />;
   }
@@ -88,7 +88,7 @@ function App() {
   }
 
   if (path === "/vendor-registration") {
-    return <VendorRegistrationForm />;
+    return <VendorRegistrationPage/>;
   }
 
   if (path === "/vendor/business-profile") {
