@@ -4,7 +4,6 @@ import RegistrationPage from "./pages/Customer/RegistrationPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
-import VendorRegistrationForm from "./components/VendorRegistrationForm/VendorRegistrationForm";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
@@ -75,7 +74,7 @@ function App() {
   }
 
   if (path === "/vendor-registration") {
-    return <VendorRegistrationForm />;
+    return <VendorRegistrationPage/>;
   }
 
   if (path === "/vendor/business-profile") {

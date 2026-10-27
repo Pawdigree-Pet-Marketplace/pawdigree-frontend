@@ -90,3 +90,31 @@
     padding: var(--space-1) var(--space-2);
   }
 }
+
+
+/* Highlight the navigation link for the current page */
+.navbar-links .navbar-link {
+  position: relative;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navbar-links .navbar-link.active {
+  color: #216C68;
+  font-weight: 800;
+}
+
+.navbar-links .navbar-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 3px;
+  background-color: #FB8665;
+  border-radius: 2px;
+}
+
+.navbar-links .navbar-link:hover {
+  color: #216C68;
+}

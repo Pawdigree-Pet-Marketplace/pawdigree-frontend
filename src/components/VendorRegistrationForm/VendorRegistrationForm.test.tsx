@@ -1,4 +1,3 @@
-
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
   cleanup,
@@ -7,7 +6,17 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
+
 import VendorRegistrationForm from "./VendorRegistrationForm";
+
+const { apiRequestMock } = vi.hoisted(() => ({
+  apiRequestMock: vi.fn(),
+}));
+
+vi.mock("../../services/api", () => ({
+  apiRequest: apiRequestMock,
+}));
 
 const countries = [
   { country: "Uganda", iso_code: "UG", dial_code: "+256" },
@@ -15,350 +24,389 @@ const countries = [
   { country: "Tanzania", iso_code: "TZ", dial_code: "+255" },
 ];
 
-const VALID_PASSWORD = "SecurePass123!";
-
-function mockCountryResponse() {
-  return {
-    ok: true,
-    json: async () => countries,
-  };
+function changeField(label: RegExp, value: string) {
+  fireEvent.change(screen.getByLabelText(label), {
+    target: { value },
+  });
 }
 
-function mockFetch(
-  registrationResponse: {
-    ok: boolean;
-    json: () => Promise<Record<string, unknown>>;
-  } = {
-    ok: true,
-    json: async () => ({ message: "Registration successful" }),
-  },
+function fillPersonalDetails() {
+  changeField(/^First name/i, "Jane");
+  changeField(/^Last name/i, "Namara");
+  changeField(/^Username/i, "@janenamara");
+}
+
+async function goToContactDetails() {
+  fillPersonalDetails();
+
+  fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+  await screen.findByRole("heading", { name: "Contact details" });
+}
+
+function fillContactDetails(
+  email = "jane@example.com",
+  phone = "771234567",
 ) {
-  const fetchMock = vi.fn().mockImplementation((url: string) => {
-    if (String(url).includes("/api/country-codes/")) {
-      return Promise.resolve(mockCountryResponse());
-    }
-
-    if (String(url).includes("/auth/register/vendor/")) {
-      return Promise.resolve(registrationResponse);
-    }
-
-    return Promise.reject(new Error(`Unexpected request: ${url}`));
-  });
-
-  vi.stubGlobal("fetch", fetchMock);
-  return fetchMock;
+  changeField(/^Email address/i, email);
+  changeField(/^Phone number/i, phone);
 }
 
-function fillValidForm() {
-  fireEvent.change(screen.getByLabelText(/^Username/i), {
-    target: { value: "pawdigreevendor" },
-  });
-  fireEvent.change(screen.getByLabelText(/^First Name/i), {
-    target: { value: "Jane" },
-  });
-  fireEvent.change(screen.getByLabelText(/^Last Name/i), {
-    target: { value: "Namara" },
-  });
-  fireEvent.change(screen.getByLabelText(/^Email Address/i), {
-    target: { value: "jane@example.com" },
-  });
-  fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
-    target: { value: "0771234567" },
-  });
-  fireEvent.change(screen.getByLabelText(/^Password/i), {
-    target: { value: VALID_PASSWORD },
-  });
-  fireEvent.change(screen.getByLabelText(/^Confirm Password/i), {
-    target: { value: VALID_PASSWORD },
+async function goToReviewStep() {
+  await goToContactDetails();
+
+  fillContactDetails();
+
+  fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+  await screen.findByRole("heading", {
+    name: "Review and create account",
   });
 }
 
-function getRegistrationCall(fetchMock: ReturnType<typeof vi.fn>) {
-  return fetchMock.mock.calls.find(([url]) =>
-    String(url).includes("/auth/register/vendor/"),
-  );
+async function fillValidRegistration() {
+  await goToReviewStep();
+
+  changeField(/^Password$/i, "SecurePass123!");
+  changeField(/^Confirm password$/i, "SecurePass123!");
 }
-
-beforeEach(() => {
-  mockFetch();
-});
-
-afterEach(() => {
-  cleanup();
-  vi.unstubAllGlobals();
-});
 
 describe("Vendor Registration Form", () => {
-  test("renders the vendor registration heading", () => {
+  beforeEach(() => {
+    apiRequestMock.mockReset();
+
+    apiRequestMock.mockImplementation(async (url: string) => {
+      if (url === "/country-codes/") {
+        return countries;
+      }
+
+      if (url === "/auth/register/vendor/") {
+        return { message: "Registration successful" };
+      }
+
+      throw new Error(`Unexpected API request: ${url}`);
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  test("renders the heading and first registration step", async () => {
     render(<VendorRegistrationForm />);
 
     expect(
-      screen.getByRole("heading", { name: "Become a Pawdigree Vendor" }),
-    ).toBeInTheDocument();
-  });
-
-  test("renders the account information fields", () => {
-    render(<VendorRegistrationForm />);
-
-    expect(screen.getByLabelText(/^Username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Email Address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^First Name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Last Name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Phone Number/i)).toBeInTheDocument();
-  });
-
-  test("renders both password fields", () => {
-    render(<VendorRegistrationForm />);
-
-    expect(screen.getByLabelText(/^Password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Confirm Password/i)).toBeInTheDocument();
-  });
-
-  test("does not render business information fields", () => {
-    render(<VendorRegistrationForm />);
-
-    expect(screen.queryByLabelText(/^Business Name/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/^Business Type/i)).not.toBeInTheDocument();
-    expect(
-      screen.queryByLabelText(/^Business Description/i),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByLabelText(/^Business Address/i),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/^District/i)).not.toBeInTheDocument();
-  });
-
-  test("renders the terms acceptance checkbox", () => {
-    render(<VendorRegistrationForm />);
-
-    expect(screen.getByRole("checkbox")).toBeInTheDocument();
-  });
-
-  test("renders the vendor account submit button", () => {
-    render(<VendorRegistrationForm />);
-
-    expect(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    ).toBeInTheDocument();
-  });
-
-  test("defaults to Uganda's country calling code", async () => {
-    render(<VendorRegistrationForm />);
-
-    expect(
-      await screen.findByRole("combobox", { name: "Country calling code" }),
-    ).toHaveValue("UG");
-  });
-
-  test("allows the vendor to select another country calling code", async () => {
-    render(<VendorRegistrationForm />);
-
-    const selector = await screen.findByRole("combobox", {
-      name: "Country calling code",
-    });
-
-    await waitFor(() => expect(selector).toHaveValue("UG"));
-
-    fireEvent.change(selector, { target: { value: "KE" } });
-
-    expect(selector).toHaveValue("KE");
-  });
-
-  test("shows required-field errors when the form is submitted empty", () => {
-    render(<VendorRegistrationForm />);
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    expect(screen.getByText(/username is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/email address is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/please enter a password/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/please confirm your password/i),
-    ).toBeInTheDocument();
-  });
-
-  test("shows an error for an invalid email address", () => {
-    render(<VendorRegistrationForm />);
-
-    fireEvent.change(screen.getByLabelText(/^Email Address/i), {
-      target: { value: "invalid-email" },
-    });
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    expect(screen.getByText(/valid email address/i)).toBeInTheDocument();
-  });
-
-  test("shows an error when the password is too short", () => {
-    render(<VendorRegistrationForm />);
-
-    fireEvent.change(screen.getByLabelText(/^Password/i), {
-      target: { value: "abc123" },
-    });
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    expect(screen.getByText(/at least 8 characters/i)).toBeInTheDocument();
-  });
-
-  test("shows an error when the passwords do not match", () => {
-    render(<VendorRegistrationForm />);
-
-    fireEvent.change(screen.getByLabelText(/^Password/i), {
-      target: { value: VALID_PASSWORD },
-    });
-
-    fireEvent.change(screen.getByLabelText(/^Confirm Password/i), {
-      target: { value: "DifferentPass123!" },
-    });
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
-  });
-
-  test("shows an error for a phone number with too few digits", () => {
-    render(<VendorRegistrationForm />);
-
-    fillValidForm();
-
-    fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
-      target: { value: "123" },
-    });
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    expect(screen.getByText(/enter a valid phone number/i)).toBeInTheDocument();
-  });
-
-  test("does not submit when the terms checkbox is unchecked", async () => {
-    const fetchMock = mockFetch();
-
-    render(<VendorRegistrationForm />);
-    fillValidForm();
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    expect(
-      await screen.findByText(/accept the terms and conditions/i),
-    ).toBeInTheDocument();
-
-    expect(getRegistrationCall(fetchMock)).toBeUndefined();
-  });
-
-  test("submits valid registration information with the country code", async () => {
-    const fetchMock = mockFetch();
-
-    render(<VendorRegistrationForm />);
-    fillValidForm();
-
-    fireEvent.click(screen.getByRole("checkbox"));
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    await waitFor(() => {
-      expect(getRegistrationCall(fetchMock)).toBeDefined();
-    });
-
-    const registrationCall = getRegistrationCall(fetchMock);
-    const options = registrationCall?.[1] as RequestInit;
-    const submittedData = JSON.parse(String(options.body));
-
-    expect(submittedData).toMatchObject({
-      username: "pawdigreevendor",
-      first_name: "Jane",
-      last_name: "Namara",
-      email: "jane@example.com",
-      phone: "+256771234567",
-      password: VALID_PASSWORD,
-    });
-
-    expect(submittedData).not.toHaveProperty("confirmPassword");
-  });
-
-  test("submits the selected country's calling code", async () => {
-    const fetchMock = mockFetch();
-
-    render(<VendorRegistrationForm />);
-
-    const selector = await screen.findByRole("combobox", {
-      name: "Country calling code",
-    });
-
-    fireEvent.change(selector, { target: { value: "KE" } });
-
-    fillValidForm();
-
-    fireEvent.click(screen.getByRole("checkbox"));
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
-    );
-
-    await waitFor(() => {
-      expect(getRegistrationCall(fetchMock)).toBeDefined();
-    });
-
-    const registrationCall = getRegistrationCall(fetchMock);
-    const options = registrationCall?.[1] as RequestInit;
-    const submittedData = JSON.parse(String(options.body));
-
-    expect(submittedData.phone).toBe("+254771234567");
-  });
-
-  test("displays errors returned by the backend", async () => {
-    const fetchMock = mockFetch({
-      ok: false,
-      json: async () => ({
-        detail: "Registration failed",
-        email: ["This email is already registered."],
+      screen.getByRole("heading", {
+        name: "Create your vendor account",
       }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("heading", { name: "Your details" }),
+    ).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(apiRequestMock).toHaveBeenCalledWith("/country-codes/");
+    });
+  });
+
+  test("does not show contact or password fields on the first step", () => {
+    render(<VendorRegistrationForm />);
+
+    expect(screen.getByLabelText(/^First name/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Email address/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Password$/i)).not.toBeInTheDocument();
+  });
+
+  test("requires personal details before continuing", () => {
+    render(<VendorRegistrationForm />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Your details" }),
+    ).toBeInTheDocument();
+  });
+
+  test("requires usernames to start with @", () => {
+    render(<VendorRegistrationForm />);
+
+    changeField(/^First name/i, "Jane");
+    changeField(/^Last name/i, "Namara");
+    changeField(/^Username/i, "janenamara");
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Your details" }),
+    ).toBeInTheDocument();
+  });
+
+  test("suggests usernames based on the user's name", () => {
+    render(<VendorRegistrationForm />);
+
+    changeField(/^First name/i, "Jane");
+    changeField(/^Last name/i, "Namara");
+
+    expect(screen.getByText("@janenamara")).toBeInTheDocument();
+    expect(screen.getByText("@jane.namara")).toBeInTheDocument();
+    expect(screen.getByText("@namarajane")).toBeInTheDocument();
+  });
+
+  test("selecting a username suggestion fills the username field", () => {
+    render(<VendorRegistrationForm />);
+
+    changeField(/^First name/i, "Jane");
+    changeField(/^Last name/i, "Namara");
+
+    fireEvent.click(screen.getByText("@jane.namara"));
+
+    expect(screen.getByLabelText(/^Username/i)).toHaveValue(
+      "@jane.namara",
+    );
+  });
+
+  test("moves forward and backward between registration steps", async () => {
+    render(<VendorRegistrationForm />);
+
+    fillPersonalDetails();
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    await screen.findByRole("heading", { name: "Contact details" });
+
+    expect(screen.queryByLabelText(/^First name/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Your details" }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/^First name/i)).toHaveValue("Jane");
+    expect(screen.getByLabelText(/^Last name/i)).toHaveValue("Namara");
+    expect(screen.getByLabelText(/^Username/i)).toHaveValue("@janenamara");
+  });
+
+  test("validates an invalid email address", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToContactDetails();
+    fillContactDetails("invalid-email", "771234567");
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Contact details" }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByLabelText(/^Email address/i),
+    ).toHaveAttribute("aria-invalid", "true");
+  });
+
+  test("validates an invalid phone number", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToContactDetails();
+    fillContactDetails("jane@example.com", "123");
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Contact details" }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByLabelText(/^Phone number/i),
+    ).toHaveAttribute("aria-invalid", "true");
+  });
+
+  test("allows changing the country calling code", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToContactDetails();
+
+    const countrySelect = screen.getByRole("combobox", {
+      name: "Country calling code",
+    });
+
+    fireEvent.change(countrySelect, { target: { value: "KE" } });
+
+    expect(countrySelect).toHaveValue("KE");
+  });
+
+  test("shows password fields on the final step", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToReviewStep();
+
+    expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/^Confirm password$/i),
+    ).toBeInTheDocument();
+  });
+
+  test("requires a strong password", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToReviewStep();
+
+    changeField(/^Password$/i, "weak");
+    changeField(/^Confirm password$/i, "weak");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /create account/i }),
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Review and create account",
+      }),
+    ).toBeInTheDocument();
+
+    expect(apiRequestMock).not.toHaveBeenCalledWith(
+      "/auth/register/vendor/",
+      expect.anything(),
+    );
+  });
+
+  test("requires passwords to match", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToReviewStep();
+
+    changeField(/^Password$/i, "SecurePass123!");
+    changeField(/^Confirm password$/i, "DifferentPass123!");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /create account/i }),
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Review and create account",
+      }),
+    ).toBeInTheDocument();
+
+    expect(apiRequestMock).not.toHaveBeenCalledWith(
+      "/auth/register/vendor/",
+      expect.anything(),
+    );
+  });
+
+  test("allows showing and hiding the password", async () => {
+    render(<VendorRegistrationForm />);
+
+    await goToReviewStep();
+
+    const passwordInput = screen.getByLabelText(/^Password$/i);
+
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    const showButton = screen.getByRole("button", {
+      name: /show password/i,
+    });
+
+    fireEvent.click(showButton);
+
+    expect(passwordInput).toHaveAttribute("type", "text");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /hide password/i }),
+    );
+
+    expect(passwordInput).toHaveAttribute("type", "password");
+  });
+
+  test("submits valid registration data to the API", async () => {
+    render(<VendorRegistrationForm />);
+
+    await fillValidRegistration();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /create account/i }),
+    );
+
+    await waitFor(() => {
+      expect(apiRequestMock).toHaveBeenCalledWith(
+        "/auth/register/vendor/",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            username: "@janenamara",
+            first_name: "Jane",
+            last_name: "Namara",
+            email: "jane@example.com",
+            phone: "+256771234567",
+            password: "SecurePass123!",
+          }),
+        },
+      );
+    });
+  });
+
+  test("shows an API error when registration fails", async () => {
+    apiRequestMock.mockImplementation(async (url: string) => {
+      if (url === "/country-codes/") {
+        return countries;
+      }
+
+      if (url === "/auth/register/vendor/") {
+        throw new Error("Email already exists");
+      }
+
+      throw new Error(`Unexpected API request: ${url}`);
     });
 
     render(<VendorRegistrationForm />);
-    fillValidForm();
 
-    fireEvent.click(screen.getByRole("checkbox"));
+    await fillValidRegistration();
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Create Vendor Account" }),
+      screen.getByRole("button", { name: /create account/i }),
     );
 
-    expect(await screen.findByText(/registration failed/i)).toBeInTheDocument();
-    expect(await screen.findByText(/already registered/i)).toBeInTheDocument();
-    expect(getRegistrationCall(fetchMock)).toBeDefined();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /email already exists/i,
+    );
   });
 
-  test("allows the user to show and hide the password", () => {
+  test("does not submit when the final step has invalid fields", async () => {
     render(<VendorRegistrationForm />);
 
-    const password = screen.getByLabelText(/^Password/i);
+    await goToReviewStep();
 
-    expect(password).toHaveAttribute("type", "password");
+    changeField(/^Password$/i, "weak");
+    changeField(/^Confirm password$/i, "notmatching");
 
-    fireEvent.click(screen.getByRole("button", { name: "Show password" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /create account/i }),
+    );
 
-    expect(password).toHaveAttribute("type", "text");
+    expect(apiRequestMock).not.toHaveBeenCalledWith(
+      "/auth/register/vendor/",
+      expect.anything(),
+    );
+  });
 
-    fireEvent.click(screen.getByRole("button", { name: "Hide password" }));
+  test("shows a success message after registration", async () => {
+    render(<VendorRegistrationForm />);
 
-    expect(password).toHaveAttribute("type", "password");
+    await fillValidRegistration();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /create account/i }),
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Vendor registration successful",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("link", { name: /continue to log in/i }),
+    ).toHaveAttribute("href", "/vendor-login");
   });
 });
