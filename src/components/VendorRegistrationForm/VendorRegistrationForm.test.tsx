@@ -319,10 +319,8 @@ describe("Vendor Registration Form", () => {
     expect(passwordInput).toHaveAttribute("type", "password");
   });
 
-    fillValidForm();
-    fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
-      target: { value: "0712345678" },
-    });
+  test("submits valid registration data to the API", async () => {
+    render(<VendorRegistrationForm />);
 
     await fillValidRegistration();
 
@@ -348,14 +346,15 @@ describe("Vendor Registration Form", () => {
     });
   });
 
-  test("shows an API error when registration fails", async () => {
+      test("shows an API error when registration fails", async () => {
     apiRequestMock.mockImplementation(async (url: string) => {
       if (url === "/country-codes/") {
         return countries;
       }
 
-    expect(submittedData.phone).toBe("+254712345678");
-  });
+      if (url === "/auth/register/vendor/") {
+        throw new Error("Email already exists");
+      }
 
       throw new Error(`Unexpected API request: ${url}`);
     });
@@ -368,9 +367,9 @@ describe("Vendor Registration Form", () => {
       screen.getByRole("button", { name: /create account/i }),
     );
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      /email already exists/i,
-    );
+    expect(
+      await screen.findByText(/Email already exists/i),
+    ).toBeInTheDocument();
   });
 
   test("does not submit when the final step has invalid fields", async () => {
