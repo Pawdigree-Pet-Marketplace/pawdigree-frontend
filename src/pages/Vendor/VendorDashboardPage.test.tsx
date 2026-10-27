@@ -1,6 +1,9 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { apiRequest } from '../../services/api'
 import VendorDashboardPage from './VendorDashboardPage'
+
+vi.mock('../../services/api', () => ({ apiRequest: vi.fn() }))
 
 vi.mock('../layouts/VendorLayout/VendorLayout', () => ({
   default: ({
@@ -26,6 +29,7 @@ describe('VendorDashboardPage', () => {
     sessionStorage.clear()
     localStorage.setItem('token', 'test-vendor-token')
     localStorage.setItem('role', 'VENDOR')
+    vi.mocked(apiRequest).mockResolvedValue({ first_name: 'Faith' })
   })
 
   afterEach(() => {
@@ -33,18 +37,33 @@ describe('VendorDashboardPage', () => {
     vi.restoreAllMocks()
   })
 
-  it('shows the vendor dashboard heading', () => {
+  it('greets the vendor by the first name returned by the backend', async () => {
     render(<VendorDashboardPage />)
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Welcome back, Happy Paws Kennel',
-      }),
-    ).toBeInTheDocument()
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Welcome back, Faith' }),
+      ).toBeInTheDocument(),
+    )
 
+    expect(apiRequest).toHaveBeenCalledWith('/auth/current-user/', {
+      headers: { Authorization: 'Bearer test-vendor-token' },
+    })
     expect(
       screen.getByText("Here's how your store is doing today"),
     ).toBeInTheDocument()
+  })
+
+  it('uses a safe greeting when the current user request fails', async () => {
+    vi.mocked(apiRequest).mockRejectedValue(new Error('Request failed'))
+
+    render(<VendorDashboardPage />)
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Welcome back, there' }),
+      ).toBeInTheDocument(),
+    )
   })
 
   it('shows all four store metric cards', () => {

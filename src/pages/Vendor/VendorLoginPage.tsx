@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, Eye, EyeOff, Store } from "lucide-react";
 import { apiRequest } from "../../services/api";
@@ -6,8 +5,15 @@ import logo from "../../assets/logos/lightmode-logo.svg";
 import "./VendorLoginPage.css";
 
 type LoginResponse = {
-  access: string;
-  refresh: string;
+  access?: string;
+  refresh?: string;
+  verification_required?: boolean;
+  verification_token?: string;
+  email?: string;
+  masked_email?: string;
+  email_sent?: boolean;
+  expires_in?: number;
+  resend_available_in?: number;
 };
 
 export default function VendorLoginPage() {
@@ -39,9 +45,7 @@ export default function VendorLoginPage() {
     if (!email.trim()) {
       setEmailError("Please enter your email address.");
       hasErrors = true;
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-    ) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       hasErrors = true;
     }
@@ -67,7 +71,41 @@ export default function VendorLoginPage() {
         },
       );
 
-      // Remove old authentication data before saving the new session.
+      // Email verification must happen before authentication tokens are saved.
+      if (data.verification_required) {
+        const verificationToken = data.verification_token;
+
+        if (!verificationToken) {
+          setGeneralError(
+            "We couldn't start email verification. Please try signing in again.",
+          );
+          return;
+        }
+
+        const verificationParams = new URLSearchParams({
+          token: verificationToken,
+          email: data.email ?? "",
+          role: "VENDOR",
+          keepLoggedIn: String(keepLoggedIn),
+          emailSent: String(data.email_sent ?? false),
+        });
+
+        window.location.href = `/verify-email?${verificationParams.toString()}`;
+        return;
+      }
+
+      // Normal login must return both authentication tokens.
+      const accessToken = data.access;
+      const refreshToken = data.refresh;
+
+      if (!accessToken || !refreshToken) {
+        setGeneralError(
+          "We couldn't complete sign-in. Please try again.",
+        );
+        return;
+      }
+
+      // Clear any previous session before saving the new one.
       for (const storage of [localStorage, sessionStorage]) {
         storage.removeItem("token");
         storage.removeItem("refresh");
@@ -76,15 +114,13 @@ export default function VendorLoginPage() {
 
       const storage = keepLoggedIn ? localStorage : sessionStorage;
 
-      storage.setItem("token", data.access);
-      storage.setItem("refresh", data.refresh);
+      storage.setItem("token", accessToken);
+      storage.setItem("refresh", refreshToken);
       storage.setItem("role", "VENDOR");
 
       window.location.href = "/vendor/dashboard";
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "";
-
+      const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();
 
       if (
@@ -98,6 +134,7 @@ export default function VendorLoginPage() {
       } else if (
         normalizedMessage.includes("non_field_errors") ||
         normalizedMessage.includes("invalid credentials") ||
+        normalizedMessage.includes("invalid email or password") ||
         normalizedMessage.includes("no active account") ||
         normalizedMessage.includes("incorrect") ||
         normalizedMessage.includes("not found") ||
@@ -142,9 +179,7 @@ export default function VendorLoginPage() {
           <Store size={28} />
         </div>
 
-        <p className="vendor-login-eyebrow">
-          PAWDIGREE FOR BUSINESS
-        </p>
+        <p className="vendor-login-eyebrow">PAWDIGREE FOR BUSINESS</p>
 
         <h1>Welcome back!</h1>
 
@@ -267,9 +302,7 @@ export default function VendorLoginPage() {
             className="vendor-login-submit"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? "Signing in..."
-              : "Sign in to your store"}
+            {isSubmitting ? "Signing in..." : "Sign in to your store"}
           </button>
         </form>
 
@@ -279,9 +312,17 @@ export default function VendorLoginPage() {
         </p>
       </section>
 
-      <footer className="vendor-login-footer">
-        Your business, growing with Pawdigree.
-      </footer>
+      <aside className="vendor-login-welcome">
+        <div className="vendor-login-welcome-copy">
+          <span className="vendor-login-welcome-kicker">PAWDIGREE FOR PET PROS</span>
+          <h1>Big things start with the care you give.</h1>
+          <p>Bring your pet business to a community that loves animals as much as you do.</p>
+          <div className="vendor-login-fact">
+            <span className="vendor-login-fact-icon" aria-hidden="true"><Store size={20} /></span>
+            <span><strong>Your business, growing with Pawdigree.</strong><small>Showcase your services and connect with local pet owners.</small></span>
+          </div>
+        </div>
+      </aside>
     </main>
   );
 }

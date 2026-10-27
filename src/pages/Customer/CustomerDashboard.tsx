@@ -19,12 +19,16 @@ import Categories from "../../components/home/Categories";
 import "./CustomerDashboard.css";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 
+type PetFilters = { purpose: string; gender: string; breed: string; minAge: string; maxAge: string };
+const emptyFilters: PetFilters = { purpose: "", gender: "", breed: "", minAge: "", maxAge: "" };
+
 type Pet = {
   pet_id: number;
   name: string;
   species: string;
   breed?: string;
   age: number;
+  gender: "MALE" | "FEMALE";
   listing_type: "ADOPTION" | "SALE";
   price?: string | number | null;
   images?: { image?: string | null; is_primary?: boolean }[];
@@ -49,6 +53,13 @@ export default function CustomerDashboard() {
   const [petsError, setPetsError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [gender, setGender] = useState("");
+  const [breed, setBreed] = useState("");
+  const [minAge, setMinAge] = useState("");
+  const [maxAge, setMaxAge] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState<PetFilters>(emptyFilters);
+  const [filterError, setFilterError] = useState("");
 
   useEffect(() => {
     if (!isAuthorized) window.location.replace("/customer-login");
@@ -64,8 +75,16 @@ export default function CustomerDashboard() {
       setPetsError("");
 
       try {
+        const params = new URLSearchParams();
+        if (submittedSearch.trim()) params.set("search", submittedSearch.trim());
+        if (appliedFilters.purpose) params.set("listing_type", appliedFilters.purpose);
+        if (appliedFilters.gender) params.set("gender", appliedFilters.gender);
+        if (appliedFilters.breed.trim()) params.set("breed", appliedFilters.breed.trim());
+        if (appliedFilters.minAge) params.set("age_min", appliedFilters.minAge);
+        if (appliedFilters.maxAge) params.set("age_max", appliedFilters.maxAge);
+        const query = params.toString();
         const response = await apiRequest<Pet[] | { results: Pet[] }>(
-          "/pets/public/",
+          `/pets/public/${query ? `?${query}` : ""}`,
         );
         const results = Array.isArray(response) ? response : response.results;
 
@@ -86,19 +105,12 @@ export default function CustomerDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [isAuthorized]);
+  }, [isAuthorized, submittedSearch, appliedFilters]);
 
+  const hasActiveCriteria = Boolean(submittedSearch.trim() || Object.values(appliedFilters).some(Boolean));
   const filteredPets = useMemo(() => {
-    const term = submittedSearch.trim().toLowerCase();
-
-    if (!term) return pets.slice(0, 4);
-
-    return pets.filter((pet) =>
-      [pet.name, pet.species, pet.breed, pet.listing_type]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(term)),
-    );
-  }, [pets, submittedSearch]);
+    return hasActiveCriteria ? pets : pets.slice(0, 4);
+  }, [pets, hasActiveCriteria]);
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,6 +119,26 @@ export default function CustomerDashboard() {
       behavior: "smooth",
       block: "start",
     });
+  }
+
+  function handleApplyFilters(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if ([minAge, maxAge].some((value) => value !== "" && !/^\d+$/.test(value))) {
+      setFilterError("Enter ages as nonnegative whole numbers of months.");
+      return;
+    }
+    if (minAge !== "" && maxAge !== "" && Number(minAge) > Number(maxAge)) {
+      setFilterError("Minimum age must be less than or equal to maximum age.");
+      return;
+    }
+    setFilterError("");
+    setAppliedFilters({ purpose, gender, breed, minAge, maxAge });
+    document.getElementById("dashboard-listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function clearCriteria() {
+    setSearchTerm(""); setSubmittedSearch(""); setPurpose(""); setGender("");
+    setBreed(""); setMinAge(""); setMaxAge(""); setAppliedFilters(emptyFilters); setFilterError("");
   }
 
   if (!isAuthorized) return null;
@@ -211,6 +243,18 @@ export default function CustomerDashboard() {
           </div>
         </form>
 
+        <form className="dashboard-filters" onSubmit={handleApplyFilters} aria-label="Filter pet listings">
+          <div className="dashboard-filter-grid">
+            <label>Purpose<select value={purpose} onChange={(event) => setPurpose(event.target.value)}><option value="">Any purpose</option><option value="ADOPTION">Adoption</option><option value="SALE">For sale</option></select></label>
+            <label>Gender<select value={gender} onChange={(event) => setGender(event.target.value)}><option value="">Any gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select></label>
+            <label>Breed<input value={breed} onChange={(event) => setBreed(event.target.value)} placeholder="Any breed" /></label>
+            <label>Minimum age (months)<input type="number" min="0" step="1" inputMode="numeric" value={minAge} onChange={(event) => setMinAge(event.target.value)} /></label>
+            <label>Maximum age (months)<input type="number" min="0" step="1" inputMode="numeric" value={maxAge} onChange={(event) => setMaxAge(event.target.value)} /></label>
+          </div>
+          <div className="dashboard-filter-actions"><button type="submit">Apply filters</button>{hasActiveCriteria && <button type="button" className="dashboard-filter-clear" onClick={clearCriteria}>Clear search and filters</button>}</div>
+          {filterError && <p className="dashboard-filter-error" role="alert">{filterError}</p>}
+        </form>
+
         <section
           id="dashboard-marketplace"
           className="dashboard-section dashboard-marketplace"
@@ -226,7 +270,7 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="dashboard-marketplace-grid">
-            <a href="/#pets" className="dashboard-marketplace-card">
+            <a href="/pets" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <Heart size={22} />
               </span>
@@ -237,7 +281,7 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </a>
 
-            <a href="/#services" className="dashboard-marketplace-card">
+            <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
               <span className="dashboard-marketplace-icon">
                 <Stethoscope size={22} />
               </span>
@@ -245,10 +289,9 @@ export default function CustomerDashboard() {
                 <strong>Pet services</strong>
                 <span>Explore services for happier, healthier pets.</span>
               </span>
-              <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </div>
 
-            <a href="/#reviews" className="dashboard-marketplace-card">
+            <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
               <span className="dashboard-marketplace-icon">
                 <Sparkles size={22} />
               </span>
@@ -256,8 +299,7 @@ export default function CustomerDashboard() {
                 <strong>Community reviews</strong>
                 <span>Read what people are saying about Pawdigree.</span>
               </span>
-              <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </div>
 
             <a href="/vendor" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
@@ -270,7 +312,7 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </a>
 
-            <a href="/#pets" className="dashboard-marketplace-card">
+            <a href="/pets" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <ShoppingBag size={22} />
               </span>
@@ -288,7 +330,7 @@ export default function CustomerDashboard() {
           title="Browse by category"
           className="dashboard-category-carousel"
           items={dashboardCategories}
-          getHref={() => "#dashboard-listings"}
+          getHref={(category) => `/pets?search=${encodeURIComponent(category.name === "Other pets" ? "rabbit" : category.name.replace(/s$/i, ""))}`}
         />
 
         <section
@@ -298,14 +340,10 @@ export default function CustomerDashboard() {
           <div className="dashboard-section-heading">
             <div>
               <p className="dashboard-eyebrow">A NEW DISCOVERY AWAITS</p>
-              <h2>{submittedSearch ? "Search results" : "Pets to discover"}</h2>
-              {submittedSearch && (
-                <p className="dashboard-section-description">
-                  Results for “{submittedSearch}”
-                </p>
-              )}
+              <h2>{hasActiveCriteria ? "Pet listings" : "Pets to discover"}</h2>
+              {hasActiveCriteria && <p className="dashboard-section-description">{submittedSearch.trim() ? `Results for “${submittedSearch.trim()}”` : "Filtered pet listings"}</p>}
             </div>
-            <a href="/#pets" className="dashboard-text-link">
+            <a href={`/pets?${new URLSearchParams({ ...(submittedSearch.trim() ? { search: submittedSearch.trim() } : {}), ...(appliedFilters.purpose ? { listing_type: appliedFilters.purpose } : {}), ...(appliedFilters.gender ? { gender: appliedFilters.gender } : {}), ...(appliedFilters.breed.trim() ? { breed: appliedFilters.breed.trim() } : {}), ...(appliedFilters.minAge ? { age_min: appliedFilters.minAge } : {}), ...(appliedFilters.maxAge ? { age_max: appliedFilters.maxAge } : {}) }).toString()}`} className="dashboard-text-link">
               Explore more <ArrowRight size={16} />
             </a>
           </div>
@@ -329,25 +367,22 @@ export default function CustomerDashboard() {
                 <Search size={32} />
               </div>
               <h3>
-                {submittedSearch
-                  ? "No matching pets found"
+                {hasActiveCriteria
+                  ? "No pets match these criteria"
                   : "Your next discovery is on its way"}
               </h3>
               <p>
-                {submittedSearch
-                  ? "Try another pet name, breed or species."
+                {hasActiveCriteria
+                  ? "Try changing or clearing your search and filters."
                   : "There are no pet listings available right now. Check back soon."}
               </p>
-              {submittedSearch && (
+              {hasActiveCriteria && (
                 <button
                   type="button"
                   className="dashboard-clear-search"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSubmittedSearch("");
-                  }}
+                  onClick={clearCriteria}
                 >
-                  Clear search
+                  Clear search and filters
                 </button>
               )}
             </div>

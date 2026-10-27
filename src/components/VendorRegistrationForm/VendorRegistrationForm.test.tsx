@@ -319,8 +319,10 @@ describe("Vendor Registration Form", () => {
     expect(passwordInput).toHaveAttribute("type", "password");
   });
 
-  test("submits valid registration data to the API", async () => {
-    render(<VendorRegistrationForm />);
+    fillValidForm();
+    fireEvent.change(screen.getByLabelText(/^Phone Number/i), {
+      target: { value: "0712345678" },
+    });
 
     await fillValidRegistration();
 
@@ -352,9 +354,8 @@ describe("Vendor Registration Form", () => {
         return countries;
       }
 
-      if (url === "/auth/register/vendor/") {
-        throw new Error("Email already exists");
-      }
+    expect(submittedData.phone).toBe("+254712345678");
+  });
 
       throw new Error(`Unexpected API request: ${url}`);
     });

@@ -6,15 +6,21 @@
   --teal: #216C68;
   --teal-dark: #1A5451;
   --teal-light: #E7F1F0;
+  --teal-border: #CFE6DE;
   --coral: #FB8665;
   --coral-dark: #DC7659;
   --coral-light: #FEEBE3;
+  --coral-border: #FFDCC3;
 
   --charcoal: #2C302F;
+  --charcoal-light: #F2F4F3;
+  --charcoal-border: #DCE0E2;
   --ink: #2C302F;
   --cream: #F7F3E8;
   --gray: #6F7371;
   --sand: #F3F0EA;
+  --sand-dark: #D1C9B8;
+  --sand-border: #B8AD97;
   --paper: #FBFAF7;
   --white: #FFFFFF;
   --coral-tint: #FFE9E2;

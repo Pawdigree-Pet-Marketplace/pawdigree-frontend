@@ -17,11 +17,11 @@ import { ConfirmLogout } from "../../layout/ConfirmLogout";
 
 const navigationItems = [
   { label: "Overview", href: "/customer/dashboard", Icon: House },
-  { label: "Discover", href: "#dashboard-listings", Icon: Compass },
-  { label: "Browse Pets", href: "#dashboard-categories", Icon: PawPrint },
-  { label: "Pet Store", href: "/#merchandise", Icon: ShoppingBag },
-  { label: "Pet Services", href: "/#services", Icon: Stethoscope },
-  { label: "Adoption", href: "/#adoption", Icon: HeartHandshake },
+  { label: "Discover", href: "/customer/dashboard#dashboard-listings", Icon: Compass },
+  { label: "Browse Pets", href: "/customer/dashboard#dashboard-categories", Icon: PawPrint },
+  { label: "Pet Store", Icon: ShoppingBag },
+  { label: "Pet Services", Icon: Stethoscope },
+  { label: "Adoption", Icon: HeartHandshake },
 ];
 
 export default function CustomerDashboardNav() {
@@ -88,21 +88,40 @@ export default function CustomerDashboardNav() {
       }
       aria-label={mobile ? "Mobile customer navigation" : "Customer navigation"}
     >
-      {navigationItems.map(({ label, href, Icon }) => (
-        <a
-          key={label}
-          href={href}
-          onClick={() => {
-            setActiveItem(label);
-            if (mobile) setIsMobileMenuOpen(false);
-          }}
-          aria-current={activeItem === label ? "page" : undefined}
-          className={"customer-dash-link" + (activeItem === label ? " is-active" : "")}
-        >
-          <Icon size={19} strokeWidth={1.9} aria-hidden="true" />
-          <span>{label}</span>
-        </a>
-      ))}
+      {navigationItems.map(({ label, href, Icon }) => {
+        const className = [
+          "customer-dash-link",
+          activeItem === label ? "is-active" : "",
+          href ? "" : "is-unavailable",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        const content = (
+          <>
+            <Icon size={19} strokeWidth={1.9} aria-hidden="true" />
+            <span>{label}</span>
+          </>
+        );
+
+        return href ? (
+          <a
+            key={label}
+            href={href}
+            onClick={() => {
+              setActiveItem(label);
+              if (mobile) setIsMobileMenuOpen(false);
+            }}
+            aria-current={activeItem === label ? "page" : undefined}
+            className={className}
+          >
+            {content}
+          </a>
+        ) : (
+          <span key={label} className={className} aria-disabled="true">
+            {content}
+          </span>
+        );
+      })}
     </nav>
   );
 
