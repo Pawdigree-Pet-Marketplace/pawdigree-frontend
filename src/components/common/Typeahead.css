@@ -1,0 +1,270 @@
+/* Search / location / vendor combobox and its suggestion list.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.ta,
+.ta *,
+.ta *::before,
+.ta *::after {
+  box-sizing: border-box;
+}
+
+.ta {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.ta) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.ta) h1,
+:where(.ta) h2,
+:where(.ta) h3,
+:where(.ta) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.ta) h2,
+:where(.ta) h3 {
+  color: var(--ink);
+}
+
+:where(.ta) p {
+  line-height: 1.6;
+}
+
+:where(.ta) ul,
+:where(.ta) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.ta) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.ta) img {
+  display: block;
+  max-width: 100%;
+}
+
+.ta svg {
+  flex-shrink: 0;
+}
+
+.ta :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.ta__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ta--pill {
+  position: static; /* dropdown anchors to the whole pill */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ta--pill .ta__wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #737c77;
+}
+
+.ta--pill input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 4px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+  text-overflow: ellipsis;
+}
+
+.ta--pill input::placeholder {
+  color: #6f7773;
+  opacity: 1;
+}
+
+.ta {
+  position: relative;
+}
+
+.ta__list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  z-index: 30;
+  max-height: min(360px, 60vh);
+  padding: 8px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 20px;
+  box-shadow: 0 18px 44px rgb(44 48 47 / 16%);
+  animation: ta-drop 0.18s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.ta__head {
+  padding: 10px 12px 4px;
+  color: #68716d;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ta__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--ink);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.ta__item svg {
+  color: var(--teal);
+}
+
+.ta__item.is-active {
+  background: var(--teal-light);
+}
+
+.ta__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ta__text strong {
+  font-weight: 800;
+}
+
+.ta__fuzzy {
+  margin: 0 5px 0 0;
+  color: var(--coral-dark);
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.ta__text strong + .ta__fuzzy {
+  margin: 0 0 0 1px;
+}
+
+.ta__hint {
+  flex-shrink: 0;
+  color: #68716d;
+  font-size: 0.76rem;
+}
+
+.ta__empty {
+  padding: 14px 12px;
+  color: #68716d;
+  font-size: 0.88rem;
+}
+
+.ta__label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.ta--field .ta__wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: #737c77;
+  background: #fff;
+  border: 1px solid #d8dcd5;
+  border-radius: 12px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ta--field .ta__wrap:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 4px rgb(33 108 104 / 16%);
+}
+
+.ta--field input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: inherit;
+}
+
+.ta--field .ta__list {
+  top: calc(100% + 6px);
+}
+
+@media (max-width: 720px) {
+  .ta--pill .ta__wrap {
+    gap: 8px;
+  }
+
+  .ta--pill .ta__wrap svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ta--pill input {
+    min-height: 48px;
+    font-size: 0.92rem;
+  }
+}
+
+@keyframes ta-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ta,
+  .ta *,
+  .ta *::before,
+  .ta *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

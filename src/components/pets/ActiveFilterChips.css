@@ -1,0 +1,112 @@
+/* Removable chips for the applied filters.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.filter-chips,
+.filter-chips *,
+.filter-chips *::before,
+.filter-chips *::after {
+  box-sizing: border-box;
+}
+
+.filter-chips {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.filter-chips) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.filter-chips) h1,
+:where(.filter-chips) h2,
+:where(.filter-chips) h3,
+:where(.filter-chips) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.filter-chips) h2,
+:where(.filter-chips) h3 {
+  color: var(--ink);
+}
+
+:where(.filter-chips) p {
+  line-height: 1.6;
+}
+
+:where(.filter-chips) ul,
+:where(.filter-chips) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.filter-chips) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.filter-chips) img {
+  display: block;
+  max-width: 100%;
+}
+
+.filter-chips svg {
+  flex-shrink: 0;
+}
+
+.filter-chips :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.filter-chips__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 7px 12px;
+  color: var(--teal-dark);
+  background: #fff;
+  border: 1px solid rgb(33 108 104 / 28%);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  transition: background-color 0.18s ease;
+}
+
+.filter-chips__chip:hover {
+  background: var(--teal-light);
+}
+
+.filter-chips__clear {
+  padding: 6px 8px;
+  color: var(--coral-dark);
+  background: none;
+  border: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-chips,
+  .filter-chips *,
+  .filter-chips *::before,
+  .filter-chips *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

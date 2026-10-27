@@ -1,0 +1,180 @@
+/* Trending searches.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.most-searched,
+.most-searched *,
+.most-searched *::before,
+.most-searched *::after {
+  box-sizing: border-box;
+}
+
+.most-searched {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.most-searched) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.most-searched) h1,
+:where(.most-searched) h2,
+:where(.most-searched) h3,
+:where(.most-searched) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.most-searched) h2,
+:where(.most-searched) h3 {
+  color: var(--ink);
+}
+
+:where(.most-searched) p {
+  line-height: 1.6;
+}
+
+:where(.most-searched) ul,
+:where(.most-searched) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.most-searched) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.most-searched) img {
+  display: block;
+  max-width: 100%;
+}
+
+.most-searched svg {
+  flex-shrink: 0;
+}
+
+.most-searched :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.most-searched {
+  padding: clamp(20px, 3vw, 32px);
+  background: rgb(255 255 255 / 70%);
+  border: 1px solid rgb(44 48 47 / 8%);
+  border-radius: 26px;
+  box-shadow: 0 10px 30px rgb(44 48 47 / 5%);
+}
+
+.most-searched__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.most-searched__icon {
+  display: grid;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  color: var(--coral-dark);
+  background: var(--coral-light);
+  border-radius: 16px;
+}
+
+.most-searched__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.most-searched__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 7px 16px 7px 7px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 999px;
+  font-weight: 800;
+  transition: transform 0.22s cubic-bezier(0.2, 0.75, 0.25, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.most-searched__pill:hover {
+  border-color: rgb(33 108 104 / 40%);
+  box-shadow: 0 8px 18px rgb(44 48 47 / 10%);
+  transform: translateY(-3px);
+}
+
+.most-searched__rank {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--coral-dark);
+  background: var(--coral-light);
+  border-radius: 50%;
+  font-size: 0.8rem;
+}
+
+.most-searched__list li:nth-child(-n + 3) .most-searched__rank {
+  color: #fff;
+  background: var(--coral);
+}
+
+.most-searched__term {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.most-searched__count {
+  color: #68716d;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .most-searched__head {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .most-searched__pill:hover {
+    transform: none;
+  }
+}
+
+.most-searched__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.25;
+}
+
+.most-searched__sub {
+  margin-top: 6px;
+  color: #68716d;
+  font-size: 0.95rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .most-searched,
+  .most-searched *,
+  .most-searched *::before,
+  .most-searched *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

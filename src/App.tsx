@@ -23,15 +23,20 @@ import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import ExplorePets from "./pages/Customer/ExplorePets";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
-import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
-import VendorLayout from './layouts/VendorLayout/VendorLayout';
+import VendorCategorySelector from "./pages/Vendor/VendorCategorySelector";
+import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import { Route } from "react-router-dom";
 function App() {
   const path = window.location.pathname;
 
   if (path === "/customer/dashboard") {
     return <CustomerDashboardLayout />;
+  }
+
+  if (path === "./explore-pets" || path === "/explore-pets/") {
+    return <ExplorePets />;
   }
 
   if (path === "/pets" || path === "/pets/") {
@@ -44,7 +49,7 @@ function App() {
   if (path === "/privacy") {
     return <PrivacyPage />;
   }
-     <Route path="/pets/:petId" element={<PetsDetailPage />} />
+  <Route path="/pets/:petId" element={<PetsDetailPage />} />;
   if (path === "/vendor/login" || path === "/vendor-login") {
     return <VendorLoginPage />;
   }
@@ -93,7 +98,7 @@ function App() {
   }
 
   if (path === "/vendor-registration") {
-    return <VendorRegistrationPage/>;
+    return <VendorRegistrationPage />;
   }
 
   if (path === "/vendor/business-profile") {

@@ -1,0 +1,337 @@
+/* Filter + sort panel (sidebar on desktop, bottom sheet on small screens).
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.pet-filters,
+.pet-filters *,
+.pet-filters *::before,
+.pet-filters *::after {
+  box-sizing: border-box;
+}
+
+.pet-filters {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.pet-filters) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.pet-filters) h1,
+:where(.pet-filters) h2,
+:where(.pet-filters) h3,
+:where(.pet-filters) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.pet-filters) h2,
+:where(.pet-filters) h3 {
+  color: var(--ink);
+}
+
+:where(.pet-filters) p {
+  line-height: 1.6;
+}
+
+:where(.pet-filters) ul,
+:where(.pet-filters) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.pet-filters) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.pet-filters) img {
+  display: block;
+  max-width: 100%;
+}
+
+.pet-filters svg {
+  flex-shrink: 0;
+}
+
+.pet-filters :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.pet-filters {
+  position: sticky;
+  top: 92px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 112px);
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgb(44 48 47 / 6%);
+}
+
+.pet-filters__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 12px;
+}
+
+.pet-filters__head h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+
+.pet-filters__head svg {
+  color: var(--teal);
+}
+
+.pet-filters__close {
+  display: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--ink);
+  background: var(--sand);
+  border: 0;
+  border-radius: 50%;
+}
+
+.pet-filters__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 4px 20px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.pet-filters__group {
+  margin: 0 0 20px;
+}
+
+.pet-filters__fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pet-filters__fieldset legend {
+  padding: 0;
+}
+
+.pet-filters__title {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.pet-filters__select,
+.pet-filters__field {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #d8dcd5;
+  border-radius: 12px;
+  font: inherit;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pet-filters__select:hover,
+.pet-filters__field:hover {
+  border-color: rgb(33 108 104 / 45%);
+}
+
+.pet-filters__select:focus-visible,
+.pet-filters__field:focus-visible {
+  border-color: var(--teal);
+  outline: none;
+  box-shadow: 0 0 0 4px rgb(33 108 104 / 16%);
+}
+
+.pet-filters__segment {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--sand);
+  border-radius: 999px;
+}
+
+.pet-filters__segment button {
+  min-height: 36px;
+  padding: 0 6px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pet-filters__segment button.is-on {
+  color: #fff;
+  background: var(--teal);
+  box-shadow: 0 3px 8px rgb(33 108 104 / 28%);
+}
+
+.pet-filters__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pet-filters__check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+
+.pet-filters__check-icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--sp-fg);
+  background: var(--sp-bg);
+  border-radius: 50%;
+}
+
+.pet-filters__loc-list,
+.pet-filters__popular {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pet-filters__loc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  color: var(--teal-dark);
+  background: var(--teal-light);
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.pet-filters__popular button {
+  padding: 5px 11px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.pet-filters__popular button.is-on {
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.pet-filters__range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #68716d;
+  font-size: 0.8rem;
+}
+
+.pet-filters__hint {
+  margin-top: 6px;
+  color: #68716d;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.pet-filters__error {
+  margin-top: 6px;
+  color: #a43425;
+  font-size: 0.85rem;
+  animation: pet-filters-drop 0.25s ease both;
+}
+
+.pet-filters__actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid #e7e5de;
+}
+
+.pet-filters__actions .pw-btn--primary {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 1023px) {
+  .pet-filters__close {
+    display: grid;
+  }
+
+  .pet-filters {
+    position: fixed;
+    z-index: 1001;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-height: 88vh;
+    max-height: 88dvh;
+    border: 0;
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -14px 44px rgb(44 48 47 / 24%);
+    visibility: hidden;
+    transform: translateY(105%);
+    transition: transform 0.35s cubic-bezier(0.2, 0.75, 0.25, 1), visibility 0s linear 0.35s;
+  }
+
+  .pet-filters.is-open {
+    visibility: visible;
+    transform: none;
+    transition: transform 0.35s cubic-bezier(0.2, 0.75, 0.25, 1), visibility 0s;
+  }
+}
+
+@keyframes pet-filters-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-filters,
+  .pet-filters *,
+  .pet-filters *::before,
+  .pet-filters *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
