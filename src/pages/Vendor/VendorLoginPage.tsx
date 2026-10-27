@@ -312,9 +312,17 @@ export default function VendorLoginPage() {
         </p>
       </section>
 
-      <footer className="vendor-login-footer">
-        Your business, growing with Pawdigree.
-      </footer>
+      <aside className="vendor-login-welcome">
+        <div className="vendor-login-welcome-copy">
+          <span className="vendor-login-welcome-kicker">PAWDIGREE FOR PET PROS</span>
+          <h1>Big things start with the care you give.</h1>
+          <p>Bring your pet business to a community that loves animals as much as you do.</p>
+          <div className="vendor-login-fact">
+            <span className="vendor-login-fact-icon" aria-hidden="true"><Store size={20} /></span>
+            <span><strong>Your business, growing with Pawdigree.</strong><small>Showcase your services and connect with local pet owners.</small></span>
+          </div>
+        </div>
+      </aside>
     </main>
   );
 }
