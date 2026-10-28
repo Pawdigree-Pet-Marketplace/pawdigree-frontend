@@ -61,6 +61,7 @@ import {
 import "./ExplorePets.css";
 
 const ALL_KINDS: SuggestionKind[] = ["breed", "pet", "location", "vendor"];
+const EMPTY_PAGE: PagedPets = { count: 0, results: [] };
 
 type Patch = Partial<PetQuery> | ((prev: PetQuery) => Partial<PetQuery>);
 
@@ -94,14 +95,17 @@ export default function ExplorePets() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   /* data */
-  const [data, setData] = useState<PagedPets>({ count: 0, results: [] });
-  const [status, setStatus] = useState<"loading" | "ready" | "error">(
-    "loading",
-  );
+  const [result, setResult] = useState<{
+    key: string;
+    data?: PagedPets;
+  } | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [featured, setFeatured] = useState<FeaturedPet[]>([]);
   const [trending, setTrending] = useState<TrendingSearch[]>([]);
-  const [didYouMean, setDidYouMean] = useState<Suggestion[]>([]);
+  const [didYouMeanFor, setDidYouMeanFor] = useState<{
+    term: string;
+    items: Suggestion[];
+  } | null>(null);
 
   const { ids: favs, toggle: toggleFav } = useFavourites();
   const resultsRef = useRef<HTMLElement>(null);
@@ -127,10 +131,12 @@ export default function ExplorePets() {
     [scrollToResults],
   );
 
-  /* keep the sidebar draft in step with the applied query */
-  useEffect(() => {
+  /* keep the sidebar draft in step with the applied query (adjusted while rendering, not in an effect) */
+  const [syncedQuery, setSyncedQuery] = useState(query);
+  if (query !== syncedQuery) {
+    setSyncedQuery(query);
     setDraft(queryFilters(query));
-  }, [query]);
+  }
 
   /* URL sync */
   useEffect(() => {
@@ -142,23 +148,38 @@ export default function ExplorePets() {
     );
   }, [query]);
 
-  /* fetch the page of pets whenever the query changes */
+  /* fetch the page of pets whenever the query changes.
+     "loading" is derived: it is simply "the stored answer is not for the current query yet". */
+  const queryKey = `${queryToParams(query).toString()}#${reloadKey}`;
   useEffect(() => {
     let cancelled = false;
-    setStatus("loading");
     fetchPets(query)
       .then((res) => {
         if (cancelled) return;
-        setData(res);
-        setStatus("ready");
+        const pages = Math.max(1, Math.ceil(res.count / PAGE_SIZE));
+        if (query.page > pages) {
+          // filters shrank the results below this page: go back to the last page
+          setQuery((prev) => ({ ...prev, page: pages }));
+          return;
+        }
+        setResult({ key: queryKey, data: res });
       })
       .catch(() => {
-        if (!cancelled) setStatus("error");
+        if (!cancelled) setResult({ key: queryKey });
       });
     return () => {
       cancelled = true;
     };
-  }, [query, reloadKey]);
+  }, [query, queryKey]);
+
+  const answered = result?.key === queryKey;
+  const status: "loading" | "ready" | "error" = !answered
+    ? "loading"
+    : result.data
+      ? "ready"
+      : "error";
+  const data: PagedPets = (answered && result.data) || EMPTY_PAGE;
+  const totalPages = Math.max(1, Math.ceil(data.count / PAGE_SIZE));
 
   /* top picks + most searched: fetched once */
   useEffect(() => {
@@ -174,32 +195,30 @@ export default function ExplorePets() {
     };
   }, []);
 
-  const totalPages = Math.max(1, Math.ceil(data.count / PAGE_SIZE));
-
-  /* if filters shrink the results below the current page, go back */
-  useEffect(() => {
-    if (status === "ready" && query.page > totalPages) {
-      setQuery((prev) => ({ ...prev, page: totalPages }));
-    }
-  }, [status, query.page, totalPages]);
-
   /* "Did you mean ...?" when a typed search finds nothing */
+  const searchTerm = query.search.trim();
+  const wantsSuggestions =
+    status === "ready" && data.count === 0 && searchTerm !== "";
   useEffect(() => {
+    if (!wantsSuggestions) return;
     let cancelled = false;
-    const term = query.search.trim();
-    if (status !== "ready" || data.count > 0 || !term) {
-      setDidYouMean([]);
-      return;
-    }
-    fetchSuggestions(term, ["breed", "location", "vendor"])
+    fetchSuggestions(searchTerm, ["breed", "location", "vendor"])
       .then((res) => {
-        if (!cancelled) setDidYouMean(res.filter((s) => s.fuzzy).slice(0, 3));
+        if (!cancelled)
+          setDidYouMeanFor({
+            term: searchTerm,
+            items: res.filter((s) => s.fuzzy).slice(0, 3),
+          });
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [status, data.count, query.search]);
+  }, [wantsSuggestions, searchTerm]);
+  const didYouMean =
+    wantsSuggestions && didYouMeanFor?.term === searchTerm
+      ? didYouMeanFor.items
+      : [];
 
   /* mobile filter sheet: lock scroll, close on Escape / when resized to desktop */
   useEffect(() => {
@@ -221,82 +240,83 @@ export default function ExplorePets() {
     };
   }, [filtersOpen]);
 
-  /* active filter chips */
+  /* active filter chips (plain data; removal is handled by removeChip) */
   const chips = useMemo<ActiveChip[]>(() => {
     const list: ActiveChip[] = [];
-    if (query.search.trim()) {
+    if (query.search.trim())
       list.push({
         id: "search",
         label: `“${query.search.trim()}”`,
         isSearch: true,
-        onRemove: () => {
-          setSearchInput("");
-          updateQuery({ search: "" });
-        },
       });
-    }
     query.species.forEach((s) =>
       list.push({
         id: `sp-${s}`,
         label: SPECIES.find((x) => x.key === s)?.plural ?? s,
-        onRemove: () =>
-          updateQuery((prev) => ({
-            species: prev.species.filter((x) => x !== s),
-          })),
       }),
     );
     if (query.listingType) {
       list.push({
         id: "type",
         label: query.listingType === "ADOPTION" ? "Adoption" : "For sale",
-        onRemove: () => updateQuery({ listingType: "" }),
       });
     }
     query.locations.forEach((loc) =>
-      list.push({
-        id: `loc-${loc}`,
-        label: loc,
-        onRemove: () =>
-          updateQuery((prev) => ({
-            locations: prev.locations.filter((x) => x !== loc),
-          })),
-      }),
+      list.push({ id: `loc-${loc}`, label: loc }),
     );
-    if (query.vendor.trim()) {
-      list.push({
-        id: "vendor",
-        label: query.vendor.trim(),
-        onRemove: () => updateQuery({ vendor: "" }),
-      });
-    }
+    if (query.vendor.trim())
+      list.push({ id: "vendor", label: query.vendor.trim() });
     if (query.gender) {
       list.push({
         id: "gender",
-        label: query.gender === "MALE" ? "Male" : "Female",
-        onRemove: () => updateQuery({ gender: "" }),
+        label:
+          query.gender === "MALE"
+            ? "Male"
+            : query.gender === "FEMALE"
+              ? "Female"
+              : "Unknown",
       });
     }
     if (query.minAge || query.maxAge) {
       list.push({
         id: "age",
         label: `Age ${query.minAge || "0"}–${query.maxAge || "any"} mo`,
-        onRemove: () => updateQuery({ minAge: "", maxAge: "" }),
       });
     }
     if (query.minPrice || query.maxPrice) {
       list.push({
         id: "price",
         label: `UGX ${query.minPrice || "0"}–${query.maxPrice || "any"}`,
-        onRemove: () => updateQuery({ minPrice: "", maxPrice: "" }),
       });
     }
     return list;
-  }, [query, updateQuery]);
+  }, [query]);
 
   const hasCriteria = chips.length > 0;
   const filterCount = chips.filter((c) => !c.isSearch).length;
 
   /* handlers */
+  function removeChip(id: string) {
+    if (id === "search") {
+      setSearchInput("");
+      updateQuery({ search: "" });
+    } else if (id.startsWith("sp-")) {
+      const key = id.slice(3);
+      updateQuery((prev) => ({
+        species: prev.species.filter((x) => x !== key),
+      }));
+    } else if (id.startsWith("loc-")) {
+      const loc = id.slice(4);
+      updateQuery((prev) => ({
+        locations: prev.locations.filter((x) => x !== loc),
+      }));
+    } else if (id === "type") updateQuery({ listingType: "" });
+    else if (id === "vendor") updateQuery({ vendor: "" });
+    else if (id === "gender") updateQuery({ gender: "" });
+    else if (id === "age") updateQuery({ minAge: "", maxAge: "" });
+    else if (id === "price") updateQuery({ minPrice: "", maxPrice: "" });
+  }
+
   function handleSearchSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     updateQuery({ search: searchInput.trim() }, { scroll: true });
@@ -577,7 +597,11 @@ export default function ExplorePets() {
                 </button>
               </div>
 
-              <ActiveFilterChips chips={chips} onClearAll={clearAll} />
+              <ActiveFilterChips
+                chips={chips}
+                onRemove={removeChip}
+                onClearAll={clearAll}
+              />
 
               {status === "loading" ? (
                 <PetGrid

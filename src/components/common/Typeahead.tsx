@@ -147,8 +147,6 @@ export default function Typeahead({
     }
   }
 
-  let lastKind: SuggestionKind | null = null;
-
   return (
     <div className={`ta ta--${variant}`}>
       <label className={hideLabel ? "ta__sr" : "ta__label"} htmlFor={inputId}>
@@ -191,7 +189,7 @@ export default function Typeahead({
         >
           {items.map((s, i) => {
             const head =
-              s.kind !== lastKind ? (
+              i === 0 || items[i - 1].kind !== s.kind ? (
                 <li
                   className="ta__head"
                   role="presentation"
@@ -200,7 +198,6 @@ export default function Typeahead({
                   {KIND_LABEL[s.kind]}
                 </li>
               ) : null;
-            lastKind = s.kind;
             const Icon = KIND_ICON[s.kind];
             return (
               <Fragment key={`${s.kind}-${s.label}`}>

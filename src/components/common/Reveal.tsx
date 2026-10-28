@@ -9,15 +9,12 @@ interface RevealProps {
 /** Fades a block in the first time it scrolls into view. */
 export default function Reveal({ children, className = "" }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
+  // Without IntersectionObserver (very old browsers) show the content straight away.
+  const [shown, setShown] = useState(() => !("IntersectionObserver" in window));
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (!("IntersectionObserver" in window)) {
-      setShown(true);
-      return;
-    }
+    if (!el || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

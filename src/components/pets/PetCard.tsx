@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { Heart, MapPin, PawPrint, Sparkles, Store } from "lucide-react";
 import { SPECIES, type PublicPet } from "../../data/pets";
 import {
@@ -20,13 +20,10 @@ const GENDER_LABEL: Record<string, string> = {
 
 function PetImage({ pet }: { pet: PublicPet }) {
   const src = primaryImage(pet);
-  const [failed, setFailed] = useState(false);
+  // remember WHICH url failed, so a new photo is tried again without needing an effect
+  const [failedSrc, setFailedSrc] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    setFailed(false);
-  }, [src]);
-
-  if (!src || failed)
+  if (!src || failedSrc === src)
     return (
       <div
         className="pet-card__placeholder"
@@ -39,7 +36,7 @@ function PetImage({ pet }: { pet: PublicPet }) {
       src={src}
       alt={`${pet.name}, ${pet.breed ?? pet.species}`}
       loading="lazy"
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(src)}
     />
   );
 }

@@ -63,6 +63,11 @@
   outline-offset: 3px;
 }
 
+/* the field/pill wrapper already shows the focus ring (see :focus-within below), so the input itself gets none */
+.ta input:focus-visible {
+  outline: none;
+}
+
 .ta__sr {
   position: absolute;
   width: 1px;

@@ -5,16 +5,17 @@ export interface ActiveChip {
   id: string;
   label: string;
   isSearch?: boolean;
-  onRemove: () => void;
 }
 
 interface ActiveFilterChipsProps {
   chips: ActiveChip[];
+  onRemove: (id: string) => void;
   onClearAll: () => void;
 }
 
 export default function ActiveFilterChips({
   chips,
+  onRemove,
   onClearAll,
 }: ActiveFilterChipsProps) {
   if (chips.length === 0) return null;
@@ -25,7 +26,7 @@ export default function ActiveFilterChips({
           <button
             type="button"
             className="filter-chips__chip"
-            onClick={chip.onRemove}
+            onClick={() => onRemove(chip.id)}
           >
             {chip.label}
             <X size={14} aria-label={`Remove filter ${chip.label}`} />
