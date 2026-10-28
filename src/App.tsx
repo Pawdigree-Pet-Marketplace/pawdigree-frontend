@@ -1,3 +1,6 @@
+
+import { Navigate, Route, Routes } from "react-router-dom";
+
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
@@ -8,153 +11,136 @@ import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
+import PetsDetailPage from "./pages/Customer/PetsDetailPage"; 
+//import AdoptionRequest from "./pages/Customer/AdoptionRequest";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
-import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
-import PrivacyPage from "./pages/PrivacyPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
-import VendorAddServicePage from "./pages/Vendor/VendorAddServicePage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
-import ResetPasswordForm from "./components/auth/ResetPasswordForm";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import ExplorePets from "./pages/Customer/ExplorePets";
-import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import VendorCategorySelector from "./pages/Vendor/VendorCategorySelector";
+
+import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
+import ResetPasswordForm from "./components/auth/ResetPasswordForm";
+
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import VendorLayout from "./layouts/VendorLayout/VendorLayout";
-import { Route } from "react-router-dom";
+
 function App() {
-  const path = window.location.pathname;
+  return (
+    <Routes>
+      {/* Public pages */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/pets" element={<CustomerPetCataloguePage />} />
+      <Route path="/pets/:petId" element={<PetsDetailPage />} />
+      <Route path="/vendors" element={<CustomerVendorsPage />} />
+      <Route
+        path="/vendors/:vendorId"
+        element={<CustomerVendorProfilePage />}
+      />
 
-  if (path === "/customer/dashboard") {
-    return <CustomerDashboardLayout />;
-  }
+      {/* Customer account pages */}
+      <Route
+        path="/customer/dashboard"
+        element={<CustomerDashboardLayout />}
+      />
+      <Route path="/registration" element={<RegistrationPage />} />
+      <Route path="/login" element={<CustomerLoginPage />} />
+      <Route
+        path="/customer-login"
+        element={<CustomerLoginPage />}
+      />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile/edit" element={<EditProfilePage />} />
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />}
+      />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordForm />}
+      />
 
-  if (path === "/explore-pets" || path === "/explore-pets/") {
-    return <ExplorePets />;
-  }
+     // {/* Adoption application */}
+     // <Route
+     //   path="/adoption-request"
+       // element={<AdoptionRequest />}
+      /> 
 
-  if (path === "/pets" || path === "/pets/") {
-    return <CustomerPetCataloguePage />;
-  }
+      {/* Vendor pages */}
+      <Route path="/vendor" element={<VendorLandingPage />} />
+      <Route path="/vendor/login" element={<VendorLoginPage />} />
+      <Route path="/vendor-login" element={<VendorLoginPage />} />
+      <Route
+        path="/vendor/register"
+        element={<VendorRegistrationPage />}
+      />
+      <Route
+        path="/vendor-registration"
+        element={<VendorRegistrationPage />}
+      />
+      <Route
+        path="/register.vendor"
+        element={<VendorRegistrationPage />}
+      />
+      <Route
+        path="/business-registration"
+        element={<BusinessRegistrationForm />}
+      />
+      <Route
+        path="/vendor/dashboard"
+        element={<VendorDashboardPage />}
+      />
+      <Route
+        path="/vendor/listings"
+        element={<VendorCataloguePage />}
+      />
+      <Route
+        path="/vendor/listings/new"
+        element={<VendorAddPetPage />}
+      />
+      <Route
+        path="/vendor/edit-pet/:petId"
+        element={<VendorEditPetListing />}
+      />
+      <Route
+        path="/vendor/documents"
+        element={<DocumentUpload />}
+      />
+      <Route
+        path="/vendor/business-profile"
+        element={<VendorBusinessProfilePage />}
+      />
+      <Route
+        path="/vendor/categories"
+        element={
+          <VendorLayout
+            title="Vendor Categories"
+            description="Manage your pet categories and listings."
+          >
+            <VendorCategorySelector />
+          </VendorLayout>
+        }
+      />
 
-  if (path === "/terms-and-conditions") {
-    return <TermsAndConditionsPage />;
-  }
-  if (path === "/privacy") {
-    return <PrivacyPage />;
-  }
-  <Route path="/pets/:petId" element={<PetsDetailPage />} />;
-  if (path === "/vendor/login" || path === "/vendor-login") {
-    return <VendorLoginPage />;
-  }
+      {/* Legal pages */}
+      <Route
+        path="/terms-and-conditions"
+        element={<TermsAndConditionsPage />}
+      />
+      <Route path="/privacy" element={<PrivacyPage />} />
 
-  if (path === "/vendor") {
-    return <VendorLandingPage />;
-  }
-
-  if (path === "/vendors" || path === "/vendors/") {
-    return <CustomerVendorsPage />;
-  }
-
-  if (path.startsWith("/vendors/")) {
-    return <CustomerVendorProfilePage />;
-  }
-
-  if (path === "/vendor/dashboard") {
-    return <VendorDashboardPage />;
-  }
-
-  if (path === "/vendor/listings") {
-    return <VendorCataloguePage />;
-  }
-
-  if (path === "/vendor/listings/new") {
-    return <VendorAddPetPage />;
-  }
-
-  if (path === "/vendor/services/new") {
-    return <VendorAddServicePage />;
-  }
-
-  if (path.startsWith("/vendor/edit-pet/")) {
-    return <VendorEditPetListing />;
-  }
-
-  if (path === "/vendor") {
-    return <VendorLandingPage />;
-  }
-  if (path === "/vendor/documents") {
-    return <DocumentUpload />;
-  }
-
-  if (path === "/business-registration") {
-    return <BusinessRegistrationForm />;
-  }
-
-  if (path === "/vendor-registration") {
-    return <VendorRegistrationPage />;
-  }
-
-  if (path === "/vendor/business-profile") {
-    return <VendorBusinessProfilePage />;
-  }
-
-  if (path === "/vendor/categories") {
-    return (
-      <VendorLayout
-        title="Vendor Categories"
-        description="Manage your pet categories and listings."
-      >
-        <VendorCategorySelector />
-      </VendorLayout>
-    );
-  }
-
-  if (
-    path.startsWith("/vendor/register") ||
-    path.startsWith("/register.vendor")
-  ) {
-    return <VendorRegistrationPage />;
-  }
-
-  if (path === "/registration") {
-    return <RegistrationPage />;
-  }
-
-  if (path === "/profile") {
-    return <ProfilePage />;
-  }
-
-  if (path === "/profile/edit") {
-    return <EditProfilePage />;
-  }
-
-  if (path === "/login" || path === "/customer-login") {
-    return <CustomerLoginPage />;
-  }
-
-  if (path === "/forgot-password") {
-    return <ForgotPasswordPage />;
-  }
-
-  if (path === "/verify-email") {
-    return <VerifyEmailPage />;
-  }
-
-  if (path === "/reset-password" || path === "/reset-password/") {
-    return <ResetPasswordForm />;
-  }
-
-  if (path.startsWith("/vendor/")) {
-    return <VendorDashboardPage />;
-  }
-
-  return <LandingPage />;
+      {/* Unknown URL */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
+
 export default App;
