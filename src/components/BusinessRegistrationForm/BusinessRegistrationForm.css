@@ -481,3 +481,89 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Business registration polish */
+.business-registration-page {
+  padding: clamp(16px, 4vw, 40px) 18px;
+}
+
+.business-registration-container {
+  max-width: 640px;
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.business-registration-container h1 {
+  letter-spacing: -0.4px;
+}
+
+.business-registration-container form {
+  gap: 20px;
+}
+
+.form-group {
+  gap: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  border-color: #d3ddda;
+  background-color: #fff;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #858d89;
+  opacity: 1;
+}
+
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible,
+.business-country-select select:focus-visible {
+  outline: 3px solid rgba(33, 108, 104, 0.2);
+  outline-offset: 2px;
+}
+
+.business-hours {
+  padding: 18px;
+}
+
+.business-hours legend {
+  font-size: 1rem;
+}
+
+.business-hours-row {
+  grid-template-columns: minmax(90px, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.business-hours-row input[type="time"] {
+  min-height: 40px;
+}
+
+.form-message {
+  border-radius: 10px;
+}
+
+@media (max-width: 480px) {
+  .business-registration-page {
+    padding: 12px;
+  }
+
+  .business-registration-container {
+    padding: 20px 16px;
+  }
+
+  .business-hours {
+    padding: 12px;
+  }
+
+  .business-hours-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .business-hours-row input[type="time"] {
+    grid-column: 1 / -1;
+  }
+}
