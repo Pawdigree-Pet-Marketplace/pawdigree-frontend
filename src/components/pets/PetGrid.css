@@ -1,0 +1,106 @@
+/* Responsive card grid.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.pet-grid,
+.pet-grid *,
+.pet-grid *::before,
+.pet-grid *::after {
+  box-sizing: border-box;
+}
+
+.pet-grid {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.pet-grid) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.pet-grid) h1,
+:where(.pet-grid) h2,
+:where(.pet-grid) h3,
+:where(.pet-grid) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.pet-grid) h2,
+:where(.pet-grid) h3 {
+  color: var(--ink);
+}
+
+:where(.pet-grid) p {
+  line-height: 1.6;
+}
+
+:where(.pet-grid) ul,
+:where(.pet-grid) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.pet-grid) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.pet-grid) img {
+  display: block;
+  max-width: 100%;
+}
+
+.pet-grid svg {
+  flex-shrink: 0;
+}
+
+.pet-grid :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 20px;
+}
+
+.pet-grid > .pet-card {
+  animation: pet-grid-rise 0.5s cubic-bezier(0.2, 0.75, 0.25, 1) backwards;
+  animation-delay: calc(var(--n, 0) * 55ms);
+}
+
+@media (max-width: 560px) {
+  .pet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 340px) {
+  .pet-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@keyframes pet-grid-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-grid,
+  .pet-grid *,
+  .pet-grid *::before,
+  .pet-grid *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

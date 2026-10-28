@@ -1,0 +1,106 @@
+/* Empty and error panel.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.empty-state,
+.empty-state *,
+.empty-state *::before,
+.empty-state *::after {
+  box-sizing: border-box;
+}
+
+.empty-state {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.empty-state) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.empty-state) h1,
+:where(.empty-state) h2,
+:where(.empty-state) h3,
+:where(.empty-state) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.empty-state) h2,
+:where(.empty-state) h3 {
+  color: var(--ink);
+}
+
+:where(.empty-state) p {
+  line-height: 1.6;
+}
+
+:where(.empty-state) ul,
+:where(.empty-state) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.empty-state) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.empty-state) img {
+  display: block;
+  max-width: 100%;
+}
+
+.empty-state svg {
+  flex-shrink: 0;
+}
+
+.empty-state :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(32px, 6vw, 56px) 20px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 26px;
+}
+
+.empty-state p {
+  max-width: 420px;
+  color: #68716d;
+}
+
+.empty-state .pw-btn--primary {
+  margin-top: 8px;
+}
+
+.empty-state__icon {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+  color: var(--teal);
+  background: var(--teal-light);
+  border-radius: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty-state,
+  .empty-state *,
+  .empty-state *::before,
+  .empty-state *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

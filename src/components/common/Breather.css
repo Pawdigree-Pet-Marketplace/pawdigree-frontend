@@ -1,0 +1,165 @@
+/* Calm pause between rows of cards.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.breather,
+.breather *,
+.breather *::before,
+.breather *::after {
+  box-sizing: border-box;
+}
+
+.breather {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.breather) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.breather) h1,
+:where(.breather) h2,
+:where(.breather) h3,
+:where(.breather) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.breather) h2,
+:where(.breather) h3 {
+  color: var(--ink);
+}
+
+:where(.breather) p {
+  line-height: 1.6;
+}
+
+:where(.breather) ul,
+:where(.breather) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.breather) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.breather) img {
+  display: block;
+  max-width: 100%;
+}
+
+.breather svg {
+  flex-shrink: 0;
+}
+
+.breather :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.breather {
+  position: relative;
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 18px;
+  padding: clamp(18px, 2.4vw, 26px) clamp(18px, 3vw, 32px);
+  overflow: hidden;
+  background: linear-gradient(115deg, #e7f3ec, #fbf5e9 68%, #ffeae1);
+  border: 1px solid rgb(33 108 104 / 13%);
+  border-radius: 24px;
+}
+
+.breather__icon {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: var(--coral);
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 16px rgb(251 134 101 / 22%);
+  animation: breather-beat 2.6s ease-in-out infinite;
+}
+
+.breather strong {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+}
+
+.breather p {
+  max-width: 560px;
+  margin-top: 2px;
+  color: #68716d;
+}
+
+.breather > div {
+  position: relative;
+}
+
+.breather__paw {
+  position: absolute;
+  color: rgb(33 108 104 / 14%);
+  animation: breather-float 5s ease-in-out infinite;
+}
+
+.breather__paw--1 { top: 12%; right: 7%; rotate: -16deg; }
+
+.breather__paw--2 { right: 16%; bottom: 14%; color: rgb(251 134 101 / 30%); rotate: 14deg; animation-delay: 1s; }
+
+@media (max-width: 720px) {
+  .breather {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@keyframes breather-beat {
+  0%,
+  70%,
+  100% {
+    transform: scale(1);
+  }
+
+  14% {
+    transform: scale(1.12);
+  }
+
+  28% {
+    transform: scale(1);
+  }
+
+  42% {
+    transform: scale(1.07);
+  }
+}
+
+@keyframes breather-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breather,
+  .breather *,
+  .breather *::before,
+  .breather *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

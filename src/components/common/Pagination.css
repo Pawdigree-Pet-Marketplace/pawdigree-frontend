@@ -1,0 +1,160 @@
+/* Page switcher.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.pager,
+.pager *,
+.pager *::before,
+.pager *::after {
+  box-sizing: border-box;
+}
+
+.pager {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.pager) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.pager) h1,
+:where(.pager) h2,
+:where(.pager) h3,
+:where(.pager) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.pager) h2,
+:where(.pager) h3 {
+  color: var(--ink);
+}
+
+:where(.pager) p {
+  line-height: 1.6;
+}
+
+:where(.pager) ul,
+:where(.pager) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.pager) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.pager) img {
+  display: block;
+  max-width: 100%;
+}
+
+.pager svg {
+  flex-shrink: 0;
+}
+
+.pager :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 36px;
+}
+
+.pager__list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pager__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 8px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 999px;
+  font-weight: 800;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.pager__btn:hover:not(:disabled):not(.is-current) {
+  color: var(--teal);
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.pager__btn.is-current {
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: 0 5px 12px rgb(33 108 104 / 28%);
+}
+
+.pager__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pager__nav {
+  padding: 0 14px;
+}
+
+.pager__gap {
+  padding: 0 4px;
+  color: #68716d;
+  font-weight: 800;
+}
+
+.pager__status {
+  display: none;
+  color: #68716d;
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .pager__hide-sm,
+  .pager__gap {
+    display: none;
+  }
+
+  .pager__status {
+    display: inline;
+  }
+
+  .pager__nav span {
+    display: none;
+  }
+
+  .pager__nav {
+    padding: 0;
+    width: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pager,
+  .pager *,
+  .pager *::before,
+  .pager *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

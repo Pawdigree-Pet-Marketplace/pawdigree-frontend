@@ -1,0 +1,148 @@
+/* Swipeable rail of top picks.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.featured-rail,
+.featured-rail *,
+.featured-rail *::before,
+.featured-rail *::after {
+  box-sizing: border-box;
+}
+
+.featured-rail {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.featured-rail) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.featured-rail) h1,
+:where(.featured-rail) h2,
+:where(.featured-rail) h3,
+:where(.featured-rail) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.featured-rail) h2,
+:where(.featured-rail) h3 {
+  color: var(--ink);
+}
+
+:where(.featured-rail) p {
+  line-height: 1.6;
+}
+
+:where(.featured-rail) ul,
+:where(.featured-rail) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.featured-rail) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.featured-rail) img {
+  display: block;
+  max-width: 100%;
+}
+
+.featured-rail svg {
+  flex-shrink: 0;
+}
+
+.featured-rail :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.featured-rail {
+  position: relative;
+}
+
+.featured-rail__track {
+  display: flex;
+  gap: 18px;
+  padding: 8px 4px 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.featured-rail__track::-webkit-scrollbar {
+  display: none;
+}
+
+.featured-rail__track > li {
+  flex: 0 0 clamp(250px, 24vw, 296px);
+  scroll-snap-align: start;
+}
+
+.featured-rail__btn {
+  position: absolute;
+  top: 38%;
+  z-index: 3;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  color: var(--teal);
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgb(44 48 47 / 14%);
+  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.featured-rail__btn:hover {
+  color: #fff;
+  background: var(--teal);
+  transform: scale(1.08);
+}
+
+.featured-rail__btn--prev { left: -20px; }
+
+.featured-rail__btn--next { right: -20px; }
+
+.featured-rail__track .pet-card {
+  animation: featured-rail-rise 0.5s cubic-bezier(0.2, 0.75, 0.25, 1) backwards;
+  animation-delay: calc(var(--n, 0) * 55ms);
+}
+
+@media (max-width: 1023px) {
+  .featured-rail__btn {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .featured-rail__track > li {
+    flex-basis: 70vw;
+  }
+}
+
+@keyframes featured-rail-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-rail,
+  .featured-rail *,
+  .featured-rail *::before,
+  .featured-rail *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
