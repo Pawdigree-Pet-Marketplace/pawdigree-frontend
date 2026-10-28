@@ -161,10 +161,7 @@ function BusinessRegistrationForm() {
           headers,
           signal: controller.signal,
         });
-        response.ok
-response.json()
-setCategories
-
+        
         if (response.status === 401) {
           throw new Error(
             "The categories endpoint requires valid authentication. Please log in again."
