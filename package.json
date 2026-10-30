@@ -17,7 +17,7 @@
     "country-flag-icons": "^1.6.20",
     "dependencies": "^0.0.1",
     "libphonenumber-js": "^1.13.15",
-    "lucide-react": "^1.61.0",
+    "lucide-react": "^1.62.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.4"

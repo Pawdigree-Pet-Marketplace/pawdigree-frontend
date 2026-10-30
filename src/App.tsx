@@ -25,7 +25,7 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import VendorCategorySelector from './pages/Vendor/VendorCategorySelector';
 import VendorLayout from './layouts/VendorLayout/VendorLayout';
-import { Route } from "react-router-dom";
+import AdoptionRequest from "./pages/Customer/AdoptionRequest";
 function App() {
   const path = window.location.pathname;
 
@@ -43,11 +43,15 @@ function App() {
   if (path === "/privacy") {
     return <PrivacyPage />;
   }
-     <Route path="/pets/:petId" element={<PetsDetailPage />} />
+  if (path.startsWith("/pets/")) {
+    return <PetsDetailPage />;
+  }
   if (path === "/vendor/login" || path === "/vendor-login") {
     return <VendorLoginPage />;
   }
-
+  if (path === "/adoption-request") {
+    return <AdoptionRequest />;
+  }
   if (path === "/vendor") {
     return <VendorLandingPage />;
   }
