@@ -257,3 +257,39 @@
 @media (max-width: 460px) {
   .login-page--auth .login-card { padding: 22px 19px 18px; }
 }
+/* Keep the login card clear of the overlay navbar, with no inner scrolling */
+@media (min-width: 761px) {
+  .login-page--auth {
+    --login-nav-offset: 76px; /* just under the navbar height */
+    padding-top: var(--login-nav-offset);
+    overflow: visible; /* never clip the card */
+  }
+
+  .login-page--auth .login-card {
+    max-height: none;
+    overflow: visible;
+    padding-top: 20px;
+    padding-bottom: 18px;
+  }
+
+  .login-welcome-panel {
+    min-height: calc(100svh - var(--login-nav-offset));
+  }
+}
+
+/* Short laptop screens: tighten the card so it still fits without scrolling */
+@media (min-width: 761px) and (max-height: 700px) {
+  .login-page--auth .login-card {
+    padding-top: 14px;
+    padding-bottom: 12px;
+  }
+
+  .login-page--auth .login-logo {
+    margin-bottom: 6px;
+  }
+
+  .login-page--auth .login-logo .real-logo {
+    width: 44px;
+    height: 44px;
+  }
+}

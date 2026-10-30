@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, ArrowRight, PawPrint, Store } from "lucide-react";
+import { ArrowRight, PawPrint, Store } from "lucide-react";
 import "./CustomerLoginPage.css";
-import logo from "../../assets/logos/icon-logo.svg";
 import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
+import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
 
 type Step = "welcome" | "password" | "phone";
 
@@ -12,6 +13,7 @@ export default function CustomerLoginPage() {
   }, []);
 
   const [step, setStep] = useState<Step>("welcome");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleBack = () => {
     if (step === "phone") {
@@ -26,23 +28,22 @@ export default function CustomerLoginPage() {
   };
 
   return (
+    <>
+    <TopNavbar
+      isLoggedIn={false}
+      loginOverlay
+      backAction={{ label: "Back", onClick: handleBack }}
+      isMenuOpen={isMenuOpen}
+      setIsMenuOpen={setIsMenuOpen}
+    />
+    <SideMenu
+      isOpen={isMenuOpen}
+      setIsOpen={setIsMenuOpen}
+      isLoggedIn={false}
+      audience="customer"
+      onClose={() => setIsMenuOpen(false)}
+    />
     <div className={`login-page ${step === "welcome" ? "login-page--role-selection" : "login-page--auth"}`}>
-      <div className="top-bar">
-        <button type="button" className="back-btn" onClick={handleBack} aria-label="Go back">
-          <ArrowLeft size={18} />
-          <span>Back</span>
-        </button>
-        <div className="role-brand">
-          <img src={logo} alt="Pawdigree" className="role-brand-logo" />
-          <span>Pawdigree</span>
-        </div>
-        {step !== "welcome" && (
-          <span className="top-bar-title">
-            {step === "password" ? "Welcome back" : "Verify Phone"}
-          </span>
-        )}
-      </div>
-
       <div className="login-card">
         {step === "welcome" && (
           <div className="welcome-content">
@@ -141,5 +142,6 @@ export default function CustomerLoginPage() {
         </aside>
       )}
     </div>
+    </>
   );
 }

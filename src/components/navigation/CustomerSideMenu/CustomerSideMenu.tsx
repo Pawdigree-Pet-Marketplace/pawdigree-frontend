@@ -6,11 +6,14 @@ type SideMenuProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
+  audience?: "customer" | "vendor";
   onClose: () => void;
 };
 
-const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
+const SideMenu = ({ isOpen, isLoggedIn, audience = "customer", onClose }: SideMenuProps) => {
   if (!isOpen) return null;
+  const customer = audience === "customer";
+  const homeHash = (hash: string) => `/${hash}`;
 
   return (
     <>
@@ -29,30 +32,30 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
         </div>
 
         <div className="sidemenu-content">
-          <a href="#pets" className="sidemenu-item" onClick={onClose}>
+          <a href={homeHash("#pets")} className="sidemenu-item" onClick={onClose}>
             Browse Pets
           </a>
-          <a href="#services" className="sidemenu-item" onClick={onClose}>
+          <a href={homeHash("#services")} className="sidemenu-item" onClick={onClose}>
             Services
           </a>
-          <a href="#merchandise" className="sidemenu-item" onClick={onClose}>
+          <a href={homeHash("#merchandise")} className="sidemenu-item" onClick={onClose}>
             Merchandise
           </a>
           <a href="/vendor" className="sidemenu-item" onClick={onClose}>
-            Become a Seller
+            {customer ? "Become a Seller" : "Vendor Home"}
           </a>
           <div className="sidemenu-divider" />
-          <a href="#help" className="sidemenu-item" onClick={onClose}>
+          <a href={homeHash("#help")} className="sidemenu-item" onClick={onClose}>
             <HelpCircle size={18} /> Help Center
           </a>
 
           {isLoggedIn ? (
             <a
-              href="/customer/dashboard"
+              href={audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard"}
               className="sidemenu-item"
               onClick={onClose}
             >
-              Customer Dashboard
+              {audience === "vendor" ? "Vendor Dashboard" : "Customer Dashboard"}
             </a>
           ) : (
             <div className="sidemenu-auth">
@@ -60,7 +63,7 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
                 className="login-btn-full"
                 onClick={() => {
                   onClose();
-                  window.location.href = "/customer-login";
+                  window.location.href = audience === "vendor" ? "/vendor/login" : "/customer-login";
                 }}
               >
                 Log In
@@ -69,7 +72,7 @@ const SideMenu = ({ isOpen, isLoggedIn, onClose }: SideMenuProps) => {
                 className="signup-btn-full"
                 onClick={() => {
                   onClose();
-                  window.location.href = "/registration";
+                  window.location.href = audience === "vendor" ? "/vendor/register" : "/registration";
                 }}
               >
                 Sign Up

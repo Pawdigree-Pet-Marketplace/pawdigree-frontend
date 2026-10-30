@@ -936,8 +936,8 @@
 
 /* Search pill inspired by the landing-page search treatment. */
 .customer-dashboard .dashboard-search {
-  width: 100%;
-  margin: 0 auto 42px;
+  width: min(100%, 860px);
+  margin: 0 auto;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -963,8 +963,8 @@
   align-items: center;
   gap: 14px;
   width: 100%;
-  min-height: 78px;
-  padding: 9px 9px 9px 22px;
+  min-height: 64px;
+  padding: 7px 7px 7px 18px;
   background: rgb(255 255 255 / 96%);
   border: 1px solid rgb(44 48 47 / 8%);
   border-radius: 999px;
@@ -987,14 +987,14 @@
   flex: 1 1 auto;
   width: auto;
   min-width: 0;
-  min-height: 56px;
+  min-height: 48px;
   padding: 0 4px;
   color: var(--dashboard-ink);
   background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  font-size: clamp(0.95rem, 1.15vw, 1.08rem);
+  font-size: clamp(0.9rem, 1vw, 1rem);
 }
 
 .customer-dashboard .dashboard-search-row input:focus-visible {
@@ -1010,11 +1010,11 @@
 
 .customer-dashboard .dashboard-search-row button {
   display: grid;
-  flex: 0 0 58px;
-  width: 58px;
-  min-width: 58px;
-  height: 58px;
-  min-height: 58px;
+  flex: 0 0 48px;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
   place-items: center;
   padding: 0;
   color: #fff;
@@ -1034,14 +1034,13 @@
 
 @media (max-width: 700px) {
   .customer-dashboard .dashboard-search {
-    margin-bottom: 34px;
     padding: 0;
   }
 
   .customer-dashboard .dashboard-search-row {
     display: flex;
     gap: 10px;
-    min-height: 66px;
+    min-height: 58px;
     padding: 7px 7px 7px 16px;
   }
 
@@ -1055,18 +1054,18 @@
   .customer-dashboard .dashboard-search-row input {
     flex: 1 1 auto;
     width: auto;
-    min-height: 50px;
+    min-height: 44px;
     padding: 0 2px;
     font-size: 0.94rem;
   }
 
   .customer-dashboard .dashboard-search-row button {
     grid-column: auto;
-    flex: 0 0 50px;
-    width: 50px;
-    min-width: 50px;
-    height: 50px;
-    min-height: 50px;
+    flex: 0 0 44px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
   }
 }
 
