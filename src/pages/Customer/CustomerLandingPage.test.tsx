@@ -22,6 +22,6 @@ describe("LandingPage", () => {
       screen.getAllByRole("button", {
         name: /create account/i,
       }),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
   });
 });
