@@ -544,3 +544,126 @@
   }
 }
 
+/* Match the shared Pawdigree vendor workspace. */
+.vendor-workspace .vendor-catalogue {
+  max-width: none;
+  margin: 0;
+  padding: 22px 2px 28px;
+  color: #2C302F;
+  font-family: "Inter", "Nunito", sans-serif;
+}
+.vendor-workspace .catalogue-toolbar { margin-bottom: 16px; }
+.vendor-workspace .catalogue-toolbar h2,
+.vendor-workspace .catalogue-empty h3,
+.vendor-workspace .catalogue-dialog h2 {
+  color: #2C302F;
+  font-family: "Poppins", "Fredoka", sans-serif;
+  font-weight: 700;
+}
+.vendor-workspace .catalogue-toolbar p,
+.vendor-workspace .catalogue-pet-details,
+.vendor-workspace .catalogue-footnote { color: rgb(44 48 47 / 66%); }
+.vendor-workspace .catalogue-add-button {
+  border: 1px solid #216C68;
+  border-radius: 999px;
+  background: #216C68;
+  color: #FBFAF7;
+  font-family: "Inter", "Nunito", sans-serif;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.vendor-workspace .catalogue-add-button:hover { transform: translateY(-1px); background: #216C68; box-shadow: 0 8px 18px rgb(33 108 104 / 18%); }
+.vendor-workspace .catalogue-grid { grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 16px; }
+.vendor-workspace .catalogue-card {
+  overflow: hidden;
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 20px;
+  background: #FBFAF7;
+  box-shadow: 0 10px 26px rgb(44 48 47 / 5%);
+  animation: catalogue-card-arrive 420ms cubic-bezier(.2, .75, .25, 1) both;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.vendor-workspace .catalogue-card:hover { transform: translateY(-3px); border-color: rgb(33 108 104 / 25%); box-shadow: 0 16px 30px rgb(44 48 47 / 9%); }
+.vendor-workspace .catalogue-card:nth-child(2) { animation-delay: 60ms; }
+.vendor-workspace .catalogue-card:nth-child(3) { animation-delay: 120ms; }
+.vendor-workspace .catalogue-card:nth-child(4) { animation-delay: 180ms; }
+.vendor-workspace .catalogue-card:nth-child(5) { animation-delay: 240ms; }
+.vendor-workspace .catalogue-photo { background: #F3F0EA; }
+.vendor-workspace .catalogue-status { border-radius: 999px; background: #FBFAF7; color: #2C302F; }
+.vendor-workspace .catalogue-status.is-active { background: rgb(33 108 104 / 12%); color: #216C68; }
+.vendor-workspace .catalogue-status.is-pending,
+.vendor-workspace .catalogue-status.is-adopted,
+.vendor-workspace .catalogue-status.is-inactive { background: #F3F0EA; color: #2C302F; }
+.vendor-workspace .catalogue-card-content { padding: 17px; }
+.vendor-workspace .catalogue-card-heading h3 { color: #2C302F; font-family: "Poppins", "Fredoka", sans-serif; font-weight: 700; }
+.vendor-workspace .catalogue-pet-id { color: rgb(44 48 47 / 60%); }
+.vendor-workspace .catalogue-card-footer { border-top-color: rgb(44 48 47 / 12%); }
+.vendor-workspace .catalogue-type { color: #216C68; }
+.vendor-workspace .catalogue-empty,
+.vendor-workspace .catalogue-state {
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 20px;
+  background: #FBFAF7;
+  box-shadow: 0 10px 26px rgb(44 48 47 / 5%);
+}
+.vendor-workspace .catalogue-empty-icon { background: rgb(251 134 101 / 14%); color: #FB8665; animation: catalogue-paw-bob 3.4s ease-in-out infinite; }
+.vendor-workspace .catalogue-welcome { color: #216C68; }
+.vendor-workspace .catalogue-empty p,
+.vendor-workspace .catalogue-state p { color: rgb(44 48 47 / 66%); }
+.vendor-workspace .catalogue-error { border: 1px solid rgb(251 134 101 / 28%); border-radius: 14px; background: rgb(251 134 101 / 10%); color: #2C302F; }
+.vendor-workspace .catalogue-error button { color: #216C68; }
+.vendor-workspace .catalogue-success { border: 1px solid rgb(33 108 104 / 20%); border-radius: 14px; background: rgb(33 108 104 / 8%); color: #216C68; }
+.vendor-workspace .catalogue-actions button,
+.vendor-workspace .catalogue-actions a {
+  display: inline-flex;
+  flex: 1 1 145px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+.vendor-workspace .catalogue-actions button:hover:not(:disabled),
+.vendor-workspace .catalogue-actions a:hover { transform: translateY(-1px); }
+.vendor-workspace .catalogue-deactivate-button { border-color: rgb(33 108 104 / 20%) !important; background: rgb(33 108 104 / 10%); color: #216C68; }
+.vendor-workspace .catalogue-deactivate-button:hover:not(:disabled) { background: rgb(33 108 104 / 16%); }
+.vendor-workspace .catalogue-edit-button { border-color: rgb(44 48 47 / 14%) !important; background: #FBFAF7; color: #2C302F; }
+.vendor-workspace .catalogue-edit-button:hover { background: #F3F0EA; }
+.vendor-workspace .catalogue-dialog { border: 1px solid rgb(44 48 47 / 12%); border-radius: 20px; background: #FBFAF7; font-family: "Inter", "Nunito", sans-serif; }
+.vendor-workspace .catalogue-dialog-icon { border-radius: 15px; background: rgb(251 134 101 / 14%); color: #FB8665; }
+.vendor-workspace .catalogue-dialog p { color: rgb(44 48 47 / 75%); }
+.vendor-workspace .catalogue-dialog-close { color: #2C302F; }
+.vendor-workspace .catalogue-confirm-deactivate { border-radius: 999px; background: #216C68; color: #FBFAF7; }
+.vendor-workspace .catalogue-confirm-deactivate:hover:not(:disabled) { background: #216C68; }
+.vendor-workspace .catalogue-cancel-button { border-radius: 999px; border-color: rgb(44 48 47 / 16%) !important; background: #FBFAF7; }
+
+@keyframes catalogue-card-arrive {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes catalogue-paw-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+@media (max-width: 650px) {
+  .vendor-workspace .vendor-catalogue { padding: 14px 0 22px; }
+  .vendor-workspace .catalogue-toolbar { align-items: stretch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vendor-workspace .catalogue-card,
+  .vendor-workspace .catalogue-empty-icon,
+  .vendor-workspace .catalogue-add-button,
+  .vendor-workspace .catalogue-actions button,
+  .vendor-workspace .catalogue-actions a { animation: none !important; transition: none !important; }
+  .vendor-workspace .catalogue-card:hover,
+  .vendor-workspace .catalogue-add-button:hover,
+  .vendor-workspace .catalogue-actions button:hover,
+  .vendor-workspace .catalogue-actions a:hover { transform: none; }
+}

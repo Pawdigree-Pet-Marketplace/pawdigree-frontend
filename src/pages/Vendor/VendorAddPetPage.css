@@ -362,3 +362,55 @@
     box-sizing: border-box;
   }
 }
+/* Pet listing pages share the dashboard's paper cards, spacing and motion. */
+.vendor-workspace .vendor-pet-page { max-width: none; margin: 0; padding: 22px 2px 28px; color: #2C302F; font-family: "Inter", "Nunito", sans-serif; }
+.vendor-workspace .pet-back-link { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin: 0 0 2px; padding: 9px 13px; border: 1px solid rgb(44 48 47 / 12%); border-radius: 999px; background: #FBFAF7; color: #216C68; font-size: 13px; font-weight: 700; text-decoration: none; transition: transform 160ms ease, background 160ms ease; }
+.vendor-workspace .pet-back-link:hover { transform: translateX(-2px); background: #F3F0EA; }
+.vendor-workspace .pet-listing-form { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .85fr); align-items: start; gap: 16px; }
+.vendor-workspace .pet-form-section { padding: 24px; border: 1px solid rgb(44 48 47 / 12%); border-radius: 20px; background: #FBFAF7; box-shadow: 0 10px 26px rgb(44 48 47 / 5%); animation: pet-form-arrive 460ms cubic-bezier(.2, .75, .25, 1) both; }
+.vendor-workspace .pet-form-section:nth-of-type(2) { animation-delay: 90ms; }
+.vendor-workspace .pet-section-heading { margin-bottom: 23px; }
+.vendor-workspace .pet-section-icon { border-radius: 15px; background: rgb(251 134 101 / 14%); color: #FB8665; animation: pet-icon-breathe 3.8s ease-in-out infinite; }
+.vendor-workspace .pet-section-heading h2 { color: #2C302F; font-family: "Poppins", "Fredoka", sans-serif; font-weight: 700; }
+.vendor-workspace .pet-section-heading p,
+.vendor-workspace .pet-upload-area span,
+.vendor-workspace .pet-field small { color: rgb(44 48 47 / 66%); }
+.vendor-workspace .pet-field { color: #2C302F; font-family: "Inter", "Nunito", sans-serif; }
+.vendor-workspace .pet-field > span,
+.vendor-workspace .pet-label > span { color: #FB8665; }
+.vendor-workspace .pet-field input,
+.vendor-workspace .pet-field select,
+.vendor-workspace .pet-field textarea { border: 1px solid rgb(44 48 47 / 16%); border-radius: 11px; background: #FBFAF7; color: #2C302F; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.vendor-workspace .pet-field input:focus,
+.vendor-workspace .pet-field select:focus,
+.vendor-workspace .pet-field textarea:focus { outline: 0; border-color: #216C68; box-shadow: 0 0 0 3px rgb(33 108 104 / 12%); }
+.vendor-workspace .pet-field input::placeholder,
+.vendor-workspace .pet-field textarea::placeholder { color: rgb(44 48 47 / 48%); }
+.vendor-workspace .pet-choice-group label { padding: 9px 13px; border: 1px solid rgb(44 48 47 / 12%); border-radius: 999px; background: #FBFAF7; color: #2C302F; }
+.vendor-workspace .pet-choice-group label.selected { border-color: rgb(33 108 104 / 24%); background: rgb(33 108 104 / 10%); color: #216C68; }
+.vendor-workspace .pet-choice-group input[type="radio"] { accent-color: #216C68; }
+.vendor-workspace .pet-upload-area { border-color: rgb(33 108 104 / 35%); border-radius: 16px; background: #F3F0EA; color: #216C68; transition: border-color 160ms ease, background 160ms ease; }
+.vendor-workspace .pet-upload-area:hover { border-color: #216C68; background: rgb(33 108 104 / 7%); }
+.vendor-workspace .pet-upload-area strong { color: #2C302F; font-family: "Poppins", "Fredoka", sans-serif; }
+.vendor-workspace .pet-upload-btn { border-radius: 999px; background: #216C68; color: #FBFAF7; }
+.vendor-workspace .pet-photo-card { border-color: rgb(44 48 47 / 12%); border-radius: 14px; background: #F3F0EA; }
+.vendor-workspace .pet-photo-card > button { border-radius: 999px; background: #FBFAF7; color: #FB8665; }
+.vendor-workspace .pet-primary-badge,
+.vendor-workspace .badge-new { border-radius: 999px; background: #216C68; }
+.vendor-workspace .badge-new { background: #FB8665; color: #2C302F; }
+.vendor-workspace .pet-photo-count { color: rgb(44 48 47 / 66%); }
+.vendor-workspace .pet-inline-note,
+.vendor-workspace .pet-form-message { border-radius: 13px; background: #F3F0EA; color: #2C302F; }
+.vendor-workspace .pet-form-message.error { background: rgb(251 134 101 / 12%); color: #2C302F; }
+.vendor-workspace .pet-form-message.success { background: rgb(33 108 104 / 10%); color: #216C68; }
+.vendor-workspace .pet-form-actions { grid-column: 1 / -1; }
+.vendor-workspace .pet-cancel-button,
+.vendor-workspace .pet-submit-button { min-height: 44px; border-radius: 999px; font-family: "Inter", "Nunito", sans-serif; }
+.vendor-workspace .pet-cancel-button { border-color: rgb(44 48 47 / 16%); background: #FBFAF7; color: #2C302F; }
+.vendor-workspace .pet-submit-button { border-color: #216C68; background: #216C68; color: #FBFAF7; }
+.vendor-workspace .pet-submit-button:hover:not(:disabled) { background: #216C68; }
+@keyframes pet-form-arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pet-icon-breathe { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(-3deg); } }
+@media (max-width: 950px) { .vendor-workspace .vendor-pet-page { padding-top: 18px; } .vendor-workspace .pet-listing-form { grid-template-columns: minmax(0, 1.2fr) minmax(230px, .8fr); } }
+@media (max-width: 700px) { .vendor-workspace .vendor-pet-page { padding: 14px 0 22px; } .vendor-workspace .pet-listing-form { grid-template-columns: 1fr; gap: 12px; } .vendor-workspace .pet-form-section { padding: 20px 16px; } .vendor-workspace .pet-form-grid { grid-template-columns: 1fr; } .vendor-workspace .pet-choice-group { gap: 8px; } .vendor-workspace .pet-form-actions { flex-direction: column-reverse; align-items: stretch; } .vendor-workspace .pet-cancel-button, .vendor-workspace .pet-submit-button { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .vendor-workspace .pet-form-section, .vendor-workspace .pet-section-icon, .vendor-workspace .pet-back-link, .vendor-workspace .pet-field input, .vendor-workspace .pet-field select, .vendor-workspace .pet-field textarea { animation: none !important; transition: none !important; } .vendor-workspace .pet-form-section:hover, .vendor-workspace .pet-back-link:hover { transform: none; } }

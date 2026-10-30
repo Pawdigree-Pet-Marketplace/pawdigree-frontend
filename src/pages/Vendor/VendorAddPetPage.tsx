@@ -7,6 +7,7 @@ import {
   Trash2,
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
+import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorAddPetPage.css";
 
@@ -29,6 +30,9 @@ type PetPhoto = {
 type ListingType = "ADOPTION" | "SALE";
 
 async function readError(response: Response): Promise<string> {
+  if (response.status === 401) {
+    return "Your session has expired. Please log in again.";
+  }
   const data = await response.json().catch(() => null);
 
   if (data && typeof data === "object") {
@@ -79,11 +83,7 @@ export default function VendorAddPetPage() {
 
     async function loadBusinesses() {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/businesses/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
 
         if (!response.ok) {
           throw new Error(await readError(response));
@@ -204,11 +204,8 @@ export default function VendorAddPetPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/pets/`, {
+      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       });
 
@@ -246,8 +243,9 @@ export default function VendorAddPetPage() {
     <VendorLayout
       title="Add a pet listing"
       description="Share a new pet with the Pawdigree community."
+      vendorWorkspace
     >
-      <div className="vendor-pet-page">
+      <div className="dashboard-content vendor-pet-page">
         <a className="pet-back-link" href="/vendor/listings">
           <ArrowLeft size={17} />
           Back to catalogue

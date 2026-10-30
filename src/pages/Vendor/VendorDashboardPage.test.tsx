@@ -73,59 +73,28 @@ describe('VendorDashboardPage', () => {
     expect(screen.getByText('Orders')).toBeInTheDocument()
     expect(screen.getByText('Revenue (net)')).toBeInTheDocument()
     expect(screen.getByText('Pending Bookings')).toBeInTheDocument()
+    expect(screen.getAllByText('—')).toHaveLength(4)
+    expect(screen.queryByText(',480')).not.toBeInTheDocument()
   })
 
-  it('shows the sales chart and all seven day labels', () => {
+  it('shows an honest empty state for sales history', () => {
     render(<VendorDashboardPage />)
-
-    expect(
-      screen.getByRole('heading', { name: 'SALES — LAST 7 DAYS' }),
-    ).toBeInTheDocument()
-
-    expect(
-      screen.getByRole('img', {
-        name: 'Illustrative sales trend over seven days',
-      }),
-    ).toBeInTheDocument()
-
-    for (const day of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) {
-      expect(screen.getByText(day)).toBeInTheDocument()
-    }
+    expect(screen.getByRole('heading', { name: 'SALES — LAST 7 DAYS' })).toBeInTheDocument()
+    expect(screen.getByText('Sales history will appear here when store activity is available.')).toBeInTheDocument()
   })
 
-  it('shows low-stock alerts', () => {
+  it('shows an honest empty state for low stock alerts', () => {
     render(<VendorDashboardPage />)
-
-    expect(
-      screen.getByRole('heading', { name: 'LOW STOCK ALERTS' }),
-    ).toBeInTheDocument()
-
-    expect(screen.getByText('Salmon Dry Food 5kg')).toBeInTheDocument()
-    expect(screen.getByText('Cat Scratch Post')).toBeInTheDocument()
-    expect(screen.getByText('Puppy Chew Toy')).toBeInTheDocument()
-    expect(screen.getByText('3 left')).toBeInTheDocument()
-    expect(screen.getByText('1 left')).toBeInTheDocument()
-    expect(screen.getByText('4 left')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'LOW STOCK ALERTS' })).toBeInTheDocument()
+    expect(screen.getByText('Stock alerts will appear here when inventory data is available.')).toBeInTheDocument()
+    expect(screen.queryByText('Salmon Dry Food 5kg')).not.toBeInTheDocument()
   })
 
-  it('shows recent orders and their statuses', () => {
+  it('shows an honest empty state for order and booking activity', () => {
     render(<VendorDashboardPage />)
-
-    expect(
-      screen.getByRole('heading', { name: 'RECENT ORDERS' }),
-    ).toBeInTheDocument()
-
-    expect(screen.getByText('#PD-2291')).toBeInTheDocument()
-    expect(screen.getByText('#PD-2290')).toBeInTheDocument()
-    expect(screen.getByText('#PD-2288')).toBeInTheDocument()
-
-    expect(screen.getByText('Alina K.')).toBeInTheDocument()
-    expect(screen.getByText('Marcus O.')).toBeInTheDocument()
-    expect(screen.getByText('Ritah N.')).toBeInTheDocument()
-
-    expect(screen.getByText('New')).toBeInTheDocument()
-    expect(screen.getByText('Processing')).toBeInTheDocument()
-    expect(screen.getByText('Completed')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'RECENT ORDERS & BOOKINGS' })).toBeInTheDocument()
+    expect(screen.getByText('Recent order and booking activity will appear here when it is available.')).toBeInTheDocument()
+    expect(screen.queryByText('#PD-2291')).not.toBeInTheDocument()
   })
 
   it('does not render the dashboard when the vendor token is missing', () => {
@@ -145,3 +114,4 @@ describe('VendorDashboardPage', () => {
     expect(container).toBeEmptyDOMElement()
   })
 })
+

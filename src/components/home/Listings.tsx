@@ -7,7 +7,7 @@ export default function Listings() {
   const listingsRef = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section className="container section" id="pets">
+    <section className="container section popular-listings-section" id="pets">
       <div className="section-header">
         <h2 className="section-title">Popular pet listings</h2>
 

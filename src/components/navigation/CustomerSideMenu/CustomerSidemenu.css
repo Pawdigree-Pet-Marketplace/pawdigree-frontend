@@ -98,16 +98,6 @@
 }
 .sidemenu-item:hover svg { color: var(--teal-dark); }
 
-/* this rule didn't exist before, so the Log Out link just rendered
-   with default teal-icon styling like every other item */
-.sidemenu-item.logout { color: var(--coral); margin-top: 4px; }
-.sidemenu-item.logout svg { color: var(--coral); }
-.sidemenu-item.logout:hover {
-  background: var(--coral-light);
-  color: var(--coral-dark);
-}
-.sidemenu-item.logout:hover svg { color: var(--coral-dark); }
-
 .icon-teal { color: var(--teal); display: grid; }
 .icon-coral { color: var(--coral); display: grid; }
 .chevron { margin-left: auto; opacity: 0.4; }
