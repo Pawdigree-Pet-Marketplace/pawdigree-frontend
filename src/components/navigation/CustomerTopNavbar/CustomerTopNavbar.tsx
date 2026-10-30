@@ -1,6 +1,7 @@
 import darkLogo from "../../../assets/logos/darkmode-logo.svg";
 import lightLogo from "../../../assets/logos/lightmode-logo.svg";
 import {
+  ArrowLeft,
   Menu,
   X,
 } from "lucide-react";
@@ -11,6 +12,8 @@ import "./CustomerTopNavbar.css";
 type TopNavbarProps = {
   isLoggedIn: boolean;
   audience?: "customer" | "vendor";
+  loginOverlay?: boolean;
+  backAction?: { label: string; onClick: () => void };
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -26,6 +29,8 @@ const navLinks = [
 const TopNavbar = ({
   isLoggedIn,
   audience = "customer",
+  loginOverlay = false,
+  backAction,
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
@@ -33,6 +38,7 @@ const TopNavbar = ({
   const [hash, setHash] = useState(window.location.hash);
   const path = window.location.pathname;
   const isLandingPage = path === "/";
+  const isTransparentPage = isLandingPage || loginOverlay;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,37 +64,54 @@ const TopNavbar = ({
   };
 
   // Dark logo only while the navbar is transparent over the hero
-  const useDarkLogo = isLandingPage && !isScrolled;
+  const useDarkLogo = (isLandingPage && !isScrolled) || loginOverlay;
 
   const navbarClass = [
     "top-navbar",
-    isLandingPage ? "top-navbar--transparent" : "",
-    isLandingPage && isScrolled ? "top-navbar--scrolled" : "",
+    isTransparentPage ? "top-navbar--transparent" : "",
+    loginOverlay ? "top-navbar--auth-overlay" : "",
+    isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <header className={navbarClass}>
-      <a href="/" aria-label="Pawdigree home">
-        <img
-          src={useDarkLogo ? darkLogo : lightLogo}
-          alt="Pawdigree"
-          className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
-        />
-      </a>
+      <div className="top-navbar-brand">
+        {backAction && (
+          <button type="button" className="top-navbar-back" onClick={backAction.onClick}>
+            <ArrowLeft size={17} aria-hidden="true" />
+            <span>{backAction.label}</span>
+          </button>
+        )}
+        <a href="/" aria-label="Pawdigree home">
+          <img
+            src={useDarkLogo ? darkLogo : lightLogo}
+            alt="Pawdigree"
+            className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
+          />
+        </a>
+      </div>
 
       <nav className="desktop-links">
-        {navLinks.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            className={isActive(link.href) ? "is-active" : undefined}
-            aria-current={isActive(link.href) ? "page" : undefined}
-          >
-            {link.label}
-          </a>
-        ))}
+        {navLinks.map((link) => {
+          const label = audience === "vendor" && link.label === "Become a Vendor"
+            ? "Vendor Home"
+            : link.label;
+          const href = link.href.startsWith("#") && !isLandingPage
+            ? `/${link.href}`
+            : link.href;
+          return (
+            <a
+              key={label}
+              href={href}
+              className={isActive(link.href) ? "is-active" : undefined}
+              aria-current={isActive(link.href) ? "page" : undefined}
+            >
+              {label}
+            </a>
+          );
+        })}
       </nav>
 
       <div className="desktop-actions">

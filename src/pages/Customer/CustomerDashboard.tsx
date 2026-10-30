@@ -221,28 +221,6 @@ export default function CustomerDashboard() {
           </div>
         </section>
 
-        <form className="dashboard-search" onSubmit={handleSearch}>
-          <label
-            className="dashboard-search-label"
-            htmlFor="dashboard-pet-search"
-          >
-            Search pet listings
-          </label>
-          <div className="dashboard-search-row">
-            <Search size={22} aria-hidden="true" />
-            <input
-              id="dashboard-pet-search"
-              type="search"
-              placeholder="Search pets by name, breed, species or listing type..."
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
-            <button type="submit" aria-label="Search pets" title="Search pets">
-              <ArrowRight size={21} aria-hidden="true" />
-            </button>
-          </div>
-        </form>
-
         <form className="dashboard-filters" onSubmit={handleApplyFilters} aria-label="Filter pet listings">
           <div className="dashboard-filter-grid">
             <label>Purpose<select value={purpose} onChange={(event) => setPurpose(event.target.value)}><option value="">Any purpose</option><option value="ADOPTION">Adoption</option><option value="SALE">For sale</option></select></label>
@@ -332,6 +310,28 @@ export default function CustomerDashboard() {
           items={dashboardCategories}
           getHref={(category) => `/pets?search=${encodeURIComponent(category.name === "Other pets" ? "rabbit" : category.name.replace(/s$/i, ""))}`}
         />
+
+        <form className="dashboard-search" onSubmit={handleSearch}>
+          <label
+            className="dashboard-search-label"
+            htmlFor="dashboard-pet-search"
+          >
+            Search pet listings
+          </label>
+          <div className="dashboard-search-row">
+            <Search size={22} aria-hidden="true" />
+            <input
+              id="dashboard-pet-search"
+              type="search"
+              placeholder="Search pets by name, breed, species or listing type..."
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+            <button type="submit" aria-label="Search pets" title="Search pets">
+              <ArrowRight size={21} aria-hidden="true" />
+            </button>
+          </div>
+        </form>
 
         <section
           id="dashboard-listings"

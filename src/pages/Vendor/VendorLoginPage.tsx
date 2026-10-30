@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Eye, EyeOff, Store } from "lucide-react";
+import { Eye, EyeOff, Store } from "lucide-react";
 import { apiRequest } from "../../services/api";
-import logo from "../../assets/logos/lightmode-logo.svg";
 import "./VendorLoginPage.css";
+import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
 
 type LoginResponse = {
   access?: string;
@@ -17,6 +18,7 @@ type LoginResponse = {
 };
 
 export default function VendorLoginPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -156,23 +158,21 @@ export default function VendorLoginPage() {
 
   return (
     <main className="vendor-login-page">
-      <header className="vendor-login-header">
-        <button
-          type="button"
-          className="vendor-login-back"
-          onClick={() => {
-            window.location.href = "/vendor";
-          }}
-          aria-label="Back to vendor landing page"
-        >
-          <ArrowLeft size={20} />
-          <span>Back</span>
-        </button>
-
-        <a href="/vendor" aria-label="Pawdigree vendor home">
-          <img src={logo} alt="Pawdigree" />
-        </a>
-      </header>
+      <TopNavbar
+        audience="vendor"
+        isLoggedIn={false}
+        loginOverlay
+        backAction={{ label: "Back", onClick: () => { window.location.href = "/vendor"; } }}
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+      />
+      <SideMenu
+        isOpen={isMenuOpen}
+        setIsOpen={setIsMenuOpen}
+        isLoggedIn={false}
+        audience="vendor"
+        onClose={() => setIsMenuOpen(false)}
+      />
 
       <section className="vendor-login-card">
         <div className="vendor-login-icon">

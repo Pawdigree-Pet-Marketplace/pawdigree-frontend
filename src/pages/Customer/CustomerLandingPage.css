@@ -1,0 +1,20 @@
+.landing-page.landing-motion-ready .landing-section-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 650ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    transform 650ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.landing-page.landing-motion-ready .landing-section-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page.landing-motion-ready .landing-section-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

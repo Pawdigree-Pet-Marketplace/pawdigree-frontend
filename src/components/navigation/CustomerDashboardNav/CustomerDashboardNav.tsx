@@ -14,14 +14,15 @@ import logo from "../../../assets/logos/lightmode-logo.svg";
 import API_BASE_URL from "../../../services/api";
 import "./CustomerDashboardNav.css";
 import { ConfirmLogout } from "../../layout/ConfirmLogout";
+import { Link } from "react-router-dom";
 
 const navigationItems = [
   { label: "Overview", href: "/customer/dashboard", Icon: House },
-  { label: "Discover", href: "/customer/dashboard#dashboard-listings", Icon: Compass },
-  { label: "Browse Pets", href: "/customer/dashboard#dashboard-categories", Icon: PawPrint },
+  { label: "Discover", href: "/explore-pets", Icon: Compass },
+  { label: "Browse Pets", href: "/pets", Icon: PawPrint },
   { label: "Pet Store", Icon: ShoppingBag },
-  { label: "Pet Services", Icon: Stethoscope },
-  { label: "Adoption", Icon: HeartHandshake },
+  { label: "Pet Services", href: "/vendors", Icon: Stethoscope },
+  { label: "Adoption", href: "/pets?listing_type=ADOPTION", Icon: HeartHandshake },
 ];
 
 export default function CustomerDashboardNav() {
@@ -104,9 +105,9 @@ export default function CustomerDashboardNav() {
         );
 
         return href ? (
-          <a
+          <Link
             key={label}
-            href={href}
+            to={href}
             onClick={() => {
               setActiveItem(label);
               if (mobile) setIsMobileMenuOpen(false);
@@ -115,7 +116,7 @@ export default function CustomerDashboardNav() {
             className={className}
           >
             {content}
-          </a>
+          </Link>
         ) : (
           <span key={label} className={className} aria-disabled="true">
             {content}
