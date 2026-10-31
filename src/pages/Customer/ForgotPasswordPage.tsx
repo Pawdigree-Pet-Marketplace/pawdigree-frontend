@@ -4,8 +4,10 @@ import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
 import "./ForgotPasswordPage.css";
 import logo from "../../assets/logos/icon-logo.svg";
 import { apiRequest } from "../../services/api";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function ForgotPasswordPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -54,7 +56,7 @@ export default function ForgotPasswordPage() {
         type="button"
         className="forgot-back-button"
         onClick={() => {
-          window.location.href = "/login";
+          navigate("/login");
         }}
       >
         <ArrowLeft size={18} />
@@ -73,7 +75,7 @@ export default function ForgotPasswordPage() {
               type="button"
               className="forgot-primary-button"
               onClick={() => {
-                window.location.href = "/login";
+                navigate("/login");
               }}
             >
               Return to login
@@ -127,7 +129,7 @@ export default function ForgotPasswordPage() {
             </form>
 
             <p className="forgot-login-link">
-              Remembered your password? <a href="/login">Log in</a>
+              Remembered your password? <Link to="/login">Log in</Link>
             </p>
           </>
         )}

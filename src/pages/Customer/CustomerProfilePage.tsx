@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
 import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
 import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 import ProfileCard from "../../components/profile/ProfileCard";
 import ProfileMenu from "../../components/profile/ProfileMenu";
 import type { Profile } from "../../data/profile";
-import API_BASE_URL from "../../services/api";
+import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
+import { getSessionToken } from "../../services/auth/authStorage";
 import "./CustomerProfilePage.css";
 
 type CustomerProfileResponse = {
@@ -26,9 +28,7 @@ export default function ProfilePage() {
     let cancelled = false;
 
     async function fetchProfile() {
-      const token =
-        localStorage.getItem("token") ||
-        sessionStorage.getItem("token");
+      const token = getSessionToken();
 
       if (!token) {
         setError("Please log in to view your profile.");
@@ -37,10 +37,7 @@ export default function ProfilePage() {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/profile/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await customerAuthenticatedFetch("/api/auth/profile/", {
         });
 
         if (!response.ok) {
@@ -113,7 +110,7 @@ export default function ProfilePage() {
           <p role="alert">
             {error}{" "}
             {error.includes("log in") && (
-              <a href="/customer-login">Log in</a>
+              <Link to="/customer-login">Log in</Link>
             )}
           </p>
         )}

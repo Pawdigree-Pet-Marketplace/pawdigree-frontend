@@ -1,4 +1,5 @@
 import useScrollReveal from "../../hooks/useScrollReveal";
+import { Link } from "react-router-dom";
 import "./CtaBanner.css";
 
 export default function CtaBanner() {
@@ -12,13 +13,9 @@ export default function CtaBanner() {
         Join thousands of buyers and sellers across Uganda
       </p>
 
-      <button
-        type="button"
-        className="btn reveal reveal-delay-2"
-        onClick={() => (window.location.href = "/registration")}
-      >
+      <Link to="/registration" className="btn reveal reveal-delay-2">
         Create Account
-      </button>
+      </Link>
     </section>
   );
 }

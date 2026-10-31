@@ -1,6 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render as rtlRender, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import LandingPage from "./CustomerLandingPage";
+
+const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe("LandingPage", () => {
   it("renders the main landing page content", () => {
@@ -19,7 +22,7 @@ describe("LandingPage", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getAllByRole("button", {
+      screen.getAllByRole("link", {
         name: /create account/i,
       }),
     ).toHaveLength(1);

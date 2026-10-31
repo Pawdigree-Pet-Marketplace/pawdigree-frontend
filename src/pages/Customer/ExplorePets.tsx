@@ -59,6 +59,7 @@ import {
   fetchTrendingSearches,
 } from "../../services/petsApi";
 import "./ExplorePets.css";
+import { Link, useSearchParams } from "react-router-dom";
 
 const ALL_KINDS: SuggestionKind[] = ["breed", "pet", "location", "vendor"];
 const EMPTY_PAGE: PagedPets = { count: 0, results: [] };
@@ -66,6 +67,8 @@ const EMPTY_PAGE: PagedPets = { count: 0, results: [] };
 type Patch = Partial<PetQuery> | ((prev: PetQuery) => Partial<PetQuery>);
 
 export default function ExplorePets() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchKey = searchParams.toString();
   /* navbar (same pattern as the vendor landing page) */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -86,9 +89,7 @@ export default function ExplorePets() {
   }, []);
 
   /* query state (mirrors the URL, so results are shareable) */
-  const [query, setQuery] = useState<PetQuery>(() =>
-    paramsToQuery(window.location.search),
-  );
+  const [query, setQuery] = useState<PetQuery>(() => paramsToQuery(searchKey));
   const [searchInput, setSearchInput] = useState(query.search);
   const [draft, setDraft] = useState<Filters>(() => queryFilters(query));
   const [filterError, setFilterError] = useState("");
@@ -138,15 +139,22 @@ export default function ExplorePets() {
     setDraft(queryFilters(query));
   }
 
+  const [syncedSearchKey, setSyncedSearchKey] = useState(searchKey);
+  if (searchKey !== syncedSearchKey) {
+    setSyncedSearchKey(searchKey);
+    const nextQuery = paramsToQuery(searchKey);
+    if (queryToParams(nextQuery).toString() !== queryToParams(query).toString()) {
+      setQuery(nextQuery);
+    }
+  }
+
   /* URL sync */
   useEffect(() => {
-    const qs = queryToParams(query).toString();
-    window.history.replaceState(
-      null,
-      "",
-      `${window.location.pathname}${qs ? `?${qs}` : ""}`,
-    );
-  }, [query]);
+    const nextSearch = queryToParams(query).toString();
+    if (nextSearch !== searchKey) {
+      setSearchParams(queryToParams(query), { replace: true });
+    }
+  }, [query, searchKey, setSearchParams]);
 
   /* fetch the page of pets whenever the query changes.
      "loading" is derived: it is simply "the stored answer is not for the current query yet". */
@@ -439,7 +447,7 @@ export default function ExplorePets() {
             </div>
 
             <nav className="ep-breadcrumb" aria-label="Breadcrumb">
-              <a href="/">Home</a>
+              <Link to="/">Home</Link>
               <span aria-hidden="true">/</span>
               <span aria-current="page">Explore Pets</span>
             </nav>

@@ -1,8 +1,11 @@
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render as rtlRender, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import BusinessRegistrationForm from "./BusinessRegistrationForm";
+
+const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 const mockCategories = [
   { id: 1, name: "Pet shop" },

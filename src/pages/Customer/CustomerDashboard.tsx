@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Heart,
@@ -60,10 +61,6 @@ export default function CustomerDashboard() {
   const [maxAge, setMaxAge] = useState("");
   const [appliedFilters, setAppliedFilters] = useState<PetFilters>(emptyFilters);
   const [filterError, setFilterError] = useState("");
-
-  useEffect(() => {
-    if (!isAuthorized) window.location.replace("/customer-login");
-  }, [isAuthorized]);
 
   useEffect(() => {
     if (!isAuthorized) return;
@@ -248,7 +245,7 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="dashboard-marketplace-grid">
-            <a href="/pets" className="dashboard-marketplace-card">
+            <Link to="/pets" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <Heart size={22} />
               </span>
@@ -257,7 +254,7 @@ export default function CustomerDashboard() {
                 <span>Browse pets for adoption and sale.</span>
               </span>
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </Link>
 
             <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
               <span className="dashboard-marketplace-icon">
@@ -279,7 +276,7 @@ export default function CustomerDashboard() {
               </span>
             </div>
 
-            <a href="/vendor" className="dashboard-marketplace-card">
+            <Link to="/vendor" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <Store size={22} />
               </span>
@@ -288,9 +285,9 @@ export default function CustomerDashboard() {
                 <span>Learn about selling on Pawdigree.</span>
               </span>
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </Link>
 
-            <a href="/pets" className="dashboard-marketplace-card">
+            <Link to="/pets" className="dashboard-marketplace-card">
               <span className="dashboard-marketplace-icon">
                 <ShoppingBag size={22} />
               </span>
@@ -299,7 +296,7 @@ export default function CustomerDashboard() {
                 <span>Start browsing the available listings.</span>
               </span>
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
-            </a>
+            </Link>
           </div>
         </section>
 
@@ -343,9 +340,9 @@ export default function CustomerDashboard() {
               <h2>{hasActiveCriteria ? "Pet listings" : "Pets to discover"}</h2>
               {hasActiveCriteria && <p className="dashboard-section-description">{submittedSearch.trim() ? `Results for “${submittedSearch.trim()}”` : "Filtered pet listings"}</p>}
             </div>
-            <a href={`/pets?${new URLSearchParams({ ...(submittedSearch.trim() ? { search: submittedSearch.trim() } : {}), ...(appliedFilters.purpose ? { listing_type: appliedFilters.purpose } : {}), ...(appliedFilters.gender ? { gender: appliedFilters.gender } : {}), ...(appliedFilters.breed.trim() ? { breed: appliedFilters.breed.trim() } : {}), ...(appliedFilters.minAge ? { age_min: appliedFilters.minAge } : {}), ...(appliedFilters.maxAge ? { age_max: appliedFilters.maxAge } : {}) }).toString()}`} className="dashboard-text-link">
+            <Link to={`/pets?${new URLSearchParams({ ...(submittedSearch.trim() ? { search: submittedSearch.trim() } : {}), ...(appliedFilters.purpose ? { listing_type: appliedFilters.purpose } : {}), ...(appliedFilters.gender ? { gender: appliedFilters.gender } : {}), ...(appliedFilters.breed.trim() ? { breed: appliedFilters.breed.trim() } : {}), ...(appliedFilters.minAge ? { age_min: appliedFilters.minAge } : {}), ...(appliedFilters.maxAge ? { age_max: appliedFilters.maxAge } : {}) }).toString()}`} className="dashboard-text-link">
               Explore more <ArrowRight size={16} />
-            </a>
+            </Link>
           </div>
 
           {isLoadingPets ? (

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Heart,
   ShoppingCart,
@@ -128,10 +129,10 @@ export default function PetDetailsPage({
         <button className="pd-icon-button" aria-label="Open menu">
           <Menu size={21} />
         </button>
-        <a className="pd-brand" href="/" aria-label="Pawdigree home">
+        <Link className="pd-brand" to="/" aria-label="Pawdigree home">
           <span className="pd-brand-mark"><PawPrint size={20} /></span>
           <span>Pawdigree<small>Pets deserve a loving home</small></span>
-        </a>
+        </Link>
 
         <label className="pd-search">
           <Search size={16} />
@@ -157,7 +158,7 @@ export default function PetDetailsPage({
       </header>
 
       <div className="pd-breadcrumb">
-        <a href="/">Home</a><span>/</span><a href="/pets">Explore Pets</a>
+        <Link to="/">Home</Link><span>/</span><Link to="/pets">Explore Pets</Link>
         <span>/</span><strong>{pet.name} — {pet.breed}</strong>
       </div>
 
@@ -195,7 +196,7 @@ export default function PetDetailsPage({
             <h2>More pets you may like</h2>
             <div className="pd-suggested-grid">
               {suggestedPets.map((suggestion) => (
-                <a className="pd-suggested-card" href="/pets" key={suggestion.name}>
+                <Link className="pd-suggested-card" to="/pets" key={suggestion.name}>
                   <div className="pd-suggested-image">
                     <img src={suggestion.photo} alt={suggestion.name} />
                     <span>{suggestion.type}</span>
@@ -204,7 +205,7 @@ export default function PetDetailsPage({
                     <strong>{suggestion.name}</strong>
                     <small><MapPin size={12} /> {suggestion.location}</small>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </section>
@@ -261,7 +262,7 @@ export default function PetDetailsPage({
       <footer className="pd-footer">
         <span>© 2026 Pawdigree. All rights reserved.</span>
         <nav aria-label="Footer links">
-          <a href="/about">About</a><a href="/vendors">Vendors</a><a href="/support">Support</a><a href="/privacy">Privacy</a>
+          <Link to="/about">About</Link><Link to="/vendors">Vendors</Link><Link to="/support">Support</Link><Link to="/privacy">Privacy</Link>
         </nav>
       </footer>
     </div>

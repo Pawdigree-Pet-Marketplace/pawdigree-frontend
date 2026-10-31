@@ -6,6 +6,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../Button/Button";
 import "./CustomerTopNavbar.css";
 
@@ -34,9 +35,11 @@ const TopNavbar = ({
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [hash, setHash] = useState(window.location.hash);
-  const path = window.location.pathname;
+  const hash = location.hash;
+  const path = location.pathname;
   const isLandingPage = path === "/";
   const isTransparentPage = isLandingPage || loginOverlay;
 
@@ -49,12 +52,6 @@ const TopNavbar = ({
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const handleHashChange = () => setHash(window.location.hash);
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   const isActive = (href: string) => {
@@ -84,13 +81,13 @@ const TopNavbar = ({
             <span>{backAction.label}</span>
           </button>
         )}
-        <a href="/" aria-label="Pawdigree home">
+        <Link to="/" aria-label="Pawdigree home">
           <img
             src={useDarkLogo ? darkLogo : lightLogo}
             alt="Pawdigree"
             className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
           />
-        </a>
+        </Link>
       </div>
 
       <nav className="desktop-links">
@@ -102,14 +99,14 @@ const TopNavbar = ({
             ? `/${link.href}`
             : link.href;
           return (
-            <a
+            <Link
               key={label}
-              href={href}
+              to={href}
               className={isActive(link.href) ? "is-active" : undefined}
               aria-current={isActive(link.href) ? "page" : undefined}
             >
               {label}
-            </a>
+            </Link>
           );
         })}
       </nav>
@@ -121,7 +118,7 @@ const TopNavbar = ({
               className="auth-btn"
               variant="primary"
               onClick={() => {
-                window.location.href = audience === "vendor" ? "/vendor/login" : "/customer-login";
+                navigate(audience === "vendor" ? "/vendor/login" : "/customer-login");
               }}
             >
               Log In
@@ -130,7 +127,7 @@ const TopNavbar = ({
               className="auth-btn"
               variant="secondary"
               onClick={() => {
-                window.location.href = audience === "vendor" ? "/vendor/register" : "/registration";
+                navigate(audience === "vendor" ? "/vendor/register" : "/registration");
               }}
             >
               Sign Up
@@ -141,8 +138,7 @@ const TopNavbar = ({
             className="auth-btn dashboard-redirect-btn"
             variant="secondary"
             onClick={() => {
-              window.location.href =
-                audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard";
+              navigate(audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard");
             }}
           >
             {audience === "vendor" ? "Vendor Dashboard" : "Go to Dashboard"}

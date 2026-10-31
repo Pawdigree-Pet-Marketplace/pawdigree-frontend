@@ -1,12 +1,14 @@
 
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import EditProfileForm from "../../components/profile/EditProfileForm";
 import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
 import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
 import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 import type { ProfileFormValues } from "../../utils/validateProfile";
-import API_BASE_URL from "../../services/api";
+import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
+import { getSessionToken } from "../../services/auth/authStorage";
 import "./CustomerProfilePage.css";
 
 
@@ -19,6 +21,7 @@ type CustomerProfileResponse = {
 };
 
 export default function EditProfilePage() {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [profile, setProfile] = useState<ProfileFormValues | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,9 +32,7 @@ export default function EditProfilePage() {
     let cancelled = false;
 
     async function fetchProfile() {
-      const token =
-        localStorage.getItem("token") ||
-        sessionStorage.getItem("token");
+      const token = getSessionToken();
 
       if (!token) {
         setError("Please log in to edit your profile.");
@@ -40,10 +41,7 @@ export default function EditProfilePage() {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/profile/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await customerAuthenticatedFetch("/api/auth/profile/", {
         });
 
         if (!response.ok) {
@@ -88,9 +86,7 @@ export default function EditProfilePage() {
   }, []);
 
   const handleSubmit = async (values: ProfileFormValues) => {
-    const token =
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("token");
+    const token = getSessionToken();
 
     if (!token) {
       setError("Please log in again before saving your profile.");
@@ -105,10 +101,9 @@ export default function EditProfilePage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile/`, {
+      const response = await customerAuthenticatedFetch("/api/auth/profile/", {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -148,7 +143,7 @@ export default function EditProfilePage() {
         throw new Error(message);
       }
 
-      window.location.href = "/profile";
+      navigate("/profile");
     } catch (err) {
       setError(
         err instanceof Error
@@ -177,10 +172,10 @@ export default function EditProfilePage() {
 
       <main className="container profile-page">
         <div className="edit-wrap">
-          <a href="/profile" className="edit-back">
+          <Link to="/profile" className="edit-back">
             <ArrowLeft size={18} aria-hidden="true" />
             Back to profile
-          </a>
+          </Link>
 
           <h1 className="profile-title">Edit profile</h1>
 
@@ -190,7 +185,7 @@ export default function EditProfilePage() {
             <p role="alert">
               {error}{" "}
               {error.toLowerCase().includes("log in") && (
-                <a href="/customer-login">Log in</a>
+                <Link to="/customer-login">Log in</Link>
               )}
             </p>
           )}

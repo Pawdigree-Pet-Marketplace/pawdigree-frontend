@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   CalendarCheck,
   Home,
@@ -41,6 +42,7 @@ type VendorLandingBottomNavbarProps = {
 };
 
 const VendorBottomNavbar = ({ isLoggedIn }: VendorLandingBottomNavbarProps) => {
+  const location = useLocation();
   const [activeAnchor, setActiveAnchor] = useState("#home");
   const items = isLoggedIn ? vendorItems : guestItems;
 
@@ -76,7 +78,7 @@ const VendorBottomNavbar = ({ isLoggedIn }: VendorLandingBottomNavbarProps) => {
   const isActive = (href: string) =>
     href.startsWith("#")
       ? href === activeAnchor
-      : window.location.pathname.startsWith(href);
+      : location.pathname.startsWith(href);
 
   return (
     <nav className="vendor-bottom-navbar" aria-label="Mobile navigation">
@@ -84,9 +86,9 @@ const VendorBottomNavbar = ({ isLoggedIn }: VendorLandingBottomNavbarProps) => {
         {items.map(({ label, icon: Icon, href }) => {
           const active = isActive(href);
           return (
-            <a
+            <Link
               key={label}
-              href={href}
+              to={href}
               className={`vendor-nav-item${active ? " active" : ""}`}
               aria-current={active ? "page" : undefined}
             >
@@ -98,7 +100,7 @@ const VendorBottomNavbar = ({ isLoggedIn }: VendorLandingBottomNavbarProps) => {
                 <Icon size={20} />
               </span>
               <span className="vendor-nav-label">{label}</span>
-            </a>
+            </Link>
           );
         })}
       </div>

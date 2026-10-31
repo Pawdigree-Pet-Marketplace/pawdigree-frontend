@@ -1,7 +1,10 @@
 
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render as rtlRender, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, test } from 'vitest'
 import RegistrationPage from '../pages/Customer/RegistrationPage'
+
+const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>)
 
 describe('Customer Registration Page', () => {
   test('allows the customer to move through the registration steps', async () => {

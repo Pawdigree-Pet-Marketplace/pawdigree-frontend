@@ -1,4 +1,5 @@
 import { Check, MapPin, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Profile } from "../../data/profile";
 import "./ProfileCard.css";
 
@@ -34,9 +35,9 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
           )}
         </div>
 
-        <a href="/profile/edit" className="profile-edit-btn">
+        <Link to="/profile/edit" className="profile-edit-btn">
           Edit
-        </a>
+        </Link>
       </div>
 
       <dl className="profile-details">

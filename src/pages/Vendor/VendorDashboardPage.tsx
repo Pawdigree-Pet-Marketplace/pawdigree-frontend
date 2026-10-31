@@ -29,12 +29,6 @@ function VendorDashboardPage() {
     sessionStorage.getItem("role");
 
   useEffect(() => {
-    if (!token || role !== "VENDOR") {
-      window.location.replace("/vendor/login");
-    }
-  }, [token, role]);
-
-  useEffect(() => {
     if (!token || role !== "VENDOR") return;
 
     let cancelled = false;

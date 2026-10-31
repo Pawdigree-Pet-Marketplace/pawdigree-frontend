@@ -36,6 +36,7 @@ function CustomerVendorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [isLoggedIn] = useState(() => Boolean(localStorage.getItem("access") || localStorage.getItem("access_token")));
 
   useEffect(() => {
@@ -56,7 +57,7 @@ function CustomerVendorsPage() {
     }
     void loadVendors();
     return () => controller.abort();
-  }, []);
+  }, [retryKey]);
 
   const visibleVendors = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
@@ -78,7 +79,7 @@ function CustomerVendorsPage() {
         <section className="vendors-results" aria-live="polite">
           {!loading && !error && <p className="vendors-count">{visibleVendors.length} {visibleVendors.length === 1 ? "vendor" : "vendors"}</p>}
           {loading ? <div className="vendors-grid" aria-label="Loading vendors">{Array.from({ length: 6 }, (_, index) => <div className="vendor-skeleton" key={index} />)}</div> : error ? (
-            <div className="vendors-state" role="alert"><h2>Vendors are unavailable</h2><p>{error}</p><button onClick={() => window.location.reload()}>Try again</button></div>
+            <div className="vendors-state" role="alert"><h2>Vendors are unavailable</h2><p>{error}</p><button onClick={() => setRetryKey((key) => key + 1)}>Try again</button></div>
           ) : visibleVendors.length === 0 ? (
             <div className="vendors-state"><h2>{query.trim() ? "No matching vendors" : "No vendors yet"}</h2><p>{query.trim() ? "Try another name, category, or location." : "Check back soon to discover businesses on Pawdigree."}</p></div>
           ) : (

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   cleanup,
   fireEvent,
-  render,
+  render as rtlRender,
   screen,
   waitFor,
 } from "@testing-library/react";
@@ -14,6 +14,20 @@ import {
   fetchTrendingSearches,
 } from "../../services/petsApi";
 import type { PublicPet } from "../../data/pets";
+import { MemoryRouter, useLocation } from "react-router-dom";
+
+function RouteSearch() {
+  return <output data-testid="route-search">{useLocation().search}</output>;
+}
+
+function render(ui: React.ReactNode) {
+  return rtlRender(
+    <MemoryRouter initialEntries={["/explore-pets"]}>
+      {ui}
+      <RouteSearch />
+    </MemoryRouter>,
+  );
+}
 
 vi.mock("../../services/petsApi", () => ({
   fetchPets: vi.fn(),
@@ -139,7 +153,7 @@ describe("ExplorePets page", () => {
         expect.objectContaining({ search: "chinchilla rabbit", page: 1 }),
       ),
     );
-    expect(window.location.search).toContain("search=chinchilla+rabbit");
+    expect(screen.getByTestId("route-search")).toHaveTextContent("search=chinchilla+rabbit");
   });
 
   it("filters by species from the quick picks and shows a removable chip", async () => {

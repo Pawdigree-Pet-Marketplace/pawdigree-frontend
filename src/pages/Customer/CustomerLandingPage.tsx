@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Adoption from "../../components/home/Adoption";
 import Footer from "../../components/layout/Footer";
 import Categories from "../../components/home/Categories";
@@ -22,6 +23,7 @@ function hasCustomerSession() {
 }
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const landingRef = useRef<HTMLElement | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCustomerSignedIn, setIsCustomerSignedIn] = useState(hasCustomerSession);
@@ -73,9 +75,9 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (isCustomerSignedIn) {
-      window.location.replace("/customer/dashboard");
+      navigate("/customer/dashboard", { replace: true });
     }
-  }, [isCustomerSignedIn]);
+  }, [isCustomerSignedIn, navigate]);
 
   if (isCustomerSignedIn) return null;
 

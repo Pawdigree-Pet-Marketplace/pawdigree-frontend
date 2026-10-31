@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, BriefcaseBusiness, Clock3, Info, Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorAddServicePage.css";
 
@@ -12,13 +13,6 @@ export default function VendorAddServicePage() {
   useEffect(() => {
     document.title = "Add Service - Pawdigree";
 
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-    const role = localStorage.getItem("role") || sessionStorage.getItem("role");
-
-    if (!token || role !== "VENDOR") {
-      window.location.href = "/vendor/login";
-    }
   }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -32,10 +26,10 @@ export default function VendorAddServicePage() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-service-page">
-        <a className="service-back-link" href="/vendor/dashboard">
+        <Link className="service-back-link" to="/vendor/dashboard">
           <ArrowLeft size={17} />
           Back to dashboard
-        </a>
+        </Link>
 
         <form className="service-listing-form" onSubmit={handleSubmit}>
           <section className="service-form-section">
@@ -118,7 +112,7 @@ export default function VendorAddServicePage() {
           </aside>
 
           <div className="service-form-actions">
-            <a href="/vendor/dashboard" className="service-cancel-button">Cancel</a>
+            <Link to="/vendor/dashboard" className="service-cancel-button">Cancel</Link>
             <button className="service-submit-button" type="submit" disabled>
               Save service
             </button>

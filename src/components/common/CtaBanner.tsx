@@ -1,5 +1,6 @@
 import { ArrowUpRight, PawPrint } from "lucide-react";
 import { useId } from "react";
+import { Link } from "react-router-dom";
 import "./CtaBanner.css";
 
 interface CtaBannerProps {
@@ -35,10 +36,10 @@ export default function CtaBanner({
         <h2 id={titleId}>{title}</h2>
         <p>{text}</p>
       </div>
-      <a className="cta-banner__btn" href={href}>
+      <Link className="cta-banner__btn" to={href}>
         {actionLabel}
         <ArrowUpRight size={17} aria-hidden="true" />
-      </a>
+      </Link>
     </section>
   );
 }

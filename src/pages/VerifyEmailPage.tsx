@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, MailCheck } from "lucide-react";
 import { apiRequest } from "../services/api";
+import { saveAuthSession } from "../services/auth/authStorage";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logos/icon-logo.svg";
 import "./Customer/CustomerLoginPage.css";
 import "./VerifyEmailPage.css";
@@ -33,6 +35,7 @@ function loginPath(role?: string) {
 }
 
 export default function VerifyEmailPage() {
+  const navigate = useNavigate();
   const [verification, setVerification] = useState(readVerificationState);
   const [loginRole, setLoginRole] = useState(() => readVerificationState()?.role);
   const [code, setCode] = useState("");
@@ -77,17 +80,9 @@ export default function VerifyEmailPage() {
       if (!tokens.access || !tokens.refresh) {
         throw new Error("Verification succeeded, but the login response did not include both access and refresh tokens.");
       }
-      for (const storage of [localStorage, sessionStorage]) {
-        storage.removeItem("token");
-        storage.removeItem("refresh");
-        storage.removeItem("role");
-      }
-      const storage = verification.keepLoggedIn ? localStorage : sessionStorage;
-      storage.setItem("token", tokens.access);
-      storage.setItem("refresh", tokens.refresh);
-      storage.setItem("role", verification.role);
+      saveAuthSession({ access: tokens.access, refresh: tokens.refresh, role: verification.role }, verification.keepLoggedIn);
       sessionStorage.removeItem("pawdigree_email_verification");
-      window.location.href = verification.role === "VENDOR" ? "/vendor/dashboard" : "/customer/dashboard";
+      navigate(verification.role === "VENDOR" ? "/vendor/dashboard" : "/customer/dashboard", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "We couldn't verify that code. Please try again.";
       if (/expired.*token|token.*expired|invalid.*token/i.test(message)) {
@@ -143,8 +138,7 @@ export default function VerifyEmailPage() {
     <main className="login-page verify-email-page">
       <header className="top-bar verify-email-topbar">
         <button type="button" className="back-btn" onClick={() => {
-          if (verification) window.location.href = loginPath(verification.role);
-          else window.location.href = loginPath(loginRole);
+          navigate(loginPath(verification?.role ?? loginRole));
         }} aria-label="Back to login"><ArrowLeft size={20} /></button>
         <span className="top-bar-title">Verify your email</span>
         <div className="spacer" />
@@ -173,7 +167,7 @@ export default function VerifyEmailPage() {
         ) : (
           <>
             <p className="verify-email-description">{error || (isExpired ? "This verification session has expired. Please log in again." : "Your verification session is unavailable. Please log in again to request a new code.")}</p>
-            <a className="btn-primary full verify-email-login-link" href={loginPath(loginRole)}>Back to login</a>
+            <Link className="btn-primary full verify-email-login-link" to={loginPath(loginRole)}>Back to login</Link>
           </>
         )}
       </section>

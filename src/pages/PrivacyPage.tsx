@@ -1,20 +1,23 @@
 import "./LegalPages.css";
 import lightLogo from "../assets/logos/lightmode-logo.svg";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function LegalHeader() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const handleBack = () => {
-    if (window.history.length > 1) {
-      window.history.back();
+    if (location.key !== "default") {
+      navigate(-1);
     } else {
-      window.location.href = "/vendor";
+      navigate("/vendor");
     }
   };
 
   return (
     <header className="legal-navbar">
-      <a className="legal-brand" href="#" aria-label="Pawdigree home">
+      <Link className="legal-brand" to="/" aria-label="Pawdigree home">
         <img src={lightLogo} alt="Pawdigree" className="legal-logo" />
-      </a>
+      </Link>
 
       <button
         className="legal-back-link"
@@ -177,14 +180,14 @@ function PrivacyPage() {
         </section>
 
         <p>
-          <a href="/terms">Read the Terms and Conditions</a>
+          <Link to="/terms-and-conditions">Read the Terms and Conditions</Link>
         </p>
       </article>
 
       <footer className="legal-footer">
         <p>
-          © 2026 Pawdigree · <a href="/terms">Terms</a> ·{" "}
-          <a href="/privacy">Privacy Policy</a>
+          © 2026 Pawdigree · <Link to="/terms-and-conditions">Terms</Link> ·{" "}
+          <Link to="/privacy">Privacy Policy</Link>
         </p>
       </footer>
     </main>

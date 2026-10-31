@@ -4,6 +4,7 @@ import {
   type CountryCode,
 } from "libphonenumber-js";
 import CountryFlag from "../CountryFlag/CountryFlag";
+import { Link } from "react-router-dom";
 import "./BusinessRegistrationForm.css";
 
 import API_BASE_URL from "../../services/api";
@@ -771,9 +772,9 @@ function handlePreviousStep() {
 
             <label htmlFor="agreeToTerms">
               I agree to the{" "}
-              <a href="/terms-and-conditions">
+              <Link to="/terms-and-conditions">
                 Terms and Conditions
-              </a>
+              </Link>
               .
             </label>
 

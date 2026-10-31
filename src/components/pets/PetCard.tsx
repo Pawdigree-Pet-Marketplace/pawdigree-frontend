@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { Heart, MapPin, PawPrint, Sparkles, Store } from "lucide-react";
+import { Link } from "react-router-dom";
 import { SPECIES, type PublicPet } from "../../data/pets";
 import {
   formatAge,
@@ -150,9 +151,9 @@ export default function PetCard({
           </p>
         )}
 
-        <a className="pet-card__btn" href={`/pets/${pet.pet_id}`}>
+        <Link className="pet-card__btn" to={`/pets/${pet.pet_id}`}>
           View details
-        </a>
+        </Link>
       </div>
     </article>
   );

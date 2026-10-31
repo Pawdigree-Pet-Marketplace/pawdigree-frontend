@@ -8,9 +8,12 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 import "./CustomerLoginForm.css";
 import { apiRequest } from "../../services/api";
+import { clearAuthSession, saveAuthSession } from "../../services/auth/authStorage";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logos/icon-logo.svg";
 
 export default function CustomerLoginForm() {
+  const navigate = useNavigate();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -79,12 +82,7 @@ export default function CustomerLoginForm() {
         if (!data.verification_token) {
           throw new Error("The verification response was incomplete. Please try logging in again.");
         }
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh");
-        localStorage.removeItem("role");
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("refresh");
-        sessionStorage.removeItem("role");
+        clearAuthSession();
         sessionStorage.setItem("pawdigree_email_verification", JSON.stringify({
           verificationToken: data.verification_token,
           email: data.masked_email ?? data.email ?? identifier.trim(),
@@ -93,7 +91,7 @@ export default function CustomerLoginForm() {
           expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
           resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
         }));
-        window.location.href = "/verify-email";
+        navigate("/verify-email");
         return;
       }
 
@@ -101,16 +99,9 @@ export default function CustomerLoginForm() {
         throw new Error("The login response was incomplete. Please try again.");
       }
 
-      const storage = keepLoggedIn ? localStorage : sessionStorage;
+      saveAuthSession({ access: data.access, refresh: data.refresh, role: "CUSTOMER" }, keepLoggedIn);
 
-      localStorage.clear();
-      sessionStorage.clear();
-
-      storage.setItem("token", data.access);
-      storage.setItem("refresh", data.refresh);
-      storage.setItem("role", "CUSTOMER");
-
-      window.location.href = "/customer/dashboard";
+      navigate("/customer/dashboard", { replace: true });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Login failed";
@@ -149,16 +140,9 @@ export default function CustomerLoginForm() {
         }),
       });
 
-      const storage = keepLoggedIn ? localStorage : sessionStorage;
+      saveAuthSession({ access: data.access, refresh: data.refresh, role: "CUSTOMER" }, keepLoggedIn);
 
-      localStorage.clear();
-      sessionStorage.clear();
-
-      storage.setItem("token", data.access);
-      storage.setItem("refresh", data.refresh);
-      storage.setItem("role", "CUSTOMER");
-
-      window.location.href = "/customer/dashboard";
+      navigate("/customer/dashboard", { replace: true });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Google login failed";
@@ -281,7 +265,7 @@ export default function CustomerLoginForm() {
             <span>Keep me logged in</span>
           </label>
 
-          <a href="/forgot-password">Forgot password?</a>
+          <Link to="/forgot-password">Forgot password?</Link>
         </div>
 
         <button
@@ -323,7 +307,7 @@ export default function CustomerLoginForm() {
       </div>
 
       <p className="login-register-link">
-        Don't have an account? <a href="/register">Sign up</a>
+        Don't have an account? <Link to="/registration">Sign up</Link>
       </p>
 
      <p className="login-terms">

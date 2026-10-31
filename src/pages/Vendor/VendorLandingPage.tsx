@@ -4,6 +4,7 @@ import vendorHero from "../../assets/images/vendor-hero.jpg";
 import logo from "../../assets/logos/darkmode-logo.svg";
 
 import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
+import { Link } from "react-router-dom";
 
 import {
   ArrowUpRight,
@@ -312,20 +313,20 @@ function VendorLandingPage() {
               </p>
 
               <div className="vendor-hero-actions">
-                <a
+                <Link
                   className="vendor-button vendor-button-primary"
-                  href="/vendor/register"
+                  to="/vendor/register"
                 >
                   Become a Vendor
                   <ArrowUpRight size={17} aria-hidden="true" />
-                </a>
+                </Link>
 
-                <a
+                <Link
                   className="vendor-button vendor-button-outline"
-                  href="/vendor/login"
+                  to="/vendor/login"
                 >
                   Log In
-                </a>
+                </Link>
               </div>
 
               <p className="vendor-trust-note">
@@ -606,10 +607,10 @@ function VendorLandingPage() {
               </li>
             </ul>
 
-            <a className="vendor-text-link" href="/vendor/register">
+            <Link className="vendor-text-link" to="/vendor/register">
               Start growing your business
               <ArrowUpRight size={17} aria-hidden="true" />
-            </a>
+            </Link>
           </div>
 
           <div
@@ -709,16 +710,16 @@ function VendorLandingPage() {
               with the people who care about pets.
             </p>
 
-            <a
+            <Link
               className="vendor-button vendor-button-primary-cta"
-              href="/vendor/register"
+              to="/vendor/register"
             >
               Become a Vendor
               <ArrowUpRight size={17} aria-hidden="true" />
-            </a>
+            </Link>
 
             <p className="vendor-cta-login">
-              Already have a vendor account? <a href="/vendor/login">Log in</a>
+              Already have a vendor account? <Link to="/vendor/login">Log in</Link>
             </p>
           </div>
         </section>
@@ -751,19 +752,19 @@ function VendorLandingPage() {
 
             <div className="vendor-footer-column">
               <h3>For Vendors</h3>
-              <a href="/vendor/register">Become a Vendor</a>
-              <a href="/vendor/login">Vendor Login</a>
+              <Link to="/vendor/register">Become a Vendor</Link>
+              <Link to="/vendor/login">Vendor Login</Link>
               <a href="#benefits">Vendor Benefits</a>
-              <a href="/vendor/register">Verification</a>
+              <Link to="/vendor/register">Verification</Link>
             </div>
 
             <div className="vendor-footer-bottom" id="footer-contact">
               <span>© 2026 Pawdigree. All rights reserved.</span>
 
               <div>
-                <a href="/privacy">Privacy Policy</a>
+                <Link to="/privacy">Privacy Policy</Link>
                 <span aria-hidden="true"> · </span>
-                <a href="/terms-and-conditions">Terms of Service</a>
+                <Link to="/terms-and-conditions">Terms of Service</Link>
               </div>
             </div>
           </div>

@@ -2,10 +2,12 @@
 import { useMemo, useState } from "react";
 import { Check, Eye, EyeOff, X } from "lucide-react";
 import { apiRequest } from "../../services/api";
+import { Link, useSearchParams } from "react-router-dom";
 import "./ResetPasswordForm.css";
 import pawdigreeLogo from "../../assets/logo.png";
 
 const ResetPasswordForm = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -53,9 +55,8 @@ const ResetPasswordForm = () => {
       return;
     }
 
-    const params = new URLSearchParams(window.location.search);
-    const uid = params.get("uid");
-    const token = params.get("token");
+    const uid = searchParams.get("uid");
+    const token = searchParams.get("token");
 
     if (!uid || !token) {
       setError("This reset link is invalid or expired. Please request a new one.");
@@ -110,9 +111,9 @@ const ResetPasswordForm = () => {
             <div className="reset-password-success" role="status">
               <Check size={32} strokeWidth={2.5} />
               <p>{success}</p>
-              <a className="reset-password-login-link" href="/login">
+              <Link className="reset-password-login-link" to="/login">
                 Go to Login
-              </a>
+              </Link>
             </div>
           </>
         ) : (
@@ -261,7 +262,7 @@ const ResetPasswordForm = () => {
             <p className="reset-password-footer">
               Remembered your password?
               <br />
-              <a href="/login">Back to Login</a>
+              <Link to="/login">Back to Login</Link>
             </p>
           </>
         )}

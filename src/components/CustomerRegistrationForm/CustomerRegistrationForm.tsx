@@ -7,6 +7,7 @@ import {
   type CountryCode,
 } from "libphonenumber-js";
 import { Eye, EyeOff } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import "../../App.css";
 import "./CustomerRegistrationForm.css";
@@ -393,7 +394,7 @@ export default function CustomerRegistrationForm() {
           <h2>Registration successful</h2>
           <p>{success}</p>
           <p>
-            <a href="/customer-login">Continue to log in</a>
+            <Link to="/customer-login">Continue to log in</Link>
           </p>
         </div>
       )}
@@ -772,7 +773,7 @@ export default function CustomerRegistrationForm() {
 
       {!success && (
         <p className="login-link">
-          Already have an account? <a href="/customer-login">Log in</a>
+          Already have an account? <Link to="/customer-login">Log in</Link>
         </p>
       )}
     </section>

@@ -11,6 +11,7 @@ import {
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./VendorEditPetListing.css";
 
 type Business = { id: string; name: string };
@@ -126,7 +127,9 @@ function BrandSelect({
 }
 
 export default function VendorEditPetListing() {
-  const id = window.location.pathname.split("/").filter(Boolean).pop() || "";
+  const { petId = "" } = useParams();
+  const navigate = useNavigate();
+  const id = petId;
   const isIdMissing = !id || id === "edit-pet";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -230,7 +233,7 @@ export default function VendorEditPetListing() {
           <div className="pet-form-section">
             <h2>No Pet ID</h2>
             <p>
-              Go to <a href="/vendor/listings">/vendor/listings</a> and click
+              Go to <Link to="/vendor/listings">/vendor/listings</Link> and click
               Edit.
             </p>
           </div>
@@ -302,7 +305,7 @@ export default function VendorEditPetListing() {
       if (!res.ok) throw new Error(await readError(res));
       setSuccess("Pet updated!");
       setTimeout(() => {
-        window.location.href = "/vendor/listings";
+        navigate("/vendor/listings");
       }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
@@ -330,9 +333,9 @@ export default function VendorEditPetListing() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <a className="pet-back-link" href="/vendor/listings">
+        <Link className="pet-back-link" to="/vendor/listings">
           <ArrowLeft size={17} /> Back to catalogue
-        </a>
+        </Link>
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
             <div className="pet-section-heading">
@@ -580,9 +583,9 @@ export default function VendorEditPetListing() {
           {success && <p className="pet-form-message success">{success}</p>}
 
           <div className="pet-form-actions">
-            <a href="/vendor/listings" className="pet-cancel-button">
+            <Link to="/vendor/listings" className="pet-cancel-button">
               Cancel
-            </a>
+            </Link>
             <button
               className="pet-submit-button"
               type="submit"
