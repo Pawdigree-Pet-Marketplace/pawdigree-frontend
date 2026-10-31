@@ -1,5 +1,6 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render as rtlRender, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import { apiRequest } from '../../services/api'
 import VendorDashboardPage from './VendorDashboardPage'
 
@@ -22,6 +23,8 @@ vi.mock('../layouts/VendorLayout/VendorLayout', () => ({
     </main>
   ),
 }))
+
+const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>)
 
 describe('VendorDashboardPage', () => {
   beforeEach(() => {

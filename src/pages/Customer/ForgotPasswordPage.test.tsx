@@ -1,11 +1,15 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render as rtlRender, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { apiRequest } from "../../services/api";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 
 vi.mock("../../services/api", () => ({
   apiRequest: vi.fn(),
 }));
+
+const render = (ui: React.ReactNode) =>
+  rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe("ForgotPasswordPage", () => {
   beforeEach(() => {

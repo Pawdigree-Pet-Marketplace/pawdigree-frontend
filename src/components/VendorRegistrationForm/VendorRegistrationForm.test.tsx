@@ -2,13 +2,16 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
   cleanup,
   fireEvent,
-  render,
+  render as rtlRender,
   screen,
   waitFor,
 } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import "@testing-library/jest-dom/vitest";
 
 import VendorRegistrationForm from "./VendorRegistrationForm";
+
+const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 const { apiRequestMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

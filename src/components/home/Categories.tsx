@@ -1,5 +1,6 @@
 import { categories as landingCategories } from '../../data/landing'
 import useScrollReveal from '../../hooks/useScrollReveal'
+import { Link } from 'react-router-dom'
 import './Categories.css'
 
 type CategoryItem = {
@@ -32,24 +33,18 @@ export default function Categories({
       <h2 className="section-title">{title}</h2>
 
       <ul ref={categoriesRef} className="categories-list">
-        {items.map((category, index) => (
+        {items.map((category, index) => {
+          const href = getHref ? getHref(category) : '#' + category.name.toLowerCase()
+          const card = <><img src={category.image} alt={category.name} className="category-image" /><span>{category.name}</span></>
+          return (
           <li
             key={category.name}
             className={'reveal reveal-delay-' + Math.min(index + 1, 4)}
           >
-            <a
-              href={getHref ? getHref(category) : '#' + category.name.toLowerCase()}
-              className="category"
-            >
-              <img
-                src={category.image}
-                alt={category.name}
-                className="category-image"
-              />
-              <span>{category.name}</span>
-            </a>
+            {href.startsWith('/') ? <Link to={href} className="category">{card}</Link> : <a href={href} className="category">{card}</a>}
           </li>
-        ))}
+          )
+        })}
       </ul>
     </section>
   )

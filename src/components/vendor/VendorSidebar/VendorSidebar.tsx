@@ -17,6 +17,8 @@ import {
 import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
 import iconLogo from "../../../assets/logos/icon-logo.svg";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { clearAuthSession } from "../../../services/auth/authStorage";
 
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
@@ -62,24 +64,20 @@ type VendorSidebarProps = {
   currentPath?: string;
 };
 
-export default function VendorSidebar({
-  currentPath = window.location.pathname,
-}: VendorSidebarProps) {
+export default function VendorSidebar({ currentPath: providedPath }: VendorSidebarProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentPath = providedPath ?? location.pathname;
   function handleLogout() {
-    for (const storage of [localStorage, sessionStorage]) {
-      storage.removeItem("token");
-      storage.removeItem("refresh");
-      storage.removeItem("role");
-    }
-
-    window.location.href = "/vendor/login";
+    clearAuthSession();
+    navigate("/vendor/login", { replace: true });
   }
 
   return (
     <aside className="dashboard-sidebar">
-     <a
+     <Link
        className="dashboard-brand"
-       href="/vendor"
+       to="/vendor"
        aria-label="Pawdigree vendor home"
       >
         <img
@@ -94,7 +92,7 @@ export default function VendorSidebar({
           alt=""
           aria-hidden="true"
         />
-     </a>
+     </Link>
 
       <nav className="dashboard-navigation" aria-label="Vendor navigation">
         {navigationGroups.map((group) => (
@@ -143,15 +141,15 @@ export default function VendorSidebar({
               }
 
               return (
-                <a
+                <Link
                   key={item.path}
-                  href={item.path}
+                  to={item.path}
                   className={`dashboard-nav-item${isActive ? " active" : ""}`}
                   aria-current={isActive ? "page" : undefined}
                   title={item.label}
                 >
                   {itemContent}
-                </a>
+                </Link>
               );
             })}
           </div>

@@ -1,25 +1,12 @@
 import API_BASE_URL from "./api";
+import { getAccessToken, getAuthStorage } from "./auth/authStorage";
 
 type TokenResponse = {
   access?: string;
   refresh?: string;
 };
 
-type AuthStorage = Storage;
-
 let refreshInFlight: Promise<string | null> | null = null;
-
-function getAuthStorage(): AuthStorage | null {
-  // Prefer a complete token pair so an old access token cannot hide a usable
-  // refresh token stored in the other browser storage area.
-  for (const storage of [localStorage, sessionStorage]) {
-    if (storage.getItem("token") && storage.getItem("refresh")) return storage;
-  }
-
-  if (localStorage.getItem("token")) return localStorage;
-  if (sessionStorage.getItem("token")) return sessionStorage;
-  return null;
-}
 
 function withAccessToken(init: RequestInit, accessToken: string): RequestInit {
   const headers = new Headers(init.headers);
@@ -27,7 +14,7 @@ function withAccessToken(init: RequestInit, accessToken: string): RequestInit {
   return { ...init, headers };
 }
 
-function refreshAccessToken(storage: AuthStorage): Promise<string | null> {
+function refreshAccessToken(storage: Storage): Promise<string | null> {
   if (refreshInFlight) return refreshInFlight;
 
   refreshInFlight = (async () => {
@@ -46,6 +33,8 @@ function refreshAccessToken(storage: AuthStorage): Promise<string | null> {
       if (!tokens.access) return null;
 
       storage.setItem("token", tokens.access);
+      storage.setItem("access", tokens.access);
+      storage.setItem("access_token", tokens.access);
       if (tokens.refresh) storage.setItem("refresh", tokens.refresh);
       return tokens.access;
     } catch {
@@ -64,7 +53,7 @@ export async function vendorAuthenticatedFetch(
   init: RequestInit = {},
 ): Promise<Response> {
   const storage = getAuthStorage();
-  const token = storage?.getItem("token");
+  const token = storage ? getAccessToken(storage) : null;
   const firstResponse = await fetch(
     input,
     token ? withAccessToken(init, token) : init,

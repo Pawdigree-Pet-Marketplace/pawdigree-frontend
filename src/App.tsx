@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
@@ -36,18 +37,18 @@ function App() {
       {/* Public pages */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/explore-pets" element={<ExplorePets />} />
-      <Route path="/pets" element={<CustomerPetCataloguePage />} />
+      <Route path="/pets" element={<ProtectedRoute role="CUSTOMER"><CustomerPetCataloguePage /></ProtectedRoute>} />
       <Route path="/pets/:petId" element={<PetsDetailPage />} />
       <Route path="/vendors" element={<CustomerVendorsPage />} />
       <Route path="/vendors/*" element={<CustomerVendorProfilePage />} />
 
       {/* Customer account pages */}
-      <Route path="/customer/dashboard" element={<CustomerDashboardLayout />} />
+      <Route path="/customer/dashboard" element={<ProtectedRoute role="CUSTOMER"><CustomerDashboardLayout /></ProtectedRoute>} />
       <Route path="/registration" element={<RegistrationPage />} />
       <Route path="/login" element={<CustomerLoginPage />} />
       <Route path="/customer-login" element={<CustomerLoginPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/profile/edit" element={<EditProfilePage />} />
+      <Route path="/profile" element={<ProtectedRoute role="CUSTOMER"><ProfilePage /></ProtectedRoute>} />
+      <Route path="/profile/edit" element={<ProtectedRoute role="CUSTOMER"><EditProfilePage /></ProtectedRoute>} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/reset-password" element={<ResetPasswordForm />} />
@@ -59,27 +60,27 @@ function App() {
       <Route path="/vendor/register/*" element={<VendorRegistrationPage />} />
       <Route path="/vendor-registration" element={<VendorRegistrationPage />} />
       <Route path="/register.vendor/*" element={<VendorRegistrationPage />} />
-      <Route path="/business-registration" element={<BusinessRegistrationForm />} />
-      <Route path="/vendor/dashboard" element={<VendorDashboardPage />} />
-      <Route path="/vendor/listings" element={<VendorCataloguePage />} />
-      <Route path="/vendor/listings/new" element={<VendorAddPetPage />} />
-      <Route path="/vendor/services/new" element={<VendorAddServicePage />} />
-      <Route path="/vendor/edit-pet/:petId" element={<VendorEditPetListing />} />
-      <Route path="/vendor/documents" element={<DocumentUpload />} />
-      <Route path="/vendor/business-profile" element={<VendorBusinessProfilePage />} />
+      <Route path="/business-registration" element={<ProtectedRoute role="VENDOR"><BusinessRegistrationForm /></ProtectedRoute>} />
+      <Route path="/vendor/dashboard" element={<ProtectedRoute role="VENDOR"><VendorDashboardPage /></ProtectedRoute>} />
+      <Route path="/vendor/listings" element={<ProtectedRoute role="VENDOR"><VendorCataloguePage /></ProtectedRoute>} />
+      <Route path="/vendor/listings/new" element={<ProtectedRoute role="VENDOR"><VendorAddPetPage /></ProtectedRoute>} />
+      <Route path="/vendor/services/new" element={<ProtectedRoute role="VENDOR"><VendorAddServicePage /></ProtectedRoute>} />
+      <Route path="/vendor/edit-pet/:petId" element={<ProtectedRoute role="VENDOR"><VendorEditPetListing /></ProtectedRoute>} />
+      <Route path="/vendor/documents" element={<ProtectedRoute role="VENDOR"><DocumentUpload /></ProtectedRoute>} />
+      <Route path="/vendor/business-profile" element={<ProtectedRoute role="VENDOR"><VendorBusinessProfilePage /></ProtectedRoute>} />
       <Route
         path="/vendor/categories"
-        element={
+        element={<ProtectedRoute role="VENDOR">
           <VendorLayout
             title="Vendor Categories"
             description="Manage your pet categories and listings."
           >
             <VendorCategorySelector />
           </VendorLayout>
-        }
+        </ProtectedRoute>}
       />
       {/* Keep the previous catch-all behavior for other vendor URLs. */}
-      <Route path="/vendor/*" element={<VendorDashboardPage />} />
+      <Route path="/vendor/*" element={<ProtectedRoute role="VENDOR"><VendorDashboardPage /></ProtectedRoute>} />
 
       {/* Legal pages */}
       <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
+import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorCataloguePage.css";
 
@@ -103,7 +104,6 @@ export default function VendorCataloguePage() {
       (localStorage.getItem("role") || sessionStorage.getItem("role")) !==
         "VENDOR"
     ) {
-      window.location.href = "/vendor/login";
       return;
     }
 
@@ -228,10 +228,10 @@ export default function VendorCataloguePage() {
             </p>
           </div>
 
-          <a className="catalogue-add-button" href="/vendor/listings/new">
+          <Link className="catalogue-add-button" to="/vendor/listings/new">
             <Plus size={18} />
             Add pet listing
-          </a>
+          </Link>
         </div>
 
         {error && (
@@ -282,10 +282,10 @@ export default function VendorCataloguePage() {
               next home.
             </p>
 
-            <a className="catalogue-add-button" href="/business-registration">
+            <Link className="catalogue-add-button" to="/business-registration">
               <Plus size={18} />
               Register your business
-            </a>
+            </Link>
 
             <span className="catalogue-footnote">
               Your next listing starts here.
@@ -377,10 +377,10 @@ export default function VendorCataloguePage() {
                           : "Deactivate Listing"}
                       </button>
 
-                      <a className="catalogue-edit-button" href={"/vendor/edit-pet/" + pet.pet_id}>
+                      <Link className="catalogue-edit-button" to={"/vendor/edit-pet/" + pet.pet_id}>
                         <Pencil size={16} />
                         Edit listing
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </article>

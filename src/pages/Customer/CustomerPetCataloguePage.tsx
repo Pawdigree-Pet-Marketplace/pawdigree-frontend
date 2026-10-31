@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { ArrowRight, Search, Heart, Sparkles } from "lucide-react";
 import { apiRequest } from "../../services/api";
+import { Link, useSearchParams } from "react-router-dom";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 import "./CustomerPetCataloguePage.css";
 
@@ -10,8 +11,8 @@ type Pet = {
   price?: string | number | null; images?: { image?: string | null; is_primary?: boolean }[];
 };
 type Filters = { search: string; purpose: string; gender: string; breed: string; minAge: string; maxAge: string; page: number };
-function readFilters(): Filters {
-  const query = new URLSearchParams(window.location.search);
+function readFilters(search: string): Filters {
+  const query = new URLSearchParams(search);
   return { search: query.get("search") || "", purpose: query.get("listing_type") || "", gender: query.get("gender") || "", breed: query.get("breed") || "", minAge: query.get("age_min") || "", maxAge: query.get("age_max") || "", page: Math.max(1, Number(query.get("page") || 1)) };
 }
 function queryFor(filters: Filters) {
@@ -26,16 +27,27 @@ function queryFor(filters: Filters) {
   return query;
 }
 export default function CustomerPetCataloguePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.toString();
   const [authorized] = useState(() => Boolean((localStorage.getItem("token") || sessionStorage.getItem("token")) && (localStorage.getItem("role") || sessionStorage.getItem("role")) === "CUSTOMER"));
-  const [filters, setFilters] = useState(readFilters);
-  const [draft, setDraft] = useState(readFilters);
+  const [filters, setFilters] = useState(() => readFilters(search));
+  const [draft, setDraft] = useState(() => readFilters(search));
+  const [syncedSearch, setSyncedSearch] = useState(search);
   const [pets, setPets] = useState<Pet[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterError, setFilterError] = useState("");
 
-  useEffect(() => { if (!authorized) window.location.replace("/customer-login"); }, [authorized]);
+  if (search !== syncedSearch) {
+    setSyncedSearch(search);
+    const next = readFilters(search);
+    if (queryFor(next).toString() !== queryFor(filters).toString()) {
+      setFilters(next);
+    }
+    setDraft(next);
+  }
+
   useEffect(() => {
     if (!authorized) return;
     let cancelled = false;
@@ -55,15 +67,15 @@ export default function CustomerPetCataloguePage() {
     if ([draft.minAge, draft.maxAge].some(v => v !== "" && !/^\d+$/.test(v))) { setFilterError("Enter ages as nonnegative whole numbers of months."); return; }
     if (draft.minAge && draft.maxAge && Number(draft.minAge) > Number(draft.maxAge)) { setFilterError("Minimum age must be less than or equal to maximum age."); return; }
     setFilterError(""); const next = { ...draft, page: 1 }; setFilters(next);
-    const query = queryFor(next); window.history.replaceState(null, "", `/pets${query.size ? `?${query}` : ""}`);
+    setSearchParams(queryFor(next), { replace: true });
   }
   function clear() {
     const next = { search: "", purpose: "", gender: "", breed: "", minAge: "", maxAge: "", page: 1 };
-    setDraft(next); setFilters(next); setFilterError(""); window.history.replaceState(null, "", "/pets");
+    setDraft(next); setFilters(next); setFilterError(""); setSearchParams({}, { replace: true });
   }
   function changePage(page: number) {
     const next = { ...filters, page }; setFilters(next); setDraft(next);
-    window.history.replaceState(null, "", `/pets?${queryFor(next)}`); window.scrollTo({ top: 0, behavior: "smooth" });
+    setSearchParams(queryFor(next), { replace: true }); window.scrollTo({ top: 0, behavior: "smooth" });
   }
   if (!authorized) return null;
   const pages = Math.ceil(count / 20);
@@ -78,7 +90,7 @@ export default function CustomerPetCataloguePage() {
       <label>Minimum age (months)<input type="number" min="0" step="1" value={draft.minAge} onChange={e => setDraft({ ...draft, minAge: e.target.value })}/></label>
       <label>Maximum age (months)<input type="number" min="0" step="1" value={draft.maxAge} onChange={e => setDraft({ ...draft, maxAge: e.target.value })}/></label>
     </div><div className="dashboard-filter-actions"><button type="submit">Apply filters</button><button type="button" className="dashboard-filter-clear" onClick={clear}>Clear filters</button></div>{filterError && <p className="dashboard-filter-error" role="alert">{filterError}</p>}</form>
-    <section className="dashboard-section dashboard-listings" aria-live="polite"><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">AVAILABLE NOW</p><h2>Pet listings</h2><p>{count} listing{count === 1 ? "" : "s"} found</p></div><a href="/customer/dashboard" className="dashboard-text-link">Back to dashboard <ArrowRight size={16}/></a></div>
+    <section className="dashboard-section dashboard-listings" aria-live="polite"><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">AVAILABLE NOW</p><h2>Pet listings</h2><p>{count} listing{count === 1 ? "" : "s"} found</p></div><Link to="/customer/dashboard" className="dashboard-text-link">Back to dashboard <ArrowRight size={16}/></Link></div>
       {loading ? <div className="dashboard-empty-state" role="status">Finding pets for you...</div> : error ? <div className="dashboard-empty-state" role="alert"><h3>We couldn’t load the listings</h3><p>{error}</p></div> : pets.length === 0 ? <div className="dashboard-empty-state"><div className="dashboard-empty-icon"><Search size={32}/></div><h3>No pets match these filters</h3><p>Try changing your search or clearing the filters.</p><button className="dashboard-clear-search" onClick={clear}>Clear filters</button></div> : <div className="dashboard-pet-grid">{pets.map(pet => { const image = pet.images?.find(i => i.is_primary)?.image || pet.images?.[0]?.image; const age = pet.age < 12 ? `${pet.age} months old` : `${Math.floor(pet.age / 12)} years old`; return <article className="dashboard-pet-card" key={pet.pet_id}>{image ? <img src={image} alt={pet.name} loading="lazy"/> : <div className="dashboard-pet-image-placeholder"><Heart size={30}/><Sparkles size={14}/></div>}<div className="dashboard-pet-card-content"><p className="dashboard-pet-type">{pet.listing_type === "ADOPTION" ? "For adoption" : "For sale"}</p><h3>{pet.name}</h3><p>{[pet.breed, pet.species].filter(Boolean).join(" · ")}</p><p>{age} · {pet.gender.toLowerCase()}</p>{pet.listing_type === "SALE" && pet.price != null && <p className="dashboard-pet-price">UGX {Number(pet.price).toLocaleString("en-UG")}</p>}</div></article>; })}</div>}
       {pages > 1 && <nav className="catalogue-pagination" aria-label="Catalogue pages"><button type="button" disabled={filters.page <= 1} onClick={() => changePage(filters.page - 1)}>Previous</button><span>Page {filters.page} of {pages}</span><button type="button" disabled={filters.page >= pages} onClick={() => changePage(filters.page + 1)}>Next</button></nav>}
     </section>

@@ -1,12 +1,13 @@
 import "./TermsAndConditionsPage.css";
+import { Link } from "react-router-dom";
 
 function TermsAndConditionsPage() {
   return (
     <main className="terms-page">
       <article className="terms-card">
-        <a href="/vendor-registration" className="terms-back-link">
+        <Link to="/vendor-registration" className="terms-back-link">
           ← Back to vendor registration
-        </a>
+        </Link>
 
         <h1>Pawdigree Terms and Conditions</h1>
         <p className="terms-updated">Vendor Agreement · Draft for review</p>
@@ -170,9 +171,9 @@ function TermsAndConditionsPage() {
           legal agreement.
         </p>
 
-        <a href="/vendor-registration" className="terms-return-button">
+        <Link to="/vendor-registration" className="terms-return-button">
           Return to Registration
-        </a>
+        </Link>
       </article>
     </main>
   );

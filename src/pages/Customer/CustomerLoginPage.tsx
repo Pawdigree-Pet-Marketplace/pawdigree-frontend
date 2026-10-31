@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, PawPrint, Store } from "lucide-react";
 import "./CustomerLoginPage.css";
 import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
@@ -8,6 +9,7 @@ import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideM
 type Step = "welcome" | "password" | "phone";
 
 export default function CustomerLoginPage() {
+  const navigate = useNavigate();
   useEffect(() => {
     document.title = "Customer Login - Pawdigree";
   }, []);
@@ -24,7 +26,7 @@ export default function CustomerLoginPage() {
       setStep("welcome");
       return;
     }
-    window.location.href = "/";
+    navigate("/");
   };
 
   return (
@@ -73,7 +75,7 @@ export default function CustomerLoginPage() {
                 type="button"
                 className="role-card"
                 onClick={() => {
-                  window.location.href = "/vendor/login";
+                  navigate("/vendor/login");
                 }}
               >
                 <span className="role-icon" aria-hidden="true">
@@ -91,13 +93,13 @@ export default function CustomerLoginPage() {
 
             <p className="bottom-link">
               New to Pawdigree?{" "}
-              <a href="/registration">Create an account</a>
+              <Link to="/registration">Create an account</Link>
             </p>
 
             <p className="terms">
               By continuing you agree to Pawdigree's{" "}
-              <a href="/terms-and-conditions">Terms &amp; Conditions</a> and{" "}
-              <a href="/privacy">Privacy Policy</a>.
+              <Link to="/terms-and-conditions">Terms &amp; Conditions</Link> and{" "}
+              <Link to="/privacy">Privacy Policy</Link>.
             </p>
           </div>
         )}

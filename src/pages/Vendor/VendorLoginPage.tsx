@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Eye, EyeOff, Store } from "lucide-react";
 import { apiRequest } from "../../services/api";
+import { clearAuthSession, saveAuthSession } from "../../services/auth/authStorage";
+import { Link, useNavigate } from "react-router-dom";
 import "./VendorLoginPage.css";
 import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
 import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
@@ -18,6 +20,7 @@ type LoginResponse = {
 };
 
 export default function VendorLoginPage() {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -84,15 +87,16 @@ export default function VendorLoginPage() {
           return;
         }
 
-        const verificationParams = new URLSearchParams({
-          token: verificationToken,
-          email: data.email ?? "",
+        clearAuthSession();
+        sessionStorage.setItem("pawdigree_email_verification", JSON.stringify({
+          verificationToken,
+          email: data.masked_email ?? data.email ?? email.trim(),
           role: "VENDOR",
-          keepLoggedIn: String(keepLoggedIn),
-          emailSent: String(data.email_sent ?? false),
-        });
-
-        window.location.href = `/verify-email?${verificationParams.toString()}`;
+          keepLoggedIn,
+          expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
+          resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
+        }));
+        navigate("/verify-email");
         return;
       }
 
@@ -107,20 +111,9 @@ export default function VendorLoginPage() {
         return;
       }
 
-      // Clear any previous session before saving the new one.
-      for (const storage of [localStorage, sessionStorage]) {
-        storage.removeItem("token");
-        storage.removeItem("refresh");
-        storage.removeItem("role");
-      }
+      saveAuthSession({ access: accessToken, refresh: refreshToken, role: "VENDOR" }, keepLoggedIn);
 
-      const storage = keepLoggedIn ? localStorage : sessionStorage;
-
-      storage.setItem("token", accessToken);
-      storage.setItem("refresh", refreshToken);
-      storage.setItem("role", "VENDOR");
-
-      window.location.href = "/vendor/dashboard";
+      navigate("/vendor/dashboard", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();
@@ -162,7 +155,7 @@ export default function VendorLoginPage() {
         audience="vendor"
         isLoggedIn={false}
         loginOverlay
-        backAction={{ label: "Back", onClick: () => { window.location.href = "/vendor"; } }}
+        backAction={{ label: "Back", onClick: () => navigate("/vendor") }}
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
       />
@@ -294,7 +287,7 @@ export default function VendorLoginPage() {
               Keep me logged in
             </label>
 
-            <a href="/forgot-password">Forgot password?</a>
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
 
           <button
@@ -308,7 +301,7 @@ export default function VendorLoginPage() {
 
         <p className="vendor-login-register">
           Not a vendor yet?{" "}
-          <a href="/vendor/register">Become a vendor</a>
+          <Link to="/vendor/register">Become a vendor</Link>
         </p>
       </section>
 

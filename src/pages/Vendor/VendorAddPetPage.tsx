@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
+import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorAddPetPage.css";
 
@@ -71,15 +72,6 @@ export default function VendorAddPetPage() {
 
   useEffect(() => {
     document.title = "Add Pet Listing - Pawdigree";
-
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-    const role = localStorage.getItem("role") || sessionStorage.getItem("role");
-
-    if (!token || role !== "VENDOR") {
-      window.location.href = "/vendor/login";
-      return;
-    }
 
     async function loadBusinesses() {
       try {
@@ -178,7 +170,6 @@ export default function VendorAddPetPage() {
       localStorage.getItem("token") || sessionStorage.getItem("token");
 
     if (!token) {
-      window.location.href = "/vendor/login";
       return;
     }
 
@@ -246,10 +237,10 @@ export default function VendorAddPetPage() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <a className="pet-back-link" href="/vendor/listings">
+        <Link className="pet-back-link" to="/vendor/listings">
           <ArrowLeft size={17} />
           Back to catalogue
-        </a>
+        </Link>
 
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
@@ -288,7 +279,7 @@ export default function VendorAddPetPage() {
               <p className="pet-inline-note">
                 No registered business was found. Register your business before
                 creating a listing.{" "}
-                <a href="/business-registration">Register a business</a>
+                <Link to="/business-registration">Register a business</Link>
               </p>
             )}
 
@@ -488,9 +479,9 @@ export default function VendorAddPetPage() {
           )}
 
           <div className="pet-form-actions">
-            <a href="/vendor/listings" className="pet-cancel-button">
+            <Link to="/vendor/listings" className="pet-cancel-button">
               Cancel
-            </a>
+            </Link>
             <button
               className="pet-submit-button"
               type="submit"

@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check, ChevronDown, PawPrint, ShoppingCart, UserRound } from "lucide-react";
-import API_BASE_URL from "../../services/api";
+import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
+import { getSessionToken } from "../../services/auth/authStorage";
 import "./AdoptionRequest.css";
 
 type HomeType = "APARTMENT" | "HOUSE" | "OTHER";
@@ -24,13 +26,9 @@ const initialForm: AdoptionForm = {
   message: "",
 };
 
-function getCustomerAccessToken(): string | null {
-  // If Pawdigree stores the customer token under a different key, update this
-  // function to use the same key/helper as your login flow.
-  return localStorage.getItem("access_token") || localStorage.getItem("access");
-}
-
 export default function AdoptionRequest() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<AdoptionForm>(initialForm);
   const [errors, setErrors] = useState<ApiErrors>({});
@@ -38,7 +36,7 @@ export default function AdoptionRequest() {
   const [success, setSuccess] = useState<{ applicationId: number | string; status: string } | null>(null);
 
   // Open this page with /adoption-request?pet_id=123, using the selected pet's pet_id.
-  const petId = Number(new URLSearchParams(window.location.search).get("pet_id"));
+  const petId = Number(searchParams.get("pet_id"));
   const petName = "your selected pet"; // Replace with the selected pet's name from route/API data.
 
   function update<K extends keyof AdoptionForm>(key: K, value: AdoptionForm[K]) {
@@ -85,7 +83,7 @@ export default function AdoptionRequest() {
     event.preventDefault();
     if (!validateStep(3)) return;
 
-    const token = getCustomerAccessToken();
+    const token = getSessionToken();
     if (!token) {
       setErrors({ detail: "Please log in with your customer account before submitting an adoption request." });
       return;
@@ -104,11 +102,10 @@ export default function AdoptionRequest() {
     setSubmitting(true);
     setErrors({});
     try {
-      const response = await fetch(`${API_BASE_URL}/api/adoptions/applications/`, {
+      const response = await customerAuthenticatedFetch("/api/adoptions/applications/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -162,7 +159,7 @@ export default function AdoptionRequest() {
           <h2>Application submitted!</h2>
           <p>Your adoption request has been sent successfully. The application status is <strong>{success.status}</strong>.</p>
           <p>Application reference: <strong>{success.applicationId}</strong></p>
-          <button className="primary-button" type="button" onClick={() => { window.location.href = "/"; }}>Back to Pawdigree</button>
+          <button className="primary-button" type="button" onClick={() => navigate("/")}>Back to Pawdigree</button>
         </section>
       </main>
     );
@@ -171,7 +168,7 @@ export default function AdoptionRequest() {
   return (
     <main className="adoption-page">
       <header className="adoption-header">
-        <button className="back-icon" type="button" onClick={step === 1 ? () => window.history.back() : goBack} aria-label="Go back">
+        <button className="back-icon" type="button" onClick={step === 1 ? () => navigate(-1) : goBack} aria-label="Go back">
           <ArrowLeft size={24} />
         </button>
         <h1>Adoption application</h1>

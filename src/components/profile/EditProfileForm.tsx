@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react'
 import type { ChangeEvent, FocusEvent, FormEvent } from 'react'
 import { parsePhoneNumber } from 'libphonenumber-js'
+import { Link } from 'react-router-dom'
 import { validateProfile } from '../../utils/validateProfile'
 import type { ProfileFormValues } from '../../utils/validateProfile'
 import './EditProfileForm.css'
@@ -233,9 +234,9 @@ export default function EditProfileForm({
       </div>
 
       <div className="edit-actions">
-        <a href={cancelHref} className="edit-cancel">
+        <Link to={cancelHref} className="edit-cancel">
           Cancel
-        </a>
+        </Link>
         <button type="submit" className="edit-save">
           Save changes
         </button>

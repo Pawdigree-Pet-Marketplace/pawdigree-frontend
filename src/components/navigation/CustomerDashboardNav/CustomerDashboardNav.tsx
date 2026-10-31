@@ -11,7 +11,8 @@ import {
   LogOut,
 } from "lucide-react";
 import logo from "../../../assets/logos/lightmode-logo.svg";
-import API_BASE_URL from "../../../services/api";
+import { customerAuthenticatedFetch } from "../../../services/customerAuthenticatedFetch";
+import { getSessionToken, getAuthStorage } from "../../../services/auth/authStorage";
 import "./CustomerDashboardNav.css";
 import { ConfirmLogout } from "../../layout/ConfirmLogout";
 import { Link } from "react-router-dom";
@@ -39,24 +40,18 @@ export default function CustomerDashboardNav() {
     let cancelled = false;
 
     async function loadUsername() {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const token = getSessionToken();
       if (!token) return;
 
       try {
-        const response = await fetch(API_BASE_URL + "/api/auth/profile/", {
-          headers: { Authorization: "Bearer " + token },
-        });
+        const response = await customerAuthenticatedFetch("/api/auth/profile/");
         if (!response.ok) return;
 
         const profile: { username?: string } = await response.json();
         const username = profile.username?.trim();
         if (!cancelled && username) {
           setStoredName(username);
-          const storage = localStorage.getItem("token")
-            ? localStorage
-            : sessionStorage;
-          storage.setItem("username", username);
+          getAuthStorage()?.setItem("username", username);
         }
       } catch {
         // Keep the stored name or fallback if the profile request fails.
@@ -128,9 +123,9 @@ export default function CustomerDashboardNav() {
 
   const account = (
     <div className="customer-dash-account-area">
-      <a
+      <Link
         className="customer-dash-account"
-        href="/profile"
+        to="/profile"
         aria-label={"Open " + storedName + "'s profile"}
       >
         <span className="customer-dash-avatar" aria-hidden="true">{initial}</span>
@@ -138,7 +133,7 @@ export default function CustomerDashboardNav() {
           <span className="customer-dash-account-label">Signed in as</span>
           <span className="customer-dash-account-name">{storedName}</span>
         </span>
-      </a>
+      </Link>
       <button
         type="button"
         className="customer-dash-logout-option"
@@ -156,21 +151,21 @@ export default function CustomerDashboardNav() {
   return (
     <>
       <aside className="customer-dash-sidebar" aria-label="Dashboard sidebar">
-        <a
+        <Link
           className="customer-dash-brand"
-          href="/customer/dashboard"
+          to="/customer/dashboard"
           aria-label="Pawdigree dashboard overview"
         >
           <img src={logo} alt="Pawdigree" className="customer-dash-logo" />
-        </a>
+        </Link>
         {renderLinks()}
         {account}
       </aside>
 
       <header className="customer-dash-mobile-header">
-        <a href="/customer/dashboard" aria-label="Pawdigree dashboard overview">
+        <Link to="/customer/dashboard" aria-label="Pawdigree dashboard overview">
           <img src={logo} alt="Pawdigree" className="customer-dash-logo" />
-        </a>
+        </Link>
         <button
           type="button"
           className="customer-dash-menu-toggle"
