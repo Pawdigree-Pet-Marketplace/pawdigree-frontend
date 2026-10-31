@@ -1,14 +1,13 @@
-
 import { useState } from "react";
 import type { FormEvent } from "react";
-import {
-  GoogleLogin,
-  type CredentialResponse,
-} from "@react-oauth/google";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
 import "./CustomerLoginForm.css";
 import { apiRequest } from "../../services/api";
-import { clearAuthSession, saveAuthSession } from "../../services/auth/authStorage";
+import {
+  clearAuthSession,
+  saveAuthSession,
+} from "../../services/auth/authStorage";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logos/icon-logo.svg";
 
@@ -28,14 +27,11 @@ export default function CustomerLoginForm() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const isEmailEmpty = !identifier.trim();
-  const isEmailInvalid =
-    !isEmailEmpty && !emailRegex.test(identifier.trim());
+  const isEmailInvalid = !isEmailEmpty && !emailRegex.test(identifier.trim());
   const isPasswordEmpty = !password;
 
-  const showEmailError =
-    touched.email && (isEmailEmpty || isEmailInvalid);
-  const showPasswordError =
-    touched.password && isPasswordEmpty;
+  const showEmailError = touched.email && (isEmailEmpty || isEmailInvalid);
+  const showPasswordError = touched.password && isPasswordEmpty;
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,18 +39,7 @@ export default function CustomerLoginForm() {
     setTouched({ email: true, password: true });
     setLoginError("");
 
-    if (isEmailEmpty) {
-      setLoginError("Email is required");
-      return;
-    }
-
-    if (isEmailInvalid) {
-      setLoginError("Enter a valid email");
-      return;
-    }
-
-    if (isPasswordEmpty) {
-      setLoginError("Password is required");
+    if (isEmailEmpty || isEmailInvalid || isPasswordEmpty) {
       return;
     }
 
@@ -80,17 +65,22 @@ export default function CustomerLoginForm() {
 
       if (data.verification_required) {
         if (!data.verification_token) {
-          throw new Error("The verification response was incomplete. Please try logging in again.");
+          throw new Error(
+            "The verification response was incomplete. Please try logging in again.",
+          );
         }
         clearAuthSession();
-        sessionStorage.setItem("pawdigree_email_verification", JSON.stringify({
-          verificationToken: data.verification_token,
-          email: data.masked_email ?? data.email ?? identifier.trim(),
-          role: "CUSTOMER",
-          keepLoggedIn,
-          expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
-          resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
-        }));
+        sessionStorage.setItem(
+          "pawdigree_email_verification",
+          JSON.stringify({
+            verificationToken: data.verification_token,
+            email: data.masked_email ?? data.email ?? identifier.trim(),
+            role: "CUSTOMER",
+            keepLoggedIn,
+            expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
+            resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
+          }),
+        );
         navigate("/verify-email");
         return;
       }
@@ -99,12 +89,14 @@ export default function CustomerLoginForm() {
         throw new Error("The login response was incomplete. Please try again.");
       }
 
-      saveAuthSession({ access: data.access, refresh: data.refresh, role: "CUSTOMER" }, keepLoggedIn);
+      saveAuthSession(
+        { access: data.access, refresh: data.refresh, role: "CUSTOMER" },
+        keepLoggedIn,
+      );
 
       navigate("/customer/dashboard", { replace: true });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Login failed";
+      const message = err instanceof Error ? err.message : "Login failed";
 
       setLoginError(
         message.includes("Invalid") || message.includes("401")
@@ -140,16 +132,17 @@ export default function CustomerLoginForm() {
         }),
       });
 
-      saveAuthSession({ access: data.access, refresh: data.refresh, role: "CUSTOMER" }, keepLoggedIn);
+      saveAuthSession(
+        { access: data.access, refresh: data.refresh, role: "CUSTOMER" },
+        keepLoggedIn,
+      );
 
       navigate("/customer/dashboard", { replace: true });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Google login failed";
 
-      setLoginError(
-        `Google login failed: ${message}. Please try again.`,
-      );
+      setLoginError(`Google login failed: ${message}. Please try again.`);
     } finally {
       setIsGoogleLoading(false);
     }
@@ -190,16 +183,12 @@ export default function CustomerLoginForm() {
               }))
             }
             aria-invalid={showEmailError}
-            aria-describedby={
-              showEmailError ? "login-email-error" : undefined
-            }
+            aria-describedby={showEmailError ? "login-email-error" : undefined}
           />
 
           {showEmailError && (
             <p id="login-email-error" className="field-error">
-              {isEmailEmpty
-                ? "Email is required"
-                : "Enter a valid email"}
+              {isEmailEmpty ? "Email is required" : "Enter a valid email"}
             </p>
           )}
         </div>
@@ -224,27 +213,17 @@ export default function CustomerLoginForm() {
               }
               aria-invalid={showPasswordError}
               aria-describedby={
-                showPasswordError
-                  ? "login-password-error"
-                  : undefined
+                showPasswordError ? "login-password-error" : undefined
               }
             />
 
             <button
               type="button"
               className="password-toggle"
-              onClick={() =>
-                setShowPassword((previous) => !previous)
-              }
-              aria-label={
-                showPassword ? "Hide password" : "Show password"
-              }
+              onClick={() => setShowPassword((previous) => !previous)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? (
-                <EyeOff size={18} />
-              ) : (
-                <Eye size={18} />
-              )}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
@@ -258,6 +237,7 @@ export default function CustomerLoginForm() {
         <div className="login-options">
           <label className="remember-me">
             <input
+              className="remember-ckeckbox"
               type="checkbox"
               checked={keepLoggedIn}
               onChange={(e) => setKeepLoggedIn(e.target.checked)}
@@ -283,11 +263,7 @@ export default function CustomerLoginForm() {
 
       <div className="google-login-button">
         {isGoogleLoading ? (
-          <button
-            type="button"
-            className="btn-outline full"
-            disabled
-          >
+          <button type="button" className="btn-outline full" disabled>
             Connecting to Google...
           </button>
         ) : (
@@ -310,14 +286,22 @@ export default function CustomerLoginForm() {
         Don't have an account? <Link to="/registration">Sign up</Link>
       </p>
 
-     <p className="login-terms">
-          By continuing you agree to Pawdigree's{" "}
-        <a href="https://pawdigree-frontend.onrender.com/terms" target="_blank" rel="noopener noreferrer">
-           <strong>T&Cs</strong>
+      <p className="login-terms">
+        By continuing you agree to Pawdigree's{" "}
+        <a
+          href="https://pawdigree-frontend.onrender.com/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>T&Cs</strong>
         </a>{" "}
-            and{" "}
-        <a href="https://pawdigree-frontend.onrender.com/privacy" target="_blank" rel="noopener noreferrer">
-           <strong>Privacy Policy</strong>
+        and{" "}
+        <a
+          href="https://pawdigree-frontend.onrender.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <strong>Privacy Policy</strong>
         </a>
       </p>
     </div>

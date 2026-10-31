@@ -5,11 +5,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: transparent;
+  background: var(--sand-dark);
   border: none;
   border-radius: 0;
   box-shadow: none;
-  color: #2c302f;
+  color: var(--cream);
   font-family: "Inter", sans-serif;
 }
 
@@ -27,6 +27,7 @@
   display: block;
   width: 58px;
   height: 58px;
+  margin: 10px;
   object-fit: contain;
 }
 
@@ -34,7 +35,7 @@
 
 .customer-login-form h1 {
   margin: 0 0 8px;
-  color: #2c302f;
+  color: var(--charcoal);
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.25;
@@ -43,28 +44,28 @@
 
 .customer-login-form .login-subtitle {
   margin: 0 0 26px;
-  color: #6b7280;
-  font-size: 0.92rem;
+  color: var(--gray);
+  font-weight: 400 !important; 
+  font-size: 0.82rem;
   line-height: 1.6;
   text-align: center;
 }
 
 /* Error messages */
 
-.customer-login-form .login-error {
-  margin-bottom: 18px;
-  padding: 12px 14px;
-  border: 1px solid #f2b8b8;
-  border-radius: 10px;
-  background: #fff3f3;
+
+/**/
+/*.customer-login-form .login-error {
+  margin-bottom: 2px;
+  margin-top: 5px;
   color: #b42318;
   font-size: 0.875rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
-}
+}*/
 
 .customer-login-form .field-error {
-  margin: 6px 0 0;
+  margin: 2px 0 4px;
   color: #c93636;
   font-size: 0.8rem;
   line-height: 1.4;
@@ -80,7 +81,7 @@
 }
 
 .customer-login-form .form-group > label {
-  color: #2c302f;
+  color: var(--gray);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -93,7 +94,7 @@
   box-sizing: border-box;
   border: 1.5px solid #dedfdd;
   border-radius: 12px;
-  background: #ffffff;
+  background: #ffffff !important;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -106,10 +107,14 @@
   font-size: 0.92rem;
 }
 
-.customer-login-form input::placeholder {
-  color: #9ca3af;
-  opacity: 1;
+.customerlogin-form .password-input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--white);
 }
+
 
 .customer-login-form .form-group > input:focus,
 .customer-login-form .password-input-wrapper:focus-within {
@@ -142,8 +147,8 @@
   padding: 0 14px;
   border: none;
   outline: none;
-  background: transparent;
-  color: #2c302f;
+  background: var(--white);
+  color: var(--charcoal);
   font: inherit;
   font-size: 0.92rem;
   box-shadow: none;
@@ -195,9 +200,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #555d5b;
+  color: var(--gray);
   font-size: 0.84rem;
   cursor: pointer;
+}
+
+.customer-login-form .remember-ckeckbox:hover {
+  accent-color: var(--teal) !important;
+  filter: brightness(1.2);
 }
 
 .customer-login-form .remember-me input {
@@ -267,17 +277,17 @@
   align-items: center;
   gap: 14px;
   margin: 23px 0;
-  color: #929795;
+  color: var(--gray);
   font-size: 0.76rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.08em;
 }
 
 .customer-login-form .login-divider::before,
 .customer-login-form .login-divider::after {
   flex: 1;
-  height: 1px;
-  background: #e8eae8;
+  height: 0.5px;
+  background: var(--gray);
   content: "";
 }
 
@@ -285,24 +295,24 @@
 
 .customer-login-form .google-login-button {
   display: flex;
-  justify-content: center;
   width: 100%;
-  min-width: 0;
 }
 
-.customer-login-form .google-login-button > div {
-  max-width: 100%;
-}
-
+.customer-login-form .google-login-button > div,
+.customer-login-form .google-login-button > div > div,
 .customer-login-form .google-login-button iframe {
-  max-width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
 }
 
 .customer-login-form .btn-outline.full {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   width: 100%;
+  min-width: 100%;
   min-height: 49px;
   padding: 12px 18px;
   border: 1.5px solid #d7dcda;
@@ -312,9 +322,9 @@
   font-family: inherit;
   font-size: 0.92rem;
   font-weight: 600;
-  cursor: not-allowed;
-  opacity: 0.75;
+  cursor: pointer;
 }
+
 
 /* Registration link */
 
