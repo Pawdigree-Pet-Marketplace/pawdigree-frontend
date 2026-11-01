@@ -249,6 +249,16 @@ export default function PetDetailsPage() {
             <p className="pd-description">{pet.description}</p>
           )}
 
+          {pet.listing_type === "ADOPTION" &&
+            (pet.adoption_status ?? "AVAILABLE") === "AVAILABLE" && (
+              <Link
+                className="pd-button pd-button-primary"
+                to={`/adoption-request?pet_id=${pet.pet_id}`}
+              >
+                Apply to adopt {pet.name}
+              </Link>
+            )}
+
           <div className="pd-facts" aria-label="Pet details">
             <div>
               <strong>{formatAge(pet.age)}</strong>
