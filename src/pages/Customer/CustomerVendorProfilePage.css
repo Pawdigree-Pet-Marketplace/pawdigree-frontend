@@ -1,4 +1,4 @@
-.cvp-shell {
+/*.cvp-shell {
   display: flex;
   min-height: 100vh;
   background: var(--paper, #faf6ec);
@@ -7,7 +7,7 @@
 .cvp-main {
   flex: 1;
   min-width: 0;
-}
+}*/
 
 .cvp-page {
   width: 100%;
@@ -22,7 +22,7 @@
   background: var(--white, #fff);
   border: 1px solid var(--border, #e4e0d4);
   border-radius: 24px;
-  margin-top: 70px;
+  margin-top: 0;
   overflow: hidden;
   margin-bottom: var(--space-3, 16px);
 }
@@ -846,3 +846,7 @@
 .cvp-not-found .cvp-btn {
   margin-top: 16px;
 }
+
+.cvp-back { padding-top: 70px; }
+.cvp-listing { text-decoration: none; color: inherit; }
+.cvp-listing-info p { font-size: 13px; color: var(--gray, #4b5563); }

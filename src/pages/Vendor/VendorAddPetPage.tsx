@@ -1,11 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import {
-  ArrowLeft,
-  ImagePlus,
-  LoaderCircle,
-  PawPrint,
-  Trash2,
-} from "lucide-react";
+import { ImagePlus, LoaderCircle, PawPrint, Trash2 } from "lucide-react";
+import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { Link } from "react-router-dom";
@@ -75,7 +70,9 @@ export default function VendorAddPetPage() {
 
     async function loadBusinesses() {
       try {
-        const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
+        const response = await vendorAuthenticatedFetch(
+          `${API_BASE_URL}/api/businesses/`,
+        );
 
         if (!response.ok) {
           throw new Error(await readError(response));
@@ -166,13 +163,6 @@ export default function VendorAddPetPage() {
       return;
     }
 
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-
-    if (!token) {
-      return;
-    }
-
     const formData = new FormData();
     formData.append("business", businessId);
     formData.append("listing_type", listingType);
@@ -195,10 +185,13 @@ export default function VendorAddPetPage() {
     setSubmitting(true);
 
     try {
-      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await vendorAuthenticatedFetch(
+        `${API_BASE_URL}/api/pets/`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error(await readError(response));
@@ -237,10 +230,7 @@ export default function VendorAddPetPage() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <Link className="pet-back-link" to="/vendor/listings">
-          <ArrowLeft size={17} />
-          Back to catalogue
-        </Link>
+        <BackButton fallback="/vendor/listings" label="Back to listings" />
 
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">

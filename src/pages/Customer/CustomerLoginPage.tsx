@@ -3,14 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, PawPrint, Store } from "lucide-react";
 import "./CustomerLoginPage.css";
 import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BackButton from "../../components/BackButton/BackButton";
 
 type Step = "welcome" | "password" | "phone";
 
 export default function CustomerLoginPage() {
   const [step, setStep] = useState<Step>("welcome");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -30,139 +28,121 @@ export default function CustomerLoginPage() {
   };
 
   return (
-    <>
-      <TopNavbar
-        isLoggedIn={false}
-        loginOverlay
-        backAction={{ label: "Back", onClick: handleBack }}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
-      <SideMenu
-        isOpen={isMenuOpen}
-        setIsOpen={setIsMenuOpen}
-        isLoggedIn={false}
-        audience="customer"
-        onClose={() => setIsMenuOpen(false)}
-      />
-      <div
-        className={`login-page ${step === "welcome" ? "login-page--role-selection" : "login-page--auth"}`}
-      >
-        <div className="login-card">
-          {step === "welcome" && (
-            <div className="welcome-content">
-              <p className="role-eyebrow">WELCOME TO PAWDIGREE</p>
-              <h1>How would you like to continue?</h1>
-              <p className="subtitle">
-                One home for pet lovers and pet businesses.
-              </p>
+    <div
+      className={`login-page ${step === "welcome" ? "login-page--role-selection" : "login-page--auth"}`}
+    >
+      <div className="login-card">
+        {step !== "welcome" && <BackButton onClick={handleBack} />}
 
-              <div className="role-options">
-                <button
-                  type="button"
-                  className="role-card"
-                  onClick={() => setStep("password")}
-                >
-                  <span className="role-icon" aria-hidden="true">
-                    <PawPrint size={26} strokeWidth={1.8} />
-                  </span>
-                  <span className="role-title">I'm here for the pets!</span>
-                  <span className="role-description">
-                    Discover pets, shop, and explore services.
-                  </span>
-                  <span className="role-action">
-                    Continue as Customer <ArrowRight size={16} />
-                  </span>
-                </button>
+        {step === "welcome" && (
+          <div className="welcome-content">
+            <p className="role-eyebrow">WELCOME TO PAWDIGREE</p>
+            <h1>How would you like to continue?</h1>
+            <p className="subtitle">
+              One home for pet lovers and pet businesses.
+            </p>
 
-                <button
-                  type="button"
-                  className="role-card"
-                  onClick={() => {
-                    navigate("/vendor/login");
-                  }}
-                >
-                  <span className="role-icon" aria-hidden="true">
-                    <Store size={26} strokeWidth={1.8} />
-                  </span>
-                  <span className="role-title">
-                    I'm here to grow my pet business!
-                  </span>
-                  <span className="role-description">
-                    Manage your pet business and listings.
-                  </span>
-                  <span className="role-action">
-                    Continue as Vendor <ArrowRight size={16} />
-                  </span>
-                </button>
-              </div>
-
-              <p className="bottom-link">
-                New to Pawdigree?{" "}
-                <Link to="/registration">Create an account</Link>
-              </p>
-
-              <p className="terms">
-                By continuing you agree to Pawdigree's{" "}
-                <Link to="/terms-and-conditions">Terms &amp; Conditions</Link>{" "}
-                and <Link to="/privacy">Privacy Policy</Link>.
-              </p>
-            </div>
-          )}
-
-          {step === "password" && (
-            <>
-              <CustomerLoginForm />
-            </>
-          )}
-
-          {step === "phone" && (
-            <div className="verify-content">
-              <div className="verify-box">
-                <h3>Phone-code login isn't ready yet</h3>
-                <p>
-                  Please go back and log in with your registered email and
-                  password.
-                </p>
-              </div>
+            <div className="role-options">
               <button
                 type="button"
-                className="btn-primary full"
+                className="role-card"
                 onClick={() => setStep("password")}
               >
-                Back to email login
+                <span className="role-icon" aria-hidden="true">
+                  <PawPrint size={26} strokeWidth={1.8} />
+                </span>
+                <span className="role-title">I'm here for the pets!</span>
+                <span className="role-description">
+                  Discover pets, shop, and explore services.
+                </span>
+                <span className="role-action">
+                  Continue as Customer <ArrowRight size={16} />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className="role-card"
+                onClick={() => {
+                  navigate("/vendor/login");
+                }}
+              >
+                <span className="role-icon" aria-hidden="true">
+                  <Store size={26} strokeWidth={1.8} />
+                </span>
+                <span className="role-title">
+                  I'm here to grow my pet business!
+                </span>
+                <span className="role-description">
+                  Manage your pet business and listings.
+                </span>
+                <span className="role-action">
+                  Continue as Vendor <ArrowRight size={16} />
+                </span>
               </button>
             </div>
-          )}
-        </div>
 
-        {step !== "welcome" && (
-          <aside className="login-welcome-panel login-welcome-panel--customer">
-            <div className="login-welcome-copy">
-              <span className="login-welcome-kicker">
-                A LITTLE MORE JOY, EVERY DAY
-              </span>
-              <h1>Good things are waiting for you and your pet.</h1>
+            <p className="bottom-link">
+              New to Pawdigree?{" "}
+              <Link to="/registration">Create an account</Link>
+            </p>
+
+            <p className="terms">
+              By continuing you agree to Pawdigree's{" "}
+              <Link to="/terms-and-conditions">Terms &amp; Conditions</Link> and{" "}
+              <Link to="/privacy">Privacy Policy</Link>.
+            </p>
+          </div>
+        )}
+
+        {step === "password" && <CustomerLoginForm />}
+
+        {step === "phone" && (
+          <div className="verify-content">
+            <div className="verify-box">
+              <h3>Phone-code login isn't ready yet</h3>
               <p>
-                Find trusted care, discover lovely local businesses, and make
-                more happy memories together.
+                Please go back and log in with your registered email and
+                password.
               </p>
-              <div className="login-fact-card">
-                <span className="login-fact-icon" aria-hidden="true">
-                  <PawPrint size={20} />
-                </span>
-                <span>
-                  <strong>Made for pet people</strong>
-                  <small>
-                    Explore services and pet-friendly finds in one welcoming
-                    place.
-                  </small>
-                </span>
-              </div>
             </div>
-          </aside>
+            <button
+              type="button"
+              className="btn-primary full"
+              onClick={() => setStep("password")}
+            >
+              Back to email login
+            </button>
+          </div>
         )}
       </div>
-    </>
+
+      {step !== "welcome" && (
+        <aside className="login-welcome-panel login-welcome-panel--customer">
+          <div className="login-welcome-copy">
+            <span className="login-welcome-kicker">
+              A LITTLE MORE JOY, EVERY DAY
+            </span>
+            <h1>Good things are waiting for you and your pet.</h1>
+            <p>
+              Find trusted care, discover lovely local businesses, and make more
+              happy memories together.
+            </p>
+            <div className="login-fact-card">
+              <span className="login-fact-icon" aria-hidden="true">
+                <PawPrint size={20} />
+              </span>
+              <span>
+                <strong>Made for pet people</strong>
+                <small>
+                  Explore services and pet-friendly finds in one welcoming
+                  place.
+                </small>
+              </span>
+            </div>
+          </div>
+        </aside>
+      )}
+    </div>
   );
 }

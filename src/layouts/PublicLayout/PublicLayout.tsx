@@ -16,7 +16,14 @@ export default function PublicLayout() {
       : "customer";
   const isLoggedIn = useSession(audience === "vendor" ? "VENDOR" : "CUSTOMER");
 
-  useEffect(() => setIsMenuOpen(false), [pathname, hash]);
+  // Close the mobile menu whenever the page or hash changes.
+  // Adjusted during render (not in an effect), so there is no extra render pass.
+  const locationKey = `${pathname}${hash}`;
+  const [lastLocationKey, setLastLocationKey] = useState(locationKey);
+  if (locationKey !== lastLocationKey) {
+    setLastLocationKey(locationKey);
+    setIsMenuOpen(false);
+  }
 
   useEffect(() => {
     if (hash) {
@@ -40,6 +47,7 @@ export default function PublicLayout() {
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
         isLoggedIn={isLoggedIn}
+        audience={audience}
         onClose={() => setIsMenuOpen(false)}
       />
 

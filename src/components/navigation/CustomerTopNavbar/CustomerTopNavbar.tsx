@@ -1,10 +1,6 @@
 import darkLogo from "../../../assets/logos/darkmode-logo.svg";
 import lightLogo from "../../../assets/logos/lightmode-logo.svg";
-import {
-  ArrowLeft,
-  Menu,
-  X,
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../Button/Button";
@@ -13,8 +9,6 @@ import "./CustomerTopNavbar.css";
 type TopNavbarProps = {
   isLoggedIn: boolean;
   audience?: "customer" | "vendor";
-  loginOverlay?: boolean;
-  backAction?: { label: string; onClick: () => void };
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -30,8 +24,6 @@ const navLinks = [
 const TopNavbar = ({
   isLoggedIn,
   audience = "customer",
-  loginOverlay = false,
-  backAction,
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
@@ -41,7 +33,7 @@ const TopNavbar = ({
   const hash = location.hash;
   const path = location.pathname;
   const isLandingPage = path === "/";
-  const isTransparentPage = isLandingPage || loginOverlay;
+  const isTransparentPage = isLandingPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,12 +53,11 @@ const TopNavbar = ({
   };
 
   // Dark logo only while the navbar is transparent over the hero
-  const useDarkLogo = (isLandingPage && !isScrolled) || loginOverlay;
+  const useDarkLogo = isLandingPage && !isScrolled;
 
   const navbarClass = [
     "top-navbar",
     isTransparentPage ? "top-navbar--transparent" : "",
-    loginOverlay ? "top-navbar--auth-overlay" : "",
     isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
   ]
     .filter(Boolean)
@@ -75,12 +66,6 @@ const TopNavbar = ({
   return (
     <header className={navbarClass}>
       <div className="top-navbar-brand">
-        {backAction && (
-          <button type="button" className="top-navbar-back" onClick={backAction.onClick}>
-            <ArrowLeft size={17} aria-hidden="true" />
-            <span>{backAction.label}</span>
-          </button>
-        )}
         <Link to="/" aria-label="Pawdigree home">
           <img
             src={useDarkLogo ? darkLogo : lightLogo}
@@ -92,12 +77,14 @@ const TopNavbar = ({
 
       <nav className="desktop-links">
         {navLinks.map((link) => {
-          const label = audience === "vendor" && link.label === "Become a Vendor"
-            ? "Vendor Home"
-            : link.label;
-          const href = link.href.startsWith("#") && !isLandingPage
-            ? `/${link.href}`
-            : link.href;
+          const label =
+            audience === "vendor" && link.label === "Become a Vendor"
+              ? "Vendor Home"
+              : link.label;
+          const href =
+            link.href.startsWith("#") && !isLandingPage
+              ? `/${link.href}`
+              : link.href;
           return (
             <Link
               key={label}
@@ -118,7 +105,9 @@ const TopNavbar = ({
               className="auth-btn"
               variant="primary"
               onClick={() => {
-                navigate(audience === "vendor" ? "/vendor/login" : "/customer-login");
+                navigate(
+                  audience === "vendor" ? "/vendor/login" : "/customer-login",
+                );
               }}
             >
               Log In
@@ -127,7 +116,9 @@ const TopNavbar = ({
               className="auth-btn"
               variant="secondary"
               onClick={() => {
-                navigate(audience === "vendor" ? "/vendor/register" : "/registration");
+                navigate(
+                  audience === "vendor" ? "/vendor/register" : "/registration",
+                );
               }}
             >
               Sign Up
@@ -138,7 +129,11 @@ const TopNavbar = ({
             className="auth-btn dashboard-redirect-btn"
             variant="secondary"
             onClick={() => {
-              navigate(audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard");
+              navigate(
+                audience === "vendor"
+                  ? "/vendor/dashboard"
+                  : "/customer/dashboard",
+              );
             }}
           >
             {audience === "vendor" ? "Vendor Dashboard" : "Go to Dashboard"}
