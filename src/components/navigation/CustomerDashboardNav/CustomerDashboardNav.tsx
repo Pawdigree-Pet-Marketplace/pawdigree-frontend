@@ -12,10 +12,13 @@ import {
 } from "lucide-react";
 import logo from "../../../assets/logos/lightmode-logo.svg";
 import { customerAuthenticatedFetch } from "../../../services/customerAuthenticatedFetch";
-import { getSessionToken, getAuthStorage } from "../../../services/auth/authStorage";
+import {
+  getSessionToken,
+  getAuthStorage,
+} from "../../../services/auth/authStorage";
 import "./CustomerDashboardNav.css";
 import { ConfirmLogout } from "../../layout/ConfirmLogout";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const navigationItems = [
   { label: "Overview", href: "/customer/dashboard", Icon: House },
@@ -27,14 +30,33 @@ const navigationItems = [
 ];
 
 export default function CustomerDashboardNav() {
-  const [activeItem, setActiveItem] = useState("Overview");
+  const { pathname, search } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [storedName, setStoredName] = useState(
     localStorage.getItem("username") ||
       sessionStorage.getItem("username") ||
-      "Pet Lover"
+      "Pet Lover",
   );
+
+  const isAdoption = search.includes("listing_type=ADOPTION");
+
+  const isItemActive = (label: string) => {
+    switch (label) {
+      case "Overview":
+        return pathname === "/customer/dashboard";
+      case "Discover":
+        return pathname === "/explore-pets" || pathname.startsWith("/pets/");
+      case "Browse Pets":
+        return pathname === "/pets" && !isAdoption;
+      case "Pet Services":
+        return pathname.startsWith("/vendors");
+      case "Adoption":
+        return pathname === "/pets" && isAdoption;
+      default:
+        return false;
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -80,14 +102,17 @@ export default function CustomerDashboardNav() {
   const renderLinks = (mobile = false) => (
     <nav
       className={
-        mobile ? "customer-dash-links customer-dash-links-mobile" : "customer-dash-links"
+        mobile
+          ? "customer-dash-links customer-dash-links-mobile"
+          : "customer-dash-links"
       }
       aria-label={mobile ? "Mobile customer navigation" : "Customer navigation"}
     >
       {navigationItems.map(({ label, href, Icon }) => {
+        const active = isItemActive(label);
         const className = [
           "customer-dash-link",
-          activeItem === label ? "is-active" : "",
+          active ? "is-active" : "",
           href ? "" : "is-unavailable",
         ]
           .filter(Boolean)
@@ -104,10 +129,9 @@ export default function CustomerDashboardNav() {
             key={label}
             to={href}
             onClick={() => {
-              setActiveItem(label);
               if (mobile) setIsMobileMenuOpen(false);
             }}
-            aria-current={activeItem === label ? "page" : undefined}
+            aria-current={active ? "page" : undefined}
             className={className}
           >
             {content}
@@ -128,7 +152,9 @@ export default function CustomerDashboardNav() {
         to="/profile"
         aria-label={"Open " + storedName + "'s profile"}
       >
-        <span className="customer-dash-avatar" aria-hidden="true">{initial}</span>
+        <span className="customer-dash-avatar" aria-hidden="true">
+          {initial}
+        </span>
         <span className="customer-dash-account-copy">
           <span className="customer-dash-account-label">Signed in as</span>
           <span className="customer-dash-account-name">{storedName}</span>
@@ -163,13 +189,18 @@ export default function CustomerDashboardNav() {
       </aside>
 
       <header className="customer-dash-mobile-header">
-        <Link to="/customer/dashboard" aria-label="Pawdigree dashboard overview">
+        <Link
+          to="/customer/dashboard"
+          aria-label="Pawdigree dashboard overview"
+        >
           <img src={logo} alt="Pawdigree" className="customer-dash-logo" />
         </Link>
         <button
           type="button"
           className="customer-dash-menu-toggle"
-          aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={
+            isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
+          }
           aria-expanded={isMobileMenuOpen}
           aria-controls="customer-dash-side-drawer"
           onClick={() => setIsMobileMenuOpen((open) => !open)}
@@ -191,7 +222,11 @@ export default function CustomerDashboardNav() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="customer-dash-drawer-heading">
-              <img src={logo} alt="Pawdigree" className="customer-dash-drawer-logo" />
+              <img
+                src={logo}
+                alt="Pawdigree"
+                className="customer-dash-drawer-logo"
+              />
               <button
                 type="button"
                 className="customer-dash-drawer-close"
@@ -207,10 +242,7 @@ export default function CustomerDashboardNav() {
         </div>
       )}
 
-      <ConfirmLogout
-        isOpen={showLogout}
-        onClose={() => setShowLogout(false)}
-      />
+      <ConfirmLogout isOpen={showLogout} onClose={() => setShowLogout(false)} />
     </>
   );
 }

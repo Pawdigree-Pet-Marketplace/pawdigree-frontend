@@ -1,0 +1,28 @@
+.customer-shell-content {
+  min-width: 0;
+}
+
+/* The fixed public navbar is gone, so remove the top space pages reserved for it. */
+.customer-shell-content .ep-page {
+  padding-top: 0;
+}
+
+.customer-shell-content .vendors-page {
+  width: 100%;
+  padding-top: 16px;
+}
+
+.customer-shell-content .pd-back,
+.customer-shell-content .cvp-back {
+  padding-top: 8px;
+}
+
+.customer-shell-content .ep-container {
+  width: 100%;
+}
+
+@media (max-width: 860px) {
+  .customer-shell-content .vendors-page {
+    padding-inline: 16px;
+  }
+}
