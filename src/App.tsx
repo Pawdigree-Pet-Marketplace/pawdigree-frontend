@@ -4,6 +4,7 @@ import BusinessRegistrationForm from "./components/BusinessRegistrationForm/Busi
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthLayout from "./layouts/AuthLayout/AuthLayout";
+import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayout";
 import PublicLayout from "./layouts/PublicLayout/PublicLayout";
 import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
@@ -36,13 +37,9 @@ import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 function App() {
   return (
     <Routes>
-      {/* GROUP 1: PUBLIC. Frame = navbar + side menu + footer + bottom bar */}
+      {/* PUBLIC: navbar + side menu + footer + bottom bar */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/explore-pets" element={<ExplorePets />} />
-        <Route path="/pets/:petId" element={<PetsDetailPage />} />
-        <Route path="/vendors" element={<CustomerVendorsPage />} />
-        <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
         <Route path="/vendor" element={<VendorLandingPage />} />
         <Route
           path="/terms-and-conditions"
@@ -53,7 +50,15 @@ function App() {
         <Route path="*" element={<LandingPage />} />
       </Route>
 
-      {/* GROUP 2: AUTH. Frame = logo chip only */}
+      {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
+      <Route element={<CustomerAwareLayout />}>
+        <Route path="/explore-pets" element={<ExplorePets />} />
+        <Route path="/pets/:petId" element={<PetsDetailPage />} />
+        <Route path="/vendors" element={<CustomerVendorsPage />} />
+        <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
+      </Route>
+
+      {/* AUTH: logo chip only */}
       <Route element={<AuthLayout />}>
         <Route path="/registration" element={<RegistrationPage />} />
         <Route path="/login" element={<CustomerLoginPage />} />
@@ -71,7 +76,7 @@ function App() {
         <Route path="/register.vendor/*" element={<VendorRegistrationPage />} />
       </Route>
 
-      {/* GROUP 3: CUSTOMER ACCOUNT AREA. Protected, own navigation */}
+      {/* CUSTOMER ACCOUNT PAGES (these render their own navigation) */}
       <Route
         path="/customer/dashboard"
         element={
@@ -105,7 +110,7 @@ function App() {
         }
       />
 
-      {/* GROUP 4: VENDOR ACCOUNT AREA. Protected, own layouts */}
+      {/* VENDOR AREA */}
       <Route
         path="/business-registration"
         element={
