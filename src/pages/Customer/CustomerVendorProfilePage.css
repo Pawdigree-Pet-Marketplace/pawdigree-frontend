@@ -230,7 +230,6 @@
   background: var(--white, #fff);
   border: 1px solid var(--border, #e4e0d4);
   border-radius: 20px;
-  padding-top: 120px;
   margin-top: 20px;
   padding: var(--space-3, 16px);
   margin-bottom: 10px;
