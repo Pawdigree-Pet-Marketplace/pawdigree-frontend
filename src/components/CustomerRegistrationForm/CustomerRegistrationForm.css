@@ -1,685 +1,174 @@
-
-/* Customer registration form only.
-   Page background and outer layout remain in RegistrationPage.css. */
+/* Customer registration form only. */
 
 .registration-card {
   width: 100%;
-  max-width: 560px;
-  padding: 32px;
-  background: var(--white, #fff);
+  max-width: 760px;
+  /*padding: 24px 28px;*/
+  background: var(--sand-dark);
+  filter: brightness(1.1);
   border-radius: 20px;
   box-shadow: 0 8px 30px rgba(44, 48, 47, 0.08);
   color: var(--charcoal, #2c302f);
   box-sizing: border-box;
 }
 
-.registration-card *,
-.registration-card *::before,
-.registration-card *::after {
+.registration-card *, .registration-card *::before, .registration-card *::after {
   box-sizing: border-box;
 }
 
 .registration-header {
-  margin-bottom: 28px;
+  margin-bottom: 16px;
   text-align: center;
 }
-
 .registration-header h1 {
-  margin: 0 0 10px;
+  margin: 0 0 5px;
   font-family: "Fredoka", sans-serif;
-  font-size: 2rem;
-  color: var(--charcoal, #2c302f);
+  font-size: 1.8rem;
 }
-
 .registration-header p {
   margin: 0;
   line-height: 1.6;
-  color: var(--charcoal, #2c302f);
+}
+.registration-required-note {
+  margin-top: 0;
+  font-size: 14px;
+  color: var(--gray);
 }
 
-/* Step progress */
-
-.registration-progress {
-  margin-bottom: 28px;
-}
-
+.registration-progress { margin-bottom: 18px; }
 .registration-progress-track {
-  height: 7px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  background: #e7e9e5;
+  height: 7px; overflow: hidden; margin-bottom: 12px;
+  border-radius: 10px; background: #e7e9e5;
 }
-
 .registration-progress-fill {
-  height: 100%;
-  border-radius: inherit;
+  height: 100%; border-radius: inherit;
   background: var(--teal, #216c68);
   transition: width 0.25s ease;
 }
-
 .registration-step-count {
-  margin: 0 0 6px;
-  color: var(--teal, #216c68);
-  font-size: 0.85rem;
-  font-weight: 800;
+  margin: 0 0 6px; color: var(--teal, #216c68);
+  font-size: 0.85rem; font-weight: 800;
 }
+.registration-step-title { margin: 0 0 5px; font-family: "Fredoka", sans-serif; font-size: 1.3rem; }
+.registration-step-description { margin: 0; color: #626964; font-size: 0.88rem; line-height: 1.5; }
 
-.registration-step-title {
-  margin: 0 0 5px;
-  font-family: "Fredoka", sans-serif;
-  font-size: 1.45rem;
+.registration-form { display: flex; flex-direction: column; gap: 14px; }
+.registration-step-fields { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
 }
+.name-row .form-group { width: 100%; }
+.name-row .form-group input { width: 100%; }
 
-.registration-step-description {
-  margin: 0;
-  color: #626964;
-  font-size: 0.95rem;
-  line-height: 1.5;
+.form-group {
+  padding-top: 6px;
 }
-
-/* Form and fields */
-
-.registration-form {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.registration-step-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 19px;
-  min-width: 0;
-}
-
 .registration-card .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
+  display: flex; flex-direction: column; gap: 5px; min-width: 0;
 }
-
 .registration-card .form-group label {
-  color: var(--charcoal, #2c302f);
-  font-size: 0.94rem;
-  font-weight: 800;
+  color: var(--charcoal, #2c302f); font-size: 0.94rem; font-weight: 800;
 }
-
-.registration-card .form-group input,
-.registration-card .registration-phone-row select {
-  width: 100%;
-  min-width: 0;
-  min-height: 48px;
-  padding: 12px 13px;
-  border: 1px solid #d5d9d5;
-  border-radius: 9px;
-  outline: none;
+.registration-card .form-group input {
+  width: 100%; min-width: 0; min-height: 42px;
+  padding: 9px 13px;
+  border: 1.5px solid #cbd5c0;
+  border-radius: 9px; outline: none;
   background: var(--white, #fff);
   color: var(--charcoal, #2c302f);
-  font: inherit;
-  font-size: 0.95rem;
+  font: inherit; font-size: 0.95rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-.registration-card .form-group input::placeholder {
-  color: #929994;
-}
-
-.registration-card .form-group input:focus,
-.registration-card .registration-phone-row select:focus {
+.registration-card .form-group input::placeholder { color: #929994; }
+.registration-card .form-group input:focus {
   border-color: var(--teal, #216c68);
   box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
 }
-
-.registration-card .form-group input.has-error,
-.registration-card .form-group select.has-error {
-  border-color: #b42318;
-}
-
-.registration-card .form-group input[aria-invalid="true"] {
-  border-color: #b42318;
-}
-
-.registration-card .form-group small {
-  color: #69716c;
-  font-size: 0.82rem;
-  line-height: 1.5;
-}
-
-/* Field validation and API errors */
+.registration-card .form-group input.has-error { border-color: #b42318; }
 
 .registration-card .field-error {
-  margin: 0;
-  color: #b42318;
-  font-size: 0.85rem;
-  font-weight: 700;
-  line-height: 1.45;
-}
-
-.registration-card > .field-error {
-  margin-bottom: 16px;
-  padding: 12px 14px;
-  border-radius: 9px;
-  background: #fff0ed;
-}
-
-/* Username suggestions */
-
-.username-suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.username-suggestion-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.username-suggestion {
-  padding: 7px 11px;
-  border: 1px solid #c8ded8;
-  border-radius: 8px;
-  background: #f0f7f4;
-  color: var(--teal, #216c68);
-  font: inherit;
-  font-size: 0.86rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.username-suggestion:hover,
-.username-suggestion[aria-pressed="true"] {
-  border-color: var(--teal, #216c68);
-  background: var(--teal, #216c68);
-  color: #fff;
+  margin: 0; color: #b42318; font-size: 0.80rem; font-weight: 300 !important; line-height: 1.45;
 }
 
 /* Country selector and phone input */
-
 .registration-phone-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
-  gap: 10px;
-  align-items: stretch;
-}
-
-.registration-country-select {
   display: flex;
+  gap: 10px;
+  width: 100%;
   align-items: center;
-  gap: 8px;
-  min-width: 0;
-  min-height: 48px;
-  padding: 0 10px;
-  border: 1px solid #d5d9d5;
-  border-radius: 9px;
-  background: #fff;
 }
-
+.registration-phone-row .registration-country-select {
+  width: 100%;
+  min-width: 0;
+}
+.registration-phone-row #phone {
+  width: 100%;
+  min-width: 0;
+}
+.registration-country-select {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 42px; padding: 0 10px;
+  border: 1.5px solid #cbd5c0; border-radius: 9px; background: #fff;
+}
 .registration-country-select:focus-within {
   border-color: var(--teal, #216c68);
   box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
 }
-
-.registration-country-select .country-flag {
-  display: block;
-  flex: 0 0 auto;
-  border-radius: 2px;
-}
-
+.registration-country-select .country-flag { display: block; flex: 0 0 auto; border-radius: 2px; }
 .registration-card .registration-country-select select {
-  width: 100%;
-  min-width: 0;
-  padding: 10px 0;
-  border: 0;
-  border-radius: 0;
-  outline: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--charcoal, #2c302f);
-  font: inherit;
-  font-size: 0.83rem;
+  width: 100%; min-width: 0; padding: 10px 0; border: 0; outline: 0;
+  background: transparent; box-shadow: none;
+  color: var(--charcoal, #2c302f); font: inherit; font-size: 0.83rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Password visibility controls */
-
-.registration-card .password-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
+/* Password visibility controls - eye INSIDE */
+.registration-card .password-field { position: relative; display: block; }
 .registration-card .password-field input {
-  flex: 1;
-  width: 0;
+  width: 100%; padding-right: 2.75rem;
 }
-
 .registration-card .password-field .password-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 44px;
-  min-height: 44px;
-  padding: 0;
-  border: 1px solid #d5d9d5;
-  border-radius: 9px;
-  background: #fff;
-  color: var(--teal, #216c68);
-  cursor: pointer;
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none !important; background: transparent !important;
+  color: var(--teal, #216c68); cursor: pointer; border-radius: 6px;
 }
-
-.registration-card .password-field .password-toggle:hover {
-  background: #f7f3e8;
-}
-
-.registration-card .password-field .password-toggle:focus-visible,
-.registration-card button:focus-visible {
-  outline: 3px solid rgba(33, 108, 104, 0.3);
-  outline-offset: 2px;
-}
-
-/* Step 3 review cards */
-
-.registration-review {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.registration-review-section {
-  min-width: 0;
-  padding: 17px;
-  border: 1px solid #e2e6e1;
-  border-radius: 12px;
-  background: #fcfcfa;
-}
-
-.registration-review-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.registration-review-heading h3 {
-  margin: 0;
-  font-family: "Fredoka", sans-serif;
-  font-size: 1.08rem;
-  color: var(--charcoal, #2c302f);
-}
-
-.registration-edit-button {
-  flex: 0 0 auto;
-  padding: 6px 13px;
-  border: 1px solid var(--teal, #216c68);
-  border-radius: 7px;
-  background: #fff;
-  color: var(--teal, #216c68);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.registration-edit-button:hover {
-  background: var(--teal, #216c68);
-  color: #fff;
-}
-
-.registration-review-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin: 0;
-}
-
-.registration-review-list > div {
-  min-width: 0;
-}
-
-.registration-review-list dt {
-  margin-bottom: 4px;
-  color: #727a74;
-  font-size: 0.82rem;
-}
-
-.registration-review-list dd {
-  overflow-wrap: anywhere;
-  margin: 0;
-  color: var(--charcoal, #2c302f);
-  font-size: 0.94rem;
-  font-weight: 800;
-}
+.registration-card .password-field .password-toggle:hover { background: #f7f3e8; }
+.registration-card .password-field input::-ms-reveal,
+.registration-card .password-field input::-ms-clear { display: none; }
+.registration-card .password-field input::-webkit-credentials-auto-fill-button { display: none !important; }
 
 /* Navigation actions */
-
 .registration-step-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin-top: 8px;
 }
-
-.registration-card .register-button,
-.registration-back-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 12px 22px;
-  border: 0;
-  border-radius: 9px;
-  font: inherit;
-  font-size: 0.96rem;
-  font-weight: 800;
-  cursor: pointer;
+.registration-card .register-button {
+  display: flex; align-items: center; justify-content: center;
+  width: 50%; min-height: 42px; padding: 9px 16px;
+  border: 0; border-radius: 999px !important;
+  background: var(--coral, #fb8665); color: #fff;
+  font: inherit; font-size: 0.96rem; font-weight: 800; cursor: pointer;
+  margin: 0 auto;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
-
-.registration-card .register-button {
-  flex: 1;
-  background: var(--coral, #fb8665);
-  color: #fff;
-}
-
-.registration-card .register-button:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.registration-card .register-button:disabled,
-.registration-back-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.registration-back-button {
-  border: 1px solid #d5d9d5;
-  background: #fff;
-  color: var(--charcoal, #2c302f);
-}
-
-.registration-back-button:hover:not(:disabled) {
-  background: #f7f3e8;
-}
-
-/* Success message */
-
-.registration-card .form-success {
-  padding: 20px;
-  border: 1px solid #c6e3d6;
-  border-radius: 12px;
-  background: #edf8f2;
-  color: var(--teal, #216c68);
-  text-align: center;
-}
-
-.registration-card .form-success h2 {
-  margin: 0 0 10px;
-  font-family: "Fredoka", sans-serif;
-}
-
-.registration-card .form-success p {
-  line-height: 1.6;
-}
-
-.registration-card .form-success a,
-.registration-card .login-link a {
-  color: var(--teal, #216c68);
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.registration-card .form-success a:hover,
-.registration-card .login-link a:hover {
-  text-decoration: underline;
-}
-
-/* Login link */
-
-.registration-card .login-link {
-  margin: 24px 0 0;
-  color: var(--charcoal, #2c302f);
-  text-align: center;
-  font-size: 0.92rem;
-}
-
-/* Responsive layout */
+.registration-card .register-button:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.registration-card .register-button:disabled { opacity: 0.6; cursor: not-allowed; }
+.registration-card .login-link { margin: 18px 0 0; text-align: center; font-size: 0.92rem; }
+.registration-card .login-link a { color: var(--teal, #216c68); font-weight: 800; text-decoration: none; }
 
 @media (max-width: 600px) {
-  .registration-card {
-    padding: 24px 17px;
-    border-radius: 15px;
-  }
-
-  .registration-header h1 {
-    font-size: 1.65rem;
-  }
-
-  .registration-step-title {
-    font-size: 1.3rem;
-  }
-
-  .registration-phone-row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-    gap: 7px;
-  }
-
-  .registration-country-select {
-    gap: 5px;
-    padding: 0 7px;
-  }
-
-  .registration-review-section {
-    padding: 14px;
-  }
-
-  .registration-review-list {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+  .registration-card { padding: 20px 16px; border-radius: 15px; }
+  .name-row { grid-template-columns: 1fr; }
+  .registration-phone-row { flex-direction: row; } /* keep 30/70 on mobile */
 }
-
-@media (max-width: 360px) {
-  .registration-phone-row {
-    grid-template-columns: 1fr;
-  }
-
-  .registration-card .registration-country-select select {
-    font-size: 0.9rem;
-  }
-}
-
-
-/* =========================================
-   COMPACT CUSTOMER REGISTRATION LAYOUT
-   ========================================= */
-
-/* A wider card allows fields to share rows. */
-.registration-card {
-  max-width: 760px;
-  padding: 24px 28px;
-}
-
-.registration-header {
-  margin-bottom: 16px;
-}
-
-.registration-header h1 {
-  margin-bottom: 5px;
-  font-size: 1.8rem;
-}
-
-.registration-progress {
-  margin-bottom: 18px;
-}
-
-.registration-step-title {
-  font-size: 1.3rem;
-}
-
-.registration-step-description {
-  font-size: 0.88rem;
-}
-
-.registration-form {
-  gap: 14px;
-}
-
-.registration-step-fields {
-  gap: 12px;
-}
-
-/* Step 1: first and last names side by side;
-   username uses the full row. */
-.registration-step-fields:has(#first_name) {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
-}
-
-.registration-step-fields:has(#first_name) > .form-group:nth-child(3) {
-  grid-column: 1 / -1;
-}
-
-/* Step 2: email and phone side by side. */
-.registration-step-fields:has(#email) {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-}
-
-/* Slightly shorter fields. */
-.registration-card .form-group {
-  gap: 5px;
-}
-
-.registration-card .form-group input,
-.registration-card .registration-phone-row select {
-  min-height: 42px;
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.registration-country-select {
-  min-height: 42px;
-}
-
-.registration-card .form-group small {
-  display: block;
-  width: 100%;
-  margin-left: 0;
-  padding-left: 0;
-  text-align: left;
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
-.username-suggestions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  gap: 5px;
-}
-
-.username-suggestion-list {
-  gap: 5px;
-}
-
-.username-suggestion {
-  padding: 5px 8px;
-  font-size: 0.8rem;
-}
-
-/* Step 3: place review cards side by side,
-   then place password fields side by side. */
-.registration-step-fields:has(.registration-review) {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
-}
-
-.registration-review {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.registration-review-section {
-  padding: 12px;
-}
-
-.registration-review-heading {
-  margin-bottom: 9px;
-}
-
-.registration-review-heading h3 {
-  font-size: 0.98rem;
-}
-
-.registration-review-list {
-  grid-template-columns: 1fr;
-  gap: 7px;
-}
-
-.registration-review-list dt {
-  margin-bottom: 2px;
-  font-size: 0.76rem;
-}
-
-.registration-review-list dd {
-  font-size: 0.86rem;
-}
-
-/* Keep password controls compact and aligned. */
-.registration-card .password-field {
-  gap: 5px;
-}
-
-.registration-card .password-field .password-toggle {
-  flex-basis: 40px;
-  min-height: 42px;
-}
-
-.registration-step-actions {
-  gap: 10px;
-}
-
-.registration-card .register-button,
-.registration-back-button {
-  min-height: 42px;
-  padding: 9px 16px;
-}
-
-/* Smaller screens: preserve readable fields. */
-@media (max-width: 600px) {
-  .registration-card {
-    padding: 20px 16px;
-  }
-
-  .registration-step-fields:has(#first_name),
-  .registration-step-fields:has(#email),
-  .registration-step-fields:has(.registration-review) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .registration-step-fields:has(#first_name) > .form-group:nth-child(3),
-  .registration-review {
-    grid-column: auto;
-  }
-
-  .registration-review {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .registration-review-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+@media (max-width: 400px) {
+  .registration-phone-row { flex-direction: column; }
+  .registration-phone-row .registration-country-select,
+  .registration-phone-row #phone { flex: 1 1 auto; width: 100%; }
 }

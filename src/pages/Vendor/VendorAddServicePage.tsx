@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, BriefcaseBusiness, Clock3, Info, Wallet } from "lucide-react";
+import { BriefcaseBusiness, Clock3, Info, Wallet } from "lucide-react";
+import BackButton from "../../components/BackButton/BackButton";
 import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorAddServicePage.css";
@@ -12,7 +13,6 @@ export default function VendorAddServicePage() {
 
   useEffect(() => {
     document.title = "Add Service - Pawdigree";
-
   }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -26,15 +26,14 @@ export default function VendorAddServicePage() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-service-page">
-        <Link className="service-back-link" to="/vendor/dashboard">
-          <ArrowLeft size={17} />
-          Back to dashboard
-        </Link>
+        <BackButton fallback="/vendor/dashboard" label="Back to dashboard" />
 
         <form className="service-listing-form" onSubmit={handleSubmit}>
           <section className="service-form-section">
             <div className="service-section-heading">
-              <span className="service-section-icon"><BriefcaseBusiness size={20} /></span>
+              <span className="service-section-icon">
+                <BriefcaseBusiness size={20} />
+              </span>
               <div>
                 <h2>Service details</h2>
                 <p>Give customers the key details they need before booking.</p>
@@ -112,7 +111,9 @@ export default function VendorAddServicePage() {
           </aside>
 
           <div className="service-form-actions">
-            <Link to="/vendor/dashboard" className="service-cancel-button">Cancel</Link>
+            <Link to="/vendor/dashboard" className="service-cancel-button">
+              Cancel
+            </Link>
             <button className="service-submit-button" type="submit" disabled>
               Save service
             </button>

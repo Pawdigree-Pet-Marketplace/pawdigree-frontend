@@ -16,7 +16,6 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
 import Breather from "../../components/common/Breather";
 import Button from "../../components/common/Button";
 import CtaBanner from "../../components/common/CtaBanner";
@@ -69,24 +68,6 @@ type Patch = Partial<PetQuery> | ((prev: PetQuery) => Partial<PetQuery>);
 export default function ExplorePets() {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchKey = searchParams.toString();
-  /* navbar (same pattern as the vendor landing page) */
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    };
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    window.addEventListener("focus", checkAuth);
-    return () => {
-      window.removeEventListener("storage", checkAuth);
-      window.removeEventListener("focus", checkAuth);
-    };
-  }, []);
 
   /* query state (mirrors the URL, so results are shareable) */
   const [query, setQuery] = useState<PetQuery>(() => paramsToQuery(searchKey));
@@ -143,7 +124,9 @@ export default function ExplorePets() {
   if (searchKey !== syncedSearchKey) {
     setSyncedSearchKey(searchKey);
     const nextQuery = paramsToQuery(searchKey);
-    if (queryToParams(nextQuery).toString() !== queryToParams(query).toString()) {
+    if (
+      queryToParams(nextQuery).toString() !== queryToParams(query).toString()
+    ) {
       setQuery(nextQuery);
     }
   }
@@ -422,282 +405,269 @@ export default function ExplorePets() {
   const to = from + data.results.length - (data.count === 0 ? 0 : 1);
 
   return (
-    <>
-      <TopNavbar
-        isLoggedIn={isLoggedIn}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
+    <main className="ep-page" id="home">
+      {/* HERO */}
+      <div className="ep-container">
+        <header className="ep-hero">
+          <div className="ep-hero-decor" aria-hidden="true">
+            <PawPrint className="ep-decor ep-decor-paw-1" size={34} />
+            <PawPrint className="ep-decor ep-decor-paw-2" size={24} />
+            <PawPrint className="ep-decor ep-decor-paw-3" size={28} />
+            <Heart
+              className="ep-decor ep-decor-heart"
+              size={24}
+              fill="currentColor"
+            />
+            <Sparkles className="ep-decor ep-decor-sparkle-1" size={22} />
+            <Sparkles className="ep-decor ep-decor-sparkle-2" size={15} />
+          </div>
 
-      <main className="ep-page" id="home">
-        {/* HERO */}
-        <div className="ep-container">
-          <header className="ep-hero">
-            <div className="ep-hero-decor" aria-hidden="true">
-              <PawPrint className="ep-decor ep-decor-paw-1" size={34} />
-              <PawPrint className="ep-decor ep-decor-paw-2" size={24} />
-              <PawPrint className="ep-decor ep-decor-paw-3" size={28} />
-              <Heart
-                className="ep-decor ep-decor-heart"
-                size={24}
-                fill="currentColor"
-              />
-              <Sparkles className="ep-decor ep-decor-sparkle-1" size={22} />
-              <Sparkles className="ep-decor ep-decor-sparkle-2" size={15} />
+          <nav className="ep-breadcrumb" aria-label="Breadcrumb">
+            <Link to="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Explore Pets</span>
+          </nav>
+
+          <p className="ep-eyebrow">Find your new best friend</p>
+          <h1>Explore Pets</h1>
+          <p className="ep-hero-sub">
+            Pets for adoption and sale from verified vendors across Uganda.
+          </p>
+
+          <form
+            className="ep-search"
+            role="search"
+            onSubmit={handleSearchSubmit}
+          >
+            <Typeahead
+              variant="pill"
+              label="Search pets, breeds, locations or vendors"
+              hideLabel
+              placeholder="Search by breed, name, location or vendor… try “chinchilla rabbit”"
+              value={searchInput}
+              onChange={setSearchInput}
+              onPick={handleSearchPick}
+              loadSuggestions={(q) => fetchSuggestions(q, ALL_KINDS)}
+              icon={<Search size={22} aria-hidden="true" />}
+            />
+            <button
+              type="submit"
+              className="ep-search-btn"
+              aria-label="Search pets"
+            >
+              <ArrowRight size={21} aria-hidden="true" />
+            </button>
+          </form>
+
+          <SpeciesQuickPicks
+            selected={query.species}
+            onToggle={toggleSpecies}
+          />
+
+          <ul className="ep-trust">
+            <li>
+              <BadgeCheck size={19} aria-hidden="true" />
+              <span>
+                <strong>Verified vendors</strong>
+                Businesses checked by our team
+              </span>
+            </li>
+            <li>
+              <ShieldCheck size={19} aria-hidden="true" />
+              <span>
+                <strong>Approved listings only</strong>
+                Every pet is reviewed first
+              </span>
+            </li>
+            <li>
+              <Heart size={19} aria-hidden="true" />
+              <span>
+                <strong>Adopt with confidence</strong>
+                Talk to vendors before you decide
+              </span>
+            </li>
+          </ul>
+        </header>
+      </div>
+
+      {/* TOP PICKS: only on the clean, unfiltered view */}
+      {!hasCriteria && featured.length > 0 && (
+        <Reveal className="ep-container ep-section">
+          <section aria-labelledby="ep-featured-title">
+            <div className="ep-section-head">
+              <div>
+                <p className="ep-eyebrow">Hand-picked for you</p>
+                <h2 id="ep-featured-title" className="ep-section-title">
+                  Top picks
+                </h2>
+                <p className="ep-section-sub">
+                  Fresh listings from trusted vendors that pet seekers love
+                  right now.
+                </p>
+              </div>
+            </div>
+            <FeaturedRail
+              items={featured}
+              favs={favs}
+              onToggleFav={toggleFav}
+            />
+          </section>
+        </Reveal>
+      )}
+
+      {/* MOST SEARCHED */}
+      {!hasCriteria && trending.length > 0 && (
+        <Reveal className="ep-container ep-section">
+          <MostSearched items={trending} onSelect={applyTrending} />
+        </Reveal>
+      )}
+
+      {/* RESULTS */}
+      <section
+        className="ep-container ep-results"
+        id="ep-results"
+        ref={resultsRef}
+        aria-labelledby="ep-results-title"
+      >
+        <div className="ep-results-layout">
+          <div
+            className={`ep-backdrop${filtersOpen ? " is-open" : ""}`}
+            onClick={() => setFiltersOpen(false)}
+            aria-hidden="true"
+          />
+
+          <aside className="ep-sidebar">
+            <PetFilters
+              draft={draft}
+              setDraft={setDraft}
+              sort={query.sort}
+              onSort={(sort) => updateQuery({ sort })}
+              onApply={applyDraft}
+              onClear={clearAll}
+              onClose={() => setFiltersOpen(false)}
+              error={filterError}
+              open={filtersOpen}
+              canClear={hasCriteria}
+              onLoadSuggestions={fetchSuggestions}
+            />
+          </aside>
+
+          <div className="ep-results-main">
+            <div className="ep-results-head">
+              <div>
+                <h2 id="ep-results-title" className="ep-section-title">
+                  {hasCriteria ? "Matching pets" : "All pets"}
+                </h2>
+                <p className="ep-results-count" aria-live="polite">
+                  {status === "loading"
+                    ? "Finding pets…"
+                    : data.count === 0
+                      ? "No pets found"
+                      : `Showing ${from}–${to} of ${data.count.toLocaleString("en-UG")} pets`}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="ep-filter-toggle"
+                onClick={() => setFiltersOpen(true)}
+                aria-expanded={filtersOpen}
+                aria-controls={PET_FILTERS_ID}
+              >
+                <SlidersHorizontal size={18} aria-hidden="true" />
+                Filters &amp; sort
+                {filterCount > 0 && (
+                  <span className="ep-badge">{filterCount}</span>
+                )}
+              </button>
             </div>
 
-            <nav className="ep-breadcrumb" aria-label="Breadcrumb">
-              <Link to="/">Home</Link>
-              <span aria-hidden="true">/</span>
-              <span aria-current="page">Explore Pets</span>
-            </nav>
-
-            <p className="ep-eyebrow">Find your new best friend</p>
-            <h1>Explore Pets</h1>
-            <p className="ep-hero-sub">
-              Pets for adoption and sale from verified vendors across Uganda.
-            </p>
-
-            <form
-              className="ep-search"
-              role="search"
-              onSubmit={handleSearchSubmit}
-            >
-              <Typeahead
-                variant="pill"
-                label="Search pets, breeds, locations or vendors"
-                hideLabel
-                placeholder="Search by breed, name, location or vendor… try “chinchilla rabbit”"
-                value={searchInput}
-                onChange={setSearchInput}
-                onPick={handleSearchPick}
-                loadSuggestions={(q) => fetchSuggestions(q, ALL_KINDS)}
-                icon={<Search size={22} aria-hidden="true" />}
-              />
-              <button
-                type="submit"
-                className="ep-search-btn"
-                aria-label="Search pets"
-              >
-                <ArrowRight size={21} aria-hidden="true" />
-              </button>
-            </form>
-
-            <SpeciesQuickPicks
-              selected={query.species}
-              onToggle={toggleSpecies}
+            <ActiveFilterChips
+              chips={chips}
+              onRemove={removeChip}
+              onClearAll={clearAll}
             />
 
-            <ul className="ep-trust">
-              <li>
-                <BadgeCheck size={19} aria-hidden="true" />
-                <span>
-                  <strong>Verified vendors</strong>
-                  Businesses checked by our team
-                </span>
-              </li>
-              <li>
-                <ShieldCheck size={19} aria-hidden="true" />
-                <span>
-                  <strong>Approved listings only</strong>
-                  Every pet is reviewed first
-                </span>
-              </li>
-              <li>
-                <Heart size={19} aria-hidden="true" />
-                <span>
-                  <strong>Adopt with confidence</strong>
-                  Talk to vendors before you decide
-                </span>
-              </li>
-            </ul>
-          </header>
-        </div>
-
-        {/* TOP PICKS: only on the clean, unfiltered view */}
-        {!hasCriteria && featured.length > 0 && (
-          <Reveal className="ep-container ep-section">
-            <section aria-labelledby="ep-featured-title">
-              <div className="ep-section-head">
-                <div>
-                  <p className="ep-eyebrow">Hand-picked for you</p>
-                  <h2 id="ep-featured-title" className="ep-section-title">
-                    Top picks
-                  </h2>
-                  <p className="ep-section-sub">
-                    Fresh listings from trusted vendors that pet seekers love
-                    right now.
-                  </p>
-                </div>
-              </div>
-              <FeaturedRail
-                items={featured}
+            {status === "loading" ? (
+              <PetGrid pets={[]} loading favs={favs} onToggleFav={toggleFav} />
+            ) : status === "error" ? (
+              <EmptyState
+                role="alert"
+                icon={<PawPrint size={34} />}
+                title="We couldn’t load the pets"
+                text="Something went wrong on our side. Please try again."
+              >
+                <Button onClick={() => setReloadKey((k) => k + 1)}>
+                  Try again
+                </Button>
+              </EmptyState>
+            ) : data.results.length === 0 ? (
+              <EmptyState
+                icon={<Search size={32} />}
+                title={
+                  hasCriteria
+                    ? "No pets match these filters"
+                    : "No pets listed yet"
+                }
+                text={
+                  hasCriteria
+                    ? "Try removing a filter, or check the spelling of your search."
+                    : "New listings are added by vendors every day. Check back soon."
+                }
+              >
+                {didYouMean.length > 0 && (
+                  <div className="ep-didyoumean">
+                    <span>Did you mean:</span>
+                    {didYouMean.map((s) => (
+                      <button
+                        type="button"
+                        key={`${s.kind}-${s.label}`}
+                        onClick={() => handleSearchPick(s)}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {hasCriteria && (
+                  <Button onClick={clearAll}>Clear search and filters</Button>
+                )}
+              </EmptyState>
+            ) : (
+              <PetGrid
+                key={`${query.page}-${query.sort}`}
+                pets={data.results}
                 favs={favs}
                 onToggleFav={toggleFav}
+                breather={
+                  <Breather title="Found a favourite?">
+                    Tap the heart to save it. Message the vendor before you
+                    decide, and always meet the pet in person first.
+                  </Breather>
+                }
               />
-            </section>
-          </Reveal>
-        )}
+            )}
 
-        {/* MOST SEARCHED */}
-        {!hasCriteria && trending.length > 0 && (
-          <Reveal className="ep-container ep-section">
-            <MostSearched items={trending} onSelect={applyTrending} />
-          </Reveal>
-        )}
-
-        {/* RESULTS */}
-        <section
-          className="ep-container ep-results"
-          id="ep-results"
-          ref={resultsRef}
-          aria-labelledby="ep-results-title"
-        >
-          <div className="ep-results-layout">
-            <div
-              className={`ep-backdrop${filtersOpen ? " is-open" : ""}`}
-              onClick={() => setFiltersOpen(false)}
-              aria-hidden="true"
-            />
-
-            <aside className="ep-sidebar">
-              <PetFilters
-                draft={draft}
-                setDraft={setDraft}
-                sort={query.sort}
-                onSort={(sort) => updateQuery({ sort })}
-                onApply={applyDraft}
-                onClear={clearAll}
-                onClose={() => setFiltersOpen(false)}
-                error={filterError}
-                open={filtersOpen}
-                canClear={hasCriteria}
-                onLoadSuggestions={fetchSuggestions}
+            {status === "ready" && (
+              <Pagination
+                page={query.page}
+                totalPages={totalPages}
+                onChange={goToPage}
               />
-            </aside>
-
-            <div className="ep-results-main">
-              <div className="ep-results-head">
-                <div>
-                  <h2 id="ep-results-title" className="ep-section-title">
-                    {hasCriteria ? "Matching pets" : "All pets"}
-                  </h2>
-                  <p className="ep-results-count" aria-live="polite">
-                    {status === "loading"
-                      ? "Finding pets…"
-                      : data.count === 0
-                        ? "No pets found"
-                        : `Showing ${from}–${to} of ${data.count.toLocaleString("en-UG")} pets`}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="ep-filter-toggle"
-                  onClick={() => setFiltersOpen(true)}
-                  aria-expanded={filtersOpen}
-                  aria-controls={PET_FILTERS_ID}
-                >
-                  <SlidersHorizontal size={18} aria-hidden="true" />
-                  Filters &amp; sort
-                  {filterCount > 0 && (
-                    <span className="ep-badge">{filterCount}</span>
-                  )}
-                </button>
-              </div>
-
-              <ActiveFilterChips
-                chips={chips}
-                onRemove={removeChip}
-                onClearAll={clearAll}
-              />
-
-              {status === "loading" ? (
-                <PetGrid
-                  pets={[]}
-                  loading
-                  favs={favs}
-                  onToggleFav={toggleFav}
-                />
-              ) : status === "error" ? (
-                <EmptyState
-                  role="alert"
-                  icon={<PawPrint size={34} />}
-                  title="We couldn’t load the pets"
-                  text="Something went wrong on our side. Please try again."
-                >
-                  <Button onClick={() => setReloadKey((k) => k + 1)}>
-                    Try again
-                  </Button>
-                </EmptyState>
-              ) : data.results.length === 0 ? (
-                <EmptyState
-                  icon={<Search size={32} />}
-                  title={
-                    hasCriteria
-                      ? "No pets match these filters"
-                      : "No pets listed yet"
-                  }
-                  text={
-                    hasCriteria
-                      ? "Try removing a filter, or check the spelling of your search."
-                      : "New listings are added by vendors every day. Check back soon."
-                  }
-                >
-                  {didYouMean.length > 0 && (
-                    <div className="ep-didyoumean">
-                      <span>Did you mean:</span>
-                      {didYouMean.map((s) => (
-                        <button
-                          type="button"
-                          key={`${s.kind}-${s.label}`}
-                          onClick={() => handleSearchPick(s)}
-                        >
-                          {s.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {hasCriteria && (
-                    <Button onClick={clearAll}>Clear search and filters</Button>
-                  )}
-                </EmptyState>
-              ) : (
-                <PetGrid
-                  key={`${query.page}-${query.sort}`}
-                  pets={data.results}
-                  favs={favs}
-                  onToggleFav={toggleFav}
-                  breather={
-                    <Breather title="Found a favourite?">
-                      Tap the heart to save it. Message the vendor before you
-                      decide, and always meet the pet in person first.
-                    </Breather>
-                  }
-                />
-              )}
-
-              {status === "ready" && (
-                <Pagination
-                  page={query.page}
-                  totalPages={totalPages}
-                  onChange={goToPage}
-                />
-              )}
-            </div>
+            )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* VENDOR CTA */}
-        <Reveal className="ep-container ep-section">
-          <CtaBanner
-            eyebrow="For pet businesses"
-            title="Have pets that need a loving home?"
-            text="Become a Pawdigree vendor and reach pet seekers across Uganda."
-            href="/vendor"
-            actionLabel="Become a vendor"
-          />
-        </Reveal>
-      </main>
-    </>
+      {/* VENDOR CTA */}
+      <Reveal className="ep-container ep-section">
+        <CtaBanner
+          eyebrow="For pet businesses"
+          title="Have pets that need a loving home?"
+          text="Become a Pawdigree vendor and reach pet seekers across Uganda."
+          href="/vendor"
+          actionLabel="Become a vendor"
+        />
+      </Reveal>
+    </main>
   );
 }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
+import { Mail, CheckCircle } from "lucide-react";
 import "./ForgotPasswordPage.css";
-import logo from "../../assets/logos/icon-logo.svg";
 import { apiRequest } from "../../services/api";
 import { Link, useNavigate } from "react-router-dom";
+import BackButton from "../../components/BackButton/BackButton";
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -52,19 +52,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="forgot-password-page">
-      <button
-        type="button"
-        className="forgot-back-button"
-        onClick={() => {
-          navigate("/login");
-        }}
-      >
-        <ArrowLeft size={18} />
-        Back to login
-      </button>
-
       <section className="forgot-password-card">
-        <img src={logo} alt="Pawdigree logo" className="forgot-logo" />
+        <BackButton label="Back to login" onClick={() => navigate("/login")} />
 
         {message ? (
           <div className="forgot-success" role="status">

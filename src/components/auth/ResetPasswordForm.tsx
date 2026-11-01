@@ -1,10 +1,8 @@
-
 import { useMemo, useState } from "react";
 import { Check, Eye, EyeOff, X } from "lucide-react";
 import { apiRequest } from "../../services/api";
 import { Link, useSearchParams } from "react-router-dom";
 import "./ResetPasswordForm.css";
-import pawdigreeLogo from "../../assets/logo.png";
 
 const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams();
@@ -59,7 +57,9 @@ const ResetPasswordForm = () => {
     const token = searchParams.get("token");
 
     if (!uid || !token) {
-      setError("This reset link is invalid or expired. Please request a new one.");
+      setError(
+        "This reset link is invalid or expired. Please request a new one.",
+      );
       return;
     }
 
@@ -95,12 +95,6 @@ const ResetPasswordForm = () => {
   return (
     <main className="reset-password-page">
       <section className="reset-password-card">
-        <img
-  src={pawdigreeLogo}
-  alt="Pawdigree logo"
-  className="reset-password-logo"
-/>
-
         {success ? (
           <>
             <h1>Password Updated!</h1>
@@ -120,7 +114,8 @@ const ResetPasswordForm = () => {
           <>
             <h1>Reset Your Password</h1>
             <p className="reset-password-description">
-              Choose a strong new password to get back to your Pawdigree account.
+              Choose a strong new password to get back to your Pawdigree
+              account.
             </p>
 
             <form
@@ -172,7 +167,9 @@ const ResetPasswordForm = () => {
                   <button
                     className="reset-password-toggle"
                     type="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     onClick={() => setShowPassword((visible) => !visible)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -188,11 +185,7 @@ const ResetPasswordForm = () => {
                         }`}
                         key={condition.text}
                       >
-                        {condition.ok ? (
-                          <Check size={14} />
-                        ) : (
-                          <X size={14} />
-                        )}
+                        {condition.ok ? <Check size={14} /> : <X size={14} />}
                         <span>{condition.text}</span>
                       </li>
                     ))}

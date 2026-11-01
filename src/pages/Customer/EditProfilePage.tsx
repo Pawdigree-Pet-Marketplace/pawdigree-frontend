@@ -1,8 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import EditProfileForm from "../../components/profile/EditProfileForm";
+import BackButton from "../../components/BackButton/BackButton";
 import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
 import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
 import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
@@ -10,7 +9,6 @@ import type { ProfileFormValues } from "../../utils/validateProfile";
 import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
 import { getSessionToken } from "../../services/auth/authStorage";
 import "./CustomerProfilePage.css";
-
 
 type CustomerProfileResponse = {
   username: string;
@@ -41,8 +39,10 @@ export default function EditProfilePage() {
       }
 
       try {
-        const response = await customerAuthenticatedFetch("/api/auth/profile/", {
-        });
+        const response = await customerAuthenticatedFetch(
+          "/api/auth/profile/",
+          {},
+        );
 
         if (!response.ok) {
           throw new Error(
@@ -130,10 +130,7 @@ export default function EditProfilePage() {
               break;
             }
 
-            if (
-              Array.isArray(value) &&
-              typeof value[0] === "string"
-            ) {
+            if (Array.isArray(value) && typeof value[0] === "string") {
               message = value[0];
               break;
             }
@@ -172,10 +169,7 @@ export default function EditProfilePage() {
 
       <main className="container profile-page">
         <div className="edit-wrap">
-          <Link to="/profile" className="edit-back">
-            <ArrowLeft size={18} aria-hidden="true" />
-            Back to profile
-          </Link>
+          <BackButton fallback="/profile" label="Back to profile" />
 
           <h1 className="profile-title">Edit profile</h1>
 
@@ -201,9 +195,7 @@ export default function EditProfilePage() {
                   cancelHref="/profile"
                 />
 
-                {isSaving && (
-                  <p role="status">Saving your changes...</p>
-                )}
+                {isSaving && <p role="status">Saving your changes...</p>}
               </section>
             </>
           )}
