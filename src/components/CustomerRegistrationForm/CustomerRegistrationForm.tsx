@@ -201,9 +201,10 @@ export default function CustomerRegistrationForm() {
   const [apiError, setApiError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [usernameStatus, setUsernameStatus] = useState<
-    "idle" | "checking" | "available" | "taken"
-  >("idle");
+  const [usernameCheck, setUsernameCheck] = useState<{
+    value: string;
+    result: "available" | "taken" | "unknown";
+  } | null>(null);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -254,13 +255,9 @@ export default function CustomerRegistrationForm() {
   useEffect(() => {
     const value = formData.username;
 
-    if (usernameError(value)) {
-      setUsernameStatus("idle");
-      return;
-    }
+    if (usernameError(value)) return;
 
     let cancelled = false;
-    setUsernameStatus("checking");
 
     const timer = setTimeout(() => {
       apiRequest<{ available: boolean }>(
@@ -268,11 +265,14 @@ export default function CustomerRegistrationForm() {
       )
         .then((result) => {
           if (!cancelled) {
-            setUsernameStatus(result.available ? "available" : "taken");
+            setUsernameCheck({
+              value,
+              result: result.available ? "available" : "taken",
+            });
           }
         })
         .catch(() => {
-          if (!cancelled) setUsernameStatus("idle");
+          if (!cancelled) setUsernameCheck({ value, result: "unknown" });
         });
     }, 500);
 
@@ -281,6 +281,18 @@ export default function CustomerRegistrationForm() {
       clearTimeout(timer);
     };
   }, [formData.username]);
+
+  /* The status is worked out from the latest check result instead of being
+     stored, so no state is set while the effect runs. */
+
+  const usernameStatus: "idle" | "checking" | "available" | "taken" =
+    usernameError(formData.username)
+      ? "idle"
+      : usernameCheck?.value !== formData.username
+        ? "checking"
+        : usernameCheck.result === "unknown"
+          ? "idle"
+          : usernameCheck.result;
 
   /* Phone number validation */
 
@@ -506,7 +518,7 @@ export default function CustomerRegistrationForm() {
       setSubmitted(false);
       setShowPassword(false);
       setShowConfirmPassword(false);
-      setUsernameStatus("idle");
+      setUsernameCheck(null);
       setStep(1);
     } catch (error) {
       setApiError(
