@@ -212,10 +212,9 @@ export default function VendorRegistrationForm() {
   const [apiError, setApiError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [usernameCheck, setUsernameCheck] = useState<{
-    value: string;
-    result: "available" | "taken" | "unknown";
-  } | null>(null);
+  const [usernameStatus, setUsernameStatus] = useState<
+    "idle" | "checking" | "available" | "taken"
+  >("idle");
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -266,9 +265,13 @@ export default function VendorRegistrationForm() {
   useEffect(() => {
     const value = formData.username;
 
-    if (usernameError(value)) return;
+    if (usernameError(value)) {
+      setUsernameStatus("idle");
+      return;
+    }
 
     let cancelled = false;
+    setUsernameStatus("checking");
 
     const timer = setTimeout(() => {
       apiRequest<{ available: boolean }>(
@@ -276,14 +279,11 @@ export default function VendorRegistrationForm() {
       )
         .then((result) => {
           if (!cancelled) {
-            setUsernameCheck({
-              value,
-              result: result.available ? "available" : "taken",
-            });
+            setUsernameStatus(result.available ? "available" : "taken");
           }
         })
         .catch(() => {
-          if (!cancelled) setUsernameCheck({ value, result: "unknown" });
+          if (!cancelled) setUsernameStatus("idle");
         });
     }, 500);
 
@@ -292,18 +292,6 @@ export default function VendorRegistrationForm() {
       clearTimeout(timer);
     };
   }, [formData.username]);
-
-  /* The status is worked out from the latest check result instead of being
-     stored, so no state is set while the effect runs. */
-
-  const usernameStatus: "idle" | "checking" | "available" | "taken" =
-    usernameError(formData.username)
-      ? "idle"
-      : usernameCheck?.value !== formData.username
-        ? "checking"
-        : usernameCheck.result === "unknown"
-          ? "idle"
-          : usernameCheck.result;
 
   /* Phone number validation */
 
@@ -561,7 +549,7 @@ export default function VendorRegistrationForm() {
       setSubmitted(false);
       setShowPassword(false);
       setShowConfirmPassword(false);
-      setUsernameCheck(null);
+      setUsernameStatus("idle");
       setStep(1);
     } catch (error) {
       setApiError(
