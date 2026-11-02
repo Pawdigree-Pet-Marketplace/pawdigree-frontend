@@ -35,8 +35,7 @@
   padding: clamp(22px, 2.6vw, 32px);
   border: 1px solid rgba(255, 255, 255, 0.76);
   border-radius: 22px;
-  background: var(--cream);
-  box-shadow: 0 24px 70px rgba(24, 28, 27, 0.3);
+  background: linear-gradient(115deg, #e7f3ec, #fbf5e9 68%, #ffeae1);
   animation: vendor-panel-reveal 480ms ease-out both;
 }
 
@@ -179,8 +178,7 @@
 .vendor-password-toggle:focus-visible,
 .vendor-login-submit:focus-visible {
   outline: 3px solid rgba(33, 108, 104, 0.3);
-  outline-offset: 2px;
-  border-radius: 10px;
+  border-radius: 999px;
 }
 
 .vendor-field-error {
