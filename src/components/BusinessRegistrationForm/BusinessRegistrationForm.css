@@ -19,7 +19,7 @@
   max-width: 590px;
   margin: 0 auto;
   padding: 30px;
-  background: #ffffff;
+  background: linear-gradient(115deg, #e7f3ec, #fbf5e9 68%, #ffeae1);
   border: 1px solid rgba(33, 108, 104, 0.1);
   border-radius: 18px;
   box-shadow: 0 12px 35px rgba(44, 48, 47, 0.09);

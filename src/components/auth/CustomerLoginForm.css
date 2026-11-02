@@ -4,7 +4,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: var(--sand-dark);
   border: none;
   border-radius: 0;
   box-shadow: none;
@@ -113,6 +112,18 @@
 
 .customer-login-form input[aria-invalid="true"]:focus {
   box-shadow: 0 0 0 3px rgba(214, 69, 69, 0.1);
+}
+
+/* Autofill styling */
+.login-page--auth input:-webkit-autofill,
+.login-page--auth input:-webkit-autofill:hover,
+.login-page--auth input:-webkit-autofill:focus,
+.login-page--auth input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: var(--charcoal) !important;
+  caret-color: var(--charcoal);
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 /* Password visibility toggle */
@@ -242,7 +253,6 @@
 .customer-login-form .btn-primary.full:hover:not(:disabled) {
   border-color: #174f4c;
   background: #174f4c;
-  box-shadow: 0 5px 14px rgba(33, 108, 104, 0.18);
 }
 
 .customer-login-form .btn-primary.full:active:not(:disabled) {
@@ -277,11 +287,13 @@
 }
 
 /* Google sign-in.
-   Google draws the icon and label inside its own iframe, so we cannot style
-   them. We centre the whole Google element inside the pill and never stretch
-   the iframe. Set a pixel width on <GoogleLogin width="..."> (see note). */
+   One white pill that WE draw (.google-login-visual). Google's real button
+   (.google-login-overlay) sits on top of it, invisible and stretched to cover
+   the whole pill, so it receives the click. This avoids the pill-inside-a-pill
+   look, because Google's own button can't be restyled or made full width. */
 
 .customer-login-form .google-login-button {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,33 +305,43 @@
   border-radius: 999px;
   background: var(--white);
   color: var(--charcoal);
-  font-family: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: background 0.2s ease;
 }
 
-.customer-login-form .google-login-button > div {
+.customer-login-form .google-login-button:hover {
+  background: #f4f6f5;
+}
+
+.customer-login-form .google-login-button:focus-within {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+.customer-login-form .google-login-visual {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.customer-login-form .google-login-overlay {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: auto;
-  max-width: 100%;
-  margin: 0 auto;
+  overflow: hidden;
+  opacity: 0.01;
 }
 
-.customer-login-form .google-login-button iframe {
-  display: block;
-  max-width: 100%;
-  margin: 0 auto;
+.customer-login-form .google-login-overlay > div {
+  transform: scale(3, 1.4);
 }
 
-/* Fallback button, if you render a custom one instead of Google's */
+/* Shown while "Connecting to Google..." */
 
 .customer-login-form .btn-outline.full {
   display: flex;
@@ -327,9 +349,9 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  min-height: 44px;
+  min-height: 46px;
   padding: 10px 16px;
-  border: 1.5px solid #d7dcda;
+  border: 1px solid var(--teal);
   border-radius: 999px;
   background: #ffffff;
   color: #2c302f;
@@ -337,6 +359,11 @@
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+.customer-login-form .btn-outline.full:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 /* Registration link and terms */
