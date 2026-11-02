@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import type { UserRole } from "../../services/auth/authStorage";
 import { getSessionRole, getSessionToken } from "../../services/auth/authStorage";
+import AccessDeniedPage from "../../pages/AccessDeniedPage";
 
 type ProtectedRouteProps = {
   role: UserRole;
@@ -18,7 +19,7 @@ export default function ProtectedRoute({ role, children }: ProtectedRouteProps) 
   }
 
   if (currentRole !== role) {
-    return <Navigate to={currentRole === "VENDOR" ? "/vendor/dashboard" : "/customer/dashboard"} replace />;
+    return <AccessDeniedPage />;
   }
 
   return children;
