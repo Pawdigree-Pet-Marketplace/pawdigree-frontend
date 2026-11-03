@@ -36,7 +36,7 @@ import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
-
+import CustomerAdoptionRequests from "./pages/Customer/CustomerAdoptionRequests";
 function App() {
   return (
     <Routes>
@@ -52,7 +52,10 @@ function App() {
         {/* Unknown URLs previously rendered the landing page. */}
         <Route path="*" element={<LandingPage />} />
       </Route>
-
+<Route
+  path="/customer/my-requests"
+  element={<CustomerAdoptionRequests />}
+/>
       {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
