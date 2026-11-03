@@ -26,7 +26,6 @@ type AdoptionApplication = {
   decided_at: string | null;
   decision_reason: string;
 };
-
 type ListResponse = AdoptionApplication[] | { results?: AdoptionApplication[] };
 
 function getToken() {
