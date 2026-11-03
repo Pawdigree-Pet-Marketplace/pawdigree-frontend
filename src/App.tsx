@@ -32,6 +32,7 @@ import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorCategorySelector from "./pages/Vendor/VendorCategorySelector";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
+import VendorServiceAvailabilityPage from "./pages/Vendor/VendorServiceAvailabilityPage";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
@@ -190,6 +191,14 @@ function App() {
         }
       />
       <Route
+        path="/vendor/services/:serviceId/availability"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorServiceAvailabilityPage />
+          </ProtectedRoute>
+        }
+      />
+     <Route
         path="/vendor/documents"
         element={
           <ProtectedRoute role="VENDOR">
