@@ -344,7 +344,9 @@ export default function CustomerDashboard() {
               Explore more <ArrowRight size={16} />
             </Link>
           </div>
-
+<Link to="/customer/my-requests">
+  My Adoption Requests
+</Link>
           {isLoadingPets ? (
             <div className="dashboard-empty-state" role="status">
               <div className="dashboard-empty-icon" aria-hidden="true">

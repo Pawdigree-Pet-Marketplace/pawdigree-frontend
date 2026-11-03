@@ -1,13 +1,19 @@
 
 import { useState } from "react";
-import { MessageCircle, Send } from "lucide-react";
-import "./AdoptionInformation.css";
+import { Send } from "lucide-react";
+
+interface InfoMessage {
+  id: string;
+  kind: "REQUEST" | "REPLY";
+  body: string;
+  created_at: string;
+}
 
 interface AdoptionInformationReplyProps {
   applicationId: string;
   petName: string;
   vendorQuestions: string[];
-  previousReply?: string;
+  messages: InfoMessage[];
   onSubmitReply: (
     applicationId: string,
     reply: string
@@ -17,88 +23,112 @@ interface AdoptionInformationReplyProps {
 export default function AdoptionInformationReply({
   applicationId,
   petName,
-  vendorQuestions,
-  previousReply = "",
+  messages,
   onSubmitReply,
 }: AdoptionInformationReplyProps) {
-  const [reply, setReply] = useState(previousReply);
-  const [loading, setLoading] = useState(false);
+  const [reply, setReply] = useState("");
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const handleSubmit = async () => {
-    if (!reply.trim()) {
-      setError("Please enter your response.");
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const trimmedReply = reply.trim();
+
+    if (!trimmedReply) {
+      setError("Please enter a message.");
       return;
     }
 
-    setLoading(true);
+    setSending(true);
     setError("");
-    setSuccess("");
 
     try {
-      await onSubmitReply(applicationId, reply.trim());
-      setSuccess("Your response has been submitted successfully.");
-    } catch {
-      setError("Unable to submit your response. Please try again.");
+      await onSubmitReply(applicationId, trimmedReply);
+      setReply("");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to send your reply."
+      );
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   };
 
   return (
-    <section className="adoption-info-card">
-      <div className="adoption-info-heading">
-        <MessageCircle size={23} />
-        <div>
-          <h3>Additional Information Required</h3>
-          <p>
-            The vendor needs more information about your
-            application for {petName}.
+    <div className="adoption-conversation">
+      <div className="conversation-messages">
+        {messages.length === 0 ? (
+          <p className="conversation-empty">
+            No messages yet. Vendor communication will
+            appear here.
           </p>
-        </div>
-      </div>
-
-      <div className="existing-questions">
-        <h4>Questions from your vendor</h4>
-
-        {vendorQuestions.length > 0 ? (
-          <ol>
-            {vendorQuestions.map((question, index) => (
-              <li key={index}>{question}</li>
-            ))}
-          </ol>
         ) : (
-          <p>No additional questions have been received.</p>
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className={`conversation-message ${
+                message.kind === "REQUEST"
+                  ? "vendor-message"
+                  : "customer-message"
+              }`}
+            >
+              <span className="conversation-sender">
+                {message.kind === "REQUEST"
+                  ? "Vendor"
+                  : "You"}
+              </span>
+
+              <p>{message.body}</p>
+
+              <time>
+                {message.created_at
+                  ? new Date(message.created_at).toLocaleString()
+                  : ""}
+              </time>
+            </div>
+          ))
         )}
       </div>
 
-      <div className="question-form">
-        <label htmlFor="customer-reply">
-          Your Response
+      <form
+        className="conversation-reply-form"
+        onSubmit={handleSubmit}
+      >
+        <label htmlFor={`reply-${applicationId}`}>
+          Reply about {petName}
         </label>
 
         <textarea
-          id="customer-reply"
-          rows={6}
-          placeholder="Please answer the vendor's questions here..."
+          id={`reply-${applicationId}`}
           value={reply}
-          onChange={(e) => setReply(e.target.value)}
+          onChange={(event) => setReply(event.target.value)}
+          placeholder="Type your response to the vendor..."
+          maxLength={2000}
+          rows={3}
+          disabled={sending}
         />
 
-        {error && <p className="form-error">{error}</p>}
-        {success && <p className="form-success">{success}</p>}
+        <div className="reply-form-footer">
+          <span>{reply.length}/2000 characters</span>
 
-        <button
-          type="button"
-          className="send-questions-btn"
-          onClick={handleSubmit}
-          disabled={loading || vendorQuestions.length === 0}
-        >
-          <Send size={17} />
-          {loading ? "Submitting..." : "Submit Response"}
-        </button>
-      </div>
-    </section>
+          <button
+            type="submit"
+            disabled={sending || !reply.trim()}
+          >
+            <Send size={16} />
+            {sending ? "Sending..." : "Send Reply"}
+          </button>
+        </div>
+
+        {error && (
+          <p className="conversation-error">{error}</p>
+        )}
+      </form>
+    </div>
   );
 }
