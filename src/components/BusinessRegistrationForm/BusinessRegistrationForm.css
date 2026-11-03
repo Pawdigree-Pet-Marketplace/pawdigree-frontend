@@ -1,100 +1,117 @@
+
 /* ==========================================
    PAWDIGREE BUSINESS REGISTRATION
-   Modern, clean and responsive design
-   ========================================== */
+   Clean, compact and responsive design
+========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   PAGE BACKGROUND
+========================================== */
 
 .business-registration-page {
   min-height: 100vh;
-  padding: 35px 18px;
+  width: 100%;
+  padding: 24px 16px;
   background-color: #f7f3e8;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Cg fill='%23216c68' fill-opacity='.09'%3E%3Cellipse cx='55' cy='69' rx='12' ry='15' transform='rotate(-20 55 69)'/%3E%3Cellipse cx='37' cy='47' rx='6' ry='8' transform='rotate(-25 37 47)'/%3E%3Cellipse cx='49' cy='38' rx='6' ry='8' transform='rotate(-10 49 38)'/%3E%3Cellipse cx='63' cy='39' rx='6' ry='8' transform='rotate(10 63 39)'/%3E%3Cellipse cx='74' cy='49' rx='6' ry='8' transform='rotate(25 74 49)'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: repeat;
-  box-sizing: border-box;
 }
 
-/* Main card */
+/* ==========================================
+   MAIN FORM CARD
+========================================== */
 
 .business-registration-container {
   width: 100%;
-  max-width: 590px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 30px;
+  padding: 26px 30px;
   background: #ffffff;
   border: 1px solid rgba(33, 108, 104, 0.1);
   border-radius: 18px;
-  box-shadow: 0 12px 35px rgba(44, 48, 47, 0.09);
-  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(44, 48, 47, 0.08);
 }
 
-/* Heading */
+/* ==========================================
+   HEADING
+========================================== */
 
 .business-registration-container h1 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: #216c68;
   font-family: "Fredoka", sans-serif;
-  font-size: 1.9rem;
+  font-size: 1.8rem;
   font-weight: 600;
   line-height: 1.25;
+  letter-spacing: -0.4px;
 }
 
 .business-registration-container > p {
-  margin: 0 0 25px;
+  margin: 0 0 18px;
   color: #707773;
   font-family: "Nunito", sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
-/* Form spacing */
+/* ==========================================
+   FORM LAYOUT
+========================================== */
 
 .business-registration-container form {
   display: flex;
   flex-direction: column;
-  gap: 17px;
+  gap: 13px;
+  width: 100%;
 }
-
-/* Form groups */
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
+  width: 100%;
 }
 
 .form-group label,
 .business-hours legend {
   color: #2c302f;
   font-family: "Nunito", sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 800;
 }
 
-/* Inputs and dropdowns */
+/* ==========================================
+   INPUTS AND TEXTAREA
+========================================== */
 
 .form-group input,
 .form-group select,
 .form-group textarea {
+  display: block;
   width: 100%;
   min-width: 0;
-  padding: 12px 13px;
+  padding: 10px 12px;
   border: 1px solid #dce2df;
-  border-radius: 9px;
+  border-radius: 8px;
   background: #fcfdfc;
   color: #2c302f;
   font-family: "Nunito", sans-serif;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  font-size: 0.92rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input,
 .form-group select {
-  min-height: 45px;
+  min-height: 42px;
 }
 
 .form-group textarea {
-  min-height: 88px;
+  min-height: 82px;
   resize: vertical;
 }
 
@@ -119,324 +136,41 @@
   background-color: #fffafa;
 }
 
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #858d89;
+  opacity: 1;
+}
+
 .form-group small {
   color: #7b817e;
   font-family: "Nunito", sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-align: right;
 }
 
-/* Validation messages */
-
-.field-error {
-  margin: 0;
-  color: #b42318;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.82rem;
-  line-height: 1.45;
-}
-
 /* ==========================================
-   OPERATING HOURS
-   ========================================== */
-
-.business-hours {
-  min-width: 0;
-  margin: 0;
-  padding: 15px;
-  border: 1px solid #e0e7e3;
-  border-radius: 11px;
-  background-color: #fbfcfa;
-  box-sizing: border-box;
-}
-
-.business-hours legend {
-  padding: 0 7px;
-}
-
-.business-hours-row {
-  display: grid;
-  grid-template-columns: minmax(85px, 1fr) auto auto;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 0;
-  border-bottom: 1px solid #edf0ed;
-  color: #454b48;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.88rem;
-}
-
-.business-hours-row:last-child {
-  border-bottom: none;
-}
-
-.business-hours-row label {
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.business-hours-row input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: #216c68;
-  cursor: pointer;
-}
-
-.business-hours-row input[type="time"] {
-  width: 100%;
-  min-width: 0;
-  padding: 8px;
-  border: 1px solid #dce2df;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #2c302f;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.82rem;
-  box-sizing: border-box;
-}
-
-/* ==========================================
-   TERMS AND CONDITIONS
-   ========================================== */
-
-.terms-checkbox {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 9px;
-  width: 100%;
-  margin: 0;
-}
-
-.terms-checkbox input[type="checkbox"] {
-  display: block;
-  flex: 0 0 17px;
-  width: 17px;
-  height: 17px;
-  min-height: 17px;
-  margin: 3px 0 0;
-  padding: 0;
-  accent-color: #216c68;
-  cursor: pointer;
-}
-
-.terms-checkbox label {
-  display: block;
-  flex: 1;
-  margin: 0;
-  padding: 0;
-  color: #535a56;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.88rem;
-  font-weight: 500;
-  line-height: 1.55;
-  cursor: pointer;
-}
-
-.terms-checkbox a {
-  color: #216c68;
-  font-weight: 800;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.terms-checkbox a:hover {
-  color: #d9674b;
-}
-
-/* ==========================================
-   REGISTER BUSINESS BUTTON
-   ========================================== */
-
-.business-registration-container button[type="submit"] {
-  display: block;
-  width: 100%;
-  min-height: 49px;
-  margin-top: 3px;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #216c68;
-  color: #ffffff;
-  font-family: "Nunito", sans-serif;
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0.25px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 4px 0 #174f4c;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-
-.business-registration-container button[type="submit"]:hover {
-  background: #195652;
-  box-shadow: 0 5px 12px rgba(33, 108, 104, 0.2);
-  transform: translateY(-1px);
-}
-
-.business-registration-container button[type="submit"]:active {
-  box-shadow: 0 1px 0 #174f4c;
-  transform: translateY(2px);
-}
-
-.business-registration-container button[type="submit"]:focus-visible {
-  outline: 3px solid #fb8665;
-  outline-offset: 4px;
-}
-
-.business-registration-container button[type="submit"]:disabled {
-  background: #8ba9a6;
-  box-shadow: none;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ==========================================
-   SUCCESS AND ERROR NOTIFICATIONS
-   ========================================== */
-
-.form-message {
-  margin: 0 0 15px;
-  padding: 12px 14px;
-  border-radius: 9px;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.form-message.error {
-  border: 1px solid #f1c4bf;
-  background: #fff0ee;
-  color: #a5261d;
-}
-
-.form-message.success {
-  border: 1px solid #b8dec6;
-  background: #e8f5ed;
-  color: #216c45;
-}
-
-/* ==========================================
-   TABLET
-   ========================================== */
-
-@media (max-width: 768px) {
-  .business-registration-page {
-    padding: 22px 14px;
-  }
-
-  .business-registration-container {
-    max-width: 540px;
-    padding: 25px;
-  }
-
-  .business-registration-container h1 {
-    font-size: 1.7rem;
-  }
-}
-
-/* ==========================================
-   MOBILE
-   ========================================== */
-
-@media (max-width: 480px) {
-  .business-registration-page {
-    padding: 12px 9px;
-  }
-
-  .business-registration-container {
-    padding: 20px 15px;
-    border-radius: 13px;
-  }
-
-  .business-registration-container h1 {
-    font-size: 1.55rem;
-  }
-
-  .business-registration-container > p {
-    margin-bottom: 19px;
-    font-size: 0.9rem;
-  }
-
-  .business-registration-container form {
-    gap: 14px;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    font-size: 16px;
-  }
-
-  .business-hours {
-    padding: 10px;
-  }
-
-  .business-hours-row {
-    grid-template-columns: minmax(72px, 1fr) auto;
-    gap: 8px;
-  }
-
-  .business-hours-row input[type="time"] {
-    grid-column: 1 / -1;
-    min-height: 40px;
-    font-size: 16px;
-  }
-
-  .terms-checkbox {
-    gap: 8px;
-  }
-
-  .terms-checkbox input[type="checkbox"] {
-    margin-top: 3px;
-  }
-
-  .terms-checkbox label {
-    font-size: 0.86rem;
-  }
-
-  .business-registration-container button[type="submit"] {
-    min-height: 47px;
-  }
-}
-
-/* Accessibility: reduced motion */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-/* ==========================================
-   PHONE NUMBER WITH COUNTRY FLAG SELECTOR
-   ========================================== */
+   PHONE NUMBER AND COUNTRY SELECTOR
+========================================== */
 
 .business-phone-row {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   align-items: stretch;
-  gap: 10px;
+  gap: 9px;
   min-width: 0;
 }
 
 .business-country-select {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
-  padding: 0 10px;
+  padding: 0 9px;
   border: 1px solid #dce2df;
-  border-radius: 9px;
+  border-radius: 8px;
   background: #fcfdfc;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .business-country-select:focus-within {
@@ -456,13 +190,14 @@
   flex: 1;
   width: 100%;
   min-width: 0;
-  padding: 12px 0;
+  padding: 10px 0;
   border: none;
   outline: none;
   box-shadow: none;
   background: transparent;
-  font: inherit;
   color: #2c302f;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
 }
 
 .business-country-select select:focus {
@@ -472,98 +207,478 @@
 }
 
 .business-phone-row > input {
-  min-width: 0;
   width: 100%;
+  min-width: 0;
 }
 
-@media (max-width: 480px) {
-  .business-phone-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+/* ==========================================
+   BUSINESS OPERATING HOURS
+========================================== */
 
-/* Business registration polish */
-.business-registration-page {
-  padding: clamp(16px, 4vw, 40px) 18px;
-}
-
-.business-registration-container {
-  max-width: 640px;
-  padding: clamp(20px, 4vw, 34px);
-}
-
-.business-registration-container h1 {
-  letter-spacing: -0.4px;
-}
-
-.business-registration-container form {
-  gap: 20px;
-}
-
-.form-group {
-  gap: 8px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  border-color: #d3ddda;
-  background-color: #fff;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #858d89;
-  opacity: 1;
-}
-
-.form-group input:focus-visible,
-.form-group select:focus-visible,
-.form-group textarea:focus-visible,
-.business-country-select select:focus-visible {
-  outline: 3px solid rgba(33, 108, 104, 0.2);
-  outline-offset: 2px;
-}
-
-.business-hours {
-  padding: 18px;
+.business-registration-container fieldset.business-hours {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #dce5e2;
+  border-radius: 11px;
+  background: #fbfcfa;
 }
 
 .business-hours legend {
-  font-size: 1rem;
+  padding: 0 7px;
+  font-size: 0.95rem;
 }
 
-.business-hours-row {
-  grid-template-columns: minmax(90px, 1fr) auto minmax(0, 1fr);
-  gap: 10px;
+/* Two-column grid for the seven days. */
+
+.business-hours-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
 }
 
-.business-hours-row input[type="time"] {
-  min-height: 40px;
+.business-hours-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid #e1e8e5;
+  border-radius: 8px;
+  background: #ffffff;
 }
+
+.business-hours-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.business-hours-heading > label:first-child {
+  margin: 0;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.business-hours-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  color: #454b48;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.business-hours-toggle input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  min-height: 15px;
+  margin: 0;
+  accent-color: #216c68;
+  cursor: pointer;
+}
+
+/* Opening and closing time inputs. */
+
+.business-hours-times {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.business-hours-times input[type="time"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid #d5dfdc;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.75rem;
+}
+
+.business-hours-times span {
+  margin: 0;
+  color: #555e59;
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.business-closed-label {
+  margin: 0;
+  color: #858d89;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.78rem;
+}
+
+/* ==========================================
+   TERMS AND CONDITIONS
+========================================== */
+
+.terms-checkbox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  display: block;
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  min-height: 17px;
+  margin: 0;
+  padding: 0;
+  accent-color: #216c68;
+  cursor: pointer;
+}
+
+.terms-checkbox label {
+  display: block;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  color: #535a56;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.terms-checkbox a {
+  color: #216c68;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.terms-checkbox a:hover {
+  color: #d9674b;
+}
+
+/* ==========================================
+   BACK, CONTINUE AND SUBMIT BUTTONS
+========================================== */
+
+.step-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin: 12px 0 0;
+}
+
+.business-registration-container .step-navigation button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 140px;
+  width: auto;
+  min-width: 112px;
+  min-height: 42px;
+  margin: 0;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #216c68;
+  color: #ffffff;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.1px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #174f4c;
+  transition: background-color 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.business-registration-container .step-navigation button:hover:not(:disabled) {
+  background: #195652;
+  transform: translateY(-1px);
+}
+
+.business-registration-container .step-navigation button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #174f4c;
+}
+
+.business-registration-container .step-navigation button:focus-visible {
+  outline: 3px solid #fb8665;
+  outline-offset: 3px;
+}
+
+.business-registration-container .step-navigation button:disabled {
+  background: #8ba9a6;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.step-navigation .back-button {
+  margin-right: auto;
+}
+
+.step-navigation .continue-button,
+.step-navigation .submit-button {
+  margin-left: auto;
+}
+
+/* ==========================================
+   VALIDATION MESSAGES
+========================================== */
+
+.field-error {
+  margin: 0;
+  color: #b42318;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+/* ==========================================
+   SUCCESS AND ERROR NOTIFICATIONS
+========================================== */
 
 .form-message {
-  border-radius: 10px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 480px) {
+.form-message.error {
+  border: 1px solid #f1c4bf;
+  background: #fff0ee;
+  color: #a5261d;
+}
+
+.form-message.success {
+  border: 1px solid #b8dec6;
+  background: #e8f5ed;
+  color: #216c45;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
   .business-registration-page {
-    padding: 12px;
+    padding: 18px 12px;
   }
 
   .business-registration-container {
-    padding: 20px 16px;
+    max-width: 560px;
+    padding: 22px;
+  }
+
+  .business-registration-container h1 {
+    font-size: 1.65rem;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .business-registration-page {
+    padding: 10px;
+  }
+
+  .business-registration-container {
+    padding: 18px 14px;
+    border-radius: 13px;
+  }
+
+  .business-registration-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .business-registration-container > p {
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+  }
+
+  .business-registration-container form {
+    gap: 11px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px;
+  }
+
+  .business-phone-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 6px;
   }
 
   .business-hours {
-    padding: 12px;
+    padding: 10px;
   }
 
-  .business-hours-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .business-hours-grid {
+    grid-template-columns: 1fr;
+    gap: 7px;
   }
 
-  .business-hours-row input[type="time"] {
-    grid-column: 1 / -1;
+  .business-hours-card {
+    padding: 9px;
+  }
+
+  .business-hours-times input[type="time"] {
+    min-height: 38px;
+    font-size: 16px;
+  }
+
+  .step-navigation {
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .business-registration-container .step-navigation button {
+    flex: 0 1 125px;
+    min-width: 105px;
+    min-height: 42px;
+    padding: 9px 12px;
+    font-size: 0.85rem;
+  }
+
+  .terms-checkbox {
+    gap: 7px;
+  }
+
+  .terms-checkbox label {
+    font-size: 0.82rem;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+/* ==========================================
+   FINAL ALIGNMENT FIX
+========================================== */
+
+/* Keep terms and conditions aligned to the left */
+.business-registration-container .terms-checkbox {
+  display: grid !important;
+  grid-template-columns: 18px 1fr;
+  align-items: center;
+  justify-content: start;
+  justify-items: start;
+  column-gap: 8px;
+  row-gap: 4px;
+  width: 100%;
+  margin: 8px 0 12px;
+  text-align: left;
+}
+
+.business-registration-container .terms-checkbox input[type="checkbox"] {
+  grid-column: 1;
+  grid-row: 1;
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  margin: 0;
+  justify-self: start;
+}
+
+.business-registration-container .terms-checkbox label {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Put the terms validation message underneath */
+.business-registration-container .terms-checkbox .field-error {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  text-align: left;
+}
+
+/* Compact, consistent navigation buttons */
+.business-registration-container .step-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 12px 0 0;
+}
+
+.business-registration-container .step-navigation button {
+  flex: 0 0 auto !important;
+  width: 112px !important;
+  min-width: 112px !important;
+  max-width: 112px !important;
+  min-height: 38px !important;
+  height: 38px;
+  margin: 0 !important;
+  padding: 7px 12px !important;
+  border-radius: 7px;
+  font-size: 0.82rem !important;
+  line-height: 1.2;
+  box-shadow: 0 2px 0 #174f4c;
+}
+
+/* Keep Back on the left and Continue/Register on the right */
+.business-registration-container .step-navigation .back-button {
+  margin-right: auto !important;
+}
+
+.business-registration-container .step-navigation button:not(.back-button) {
+  margin-left: auto !important;
+}
+
+/* Smaller buttons on narrow screens */
+@media (max-width: 480px) {
+  .business-registration-container .step-navigation button {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
   }
 }

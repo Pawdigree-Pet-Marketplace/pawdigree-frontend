@@ -1,3 +1,4 @@
+
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   parsePhoneNumberFromString,
@@ -6,13 +7,7 @@ import {
 import CountryFlag from "../CountryFlag/CountryFlag";
 import { Link } from "react-router-dom";
 import "./BusinessRegistrationForm.css";
-
 import API_BASE_URL from "../../services/api";
-
-interface Category {
-  id: number;
-  name: string;
-}
 
 interface CountryOption {
   country: string;
@@ -31,7 +26,6 @@ type BusinessHours = Record<string, DayHours>;
 interface FormData {
   businessName: string;
   description: string;
-  businessType: string;
   address: string;
   cityDistrict: string;
   businessPhone: string;
@@ -62,7 +56,6 @@ const initialBusinessHours: BusinessHours = {
 const initialFormData: FormData = {
   businessName: "",
   description: "",
-  businessType: "",
   address: "",
   cityDistrict: "",
   businessPhone: "",
@@ -72,20 +65,24 @@ const initialFormData: FormData = {
 
 function BusinessRegistrationForm() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [categories, setCategories] = useState<Category[]>([]);
+
   const [countries, setCountries] = useState<CountryOption[]>([]);
   const [selectedCountry, setSelectedCountry] =
     useState<CountryCode>("UG");
   const [loadingCountries, setLoadingCountries] = useState(true);
+
   const [businessHours, setBusinessHours] =
     useState<BusinessHours>(initialBusinessHours);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loadingCategories, setLoadingCategories] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("error");
-    // NEW: Controls which step of the form is displayed
+  const [messageType, setMessageType] = useState<"success" | "error">(
+    "error"
+  );
+
+  // Controls the currently displayed form step.
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
 
@@ -108,6 +105,7 @@ function BusinessRegistrationForm() {
         }
 
         const data = await response.json();
+
         const countryList: CountryOption[] = Array.isArray(data)
           ? data
           : Array.isArray(data.results)
@@ -127,6 +125,7 @@ function BusinessRegistrationForm() {
         if (error instanceof Error && error.name === "AbortError") {
           return;
         }
+
         console.error("Unable to load phone country codes:", error);
       } finally {
         if (!controller.signal.aborted) {
@@ -136,92 +135,11 @@ function BusinessRegistrationForm() {
     }
 
     loadCountries();
-    return () => controller.abort();
-  }, []);
-
-  // Load the categories already created in the backend.
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadCategories() {
-      setLoadingCategories(true);
-
-      try {
-        const accessToken = localStorage.getItem("access");
-
-        const headers: HeadersInit = {
-          Accept: "application/json",
-        };
-
-        if (accessToken) {
-          headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/api/categories/`, {
-          method: "GET",
-          headers,
-          signal: controller.signal,
-        });
-        
-        if (response.status === 401) {
-          throw new Error(
-            "The categories endpoint requires valid authentication. Please log in again."
-          );
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            `Unable to load categories (HTTP ${response.status}).`
-          );
-        }
-
-        const data = await response.json();
-
-        const categoryList: Category[] = Array.isArray(data)
-          ? data
-          : Array.isArray(data.results)
-            ? data.results
-            : [];
-
-        setCategories(categoryList);
-
-        if (categoryList.length === 0) {
-          setErrors((previous) => ({
-            ...previous,
-            businessType:
-              "No categories are available yet. Please contact the administrator.",
-          }));
-        } else {
-          setErrors((previous) => {
-            const updated = { ...previous };
-            delete updated.businessType;
-            return updated;
-          });
-        }
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
-        }
-
-        setErrors((previous) => ({
-          ...previous,
-          businessType:
-            error instanceof Error
-              ? error.message
-              : "Unable to load business categories.",
-        }));
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoadingCategories(false);
-        }
-      }
-    }
-
-    loadCategories();
 
     return () => controller.abort();
   }, []);
 
+  // Handle ordinary form fields and checkboxes.
   function handleChange(
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -246,6 +164,7 @@ function BusinessRegistrationForm() {
     });
   }
 
+  // Handle opening days and times.
   function handleHoursChange(
     day: string,
     field: keyof DayHours,
@@ -266,145 +185,132 @@ function BusinessRegistrationForm() {
     });
   }
 
- 
-function validateForm(step: number = currentStep): boolean {
-  const newErrors: Record<string, string> = {};
+  // Validate only the fields belonging to the current step.
+  function validateForm(step: number = currentStep): boolean {
+    const newErrors: Record<string, string> = {};
 
-  // STEP 1: Business basics
-  if (step === 1) {
-    if (!formData.businessName.trim()) {
-      newErrors.businessName = "Business name is required.";
-    }
+    // STEP 1: Business information.
+    if (step === 1) {
+      if (!formData.businessName.trim()) {
+        newErrors.businessName = "Business name is required.";
+      }
 
-    if (!formData.description.trim()) {
-      newErrors.description = "Business description is required.";
-    } else if (formData.description.trim().length > 500) {
-      newErrors.description =
-        "Description cannot exceed 500 characters.";
-    }
-
-    if (!formData.businessType) {
-      newErrors.businessType = "Please select a business category.";
-    } else if (
-      !categories.some(
-        (category) => String(category.id) === formData.businessType
-      )
-    ) {
-      newErrors.businessType = "Please select a valid category.";
-    }
-  }
-
-  // STEP 2: Location, contact details and operating hours
-  if (step === 2) {
-    if (!formData.address.trim()) {
-      newErrors.address = "Business address is required.";
-    }
-
-    if (!formData.cityDistrict.trim()) {
-      newErrors.cityDistrict = "City or district is required.";
-    }
-
-    // Validate business phone
-    if (!formData.businessPhone.trim()) {
-      newErrors.businessPhone = "Business phone number is required.";
-    } else {
-      const phoneInput = formData.businessPhone.trim();
-
-      const phone = phoneInput.startsWith("+")
-        ? parsePhoneNumberFromString(phoneInput)
-        : parsePhoneNumberFromString(phoneInput, selectedCountry);
-
-      if (!phone || !phone.isValid()) {
-        newErrors.businessPhone =
-          "Enter a valid phone number for the selected country.";
+      if (!formData.description.trim()) {
+        newErrors.description = "Business description is required.";
+      } else if (formData.description.trim().length > 500) {
+        newErrors.description =
+          "Description cannot exceed 500 characters.";
       }
     }
 
-    // Validate business email
-    if (!formData.businessEmail.trim()) {
-      newErrors.businessEmail = "Business email is required.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.businessEmail)
-    ) {
-      newErrors.businessEmail = "Enter a valid email address.";
-    }
-
-    // Validate operating hours
-    const invalidHours = weekdays.some((day) => {
-      const hours = businessHours[day];
-
-      if (!hours.is_open) {
-        return false;
+    // STEP 2: Contact and location.
+    if (step === 2) {
+      if (!formData.address.trim()) {
+        newErrors.address = "Business address is required.";
       }
 
-      return (
-        !hours.open ||
-        !hours.close ||
-        hours.open >= hours.close
-      );
+      if (!formData.cityDistrict.trim()) {
+        newErrors.cityDistrict = "City or district is required.";
+      }
+
+      // Validate business phone.
+      if (!formData.businessPhone.trim()) {
+        newErrors.businessPhone = "Business phone number is required.";
+      } else {
+        const phoneInput = formData.businessPhone.trim();
+
+        const phone = phoneInput.startsWith("+")
+          ? parsePhoneNumberFromString(phoneInput)
+          : parsePhoneNumberFromString(phoneInput, selectedCountry);
+
+        if (!phone || !phone.isValid()) {
+          newErrors.businessPhone =
+            "Enter a valid phone number for the selected country.";
+        }
+      }
+
+      // Validate business email.
+      if (!formData.businessEmail.trim()) {
+        newErrors.businessEmail = "Business email is required.";
+      } else if (
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.businessEmail.trim())
+      ) {
+        newErrors.businessEmail = "Enter a valid email address.";
+      }
+    }
+
+    // STEP 3: Operating hours and terms.
+    if (step === 3) {
+      const invalidHours = weekdays.some((day) => {
+        const hours = businessHours[day];
+
+        if (!hours.is_open) {
+          return false;
+        }
+
+        return (
+          !hours.open ||
+          !hours.close ||
+          hours.open >= hours.close
+        );
+      });
+
+      if (invalidHours) {
+        newErrors.businessHours =
+          "For each open day, provide valid opening and closing times.";
+      }
+
+      if (!formData.agreeToTerms) {
+        newErrors.agreeToTerms =
+          "You must agree to the terms and conditions.";
+      }
+    }
+
+    // Clear previous errors for this step and add new errors.
+    setErrors((previous) => {
+      const updated = { ...previous };
+
+      const fieldsByStep: Record<number, string[]> = {
+        1: ["businessName", "description"],
+        2: [
+          "address",
+          "cityDistrict",
+          "businessPhone",
+          "businessEmail",
+        ],
+        3: ["businessHours", "agreeToTerms"],
+      };
+
+      fieldsByStep[step].forEach((field) => {
+        delete updated[field];
+      });
+
+      return { ...updated, ...newErrors };
     });
 
-    if (invalidHours) {
-      newErrors.businessHours =
-        "For each open day, provide valid opening and closing times.";
+    return Object.keys(newErrors).length === 0;
+  }
+
+  // Move to the next step after successful validation.
+  function handleNextStep() {
+    setMessage("");
+
+    if (!validateForm(currentStep)) {
+      return;
+    }
+
+    if (currentStep < totalSteps) {
+      setCurrentStep((previous) => previous + 1);
     }
   }
 
-  // STEP 3: Terms and conditions
-  if (step === 3 && !formData.agreeToTerms) {
-    newErrors.agreeToTerms =
-      "You must agree to the terms and conditions.";
+  // Return to the previous step.
+  function handlePreviousStep() {
+    setMessage("");
+    setCurrentStep((previous) => Math.max(1, previous - 1));
   }
 
-  // Clear previous errors for the current step,
-  // then add any errors found during this validation.
-  setErrors((previous) => {
-    const updated = { ...previous };
-
-    const fieldsByStep: Record<number, string[]> = {
-      1: ["businessName", "description", "businessType"],
-      2: [
-        "address",
-        "cityDistrict",
-        "businessPhone",
-        "businessEmail",
-        "businessHours",
-      ],
-      3: ["agreeToTerms"],
-    };
-
-    fieldsByStep[step].forEach((field) => {
-      delete updated[field];
-    });
-
-    return { ...updated, ...newErrors };
-  });
-
-  return Object.keys(newErrors).length === 0;
-}
-
-function handleNextStep() {
-  setMessage("");
-
-  if (!validateForm(currentStep)) {
-   if (!validateForm(currentStep)) {
-  return;
-}
-
-  return;
-}
-
-  if (currentStep < totalSteps) {
-    setCurrentStep((previous) => previous + 1);
-  }
-}
-
-function handlePreviousStep() {
-  setMessage("");
-  setCurrentStep((previous) => Math.max(1, previous - 1));
-}
-
-
+  // Submit the completed business registration.
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
@@ -429,6 +335,7 @@ function handlePreviousStep() {
 
     try {
       const phoneInput = formData.businessPhone.trim();
+
       const phone = phoneInput.startsWith("+")
         ? parsePhoneNumberFromString(phoneInput)
         : parsePhoneNumberFromString(phoneInput, selectedCountry);
@@ -449,11 +356,10 @@ function handlePreviousStep() {
           body: JSON.stringify({
             name: formData.businessName.trim(),
             description: formData.description.trim(),
-            contact: phone?.number,
+            contact: phone.number,
             email: formData.businessEmail.trim(),
             address: formData.address.trim(),
             city_district: formData.cityDistrict.trim(),
-            category: Number(formData.businessType),
             business_hours: businessHours,
           }),
         }
@@ -489,9 +395,11 @@ function handlePreviousStep() {
       setMessage(
         "Your business registration has been submitted successfully."
       );
+
       setFormData(initialFormData);
       setBusinessHours(initialBusinessHours);
       setErrors({});
+      setCurrentStep(1);
     } catch (error) {
       setMessageType("error");
       setMessage(
@@ -508,284 +416,269 @@ function handlePreviousStep() {
     <main className="business-registration-page">
       <section className="business-registration-container">
         <h1>Register Your Business</h1>
+
         <p>
           Tell us about your business to get started on Pawdigree.
         </p>
-        <div className="step-navigation">
-  {currentStep > 1 && (
-    <button
-      type="button"
-      className="back-button"
-      onClick={handlePreviousStep}
-      disabled={submitting}
-    >
-      Back
-    </button>
-  )}
 
-{currentStep < totalSteps ? (
-  <button
-    type="button"
-    onClick={handleNextStep}
-    disabled={submitting}
-  >
-  </button>
-) : (
-  <button type="submit" disabled={submitting}>
-    {submitting ? "Submitting..." : "Register Business"}
-  </button>
-)}
-</div>
-{message && messageType === "success" && (
-  <div className="form-message success" role="status">
-    {message}
-  </div>
-)}
+        {/* Display success and error messages. */}
+        {message && (
+          <div
+            className={`form-message ${messageType}`}
+            role={messageType === "success" ? "status" : "alert"}
+          >
+            {message}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} noValidate>
-            {currentStep === 1 && (
-             <>
-          <div className="form-group">
-            <label htmlFor="businessName">Business name </label>
-            <input
-              id="businessName"
-              name="businessName"
-              value={formData.businessName}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.businessName)}
-            />
-            {errors.businessName && (
-              <p className="field-error">{errors.businessName}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Business description </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              maxLength={500}
-              rows={4}
-              aria-invalid={Boolean(errors.description)}
-            />
-            <small>{formData.description.length}/500 characters</small>
-            {errors.description && (
-              <p className="field-error">{errors.description}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="businessType">Business category </label>
-            <select
-              id="businessType"
-              name="businessType"
-              value={formData.businessType}
-              onChange={handleChange}
-              disabled={loadingCategories || categories.length === 0}
-              aria-invalid={Boolean(errors.businessType)}
-            >
-              <option value="">
-                {loadingCategories
-                  ? "Loading categories..."
-                  : "Select a category"}
-              </option>
-
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-
-            {errors.businessType && (
-              <p className="field-error">{errors.businessType}</p>
-            )}
-          </div>
-                      </>
-          )}
-
-                    {currentStep === 2 && (
+          {/* STEP 1: Business information. */}
+          {currentStep === 1 && (
             <>
-
-          <div className="form-group">
-            <label htmlFor="address">Business address </label>
-            <input
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.address)}
-            />
-            {errors.address && (
-              <p className="field-error">{errors.address}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="cityDistrict">City or district </label>
-            <input
-              id="cityDistrict"
-              name="cityDistrict"
-              value={formData.cityDistrict}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.cityDistrict)}
-            />
-            {errors.cityDistrict && (
-              <p className="field-error">{errors.cityDistrict}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="businessPhone">Business phone</label>
-            <div className="business-phone-row">
-              <div className="business-country-select">
-                <CountryFlag countryCode={selectedCountry} />
-                <select
-                  aria-label="Phone country"
-                  value={selectedCountry}
-                  disabled={loadingCountries || countries.length === 0}
-                  onChange={(event) => {
-                    setSelectedCountry(event.target.value as CountryCode);
-                    setErrors((previous) => {
-                      const updated = { ...previous };
-                      delete updated.businessPhone;
-                      return updated;
-                    });
-                  }}
-                >
-                  {countries.map((item) => (
-                    <option key={item.iso_code} value={item.iso_code}>
-                      {item.country} ({item.dial_code})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <input
-                id="businessPhone"
-                name="businessPhone"
-                type="tel"
-                placeholder="+256..."
-                value={formData.businessPhone}
-                onChange={handleChange}
-                aria-invalid={Boolean(errors.businessPhone)}
-              />
-            </div>
-            {errors.businessPhone && (
-              <p className="field-error">{errors.businessPhone}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="businessEmail">Business email </label>
-            <input
-              id="businessEmail"
-              name="businessEmail"
-              type="email"
-              value={formData.businessEmail}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.businessEmail)}
-            />
-            {errors.businessEmail && (
-              <p className="field-error">{errors.businessEmail}</p>
-            )}
-          </div>
-
-          <fieldset className="business-hours">
-            <legend>Business operating hours</legend>
-
-            {weekdays.map((day) => (
-              <div className="business-hours-row" key={day}>
-                <label htmlFor={`${day}-open`}>
-                  {day.charAt(0).toUpperCase() + day.slice(1)}
-                </label>
+              <div className="form-group">
+                <label htmlFor="businessName">Business name</label>
 
                 <input
-                  id={`${day}-open`}
-                  type="checkbox"
-                  checked={businessHours[day].is_open}
-                  onChange={(event) =>
-                    handleHoursChange(
-                      day,
-                      "is_open",
-                      event.target.checked
-                    )
-                  }
+                  id="businessName"
+                  name="businessName"
+                  value={formData.businessName}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.businessName)}
                 />
 
-                <span>Open</span>
-
-                {businessHours[day].is_open && (
-                  <>
-                    <input
-                      type="time"
-                      aria-label={`${day} opening time`}
-                      value={businessHours[day].open}
-                      onChange={(event) =>
-                        handleHoursChange(
-                          day,
-                          "open",
-                          event.target.value
-                        )
-                      }
-                    />
-
-                    <span>to</span>
-
-                    <input
-                      type="time"
-                      aria-label={`${day} closing time`}
-                      value={businessHours[day].close}
-                      onChange={(event) =>
-                        handleHoursChange(
-                          day,
-                          "close",
-                          event.target.value
-                        )
-                      }
-                    />
-                  </>
+                {errors.businessName && (
+                  <p className="field-error">{errors.businessName}</p>
                 )}
               </div>
-            ))}
 
-            {errors.businessHours && (
-              <p className="field-error">{errors.businessHours}</p>
-            )}
-          </fieldset>
-                      </>
+              <div className="form-group">
+                <label htmlFor="description">Business description</label>
+
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  maxLength={500}
+                  rows={4}
+                  aria-invalid={Boolean(errors.description)}
+                />
+
+                <small>
+                  {formData.description.length}/500 characters
+                </small>
+
+                {errors.description && (
+                  <p className="field-error">{errors.description}</p>
+                )}
+              </div>
+            </>
           )}
 
-                    {currentStep === 3 && (
+          {/* STEP 2: Contact and location. */}
+          {currentStep === 2 && (
             <>
+              <div className="form-group">
+                <label htmlFor="address">Business address</label>
 
-          <div className="form-group terms-checkbox">
-            <input
-              id="agreeToTerms"
-              name="agreeToTerms"
-              type="checkbox"
-              checked={formData.agreeToTerms}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.agreeToTerms)}
-            />
+                <input
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.address)}
+                />
 
-            <label htmlFor="agreeToTerms">
-              I agree to the{" "}
-              <Link to="/terms-and-conditions">
-                Terms and Conditions
-              </Link>
-              .
-            </label>
+                {errors.address && (
+                  <p className="field-error">{errors.address}</p>
+                )}
+              </div>
 
-            {errors.agreeToTerms && (
-              <p className="field-error">{errors.agreeToTerms}</p>
-            )}
-          </div>
-                      </>
+              <div className="form-group">
+                <label htmlFor="cityDistrict">City or district</label>
+
+                <input
+                  id="cityDistrict"
+                  name="cityDistrict"
+                  value={formData.cityDistrict}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.cityDistrict)}
+                />
+
+                {errors.cityDistrict && (
+                  <p className="field-error">{errors.cityDistrict}</p>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="businessPhone">Business phone</label>
+
+                <div className="business-phone-row">
+                  <div className="business-country-select">
+                    <CountryFlag countryCode={selectedCountry} />
+
+                    <select
+                      aria-label="Phone country"
+                      value={selectedCountry}
+                      disabled={loadingCountries || countries.length === 0}
+                      onChange={(event) => {
+                        setSelectedCountry(
+                          event.target.value as CountryCode
+                        );
+
+                        setErrors((previous) => {
+                          const updated = { ...previous };
+                          delete updated.businessPhone;
+                          return updated;
+                        });
+                      }}
+                    >
+                      {countries.map((item) => (
+                        <option
+                          key={item.iso_code}
+                          value={item.iso_code}
+                        >
+                          {item.country} ({item.dial_code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <input
+                    id="businessPhone"
+                    name="businessPhone"
+                    type="tel"
+                    placeholder="+256..."
+                    value={formData.businessPhone}
+                    onChange={handleChange}
+                    aria-invalid={Boolean(errors.businessPhone)}
+                  />
+                </div>
+
+                {errors.businessPhone && (
+                  <p className="field-error">{errors.businessPhone}</p>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="businessEmail">Business email</label>
+
+                <input
+                  id="businessEmail"
+                  name="businessEmail"
+                  type="email"
+                  value={formData.businessEmail}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.businessEmail)}
+                />
+
+                {errors.businessEmail && (
+                  <p className="field-error">{errors.businessEmail}</p>
+                )}
+              </div>
+            </>
           )}
 
-                   <div className="step-navigation">
+          {/* STEP 3: Operating hours and terms. */}
+          {currentStep === 3 && (
+            <>
+              <fieldset className="business-hours">
+                <legend>Business operating hours</legend>
+
+                <div className="business-hours-grid">
+                  {weekdays.map((day) => (
+                    <div className="business-hours-card" key={day}>
+                      <div className="business-hours-heading">
+                        <label htmlFor={`${day}-open`}>
+                          {day.charAt(0).toUpperCase() + day.slice(1)}
+                        </label>
+
+                        <label className="business-hours-toggle">
+                          <input
+                            id={`${day}-open`}
+                            type="checkbox"
+                            checked={businessHours[day].is_open}
+                            onChange={(event) =>
+                              handleHoursChange(
+                                day,
+                                "is_open",
+                                event.target.checked
+                              )
+                            }
+                          />
+                          <span>Open</span>
+                        </label>
+                      </div>
+
+                      {businessHours[day].is_open ? (
+                        <div className="business-hours-times">
+                          <input
+                            type="time"
+                            aria-label={`${day} opening time`}
+                            value={businessHours[day].open}
+                            onChange={(event) =>
+                              handleHoursChange(
+                                day,
+                                "open",
+                                event.target.value
+                              )
+                            }
+                          />
+
+                          <span>to</span>
+
+                          <input
+                            type="time"
+                            aria-label={`${day} closing time`}
+                            value={businessHours[day].close}
+                            onChange={(event) =>
+                              handleHoursChange(
+                                day,
+                                "close",
+                                event.target.value
+                              )
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <p className="business-closed-label">Closed</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {errors.businessHours && (
+                  <p className="field-error">{errors.businessHours}</p>
+                )}
+              </fieldset>
+
+              <div className="form-group terms-checkbox">
+                <input
+                  id="agreeToTerms"
+                  name="agreeToTerms"
+                  type="checkbox"
+                  checked={formData.agreeToTerms}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.agreeToTerms)}
+                />
+
+                <label htmlFor="agreeToTerms">
+                  I agree to the{" "}
+                  <Link to="/terms-and-conditions">
+                    Terms and Conditions
+                  </Link>
+                  .
+                </label>
+
+                {errors.agreeToTerms && (
+                  <p className="field-error">{errors.agreeToTerms}</p>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Navigation buttons. */}
+          <div className="step-navigation">
             {currentStep > 1 && (
               <button
                 type="button"
@@ -800,13 +693,18 @@ function handlePreviousStep() {
             {currentStep < totalSteps ? (
               <button
                 type="button"
+                className="continue-button"
                 onClick={handleNextStep}
                 disabled={submitting}
               >
                 Continue
               </button>
             ) : (
-              <button type="submit" disabled={submitting}>
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={submitting}
+              >
                 {submitting ? "Submitting..." : "Register Business"}
               </button>
             )}
