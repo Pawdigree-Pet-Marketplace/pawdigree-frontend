@@ -230,6 +230,7 @@
   font-size: 13px;
 }
 
+/*
 .vendor-remember {
   display: inline-flex;
   align-items: center;
@@ -239,6 +240,7 @@
 .vendor-remember input {
   accent-color: var(--teal, #216c68);
 }
+*/
 
 .vendor-login-options a,
 .vendor-login-register a {

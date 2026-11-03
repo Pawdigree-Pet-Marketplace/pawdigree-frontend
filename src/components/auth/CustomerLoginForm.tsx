@@ -16,7 +16,7 @@ export default function CustomerLoginForm() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepLoggedIn, setKeepLoggedIn] = useState(true);
+  const [keepLoggedIn] = useState(true);
   const [touched, setTouched] = useState({
     email: false,
     password: false,
@@ -235,15 +235,17 @@ export default function CustomerLoginForm() {
         </div>
 
         <div className="login-options">
+          {/*
           <label className="remember-me">
             <input
-              className="remember-ckeckbox"
+              className="remember-checkbox"
               type="checkbox"
               checked={keepLoggedIn}
               onChange={(e) => setKeepLoggedIn(e.target.checked)}
             />
             <span>Keep me logged in</span>
           </label>
+          */}
 
           <Link to="/forgot-password">Forgot password?</Link>
         </div>

@@ -24,7 +24,7 @@
   display: block;
   width: 44px;
   height: 44px;
-  margin: 10px;
+  margin-bottom: 10px;
   object-fit: contain;
 }
 
@@ -40,7 +40,7 @@
 }
 
 .customer-login-form .login-subtitle {
-  margin: 0 0 17px;
+  margin: 0 0 8px;
   color: var(--gray);
   font-weight: 400 !important;
   font-size: 0.86rem;
@@ -192,6 +192,7 @@
   margin: 2px 0 15px;
 }
 
+/*
 .customer-login-form .remember-me {
   display: inline-flex;
   align-items: center;
@@ -212,6 +213,7 @@
 .customer-login-form .remember-me input:hover {
   filter: brightness(1.2);
 }
+*/
 
 .customer-login-form .login-options a {
   color: #216c68;
@@ -428,7 +430,7 @@
   }
 
   .customer-login-form .login-subtitle {
-    margin-bottom: 15px;
+    margin-bottom: 8px;
   }
 }
 

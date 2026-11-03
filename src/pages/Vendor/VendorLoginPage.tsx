@@ -42,7 +42,7 @@ export default function VendorLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepLoggedIn, setKeepLoggedIn] = useState(true);
+  const [keepLoggedIn] = useState(true);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
@@ -289,6 +289,7 @@ export default function VendorLoginPage() {
           </div>
 
           <div className="vendor-login-options">
+            {/*
             <label className="vendor-remember">
               <input
                 type="checkbox"
@@ -297,6 +298,7 @@ export default function VendorLoginPage() {
               />
               Keep me logged in
             </label>
+            */}
 
             <Link to="/forgot-password">Forgot password?</Link>
           </div>
