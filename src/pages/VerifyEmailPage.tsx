@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { MailCheck } from "lucide-react";
 import { apiRequest } from "../services/api";
 import { saveAuthSession } from "../services/auth/authStorage";
+import { getPostLoginPath } from "../services/auth/authRedirect";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton/BackButton";
 import "./Customer/CustomerLoginPage.css";
@@ -11,6 +12,7 @@ type VerificationState = {
   verificationToken: string;
   email: string;
   role: "CUSTOMER" | "VENDOR";
+  redirectTo?: string;
   keepLoggedIn: boolean;
   expiresAt: number;
   resendAt: number;
@@ -103,9 +105,7 @@ export default function VerifyEmailPage() {
       );
       sessionStorage.removeItem("pawdigree_email_verification");
       navigate(
-        verification.role === "VENDOR"
-          ? "/vendor/dashboard"
-          : "/customer/dashboard",
+        getPostLoginPath({ from: verification.redirectTo }, verification.role),
         { replace: true },
       );
     } catch (err) {

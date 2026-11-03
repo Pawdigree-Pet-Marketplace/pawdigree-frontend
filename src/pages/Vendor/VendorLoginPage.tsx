@@ -12,9 +12,10 @@ import {
   clearAuthSession,
   saveAuthSession,
 } from "../../services/auth/authStorage";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./VendorLoginPage.css";
 import BackButton from "../../components/BackButton/BackButton";
+import { getPostLoginPath } from "../../services/auth/authRedirect";
 
 type LoginResponse = {
   access?: string;
@@ -39,6 +40,8 @@ function Required() {
 
 export default function VendorLoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const postLoginPath = getPostLoginPath(location.state, "VENDOR");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -108,6 +111,7 @@ export default function VendorLoginPage() {
             verificationToken,
             email: data.masked_email ?? data.email ?? email.trim(),
             role: "VENDOR",
+            redirectTo: postLoginPath,
             keepLoggedIn,
             expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
             resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
@@ -131,7 +135,7 @@ export default function VendorLoginPage() {
         keepLoggedIn,
       );
 
-      navigate("/vendor/dashboard", { replace: true });
+      navigate(postLoginPath, { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();

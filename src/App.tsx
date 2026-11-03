@@ -52,10 +52,14 @@ function App() {
         {/* Unknown URLs previously rendered the landing page. */}
         <Route path="*" element={<LandingPage />} />
       </Route>
-<Route
-  path="/customer/my-requests"
-  element={<CustomerAdoptionRequests />}
-/>
+      <Route
+        path="/customer/my-requests"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerAdoptionRequests />
+          </ProtectedRoute>
+        }
+      />
       {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
