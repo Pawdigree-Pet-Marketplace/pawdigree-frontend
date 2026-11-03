@@ -93,11 +93,20 @@ function CustomerVendorsPage() {
     <div className="vendors-shell">
       <main className="vendors-page">
         <section className="vendors-intro">
+          <div className="vendors-intro-decor" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
           <span className="vendors-eyebrow">
             <Store size={16} /> PAWDIGREE MARKETPLACE
           </span>
           <h1>Meet our vendors</h1>
           <p>Find trusted pet businesses and the people who care for them.</p>
+        </section>
+        <section className="vendors-results" aria-label="Vendor directory">
           <label className="vendors-search">
             <Search size={20} aria-hidden="true" />
             <span className="visually-hidden">Search vendors</span>
@@ -107,8 +116,7 @@ function CustomerVendorsPage() {
               placeholder="Search by name, category, or location"
             />
           </label>
-        </section>
-        <section className="vendors-results" aria-live="polite">
+          <div aria-live="polite">
           {!loading && !error && (
             <p className="vendors-count">
               {visibleVendors.length}{" "}
@@ -192,6 +200,7 @@ function CustomerVendorsPage() {
               ))}
             </div>
           )}
+          </div>
         </section>
       </main>
     </div>

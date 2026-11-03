@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useState } from "react";
-import { ArrowRight, Search, Heart, Sparkles } from "lucide-react";
+import { ArrowRight, Search, Heart, PawPrint, Sparkles } from "lucide-react";
 import { apiRequest } from "../../services/api";
 import { Link, useSearchParams } from "react-router-dom";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
@@ -80,7 +80,7 @@ export default function CustomerPetCataloguePage() {
   if (!authorized) return null;
   const pages = Math.ceil(count / 20);
   return <div className="customer-dashboard-layout"><CustomerDashboardNav /><main className="customer-dashboard-main customer-dashboard pet-catalogue">
-    <header className="catalogue-heading"><p className="dashboard-eyebrow">PAWDIGREE PET CATALOGUE</p><h1>Find your new companion</h1><p>Browse available pets from Pawdigree vendors and narrow the list to what you are looking for.</p></header>
+    <header className="catalogue-heading"><div className="catalogue-heading-decor" aria-hidden="true"><PawPrint className="catalogue-decor-paw catalogue-decor-paw-one"/><PawPrint className="catalogue-decor-paw catalogue-decor-paw-two"/><Sparkles className="catalogue-decor-sparkle"/></div><p className="dashboard-eyebrow">PAWDIGREE PET CATALOGUE</p><h1>Find your new companion</h1><p>Browse available pets from Pawdigree vendors and narrow the list to what you are looking for.</p></header>
     <form className="dashboard-search" onSubmit={apply} aria-label="Search pet catalogue"><label htmlFor="catalogue-search">Search pet listings</label><div className="dashboard-search-row"><Search size={22} aria-hidden="true"/><input id="catalogue-search" type="text" placeholder="Name, breed, species or listing details" value={draft.search} onChange={e => setDraft({ ...draft, search: e.target.value })}/><button type="submit" aria-label="Search pets"><ArrowRight size={21}/></button></div></form>
     <form className="dashboard-filters" onSubmit={apply} aria-label="Filter pet catalogue"><div className="dashboard-filter-grid">
       <label>Species / category<input value={draft.search} onChange={e => setDraft({ ...draft, search: e.target.value })} placeholder="e.g. dog, cat, bird" /></label>
