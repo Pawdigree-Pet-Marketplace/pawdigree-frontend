@@ -13,6 +13,7 @@ import {
   Store,
   Wallet,
   Headset,
+  FileText,
 } from "lucide-react";
 import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
@@ -23,6 +24,7 @@ import { clearAuthSession } from "../../../services/auth/authStorage";
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
   "/vendor/listings",
+  "/vendor/adoption-applications",
   "/vendor/services/new",
 ]);
 
@@ -38,6 +40,7 @@ const navigationGroups = [
     title: "YOUR STORE",
     items: [
       { label: "Catalogue", path: "/vendor/listings", icon: Package },
+      { label: "Adoption applications", path: "/vendor/adoption-applications", icon: FileText },
       { label: "Add Service", path: "/vendor/services/new", icon: BriefcaseBusiness },
     ],
   },

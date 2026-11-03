@@ -26,11 +26,7 @@ const navigationItems = [
   { label: "Browse Pets", href: "/pets", Icon: PawPrint },
   { label: "Pet Store", Icon: ShoppingBag },
   { label: "Pet Services", href: "/vendors", Icon: Stethoscope },
-  {
-    label: "Adoption",
-    href: "/pets?listing_type=ADOPTION",
-    Icon: HeartHandshake,
-  },
+  { label: "Adoption", href: "/customer/adoption", Icon: HeartHandshake },
 ];
 
 export default function CustomerDashboardNav() {

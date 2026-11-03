@@ -1,24 +1,52 @@
 /* ---------- Vendor registration page ---------- */
 
+/* Desktop: the photo and the dark overlay are two layers behind the page
+   (::before and ::after) instead of one background on the wrapper. That lets
+   the photo be slid to the left, so the lady and her pets are not hidden
+   under the form. Tablet and phone still use the original single background
+   (see the 1100px rule below). */
+
 .vendor-registration-page-wrapper {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 100vh;
   min-height: 100svh;
   color: var(--cream, #faf6ec);
   font-family: "Nunito", sans-serif;
   background-color: #4b5047;
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(20, 28, 27, 0.82) 0%,
-      rgba(20, 28, 27, 0.62) 35%,
-      rgba(20, 28, 27, 0.3) 65%,
-      rgba(20, 28, 27, 0.12) 100%
-    ),
-    url("../../assets/images/vendorsmilelady.png");
-  background-size: cover;
-  background-position: center 25%;
-  background-repeat: no-repeat;
+}
+
+/* The photo. It starts 12% to the left of the screen, so everything in it
+   moves left. To move the subjects further left, make the left value more
+   negative and the width larger (for example -18% and 118%). To move them back
+   toward the centre, use a smaller value (for example -6% and 106%). */
+.vendor-registration-page-wrapper::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -12%;
+  width: 112%;
+  z-index: -2;
+  background: url("../../assets/images/vendorsmilelady.png") center 25% /
+    cover no-repeat;
+  content: "";
+}
+
+/* The dark overlay stays fixed to the screen so the text is always readable. */
+.vendor-registration-page-wrapper::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 28, 27, 0.82) 0%,
+    rgba(20, 28, 27, 0.62) 35%,
+    rgba(20, 28, 27, 0.3) 65%,
+    rgba(20, 28, 27, 0.12) 100%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .vendor-registration-main {
@@ -29,7 +57,8 @@
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
-  padding: 84px clamp(24px, 5vw, 72px) 24px; /* top space clears the logo chip */
+  /* More space on the left so the text is not tight against the edge */
+  padding: 84px clamp(24px, 5vw, 72px) 24px clamp(32px, 7vw, 128px);
   box-sizing: border-box;
 }
 
@@ -39,10 +68,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 15px;
   width: 100%;
   max-width: 500px;
   min-width: 0;
   justify-self: start;
+  /* Lifts the text block a little above the vertical centre of the form */
+  margin-bottom: clamp(24px, 14vh, 130px);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
@@ -59,6 +91,7 @@
   color: var(--white, #fff);
   background: rgba(20, 28, 27, 0.45);
   border-color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;;
   backdrop-filter: blur(6px);
   text-shadow: none;
 }
@@ -165,11 +198,21 @@
 
 /* ----- Responsive ----- */
 
+/* Tablet and phone: exactly as before. One background on the wrapper, and the
+   desktop photo layers are switched off. */
 @media (max-width: 1100px) {
   .vendor-registration-page-wrapper {
     background-image:
       linear-gradient(rgba(20, 28, 27, 0.66), rgba(20, 28, 27, 0.66)),
       url("../../assets/images/vendorsmilelady.png");
+    background-size: cover;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+  }
+
+  .vendor-registration-page-wrapper::before,
+  .vendor-registration-page-wrapper::after {
+    display: none;
   }
 
   .vendor-registration-main {
@@ -182,6 +225,7 @@
   .vendor-registration-intro {
     max-width: 780px;
     justify-self: center;
+    margin-bottom: 0;
   }
 
   .vendor-registration-benefits {

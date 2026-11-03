@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { clearAuthSession, getSessionRole, getSessionToken, saveAuthSession } from "./authStorage";
+import {
+  clearAuthSession,
+  getSessionRole,
+  getSessionToken,
+  saveAuthSession,
+} from "./authStorage";
 
 afterEach(() => {
   localStorage.clear();
@@ -30,4 +35,5 @@ describe("authStorage", () => {
     expect(sessionStorage.getItem("token")).toBeNull();
     expect(getSessionRole()).toBeNull();
   });
+
 });
