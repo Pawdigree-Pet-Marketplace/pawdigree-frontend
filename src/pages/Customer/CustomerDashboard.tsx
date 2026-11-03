@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -15,6 +15,11 @@ import catsImage from "../../assets/images/cats.jpg";
 import birdsImage from "../../assets/images/birds.jpg";
 import livestockImage from "../../assets/images/livestock.jpg";
 import rabbitImage from "../../assets/images/rabbit.jpg";
+import catsFeatureImage from "../../assets/images/cats.jpg";
+import veterinaryFeatureImage from "../../assets/images/veterinary.jpg";
+import bellaFeatureImage from "../../assets/images/bella.jpg";
+import groomingFeatureImage from "../../assets/images/grooming.jpg";
+import petWalkingFeatureImage from "../../assets/images/pet-walking.jpg";
 import { apiRequest } from "../../services/api";
 import Categories from "../../components/home/Categories";
 import "./CustomerDashboard.css";
@@ -53,6 +58,20 @@ export default function CustomerDashboard() {
   const [isLoadingPets, setIsLoadingPets] = useState(true);
   const [petsError, setPetsError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const exploreSliderRef = useRef<HTMLDivElement>(null);
+
+  function scrollExploreSlider(direction: -1 | 1) {
+    const slider = exploreSliderRef.current;
+    if (!slider) return;
+    const slide = slider.querySelector<HTMLElement>(".dashboard-explore-slide");
+    const distance = slide ? slide.getBoundingClientRect().width + 16 : 300;
+    slider.scrollBy({
+      left: direction * distance,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  }
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [purpose, setPurpose] = useState("");
   const [gender, setGender] = useState("");
@@ -242,10 +261,14 @@ export default function CustomerDashboard() {
                 Everything you need to help pets thrive, all in one place.
               </p>
             </div>
+            <div className="dashboard-explore-controls" aria-label="Explore Pawdigree slider controls">
+              <button type="button" aria-label="Previous Explore Pawdigree slide" onClick={() => scrollExploreSlider(-1)}><ArrowRight size={18} className="dashboard-explore-prev" /></button>
+              <button type="button" aria-label="Next Explore Pawdigree slide" onClick={() => scrollExploreSlider(1)}><ArrowRight size={18} /></button>
+            </div>
           </div>
 
-          <div className="dashboard-marketplace-grid">
-            <Link to="/pets" className="dashboard-marketplace-card">
+          <div className="dashboard-explore-track" ref={exploreSliderRef} role="group" aria-label="Explore Pawdigree slides" tabIndex={0}>
+            <Link to="/pets" className="dashboard-explore-slide" style={{ "--explore-image": `url(${catsFeatureImage})` } as CSSProperties}>
               <span className="dashboard-marketplace-icon">
                 <Heart size={22} />
               </span>
@@ -256,7 +279,7 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </Link>
 
-            <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
+            <div className="dashboard-explore-slide dashboard-explore-slide--unavailable" aria-disabled="true" style={{ "--explore-image": `url(${veterinaryFeatureImage})` } as CSSProperties}>
               <span className="dashboard-marketplace-icon">
                 <Stethoscope size={22} />
               </span>
@@ -266,7 +289,7 @@ export default function CustomerDashboard() {
               </span>
             </div>
 
-            <div className="dashboard-marketplace-card dashboard-marketplace-card--unavailable">
+            <div className="dashboard-explore-slide dashboard-explore-slide--unavailable" aria-disabled="true" style={{ "--explore-image": `url(${bellaFeatureImage})` } as CSSProperties}>
               <span className="dashboard-marketplace-icon">
                 <Sparkles size={22} />
               </span>
@@ -276,7 +299,7 @@ export default function CustomerDashboard() {
               </span>
             </div>
 
-            <Link to="/vendor" className="dashboard-marketplace-card">
+            <Link to="/vendor" className="dashboard-explore-slide" style={{ "--explore-image": `url(${petWalkingFeatureImage})` } as CSSProperties}>
               <span className="dashboard-marketplace-icon">
                 <Store size={22} />
               </span>
@@ -287,7 +310,7 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </Link>
 
-            <Link to="/pets" className="dashboard-marketplace-card">
+            <Link to="/pets" className="dashboard-explore-slide" style={{ "--explore-image": `url(${groomingFeatureImage})` } as CSSProperties}>
               <span className="dashboard-marketplace-icon">
                 <ShoppingBag size={22} />
               </span>

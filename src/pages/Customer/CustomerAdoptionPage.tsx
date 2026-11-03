@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
+  Bone,
   ClipboardList,
   HeartHandshake,
   Search,
@@ -83,6 +84,11 @@ export default function CustomerAdoptionPage() {
       <CustomerDashboardNav />
       <main className="customer-dashboard-main customer-dashboard customer-adoption">
         <header className="customer-adoption-hero">
+          <div className="customer-adoption-hero-decor" aria-hidden="true">
+            <Bone className="adoption-decor-bone" />
+            <Bone className="adoption-decor-bone adoption-decor-bone-small" />
+            <span className="adoption-decor-dot" />
+          </div>
           <p className="dashboard-eyebrow">A NEW COMPANION STARTS HERE</p>
           <h1>Adoption</h1>
           <p>
