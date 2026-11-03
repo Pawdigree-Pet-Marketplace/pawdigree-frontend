@@ -5,7 +5,6 @@ import { customerAuthenticatedFetch } from "../../services/customerAuthenticated
 import { getSessionToken } from "../../services/auth/authStorage";
 import { fetchPet } from "../../services/petsApi";
 import "./AdoptionRequest.css";
-
 type HomeType = "APARTMENT" | "HOUSE" | "OTHER";
 type Experience = "NONE" | "SOME" | "EXPERIENCED";
 type AdoptionForm = {
