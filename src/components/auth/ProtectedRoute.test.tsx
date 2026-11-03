@@ -20,7 +20,9 @@ function renderRoute(role?: "CUSTOMER" | "VENDOR", path = "/vendor/documents") {
       <Routes>
         <Route path="/vendor/documents" element={<ProtectedRoute role="VENDOR"><p>Vendor documents</p></ProtectedRoute>} />
         <Route path="/customer/dashboard" element={<ProtectedRoute role="CUSTOMER"><p>Customer dashboard</p></ProtectedRoute>} />
+        <Route path="/customer/private" element={<ProtectedRoute role="CUSTOMER"><p>Customer private page</p></ProtectedRoute>} />
         <Route path="/vendor/dashboard" element={<p>Vendor dashboard</p>} />
+        <Route path="/login" element={<p>Customer login</p>} />
         <Route path="/vendor/login" element={<p>Vendor login</p>} />
       </Routes>
     </MemoryRouter>,
@@ -28,14 +30,20 @@ function renderRoute(role?: "CUSTOMER" | "VENDOR", path = "/vendor/documents") {
 }
 
 describe("ProtectedRoute", () => {
-  it("redirects unauthenticated visitors to the matching login page", () => {
+  it("redirects unauthenticated visitors to the vendor login page for vendor routes", () => {
     renderRoute();
     expect(screen.getByText("Vendor login")).toBeInTheDocument();
   });
 
-  it("redirects customers away from vendor routes to their dashboard", () => {
+  it("redirects unauthenticated visitors to the customer login page for customer routes", () => {
+    renderRoute(undefined, "/customer/dashboard");
+    expect(screen.getByText("Customer login")).toBeInTheDocument();
+  });
+
+  it("shows access denied when a customer tries to access a vendor route", () => {
     renderRoute("CUSTOMER");
-    expect(screen.getByText("Customer dashboard")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /you can’t access this page/i })).toBeInTheDocument();
+    expect(screen.queryByText("Customer dashboard")).not.toBeInTheDocument();
   });
 
   it("allows a vendor to access vendor routes", () => {
@@ -43,8 +51,9 @@ describe("ProtectedRoute", () => {
     expect(screen.getByText("Vendor documents")).toBeInTheDocument();
   });
 
-  it("redirects vendors away from customer routes to their dashboard", () => {
-    renderRoute("VENDOR", "/customer/dashboard");
-    expect(screen.getByText("Vendor dashboard")).toBeInTheDocument();
+  it("shows access denied when a vendor tries to access a customer route", () => {
+    renderRoute("VENDOR", "/customer/private");
+    expect(screen.getByRole("heading", { name: /you can’t access this page/i })).toBeInTheDocument();
+    expect(screen.queryByText("Vendor dashboard")).not.toBeInTheDocument();
   });
 });

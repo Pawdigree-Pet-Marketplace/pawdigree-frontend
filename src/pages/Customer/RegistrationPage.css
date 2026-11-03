@@ -38,7 +38,6 @@
   color: var(--white);
   background: rgba(20, 28, 27, 0.45);
   border-color: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(6px);
   text-shadow: none;
 }
 

@@ -64,7 +64,7 @@ export default function CustomerLoginPage() {
                 type="button"
                 className="role-card"
                 onClick={() => {
-                  navigate("/vendor/login");
+                  navigate("/vendor/login", { replace: true });
                 }}
               >
                 <span className="role-icon" aria-hidden="true">

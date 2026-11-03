@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import "./VendorLandingPage.css";
 import vendorHero from "../../assets/images/vendor-hero.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useSession from "../../hooks/useSession";
 
 import {
   ArrowUpRight,
@@ -193,6 +194,14 @@ function VendorSteps({
 
 function VendorLandingPage() {
   const [hideFloaties, setHideFloaties] = useState(false);
+  const navigate = useNavigate();
+  const isVendorSignedIn = useSession("VENDOR");
+
+  useEffect(() => {
+    if (isVendorSignedIn) {
+      navigate("/vendor/dashboard", { replace: true });
+    }
+  }, [isVendorSignedIn, navigate]);
 
   useEffect(() => {
     const footer = document.querySelector(".footer");
@@ -249,6 +258,8 @@ function VendorLandingPage() {
 
     return () => observer.disconnect();
   }, []);
+
+  if (isVendorSignedIn) return null;
 
   return (
     <main className="vendor-page" id="home">

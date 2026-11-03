@@ -1,0 +1,38 @@
+.customer-adoption { padding-bottom: 50px; }
+.customer-adoption-hero { margin: 8px 0 20px; padding: clamp(24px, 4vw, 42px); border: 1px solid var(--dashboard-border); border-radius: 22px; background: linear-gradient(120deg, #fbfaf7, #edf5ef); }
+.customer-adoption-hero h1 { margin: 4px 0 8px; color: var(--dashboard-ink); font-size: clamp(2rem, 4vw, 2.8rem); }
+.customer-adoption-hero > p:last-child { max-width: 650px; margin: 0; color: var(--dashboard-muted); line-height: 1.6; }
+.customer-adoption-tabs { display: flex; gap: 8px; margin: 20px 0 26px; padding: 5px; border: 1px solid var(--dashboard-border); border-radius: 13px; background: #f5f4ef; }
+.customer-adoption-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; padding: 0 16px; border: 0; border-radius: 9px; background: transparent; color: var(--dashboard-muted); cursor: pointer; font: inherit; font-weight: 800; }
+.customer-adoption-tabs button.is-active { background: #fff; color: var(--dashboard-teal); box-shadow: 0 2px 9px rgb(44 48 47 / 7%); }
+.customer-adoption-search { display: grid; gap: 7px; max-width: 650px; margin: 0 0 24px; color: var(--dashboard-ink); font-size: 13px; font-weight: 800; }
+.customer-adoption-search > div { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 0 9px 0 13px; border: 1px solid var(--dashboard-border); border-radius: 11px; background: #fff; color: var(--dashboard-muted); }
+.customer-adoption-search input { flex: 1; min-width: 0; border: 0; outline: 0; color: var(--dashboard-ink); font: inherit; font-weight: 500; }
+.customer-adoption-search button, .customer-adoption-state button, .customer-adoption-refresh { min-height: 36px; padding: 0 13px; border: 0; border-radius: 8px; background: var(--dashboard-teal); color: #fff; cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; }
+.customer-adoption-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 17px; }
+.customer-adoption-section-heading h2 { margin: 0; color: var(--dashboard-ink); font-size: 1.35rem; }
+.customer-adoption-section-heading p { margin: 4px 0 0; color: var(--dashboard-muted); font-size: 13px; }
+.customer-adoption-section-heading > a, .customer-adoption-request-card > a { display: inline-flex; align-items: center; gap: 5px; color: var(--dashboard-teal); font-size: 12px; font-weight: 800; text-decoration: none; }
+.customer-adoption-section-heading > a:hover, .customer-adoption-request-card > a:hover { text-decoration: underline; }
+.customer-adoption-state { display: grid; justify-items: center; gap: 9px; min-height: 190px; padding: 28px; border: 1px dashed var(--dashboard-border); border-radius: 15px; background: var(--dashboard-paper); color: var(--dashboard-muted); text-align: center; }
+.customer-adoption-state h3, .customer-adoption-state p { margin: 0; }
+.customer-adoption-state h3 { color: var(--dashboard-ink); }
+.customer-adoption-state p { max-width: 440px; line-height: 1.55; }
+.customer-adoption-pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 24px 0; color: var(--dashboard-muted); font-weight: 800; }
+.customer-adoption-pagination button { min-height: 38px; padding: 0 13px; border: 1px solid var(--dashboard-border); border-radius: 9px; background: #fff; color: var(--dashboard-teal); cursor: pointer; font: inherit; }
+.customer-adoption-pagination button:disabled, .customer-adoption-refresh:disabled { cursor: wait; opacity: .55; }
+.customer-adoption-requests { display: grid; gap: 12px; }
+.customer-adoption-request-card { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 18px; padding: 18px 20px; border: 1px solid var(--dashboard-border); border-radius: 14px; background: #fff; }
+.customer-adoption-request-card h3 { margin: 3px 0; color: var(--dashboard-ink); font-size: 16px; }
+.customer-adoption-request-card p:not(.dashboard-eyebrow) { margin: 0; color: var(--dashboard-muted); font-size: 12px; }
+.customer-adoption-request-card .dashboard-eyebrow { margin: 0; font-size: 10px; }
+.customer-adoption-status { padding: 7px 10px; border-radius: 999px; background: #f0f1ef; color: #646b67; font-size: 11px; font-weight: 800; }
+.customer-adoption-status--pending, .customer-adoption-status--info_requested { background: #fff2d9; color: #875a17; }
+.customer-adoption-status--approved { background: #e6f4e9; color: #24663b; }
+.customer-adoption-status--rejected, .customer-adoption-status--cancelled { background: #fbe9e6; color: #9b3d31; }
+@media (max-width: 650px) {
+  .customer-adoption-tabs button { flex: 1; padding: 0 8px; }
+  .customer-adoption-section-heading { align-items: flex-start; flex-direction: column; }
+  .customer-adoption-request-card { grid-template-columns: 1fr auto; gap: 12px; }
+  .customer-adoption-request-card > a { grid-column: 1 / -1; }
+}
