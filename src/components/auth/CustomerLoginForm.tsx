@@ -8,11 +8,14 @@ import {
   clearAuthSession,
   saveAuthSession,
 } from "../../services/auth/authStorage";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logos/icon-logo.svg";
+import { getPostLoginPath } from "../../services/auth/authRedirect";
 
 export default function CustomerLoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const postLoginPath = getPostLoginPath(location.state, "CUSTOMER");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -76,6 +79,7 @@ export default function CustomerLoginForm() {
             verificationToken: data.verification_token,
             email: data.masked_email ?? data.email ?? identifier.trim(),
             role: "CUSTOMER",
+            redirectTo: postLoginPath,
             keepLoggedIn,
             expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
             resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
@@ -94,7 +98,7 @@ export default function CustomerLoginForm() {
         keepLoggedIn,
       );
 
-      navigate("/customer/dashboard", { replace: true });
+      navigate(postLoginPath, { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Login failed";
 
@@ -137,7 +141,7 @@ export default function CustomerLoginForm() {
         keepLoggedIn,
       );
 
-      navigate("/customer/dashboard", { replace: true });
+      navigate(postLoginPath, { replace: true });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Google login failed";
