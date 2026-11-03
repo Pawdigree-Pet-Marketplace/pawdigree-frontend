@@ -1,0 +1,229 @@
+.service-availability {
+  width: 100%;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  color: #2c302f;
+}
+
+.availability-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.availability-intro h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.availability-intro p {
+  margin: 0;
+  color: #6b7371;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.availability-intro > svg {
+  color: #216c68;
+  flex-shrink: 0;
+}
+
+.availability-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.availability-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  border: 1px solid #e6e9e8;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2c302f;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.availability-day span {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.availability-day small {
+  color: #737b79;
+  font-size: 11px;
+}
+
+.availability-day:hover {
+  border-color: #216c68;
+}
+
+.availability-day.selected {
+  background: #eaf4f2;
+  border-color: #216c68;
+  color: #216c68;
+}
+
+.availability-day.selected small {
+  color: #216c68;
+}
+
+.availability-day-content {
+  border-top: 1px solid #eeeeee;
+  padding-top: 22px;
+}
+
+.availability-day-content h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.availability-empty {
+  padding: 18px;
+  background: #f7f3e8;
+  border-radius: 10px;
+  color: #747b78;
+  font-size: 14px;
+  text-align: center;
+}
+
+.availability-slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.availability-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  background: #f7f9f8;
+  border: 1px solid #e8eeec;
+  border-radius: 10px;
+}
+
+.availability-slot span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.availability-slot button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: #fff0ed;
+  color: #c94e42;
+  cursor: pointer;
+}
+
+.availability-slot button:hover {
+  background: #ffe0da;
+}
+
+.availability-add-slot {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #e8eeec;
+  border-radius: 12px;
+}
+
+.availability-add-slot h4 {
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+
+.availability-time-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.availability-time-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #454c4a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.availability-time-fields input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #dce2df;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2c302f;
+  font: inherit;
+}
+
+.availability-time-fields input:focus {
+  outline: 2px solid #216c68;
+  outline-offset: 1px;
+}
+
+.availability-error {
+  margin: 0 0 14px;
+  color: #c0392b;
+  font-size: 13px;
+}
+
+.availability-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #216c68;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.availability-add-button:hover {
+  background: #185653;
+}
+
+@media (max-width: 700px) {
+  .service-availability {
+    padding: 16px;
+  }
+
+  .availability-days {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .availability-time-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .availability-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
