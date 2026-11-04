@@ -17,6 +17,12 @@ import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetc
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./VendorEditServicePage.css";
 
+/* ------------------------------------------------------------------ */
+/* Endpoints (from the API docs):                                      */
+/*   GET    /api/services/{id}/  view one of my services               */
+/*   PATCH  /api/services/{id}/  edit a service                        */
+/*   DELETE /api/services/{id}/  remove a service                      */
+/* ------------------------------------------------------------------ */
 const SERVICES_URL = `${API_BASE_URL}/api/services/`;
 const serviceUrl = (id: string) => `${SERVICES_URL}${id}/`;
 const AFTER_SAVE_PATH = "/vendor/dashboard";
@@ -97,8 +103,11 @@ function ConfirmRemoveDialog({
   const confirmRef = useRef<HTMLButtonElement>(null);
   const busyRef = useRef(busy);
   const cancelHandlerRef = useRef(onCancel);
-  busyRef.current = busy;
-  cancelHandlerRef.current = onCancel;
+
+  useEffect(() => {
+    busyRef.current = busy;
+    cancelHandlerRef.current = onCancel;
+  });
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -202,7 +211,7 @@ export default function VendorEditServicePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const redirectTimer = useRef<number | undefined>(undefined);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(id));
   const [loadFailed, setLoadFailed] = useState(false);
   const [serviceName, setServiceName] = useState("");
   const [category, setCategory] = useState("");
@@ -224,7 +233,9 @@ export default function VendorEditServicePage() {
   const [removeError, setRemoveError] = useState("");
 
   const newPhotosRef = useRef(newPhotos);
-  newPhotosRef.current = newPhotos;
+  useEffect(() => {
+    newPhotosRef.current = newPhotos;
+  }, [newPhotos]);
 
   const busy = submitting !== null || removing;
   const photoCount = existingPhotos.length + newPhotos.length;
@@ -238,11 +249,7 @@ export default function VendorEditServicePage() {
   }, []);
 
   useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      setLoadFailed(true);
-      return;
-    }
+    if (!id) return;
     let cancelled = false;
 
     async function loadService() {
@@ -419,7 +426,7 @@ export default function VendorEditServicePage() {
     );
   }
 
-  if (loadFailed) {
+  if (loadFailed || !id) {
     return (
       <VendorLayout
         title="Edit service"
