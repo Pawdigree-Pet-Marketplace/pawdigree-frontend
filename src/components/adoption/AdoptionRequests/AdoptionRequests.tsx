@@ -126,8 +126,7 @@ function RequestDetail({
     request.hasOtherPets !== null,
   );
 
-  // On phones the detail takes over the screen, so move focus to it.
-  // On desktop it sits beside the list, so leave focus where it is.
+  // Phone focus
   useEffect(() => {
     if (window.matchMedia("(max-width: 899px)").matches)
       headingRef.current?.focus();
