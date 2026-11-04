@@ -425,7 +425,7 @@ export default function ExplorePets() {
           <nav className="ep-breadcrumb" aria-label="Breadcrumb">
             <Link to="/">Home</Link>
             <span aria-hidden="true">/</span>
-            <span aria-current="page">Explore Pets</span>
+            <span aria-current="page">Browse Pets</span>
           </nav>
 
           <p className="ep-eyebrow">Find your new best friend</p>
