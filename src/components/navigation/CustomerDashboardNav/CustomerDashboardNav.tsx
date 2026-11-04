@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   PawPrint,
   House,
-  Compass,
   ShoppingBag,
   Stethoscope,
   HeartHandshake,
@@ -22,8 +21,8 @@ import { Link, useLocation } from "react-router-dom";
 
 const navigationItems = [
   { label: "Overview", href: "/customer/dashboard", Icon: House },
-  { label: "Discover", href: "/explore-pets", Icon: Compass },
-  { label: "Browse Pets", href: "/pets", Icon: PawPrint },
+  { label: "Browse Pets", href: "/explore-pets", Icon: PawPrint },
+  { label: "Pet Catalogue", href: "/pets", Icon: ShoppingBag },
   { label: "Pet Store", Icon: ShoppingBag },
   { label: "Pet Services", href: "/vendors", Icon: Stethoscope },
   { label: "Adoption", href: "/customer/adoption", Icon: HeartHandshake },
@@ -45,9 +44,9 @@ export default function CustomerDashboardNav() {
     switch (label) {
       case "Overview":
         return pathname === "/customer/dashboard";
-      case "Discover":
-        return pathname === "/explore-pets" || pathname.startsWith("/pets/");
       case "Browse Pets":
+        return pathname === "/explore-pets" || pathname.startsWith("/pets/");
+      case "Pet Catalogue":
         return pathname === "/pets" && !isAdoption;
       case "Pet Services":
         return pathname.startsWith("/vendors");

@@ -1,7 +1,19 @@
 import { SPECIES, type SpeciesKey } from "../../data/pets";
-import { SPECIES_ICON } from "./speciesIcons";
+import dogsImage from "../../assets/images/dogs.jpg";
+import catsImage from "../../assets/images/cats.jpg";
+import rabbitImage from "../../assets/images/rabbit.jpg";
+import birdsImage from "../../assets/images/birds.jpg";
+import fishImage from "../../assets/images/aquatic.jpg";
 import "./speciesColors.css";
 import "./SpeciesQuickPicks.css";
+
+const SPECIES_IMAGE: Record<SpeciesKey, string> = {
+  dog: dogsImage,
+  cat: catsImage,
+  rabbit: rabbitImage,
+  bird: birdsImage,
+  fish: fishImage,
+};
 
 interface SpeciesQuickPicksProps {
   selected: SpeciesKey[];
@@ -15,7 +27,6 @@ export default function SpeciesQuickPicks({
   return (
     <div className="species-picks" role="group" aria-label="Browse by species">
       {SPECIES.map((s) => {
-        const Icon = SPECIES_ICON[s.key];
         const on = selected.includes(s.key);
         return (
           <button
@@ -27,7 +38,7 @@ export default function SpeciesQuickPicks({
             onClick={() => onToggle(s.key)}
           >
             <span className="species-picks__icon">
-              <Icon size={26} strokeWidth={1.7} aria-hidden="true" />
+              <img src={SPECIES_IMAGE[s.key]} alt="" loading="lazy" />
             </span>
             {s.plural}
           </button>

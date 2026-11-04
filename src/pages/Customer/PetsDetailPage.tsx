@@ -177,7 +177,7 @@ export default function PetDetailsPage() {
       <div className="pd-breadcrumb">
         <Link to="/">Home</Link>
         <span>/</span>
-        <Link to="/explore-pets">Explore Pets</Link>
+        <Link to="/explore-pets">Browse Pets</Link>
         <span>/</span>
         <strong>
           {pet.name}
