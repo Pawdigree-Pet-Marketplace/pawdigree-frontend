@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
+import { Bone, PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 import ProfileCard from "../../components/profile/ProfileCard";
 import ProfileMenu from "../../components/profile/ProfileMenu";
 import type { Profile } from "../../data/profile";
@@ -19,7 +17,6 @@ type CustomerProfileResponse = {
 };
 
 export default function ProfilePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -87,23 +84,19 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <>
-      <TopNavbar
-        isLoggedIn
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
-
-      <SideMenu
-        isOpen={isMenuOpen}
-        setIsOpen={setIsMenuOpen}
-        isLoggedIn
-        onClose={() => setIsMenuOpen(false)}
-      />
-
-      <main className="container profile-page">
+    <main className="customer-dashboard profile-page">
+      <header className="profile-hero">
+        <div className="profile-hero-decor" aria-hidden="true">
+          <Bone className="profile-hero-bone" />
+          <PawPrint className="profile-hero-paw" />
+          <span className="profile-hero-dot" />
+        </div>
+        <p className="dashboard-eyebrow">YOUR PAWDIGREE ACCOUNT</p>
         <h1 className="profile-title">Profile</h1>
+        <p>View and manage your personal information and account settings.</p>
+      </header>
 
+      <section className="profile-content" aria-label="Profile information">
         {isLoading && <p role="status">Loading your profile...</p>}
 
         {!isLoading && error && (
@@ -124,9 +117,7 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-      </main>
-
-      <BottomNavbar />
-    </>
+      </section>
+    </main>
   );
 }

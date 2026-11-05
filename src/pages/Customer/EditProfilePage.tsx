@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
+import { Bone, PawPrint } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import EditProfileForm from "../../components/profile/EditProfileForm";
 import BackButton from "../../components/BackButton/BackButton";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 import type { ProfileFormValues } from "../../utils/validateProfile";
 import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
 import { getSessionToken } from "../../services/auth/authStorage";
@@ -20,7 +18,6 @@ type CustomerProfileResponse = {
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [profile, setProfile] = useState<ProfileFormValues | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -153,56 +150,48 @@ export default function EditProfilePage() {
   };
 
   return (
-    <>
-      <TopNavbar
-        isLoggedIn
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
-
-      <SideMenu
-        isOpen={isMenuOpen}
-        setIsOpen={setIsMenuOpen}
-        isLoggedIn
-        onClose={() => setIsMenuOpen(false)}
-      />
-
-      <main className="container profile-page">
-        <div className="edit-wrap">
-          <BackButton fallback="/profile" label="Back to profile" />
-
-          <h1 className="profile-title">Edit profile</h1>
-
-          {isLoading && <p role="status">Loading your profile...</p>}
-
-          {!isLoading && error && !profile && (
-            <p role="alert">
-              {error}{" "}
-              {error.toLowerCase().includes("log in") && (
-                <Link to="/customer-login">Log in</Link>
-              )}
-            </p>
-          )}
-
-          {!isLoading && profile && (
-            <>
-              {error && <p role="alert">{error}</p>}
-
-              <section className="edit-card">
-                <EditProfileForm
-                  initialValues={profile}
-                  onSubmit={handleSubmit}
-                  cancelHref="/profile"
-                />
-
-                {isSaving && <p role="status">Saving your changes...</p>}
-              </section>
-            </>
-          )}
+    <main className="customer-dashboard profile-page">
+      <header className="profile-hero">
+        <div className="profile-hero-decor" aria-hidden="true">
+          <Bone className="profile-hero-bone" />
+          <PawPrint className="profile-hero-paw" />
+          <span className="profile-hero-dot" />
         </div>
-      </main>
+        <p className="dashboard-eyebrow">KEEP YOUR DETAILS UP TO DATE</p>
+        <h1 className="profile-title">Edit profile</h1>
+        <p>Update your personal information and contact details.</p>
+      </header>
 
-      <BottomNavbar />
-    </>
+      <section className="profile-content profile-edit-content">
+        <BackButton fallback="/profile" label="Back to profile" />
+
+        {isLoading && <p role="status">Loading your profile...</p>}
+
+        {!isLoading && error && !profile && (
+          <p role="alert">
+            {error}{" "}
+            {error.toLowerCase().includes("log in") && (
+              <Link to="/customer-login">Log in</Link>
+            )}
+          </p>
+        )}
+
+        {!isLoading && profile && (
+          <>
+            {error && <p role="alert">{error}</p>}
+
+            <section className="edit-card">
+              <EditProfileForm
+                initialValues={profile}
+                onSubmit={handleSubmit}
+                cancelHref="/profile"
+              />
+
+              {isSaving && <p role="status">Saving your changes...</p>}
+            </section>
+          </>
+        )}
+      </section>
+    </main>
   );
 }
