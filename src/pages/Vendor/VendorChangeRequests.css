@@ -1,0 +1,354 @@
+
+.vendor-change-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+}
+
+.vendor-change-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.vendor-change-eyebrow {
+  color: #216c68;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.vendor-change-page-header h1 {
+  margin: 8px 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: 34px;
+  color: #216c68;
+}
+
+.vendor-change-page-header p {
+  max-width: 650px;
+  margin: 0;
+  color: #777e7b;
+  line-height: 1.7;
+}
+
+.vendor-change-refresh,
+.vendor-change-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #216c68;
+  color: white;
+  font-family: "Nunito", sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.vendor-change-refresh:hover,
+.vendor-change-button:hover {
+  background: #185550;
+}
+
+.vendor-change-refresh:disabled,
+.vendor-change-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vendor-change-business-list {
+  display: grid;
+  gap: 24px;
+}
+
+.vendor-change-business-card {
+  padding: 26px;
+  border: 1px solid #e6e1d6;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 4px 18px rgba(44, 48, 47, 0.04);
+}
+
+.vendor-change-business-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.vendor-change-business-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: #e9f4f1;
+  color: #216c68;
+}
+
+.vendor-change-business-title h2 {
+  margin: 0 0 7px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 24px;
+  color: #216c68;
+}
+
+.vendor-change-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #fff2e8;
+  color: #9c5a35;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.vendor-change-request {
+  padding: 18px;
+  margin-bottom: 24px;
+  border-left: 4px solid #fb8665;
+  border-radius: 8px;
+  background: #fff5ef;
+}
+
+.vendor-change-request h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: #9c4d31;
+  font-family: "Fredoka", sans-serif;
+}
+
+.vendor-change-request p {
+  margin: 0;
+  color: #684a3d;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.vendor-change-section {
+  padding-top: 22px;
+  margin-top: 22px;
+  border-top: 1px solid #eee9df;
+}
+
+.vendor-change-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 8px;
+  color: #216c68;
+  font-family: "Fredoka", sans-serif;
+  font-size: 21px;
+}
+
+.vendor-change-section-description {
+  margin: 0 0 18px;
+  color: #777e7b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.vendor-change-form {
+  display: grid;
+  gap: 15px;
+}
+
+.vendor-change-form label {
+  display: grid;
+  gap: 8px;
+  color: #2c302f;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.vendor-change-form input,
+.vendor-change-form textarea,
+.vendor-change-form select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9dedb;
+  border-radius: 8px;
+  background: #fff;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.vendor-change-form textarea {
+  resize: vertical;
+}
+
+.vendor-change-form input:focus,
+.vendor-change-form textarea:focus,
+.vendor-change-form select:focus {
+  outline: none;
+  border-color: #216c68;
+  box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.1);
+}
+
+.vendor-change-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.vendor-change-character-count {
+  margin-top: -8px;
+  color: #777e7b;
+  text-align: right;
+  font-size: 12px;
+}
+
+.vendor-change-selected-file {
+  margin: 0;
+  color: #216c68;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.vendor-change-error {
+  margin: 0;
+  color: #a52d2d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vendor-change-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: #236744;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vendor-change-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.vendor-change-alert-error {
+  background: #fff0f0;
+  color: #a52d2d;
+}
+
+.vendor-change-alert-success {
+  background: #edf8ef;
+  color: #236744;
+}
+
+.vendor-change-loading {
+  padding: 30px;
+  text-align: center;
+  color: #216c68;
+}
+
+.vendor-change-empty {
+  padding: 50px 24px;
+  text-align: center;
+  border: 1px dashed #d9dedb;
+  border-radius: 14px;
+  color: #216c68;
+}
+
+.vendor-change-empty h2 {
+  font-family: "Fredoka", sans-serif;
+}
+
+.vendor-change-empty p {
+  color: #777e7b;
+}
+
+.vendor-change-documents {
+  display: grid;
+  gap: 14px;
+  margin-top: 15px;
+}
+
+.vendor-change-document {
+  padding: 16px;
+  border: 1px solid #e6e1d6;
+  border-radius: 10px;
+  background: #fafaf7;
+}
+
+.vendor-change-document-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #216c68;
+}
+
+.vendor-change-document-info div {
+  display: grid;
+  gap: 5px;
+}
+
+.vendor-change-document-info strong {
+  color: #2c302f;
+  overflow-wrap: anywhere;
+}
+
+.vendor-change-document-info span {
+  color: #777e7b;
+  font-size: 12px;
+}
+
+.vendor-change-document-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #216c68;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.vendor-document-resubmit {
+  padding-top: 15px;
+  margin-top: 15px;
+  border-top: 1px solid #e6e1d6;
+}
+
+@media (max-width: 650px) {
+  .vendor-change-page {
+    padding: 20px 14px;
+  }
+
+  .vendor-change-page-header {
+    flex-direction: column;
+  }
+
+  .vendor-change-page-header h1 {
+    font-size: 28px;
+  }
+
+  .vendor-change-business-card {
+    padding: 18px;
+  }
+
+  .vendor-change-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vendor-change-refresh,
+  .vendor-change-button {
+    width: 100%;
+  }
+}

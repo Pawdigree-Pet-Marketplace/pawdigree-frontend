@@ -30,7 +30,6 @@ import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
-
 function App() {
   return (
     <Routes>
@@ -52,7 +51,6 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/reset-password" element={<ResetPasswordForm />} />
-
       {/* Vendor pages */}
       <Route path="/vendor" element={<VendorLandingPage />} />
       <Route path="/vendor/login" element={<VendorLoginPage />} />

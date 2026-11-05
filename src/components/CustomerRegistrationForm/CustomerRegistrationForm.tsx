@@ -412,27 +412,59 @@ export default function CustomerRegistrationForm() {
           ref={formRef}
           noValidate
         >
-          {step === 0 && (
-            <div className="registration-step-fields">
-              <div className="form-group">
-                <label htmlFor="first_name">First name</label>
-                <input
-                  id="first_name"
-                  name="first_name"
-                  autoComplete="given-name"
-                  placeholder="Enter your first name"
-                  value={formData.first_name}
-                  onChange={(e) => updateField("first_name", e.target.value)}
-                  onBlur={handleBlur}
-                  className={showError("first_name") ? "has-error" : undefined}
-                  aria-invalid={showError("first_name")}
-                />
-                {showError("first_name") && (
-                  <p className="field-error" role="alert">
-                    {errors.first_name}
-                  </p>
-                )}
-              </div>
+          {/* Step indicator */}
+
+          <div className="creg-step-indicator">
+            <span>Step {step} of 2</span>
+
+            <div
+              className="creg-progress"
+              aria-label={`Registration progress: step ${step} of 2`}
+            >
+              <span className={step >= 1 ? "active" : ""} />
+              <span className={step >= 2 ? "active" : ""} />
+            </div>
+
+            <p className="creg-required-note">
+              Fields marked <span className="creg-required-star">*</span> are
+              required.
+            </p>
+          </div>
+
+          <div className="creg-grid">
+            {/* STEP ONE: Personal and contact information */}
+
+            {step === 1 && (
+              <>
+                <div className="creg-group">
+                  <label htmlFor="first_name">
+                    First name
+                    <span className="creg-required-star" aria-hidden="true">
+                      *
+                    </span>
+                  </label>
+
+                  <input
+                    id="first_name"
+                    name="first_name"
+                    autoComplete="given-name"
+                    placeholder="Enter your first name"
+                    value={formData.first_name}
+                    onChange={(e) => updateField("first_name", e.target.value)}
+                    onBlur={handleBlur}
+                    className={
+                      showError("first_name") ? "has-error" : undefined
+                    }
+                    aria-invalid={showError("first_name")}
+                    aria-required="true"
+                  />
+
+                  {showError("first_name") && (
+                    <p className="creg-error" role="alert">
+                      {errors.first_name}
+                    </p>
+                  )}
+                </div>
 
               <div className="form-group">
                 <label htmlFor="last_name">Last name</label>
@@ -502,11 +534,12 @@ export default function CustomerRegistrationForm() {
                     </div>
                   </div>
                 )}
-              </div>
+              
+                </div>
+              </>
+            )}
             </div>
-          )}
-
-          {step === 1 && (
+          {step === 2 && (
             <div className="registration-step-fields">
               <div className="form-group">
                 <label htmlFor="email">Email address</label>
