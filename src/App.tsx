@@ -39,6 +39,7 @@ import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplica
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionRequests from "./pages/Customer/CustomerAdoptionRequests";
+import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 function App() {
   return (
     <Routes>
@@ -154,6 +155,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/vendor/change-requests"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorChangeRequests />
+    </ProtectedRoute>
+  }
+/>
       <Route
         path="/vendor/listings"
         element={
