@@ -205,6 +205,17 @@
   color: var(--coral);
 }
 
+/* Explore Pets keeps every navbar label black in both scroll states. */
+.top-navbar--explore .desktop-links a,
+.top-navbar--explore .desktop-links a:hover,
+.top-navbar--explore .desktop-links a.is-active {
+  color: #000;
+}
+
+.top-navbar--explore .hamburger {
+  color: #000;
+}
+
 /* =========================
    MOBILE
 ========================= */

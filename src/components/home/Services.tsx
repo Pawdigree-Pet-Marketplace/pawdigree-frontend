@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { apiRequest } from '../../services/api'
 import useScrollReveal from '../../hooks/useScrollReveal'
 import { CheckIcon } from '../icons'
+import { Link } from 'react-router-dom'
 import './Services.css'
 
 type PublicBusiness = {
@@ -59,7 +60,7 @@ export default function Services() {
     <section className="container section" id="services">
       <div className="section-header">
         <h2 className="section-title">Trusted pet services</h2>
-        <a href="#services" className="section-link">See All</a>
+        <Link to="/vendors" className="section-link">See All</Link>
       </div>
 
       {loading ? <p role="status">Loading approved service providers…</p> : null}
@@ -73,7 +74,11 @@ export default function Services() {
             const category = business.categories.find((name) => SERVICE_CATEGORY.test(name)) || 'Pet service'
             const image = imageUrl(business.cover_image || business.logo)
             return (
-              <article key={business.id} className={`service-card reveal reveal-delay-${Math.min(index + 1, 4)}`}>
+              <Link
+                key={business.id}
+                to={`/vendors/${encodeURIComponent(business.id)}`}
+                className={`service-card reveal reveal-delay-${Math.min(index + 1, 4)}`}
+              >
                 {image ? <div className="service-media"><img src={image} alt="" className="service-image" /></div> : null}
                 <div className="service-body">
                   <div>
@@ -82,7 +87,7 @@ export default function Services() {
                   </div>
                   <span className="verified-pill"><CheckIcon width={16} height={16} />Verified</span>
                 </div>
-              </article>
+              </Link>
             )
           })}
         </div>

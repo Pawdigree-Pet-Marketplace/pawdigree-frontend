@@ -36,7 +36,7 @@ describe("LandingPage", () => {
 
     expect(
       screen.getByRole("searchbox", {
-        name: /search pets, services, products/i,
+        name: /search pets, breeds, or locations/i,
       }),
     ).toBeInTheDocument();
 

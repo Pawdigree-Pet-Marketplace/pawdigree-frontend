@@ -314,7 +314,8 @@ export default function CustomerLoginForm() {
       )}
 
       <p className="login-register-link">
-        Don't have an account? <Link to="/registration">Sign up</Link>
+        Don't have an account?{" "}
+        <Link to="/registration" state={location.state}>Sign up</Link>
       </p>
 
       <p className="login-terms">

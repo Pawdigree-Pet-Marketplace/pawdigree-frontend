@@ -60,7 +60,21 @@ export default function LandingPage() {
     <main ref={landingRef} className="landing-page">
       <Hero />
       <Stats />
-      <Categories />
+      <Categories
+        getHref={({ name }) => {
+          const speciesByCategory: Record<string, string> = {
+            Dogs: "dog",
+            Cats: "cat",
+            Birds: "bird",
+            Rabbits: "rabbit",
+            Aquatic: "fish",
+          };
+          const species = speciesByCategory[name];
+          return species
+            ? `/explore-pets?species=${species}`
+            : "/explore-pets";
+        }}
+      />
       <Merchandise />
       <HowItWorks />
       <Listings />

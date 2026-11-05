@@ -33,7 +33,8 @@ const TopNavbar = ({
   const hash = location.hash;
   const path = location.pathname;
   const isLandingPage = path === "/";
-  const isTransparentPage = isLandingPage;
+  const isExplorePetsPage = path === "/explore-pets";
+  const isTransparentPage = isLandingPage || isExplorePetsPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,11 +54,12 @@ const TopNavbar = ({
   };
 
   // Dark logo only while the navbar is transparent over the hero
-  const useDarkLogo = isLandingPage && !isScrolled;
+  const useDarkLogo = isTransparentPage && !isScrolled;
 
   const navbarClass = [
     "top-navbar",
     isTransparentPage ? "top-navbar--transparent" : "",
+    isExplorePetsPage ? "top-navbar--explore" : "",
     isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
   ]
     .filter(Boolean)

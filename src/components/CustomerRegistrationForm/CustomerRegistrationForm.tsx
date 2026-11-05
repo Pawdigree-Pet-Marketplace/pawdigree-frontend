@@ -6,7 +6,7 @@ import {
   type CountryCode,
 } from "libphonenumber-js";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import "../../App.css";
 import "./CustomerRegistrationForm.css";
@@ -181,6 +181,8 @@ function Required() {
 }
 
 export default function CustomerRegistrationForm() {
+  const location = useLocation();
+  const returnFrom = location.state?.from;
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [step, setStep] = useState<1 | 2>(1);
 
@@ -559,7 +561,9 @@ export default function CustomerRegistrationForm() {
           <h2>Registration successful</h2>
           <p>{success}</p>
           <p>
-            <Link to="/customer-login">Continue to log in</Link>
+            <Link to="/customer-login" state={{ from: returnFrom }}>
+              Continue to log in
+            </Link>
           </p>
         </div>
       )}
@@ -952,7 +956,8 @@ export default function CustomerRegistrationForm() {
 
       {!success && (
         <p className="creg-login-link">
-          Already have an account? <Link to="/customer-login">Log in</Link>
+          Already have an account?{" "}
+          <Link to="/customer-login" state={location.state}>Log in</Link>
         </p>
       )}
     </section>
