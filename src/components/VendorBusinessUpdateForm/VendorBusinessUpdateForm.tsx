@@ -94,6 +94,24 @@ export default function VendorBusinessUpdateForm({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+  const getImageUrl = (path?: string | null) => {
+    if (!path) return undefined;
+    if (/^(https?:|data:|blob:)/i.test(path)) return path;
+    return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+  };
+
+  useEffect(() => () => {
+    if (logoPreview) URL.revokeObjectURL(logoPreview);
+  }, [logoPreview]);
+
+  useEffect(() => () => {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+  }, [coverPreview]);
 
   // The form values shown on screen = values derived from `business`
   // (and the loaded categories) + whatever the user has typed so far.
@@ -181,6 +199,35 @@ export default function VendorBusinessUpdateForm({
     });
   };
 
+  const handleImageChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    kind: "logo" | "cover",
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setMessage("Choose a JPEG, PNG, or WebP image.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("Each image must be 5 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    setMessage("");
+    const preview = URL.createObjectURL(file);
+    if (kind === "logo") {
+      setLogoFile(file);
+      setLogoPreview(preview);
+    } else {
+      setCoverFile(file);
+      setCoverPreview(preview);
+    }
+  };
+
   const handleHoursChange = (
     day: string,
     field: keyof DayHours,
@@ -264,14 +311,34 @@ export default function VendorBusinessUpdateForm({
         ? `${API_BASE_URL}/api/businesses/${business?.id}/`
         : `${API_BASE_URL}/api/businesses/`;
       const method = isExistingBusiness ? "PATCH" : "POST";
+      const headers: Record<string, string> = {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      let body: BodyInit;
+
+      if (logoFile || coverFile) {
+        const formData = new FormData();
+        Object.entries(payload).forEach(([key, value]) => {
+          if (value !== undefined) {
+            formData.append(
+              key,
+              typeof value === "object" ? JSON.stringify(value) : String(value),
+            );
+          }
+        });
+        if (logoFile) formData.append("logo", logoFile);
+        if (coverFile) formData.append("cover_image", coverFile);
+        body = formData;
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(payload);
+      }
+
       const res = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
+        headers,
+        body,
       });
       const data = (await res.json().catch(() => ({}))) as Record<
         string,
@@ -349,6 +416,50 @@ export default function VendorBusinessUpdateForm({
           <p className="field-error">{errors.description}</p>
         )}
       </div>
+
+      <section className="business-image-fields" aria-label="Business images">
+        <div className="business-image-field">
+          <label htmlFor="businessLogo">Business profile image</label>
+          <div className="business-image-preview business-image-preview--logo">
+            {(logoPreview || getImageUrl(business?.logo)) ? (
+              <img
+                src={logoPreview || getImageUrl(business?.logo)}
+                alt="Business profile preview"
+              />
+            ) : (
+              <span>Logo preview</span>
+            )}
+          </div>
+          <input
+            id="businessLogo"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(event) => handleImageChange(event, "logo")}
+          />
+          <small>JPEG, PNG, or WebP. Maximum 5 MB.</small>
+        </div>
+
+        <div className="business-image-field">
+          <label htmlFor="businessCover">Business hero image</label>
+          <div className="business-image-preview business-image-preview--cover">
+            {(coverPreview || getImageUrl(business?.cover_image)) ? (
+              <img
+                src={coverPreview || getImageUrl(business?.cover_image)}
+                alt="Business hero preview"
+              />
+            ) : (
+              <span>Hero image preview</span>
+            )}
+          </div>
+          <input
+            id="businessCover"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(event) => handleImageChange(event, "cover")}
+          />
+          <small>JPEG, PNG, or WebP. Maximum 5 MB.</small>
+        </div>
+      </section>
 
       <div className="form-group">
         <label htmlFor="businessType">

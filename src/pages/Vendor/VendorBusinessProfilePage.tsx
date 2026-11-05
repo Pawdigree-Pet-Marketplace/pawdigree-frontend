@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Phone,
   Mail,
@@ -7,6 +7,8 @@ import {
   Share2,
   PawPrint,
   Store,
+  ImagePlus,
+  LoaderCircle,
 } from "lucide-react";
 import VendorBusinessUpdateForm, {
   type Business,
@@ -182,6 +184,17 @@ export default function VendorBusinessProfilePage() {
     setIsRegistering(false);
   }
 
+  function updateBusinessImages(updatedBusiness: Business) {
+    setState((current) => ({
+      ...current,
+      businesses: current.businesses.map((business) =>
+        String(business.id) === String(updatedBusiness.id)
+          ? { ...business, ...updatedBusiness }
+          : business,
+      ),
+    }));
+  }
+
   return (
     <VendorLayout
       title="Business & Payout"
@@ -259,6 +272,7 @@ export default function VendorBusinessProfilePage() {
                       last_verified: selectedBusiness.reviewed_at,
                     }}
                     onEdit={() => setEditingBusinessId(selectedBusinessId)}
+                    onBusinessUpdated={updateBusinessImages}
                   />
                 </>
               )
@@ -300,15 +314,21 @@ type ViewProps = {
   business: Business | null;
   verification: Verification | null;
   onEdit: () => void;
+  onBusinessUpdated: (business: Business) => void;
 };
 
 type PetsLoaded = { key: string; pets: PublicPet[] | null };
 
-function VendorProfileView({ business, verification, onEdit }: ViewProps) {
+function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }: ViewProps) {
   const [copied, setCopied] = useState(false);
   const [catTab, setCatTab] = useState<CatTab>("all");
   const [showAll, setShowAll] = useState(false);
   const [petsLoaded, setPetsLoaded] = useState<PetsLoaded | null>(null);
+  const [uploadingImage, setUploadingImage] = useState<"logo" | "cover" | null>(null);
+  const [imageUploadError, setImageUploadError] = useState("");
+  const [imageUploadSuccess, setImageUploadSuccess] = useState("");
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const businessId = business?.id !== undefined ? String(business.id) : "";
   const name = business?.name || business?.business_name || "";
@@ -349,6 +369,45 @@ function VendorProfileView({ business, verification, onEdit }: ViewProps) {
   const cover = imageUrl(business.cover_image);
   const logo = imageUrl(business.logo);
 
+  async function uploadBusinessImage(file: File, field: "logo" | "cover_image") {
+    setImageUploadError("");
+    setImageUploadSuccess("");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setImageUploadError("Choose a JPEG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setImageUploadError("The image must be 5 MB or smaller.");
+      return;
+    }
+
+    setUploadingImage(field === "logo" ? "logo" : "cover");
+    try {
+      const formData = new FormData();
+      formData.append(field, file);
+      const response = await vendorAuthenticatedFetch(
+        `${API_BASE_URL}/api/businesses/${encodeURIComponent(businessId)}/`,
+        { method: "PATCH", body: formData },
+      );
+      if (!response.ok) {
+        const data: unknown = await response.json().catch(() => null);
+        const details = data && typeof data === "object"
+          ? Object.entries(data as Record<string, unknown>)
+              .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(" ") : String(value)}`)
+              .join(" ")
+          : "";
+        throw new Error(details || `Image upload failed (${response.status}).`);
+      }
+      const updatedBusiness = (await response.json()) as Business;
+      onBusinessUpdated(updatedBusiness);
+      setImageUploadSuccess("Business image uploaded successfully.");
+    } catch (error) {
+      setImageUploadError(error instanceof Error ? error.message : "Could not upload the image. Please try again.");
+    } finally {
+      setUploadingImage(null);
+    }
+  }
+
   const changeTab = (next: CatTab) => {
     setCatTab(next);
     setShowAll(false);
@@ -378,7 +437,6 @@ function VendorProfileView({ business, verification, onEdit }: ViewProps) {
       <div className="bp-banner-card">
         <div
           className="bp-cover"
-          style={{ position: "relative", overflow: "hidden" }}
         >
           {cover ? (
             <img
@@ -389,6 +447,30 @@ function VendorProfileView({ business, verification, onEdit }: ViewProps) {
           ) : (
             <ImageFallback kind="cover" />
           )}
+          <input
+            ref={coverInputRef}
+            className="bp-image-file-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            aria-label="Choose business hero image"
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              event.currentTarget.value = "";
+              if (file) void uploadBusinessImage(file, "cover_image");
+            }}
+          />
+          <button
+            type="button"
+            className="bp-cover-upload-button"
+            disabled={uploadingImage !== null}
+            onClick={() => coverInputRef.current?.click()}
+          >
+            {uploadingImage === "cover" ? (
+              <><LoaderCircle className="bp-upload-spinner" size={17} /> Uploading hero image…</>
+            ) : (
+              <><ImagePlus size={17} /> {cover ? "Change hero image" : "Upload hero image"}</>
+            )}
+          </button>
         </div>
 
         <div className="bp-profile-row">
@@ -437,6 +519,32 @@ function VendorProfileView({ business, verification, onEdit }: ViewProps) {
               ) : (
                 <span className="pending-badge">Pending Verification</span>
               )}
+              <div className="bp-profile-image-actions">
+                <input
+                  ref={logoInputRef}
+                  className="bp-image-file-input"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  aria-label="Choose business profile image"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+                    event.currentTarget.value = "";
+                    if (file) void uploadBusinessImage(file, "logo");
+                  }}
+                />
+                <button
+                  type="button"
+                  className="bp-profile-upload-button"
+                  disabled={uploadingImage !== null}
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  {uploadingImage === "logo" ? (
+                    <><LoaderCircle className="bp-upload-spinner" size={14} /> Uploading…</>
+                  ) : (
+                    <><ImagePlus size={14} /> {logo ? "Change profile image" : "Upload profile image"}</>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -450,6 +558,13 @@ function VendorProfileView({ business, verification, onEdit }: ViewProps) {
           </span>
         </div>
       </div>
+
+      {(imageUploadError || imageUploadSuccess) && (
+        <p className={`bp-image-upload-feedback${imageUploadError ? " is-error" : " is-success"}`} role={imageUploadError ? "alert" : "status"}>
+          {imageUploadError || imageUploadSuccess}
+        </p>
+      )}
+      <p className="bp-image-review-note">Image changes to an approved business may be sent for review.</p>
 
       <div className="bp-grid">
         <div className="bp-left">
