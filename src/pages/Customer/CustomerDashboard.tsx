@@ -20,13 +20,24 @@ import veterinaryFeatureImage from "../../assets/images/veterinary.jpg";
 import bellaFeatureImage from "../../assets/images/bella.jpg";
 import groomingFeatureImage from "../../assets/images/grooming.jpg";
 import petWalkingFeatureImage from "../../assets/images/pet-walking.jpg";
-import { apiRequest } from "../../services/api";
+import API_BASE_URL, { apiRequest } from "../../services/api";
 import Categories from "../../components/home/Categories";
 import "./CustomerDashboard.css";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 
 type PetFilters = { purpose: string; gender: string; breed: string; minAge: string; maxAge: string };
 const emptyFilters: PetFilters = { purpose: "", gender: "", breed: "", minAge: "", maxAge: "" };
+
+function petImageUrl(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  if (/^(https?:|data:|blob:)/i.test(path)) return path;
+  if (!API_BASE_URL) return path;
+  try {
+    return new URL(path, `${new URL(API_BASE_URL).origin}/`).href;
+  } catch {
+    return path;
+  }
+}
 
 type Pet = {
   pet_id: number;
@@ -411,9 +422,10 @@ export default function CustomerDashboard() {
           ) : (
             <div className="dashboard-pet-grid">
               {filteredPets.map((pet) => {
-                const primaryImage =
+                const primaryImage = petImageUrl(
                   pet.images?.find((image) => image.is_primary)?.image ||
-                  pet.images?.[0]?.image;
+                  pet.images?.[0]?.image,
+                );
 
                 const ageInYears = Math.floor(pet.age / 12);
                 const ageLabel =

@@ -14,7 +14,7 @@ export interface BusinessStats {
 }
 
 export interface Business {
-  id?: number;
+  id?: number | string;
   business_name?: string;
   name?: string;
   description?: string;
@@ -32,6 +32,8 @@ export interface Business {
   business_hours?: BusinessHours;
   working_hours?: unknown;
   created_at?: string;
+  reviewed_at?: string;
+  verification_status?: string;
   cover_image?: string;
   logo?: string;
   stats?: BusinessStats;
@@ -139,12 +141,17 @@ export default function VendorBusinessUpdateForm({
   useEffect(() => {
     let cancelled = false;
     const token =
-      localStorage.getItem("access") || localStorage.getItem("access_token");
+      localStorage.getItem("access") ||
+      localStorage.getItem("access_token") ||
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("access") ||
+      sessionStorage.getItem("access_token") ||
+      sessionStorage.getItem("token");
     const headers: Record<string, string> = {
       Accept: "application/json",
       Authorization: `Bearer ${token}`,
     };
-    fetch(`${API_BASE_URL}/categories/`, { headers })
+    fetch(`${API_BASE_URL}/api/categories/`, { headers })
       .then((r) => r.json())
       .then((d: unknown) => {
         const data = d as { results?: Category[] };
@@ -228,7 +235,12 @@ export default function VendorBusinessUpdateForm({
       return;
     }
     const token =
-      localStorage.getItem("access") || localStorage.getItem("access_token");
+      localStorage.getItem("access") ||
+      localStorage.getItem("access_token") ||
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("access") ||
+      sessionStorage.getItem("access_token") ||
+      sessionStorage.getItem("token");
     if (!token) {
       setMessage("Login session expired. Please log in again.");
       return;
@@ -246,11 +258,12 @@ export default function VendorBusinessUpdateForm({
         category: Number(form.businessType),
         business_hours: hours,
       };
-      const url =
-        business?.id && business.id !== 1
-          ? `${API_BASE_URL}/businesses/${business.id}/`
-          : `${API_BASE_URL}/businesses/`;
-      const method = business?.id && business.id !== 1 ? "PATCH" : "POST";
+      const isExistingBusiness =
+        Boolean(business?.id) && String(business?.id) !== "1";
+      const url = isExistingBusiness
+        ? `${API_BASE_URL}/api/businesses/${business?.id}/`
+        : `${API_BASE_URL}/api/businesses/`;
+      const method = isExistingBusiness ? "PATCH" : "POST";
       const res = await fetch(url, {
         method,
         headers: {
@@ -286,7 +299,7 @@ export default function VendorBusinessUpdateForm({
     <div className="vendor-business-form-wrapper">
       <div className="vendor-business-form-header">
         <h3>
-          {business?.id && business.id !== 1
+          {business?.id && String(business.id) !== "1"
             ? "Update Business Information"
             : "Add Business Information"}
         </h3>
@@ -482,7 +495,11 @@ export default function VendorBusinessUpdateForm({
           onClick={handleSubmit}
           disabled={saving}
         >
-          {saving ? "Saving..." : "Update Business"}
+          {saving
+            ? "Saving..."
+            : business?.id && String(business.id) !== "1"
+              ? "Update Business"
+              : "Register Business"}
         </button>
       </div>
     </div>

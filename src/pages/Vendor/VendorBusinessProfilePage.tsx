@@ -8,14 +8,13 @@ import {
   PawPrint,
   Store,
 } from "lucide-react";
-import VendorSidebar from "../../components/vendor/VendorSidebar/VendorSidebar";
-import VendorTopbar from "../../components/vendor/VendorTopbar/VendorTopbar";
-import VendorPageHeader from "../../components/vendor/VendorPageHeader/VendorPageHeader";
 import VendorBusinessUpdateForm, {
   type Business,
 } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
+import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { type PublicPet } from "../../data/pets";
-import API_BASE_URL, { apiRequest } from "../../services/api";
+import API_BASE_URL from "../../services/api";
+import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { fetchPetsByBusiness } from "../../services/petsApi";
 import "./VendorBusinessProfilePage.css";
 
@@ -25,12 +24,11 @@ interface Verification {
 }
 
 type CatTab = "all" | "pets" | "products" | "services";
-type BusinessListResponse = Business[] | (Business & { results?: Business[] });
+type BusinessListResponse = Business[] | { results?: Business[] };
 
 type PageState = {
   status: "loading" | "ready" | "error";
-  business: Business | null;
-  verification: Verification | null;
+  businesses: Business[];
 };
 
 /* ---------- helpers ---------- */
@@ -128,11 +126,12 @@ function ImageFallback({ kind }: { kind: "cover" | "logo" | "pet" }) {
 /* ---------- page ---------- */
 
 export default function VendorBusinessProfilePage() {
-  const [tab, setTab] = useState<"view" | "edit">("view");
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
+  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [state, setState] = useState<PageState>({
     status: "loading",
-    business: null,
-    verification: null,
+    businesses: [],
   });
 
   useEffect(() => {
@@ -140,23 +139,19 @@ export default function VendorBusinessProfilePage() {
 
     (async () => {
       try {
-        const data = await apiRequest<BusinessListResponse>("/businesses/");
-        const business = Array.isArray(data)
-          ? (data[0] ?? null)
-          : (data.results?.[0] ?? data);
-        const verification = await apiRequest<Verification>(
-          "/businesses/verification-status/",
-        ).catch(() => null);
+        const response = await vendorAuthenticatedFetch(
+          `${API_BASE_URL}/api/businesses/`,
+        );
+        if (!response.ok) throw new Error("Could not load your businesses.");
+        const data = (await response.json()) as BusinessListResponse;
+        const businesses = Array.isArray(data) ? data : data.results ?? [];
         if (!cancelled) {
-          setState({
-            status: "ready",
-            business: business?.id ? business : null,
-            verification,
-          });
+          setState({ status: "ready", businesses });
+          setSelectedBusinessId(businesses[0]?.id ? String(businesses[0].id) : null);
         }
       } catch {
         if (!cancelled)
-          setState({ status: "error", business: null, verification: null });
+          setState({ status: "error", businesses: [] });
       }
     })();
 
@@ -165,59 +160,137 @@ export default function VendorBusinessProfilePage() {
     };
   }, []);
 
-  return (
-    <div className="vendor-layout">
-      <VendorSidebar />
-      <div className="vendor-main">
-        <VendorTopbar />
-        <VendorPageHeader
-          title="Store Profile"
-          description="View and manage your business information"
-        />
-        <div className="bp-page">
-          <div className="bp-mode-tabs">
-            <button
-              className={tab === "view" ? "active" : ""}
-              onClick={() => setTab("view")}
-            >
-              View
-            </button>
-            <button
-              className={tab === "edit" ? "active" : ""}
-              onClick={() => setTab("edit")}
-            >
-              Edit
-            </button>
-          </div>
+  const selectedBusiness = state.businesses.find(
+    (business) => String(business.id) === selectedBusinessId,
+  ) ?? null;
 
-          {state.status === "loading" ? (
-            <div className="bp-empty-card" role="status">
-              <p>Loading your business profile…</p>
-            </div>
-          ) : state.status === "error" ? (
-            <div className="bp-empty-card" role="alert">
-              <h3>We couldn't load your profile</h3>
-              <p>Please check your connection and refresh the page.</p>
-            </div>
-          ) : tab === "view" ? (
-            <VendorProfileView
-              business={state.business}
-              verification={state.verification}
-              onEdit={() => setTab("edit")}
-            />
-          ) : (
-            <VendorBusinessUpdateForm
-              business={state.business}
-              onSaved={(b) => {
-                setState((prev) => ({ ...prev, business: b }));
-                setTab("view");
-              }}
-              onCancel={() => setTab("view")}
-            />
-          )}
-        </div>
+  function saveBusiness(savedBusiness: Business) {
+    setState((current) => ({
+      ...current,
+      businesses: current.businesses.some(
+        (business) => String(business.id) === String(savedBusiness.id),
+      )
+        ? current.businesses.map((business) =>
+            String(business.id) === String(savedBusiness.id)
+              ? savedBusiness
+              : business,
+          )
+        : [savedBusiness, ...current.businesses],
+    }));
+    setSelectedBusinessId(savedBusiness.id ? String(savedBusiness.id) : null);
+    setEditingBusinessId(null);
+    setIsRegistering(false);
+  }
+
+  return (
+    <VendorLayout
+      title="Business & Payout"
+      description="View your business profiles or register another business."
+      vendorWorkspace
+    >
+      <div className="dashboard-content bp-page">
+        {state.status === "loading" ? (
+          <div className="bp-empty-card" role="status">
+            <p>Loading your businesses…</p>
+          </div>
+        ) : state.status === "error" ? (
+          <div className="bp-empty-card" role="alert">
+            <h3>We couldn't load your businesses</h3>
+            <p>Please check your connection and refresh the page.</p>
+          </div>
+        ) : (
+          <>
+            {state.businesses.length > 0 ? (
+              <section className="bp-business-section" aria-labelledby="bp-businesses-heading">
+                <div className="bp-business-section-heading">
+                  <div>
+                    <h2 id="bp-businesses-heading">Your businesses</h2>
+                    <p>Select a business to view or edit its profile.</p>
+                  </div>
+                  <span>{state.businesses.length} {state.businesses.length === 1 ? "business" : "businesses"}</span>
+                </div>
+                <div className="bp-business-grid">
+                  {state.businesses.map((business) => {
+                    const id = String(business.id);
+                    const isSelected = id === selectedBusinessId;
+                    return (
+                      <article className={`bp-business-card${isSelected ? " is-selected" : ""}`} key={id}>
+                        <div>
+                          <h3>{business.name || business.business_name || "Business"}</h3>
+                          <p>{business.city_district || business.location_district || business.city || "Location not set"}</p>
+                          <span className={`bp-business-status bp-business-status--${(business.verification_status || "draft").toLowerCase()}`}>
+                            {cap(business.verification_status || "draft")}
+                          </span>
+                        </div>
+                        <button type="button" className="bp-business-select" onClick={() => { setSelectedBusinessId(id); setEditingBusinessId(null); }}>
+                          {isSelected ? "Viewing" : "View business"}
+                        </button>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : (
+              <div className="bp-empty-card">
+                <h2>No business registered yet</h2>
+                <p>Register your first business to start adding listings and offering services.</p>
+              </div>
+            )}
+
+            {selectedBusiness && !isRegistering && (
+              editingBusinessId === selectedBusinessId ? (
+                <VendorBusinessUpdateForm
+                  business={selectedBusiness}
+                  onSaved={saveBusiness}
+                  onCancel={() => setEditingBusinessId(null)}
+                />
+              ) : (
+                <>
+                  <div className="bp-profile-actions">
+                    <h2>{selectedBusiness.name || selectedBusiness.business_name}</h2>
+                    <button type="button" className="bp-business-select" onClick={() => setEditingBusinessId(selectedBusinessId)}>
+                      Edit business
+                    </button>
+                  </div>
+                  <VendorProfileView
+                    business={selectedBusiness}
+                    verification={{
+                      status: selectedBusiness.verification_status,
+                      last_verified: selectedBusiness.reviewed_at,
+                    }}
+                    onEdit={() => setEditingBusinessId(selectedBusinessId)}
+                  />
+                </>
+              )
+            )}
+
+            <section className="bp-register-section" aria-labelledby="bp-register-heading">
+              <div>
+                <h2 id="bp-register-heading">
+                  {state.businesses.length > 0
+                    ? "Need another business profile?"
+                    : "Register your business"}
+                </h2>
+                <p>Each business can have its own profile and listings.</p>
+              </div>
+              {isRegistering ? (
+                <VendorBusinessUpdateForm
+                  business={null}
+                  onSaved={saveBusiness}
+                  onCancel={() => setIsRegistering(false)}
+                />
+              ) : (
+                <button type="button" className="bp-register-button" onClick={() => { setEditingBusinessId(null); setIsRegistering(true); }}>
+                  {state.businesses.length > 0
+                    ? "Register another business"
+                    : "Register your business"}
+                </button>
+              )}
+            </section>
+          </>
+        )}
       </div>
-    </div>
+    </VendorLayout>
   );
 }
 
