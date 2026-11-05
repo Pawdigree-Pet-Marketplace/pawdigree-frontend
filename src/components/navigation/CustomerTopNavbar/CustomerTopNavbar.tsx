@@ -14,7 +14,7 @@ type TopNavbarProps = {
 };
 
 const navLinks = [
-  { label: "Browse Pets", href: "#pets" },
+  { label: "Browse Pets", href: "/explore-pets" },
   { label: "Services", href: "#services" },
   { label: "Merchandise", href: "#merchandise" },
   { label: "Become a Vendor", href: "/vendor" },
@@ -142,14 +142,17 @@ const TopNavbar = ({
           </Button>
         )}
 
-        <button
-          className="hamburger"
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMenuOpen}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {audience === "customer" && (
+          <button
+            type="button"
+            className="hamburger"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        )}
       </div>
     </header>
   );

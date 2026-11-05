@@ -43,18 +43,19 @@ export default function PublicLayout() {
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
       />
-      <SideMenu
-        isOpen={isMenuOpen}
-        setIsOpen={setIsMenuOpen}
-        isLoggedIn={isLoggedIn}
-        audience={audience}
-        onClose={() => setIsMenuOpen(false)}
-      />
+      {audience === "customer" && (
+        <SideMenu
+          isOpen={isMenuOpen}
+          isLoggedIn={isLoggedIn}
+          audience={audience}
+          onClose={() => setIsMenuOpen(false)}
+        />
+      )}
 
       <Outlet />
 
       <Footer />
-      <BottomNavbar />
+      {audience === "customer" && <BottomNavbar />}
     </>
   );
 }
