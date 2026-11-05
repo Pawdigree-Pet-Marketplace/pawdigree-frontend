@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import Adoption from "../../components/home/Adoption";
 import Categories from "../../components/home/Categories";
 import CtaBanner from "../../components/home/CtaBanner";
@@ -10,13 +9,10 @@ import Merchandise from "../../components/home/Merchandise";
 import Services from "../../components/home/Services";
 import Stats from "../../components/home/Stats";
 import Testimonials from "../../components/home/Testimonials";
-import useSession from "../../hooks/useSession";
 import "./CustomerLandingPage.css";
 
 export default function LandingPage() {
-  const navigate = useNavigate();
   const landingRef = useRef<HTMLElement | null>(null);
-  const isCustomerSignedIn = useSession("CUSTOMER");
 
   useEffect(() => {
     const landing = landingRef.current;
@@ -48,19 +44,25 @@ export default function LandingPage() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (isCustomerSignedIn) {
-      navigate("/customer/dashboard", { replace: true });
-    }
-  }, [isCustomerSignedIn, navigate]);
-
-  if (isCustomerSignedIn) return null;
-
   return (
     <main ref={landingRef} className="landing-page">
       <Hero />
       <Stats />
-      <Categories />
+      <Categories
+        getHref={({ name }) => {
+          const speciesByCategory: Record<string, string> = {
+            Dogs: "dog",
+            Cats: "cat",
+            Birds: "bird",
+            Rabbits: "rabbit",
+            Aquatic: "fish",
+          };
+          const species = speciesByCategory[name];
+          return species
+            ? `/explore-pets?species=${species}`
+            : "/explore-pets";
+        }}
+      />
       <Merchandise />
       <HowItWorks />
       <Listings />
