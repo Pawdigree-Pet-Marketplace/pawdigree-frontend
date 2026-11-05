@@ -1,4 +1,5 @@
 import { isValidPhoneNumber } from 'libphonenumber-js'
+import type { CountryCode } from 'libphonenumber-js'
 
 export interface ProfileFormValues {
   fullName: string
@@ -14,7 +15,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export function validateProfile(
   values: ProfileFormValues,
-  country: 'UG' | 'KE' | 'TZ' | 'RW' | 'BI' | 'SS' = 'UG',
+  country: CountryCode = 'UG',
 ): ProfileErrors {
   const errors: ProfileErrors = {}
 

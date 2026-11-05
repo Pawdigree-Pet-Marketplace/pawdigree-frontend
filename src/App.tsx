@@ -68,6 +68,22 @@ function App() {
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute role="CUSTOMER">
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute role="CUSTOMER">
+              <EditProfilePage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       {/* AUTH: logo chip only */}
@@ -121,23 +137,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile/edit"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <EditProfilePage />
-          </ProtectedRoute>
-        }
-      />
-
       {/* VENDOR AREA */}
       <Route
         path="/business-registration"
