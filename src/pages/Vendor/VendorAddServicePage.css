@@ -45,9 +45,11 @@
 .vendor-workspace .service-field { display: flex; flex-direction: column; gap: 9px; margin-bottom: 19px; color: #2C302F; font-size: 13px; font-weight: 700; }
 .vendor-workspace .service-field > span[aria-hidden="true"] { color: #FB8665; }
 .vendor-workspace .service-field input,
+.vendor-workspace .service-field select,
 .vendor-workspace .service-field textarea { box-sizing: border-box; width: 100%; min-height: 46px; padding: 12px 14px; border: 1px solid rgb(44 48 47 / 16%); border-radius: 11px; background: #FBFAF7; color: #2C302F; font: inherit; font-size: 13px; transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease; }
 .vendor-workspace .service-field textarea { min-height: 132px; resize: vertical; }
 .vendor-workspace .service-field input:focus,
+.vendor-workspace .service-field select:focus,
 .vendor-workspace .service-field textarea:focus { outline: 0; border-color: #216C68; background: #FBFAF7; box-shadow: 0 0 0 3px rgb(33 108 104 / 12%); }
 .vendor-workspace .service-field input::placeholder,
 .vendor-workspace .service-field textarea::placeholder { color: rgb(44 48 47 / 48%); font-weight: 400; }
@@ -64,12 +66,24 @@
 .vendor-workspace .service-submit-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease; }
 .vendor-workspace .service-cancel-button { border: 1px solid rgb(44 48 47 / 16%); background: #FBFAF7; color: #2C302F; }
 .vendor-workspace .service-cancel-button:hover { transform: translateY(-1px); background: #F3F0EA; }
-.vendor-workspace .service-submit-button { border: 1px solid #216C68; background: #216C68; color: #FBFAF7; cursor: not-allowed; opacity: .55; }
+.vendor-workspace .service-submit-button { gap: 8px; border: 1px solid #216C68; background: #216C68; color: #FBFAF7; cursor: pointer; }
+.vendor-workspace .service-submit-button:disabled { cursor: not-allowed; opacity: .55; }
+.vendor-workspace .service-spinner { animation: service-spin 900ms linear infinite; }
+.vendor-workspace .service-form-message,
+.vendor-workspace .service-inline-note { grid-column: 1 / -1; margin: 0; padding: 12px 14px; border-radius: 11px; font-size: 13px; line-height: 1.6; }
+.vendor-workspace .service-form-message.error { border: 1px solid rgb(166 61 34 / 20%); background: #fff1ec; color: #a63d22; }
+.vendor-workspace .service-form-message.success { border: 1px solid rgb(33 108 104 / 20%); background: #edf6f1; color: #216c68; }
+.vendor-workspace .service-form-message:not(.error):not(.success),
+.vendor-workspace .service-inline-note { background: #F3F0EA; color: #2C302F; }
+.vendor-workspace .service-inline-note a { color: #216C68; font-weight: 700; }
+.vendor-workspace .service-submit-button:focus-visible,
+.vendor-workspace .service-cancel-button:focus-visible { outline: 3px solid rgb(33 108 104 / 30%); outline-offset: 2px; }
 
 @keyframes service-icon-breathe {
   0%, 100% { transform: translateY(0) rotate(0); }
   50% { transform: translateY(-3px) rotate(-3deg); }
 }
+@keyframes service-spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 950px) {
   .vendor-workspace .vendor-service-page { padding-top: 18px; }
@@ -89,9 +103,11 @@
   .vendor-workspace .service-back-link,
   .vendor-workspace .service-section-icon,
   .vendor-workspace .service-field input,
+  .vendor-workspace .service-field select,
   .vendor-workspace .service-field textarea,
   .vendor-workspace .service-cancel-button,
-  .vendor-workspace .service-submit-button { animation: none !important; transition: none !important; }
+  .vendor-workspace .service-submit-button,
+  .vendor-workspace .service-spinner { animation: none !important; transition: none !important; }
   .vendor-workspace .service-back-link:hover,
   .vendor-workspace .service-cancel-button:hover { transform: none; }
 }
