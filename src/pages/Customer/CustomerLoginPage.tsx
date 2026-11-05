@@ -3,19 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, PawPrint, Store } from "lucide-react";
 import "./CustomerLoginPage.css";
 import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
+import BackButton from "../../components/BackButton/BackButton";
 
 type Step = "welcome" | "password" | "phone";
 
 export default function CustomerLoginPage() {
+  const [step, setStep] = useState<Step>("welcome");
+
   const navigate = useNavigate();
   useEffect(() => {
     document.title = "Customer Login - Pawdigree";
   }, []);
-
-  const [step, setStep] = useState<Step>("welcome");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleBack = () => {
     if (step === "phone") {
@@ -30,23 +28,12 @@ export default function CustomerLoginPage() {
   };
 
   return (
-    <>
-    <TopNavbar
-      isLoggedIn={false}
-      loginOverlay
-      backAction={{ label: "Back", onClick: handleBack }}
-      isMenuOpen={isMenuOpen}
-      setIsMenuOpen={setIsMenuOpen}
-    />
-    <SideMenu
-      isOpen={isMenuOpen}
-      setIsOpen={setIsMenuOpen}
-      isLoggedIn={false}
-      audience="customer"
-      onClose={() => setIsMenuOpen(false)}
-    />
-    <div className={`login-page ${step === "welcome" ? "login-page--role-selection" : "login-page--auth"}`}>
+    <div
+      className={`login-page ${step === "welcome" ? "login-page--role-selection" : "login-page--auth"}`}
+    >
       <div className="login-card">
+        {step !== "welcome" && <BackButton onClick={handleBack} />}
+
         {step === "welcome" && (
           <div className="welcome-content">
             <p className="role-eyebrow">WELCOME TO PAWDIGREE</p>
@@ -68,14 +55,16 @@ export default function CustomerLoginPage() {
                 <span className="role-description">
                   Discover pets, shop, and explore services.
                 </span>
-                <span className="role-action">Continue as Customer →</span>
+                <span className="role-action">
+                  Continue as Customer <ArrowRight size={16} />
+                </span>
               </button>
 
               <button
                 type="button"
                 className="role-card"
                 onClick={() => {
-                  navigate("/vendor/login");
+                  navigate("/vendor/login", { replace: true });
                 }}
               >
                 <span className="role-icon" aria-hidden="true">
@@ -87,7 +76,9 @@ export default function CustomerLoginPage() {
                 <span className="role-description">
                   Manage your pet business and listings.
                 </span>
-                <span className="role-action">Continue as Vendor <ArrowRight size={16} /></span>
+                <span className="role-action">
+                  Continue as Vendor <ArrowRight size={16} />
+                </span>
               </button>
             </div>
 
@@ -104,11 +95,7 @@ export default function CustomerLoginPage() {
           </div>
         )}
 
-        {step === "password" && (
-          <>
-            <CustomerLoginForm />
-          </>
-        )}
+        {step === "password" && <CustomerLoginForm />}
 
         {step === "phone" && (
           <div className="verify-content">
@@ -133,17 +120,29 @@ export default function CustomerLoginPage() {
       {step !== "welcome" && (
         <aside className="login-welcome-panel login-welcome-panel--customer">
           <div className="login-welcome-copy">
-            <span className="login-welcome-kicker">A LITTLE MORE JOY, EVERY DAY</span>
+            <span className="login-welcome-kicker">
+              A LITTLE MORE JOY, EVERY DAY
+            </span>
             <h1>Good things are waiting for you and your pet.</h1>
-            <p>Find trusted care, discover lovely local businesses, and make more happy memories together.</p>
+            <p>
+              Find trusted care, discover lovely local businesses, and make more
+              happy memories together.
+            </p>
             <div className="login-fact-card">
-              <span className="login-fact-icon" aria-hidden="true"><PawPrint size={20} /></span>
-              <span><strong>Made for pet people</strong><small>Explore services and pet-friendly finds in one welcoming place.</small></span>
+              <span className="login-fact-icon" aria-hidden="true">
+                <PawPrint size={20} />
+              </span>
+              <span>
+                <strong>Made for pet people</strong>
+                <small>
+                  Explore services and pet-friendly finds in one welcoming
+                  place.
+                </small>
+              </span>
             </div>
           </div>
         </aside>
       )}
     </div>
-    </>
   );
 }

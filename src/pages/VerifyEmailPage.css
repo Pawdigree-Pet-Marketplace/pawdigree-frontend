@@ -2,9 +2,7 @@
   min-height: 100vh;
   min-height: 100svh;
 }
-.verify-email-topbar { justify-content: space-between; }
 .verify-email-card { text-align: center; }
-.verify-email-card .login-logo { margin-bottom: 10px; }
 .verify-email-icon { display: grid; place-items: center; width: 54px; height: 54px; margin: 0 auto 12px; color: var(--teal); background: var(--teal-light); border-radius: 18px; }
 .verify-email-card .role-eyebrow { margin-bottom: 5px; }
 .verify-email-card h1 { margin: 4px 0 8px; color: var(--ink); font-size: 26px; }

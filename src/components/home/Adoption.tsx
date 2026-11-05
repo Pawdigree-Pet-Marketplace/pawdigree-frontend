@@ -1,6 +1,7 @@
 import adoptionImage from '../../assets/images/adoption.jpg'
 import useScrollReveal from '../../hooks/useScrollReveal'
 import { CheckIcon } from '../icons'
+import { Link } from 'react-router-dom'
 import './Adoption.css'
 
 const points = [
@@ -43,12 +44,12 @@ export default function Adoption() {
           ))}
         </ul>
 
-        <a
-          href="#pets"
+        <Link
+          to="/explore-pets?listing_type=ADOPTION"
           className="btn adoption-btn reveal reveal-delay-4"
         >
           Browse adoptable pets
-        </a>
+        </Link>
       </div>
 
       <div className="adoption-photo reveal reveal-delay-2">

@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check, ChevronDown, PawPrint, ShoppingCart, UserRound } from "lucide-react";
 import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
 import { getSessionToken } from "../../services/auth/authStorage";
+import { fetchPet } from "../../services/petsApi";
 import "./AdoptionRequest.css";
-
 type HomeType = "APARTMENT" | "HOUSE" | "OTHER";
 type Experience = "NONE" | "SOME" | "EXPERIENCED";
 type AdoptionForm = {
@@ -37,7 +37,18 @@ export default function AdoptionRequest() {
 
   // Open this page with /adoption-request?pet_id=123, using the selected pet's pet_id.
   const petId = Number(searchParams.get("pet_id"));
-  const petName = "your selected pet"; // Replace with the selected pet's name from route/API data.
+  const [petName, setPetName] = useState("your selected pet");
+
+  useEffect(() => {
+    if (!Number.isInteger(petId) || petId < 1) return;
+    let cancelled = false;
+    fetchPet(String(petId)).then((pet) => {
+      if (!cancelled) setPetName(pet.name);
+    }).catch(() => {
+      // The application can still be submitted by ID if pet details are unavailable.
+    });
+    return () => { cancelled = true; };
+  }, [petId]);
 
   function update<K extends keyof AdoptionForm>(key: K, value: AdoptionForm[K]) {
     setForm((current) => ({
@@ -159,7 +170,7 @@ export default function AdoptionRequest() {
           <h2>Application submitted!</h2>
           <p>Your adoption request has been sent successfully. The application status is <strong>{success.status}</strong>.</p>
           <p>Application reference: <strong>{success.applicationId}</strong></p>
-          <button className="primary-button" type="button" onClick={() => navigate("/")}>Back to Pawdigree</button>
+          <button className="primary-button" type="button" onClick={() => navigate("/customer/adoption?view=requests")}>View my adoption requests</button>
         </section>
       </main>
     );

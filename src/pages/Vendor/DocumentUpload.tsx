@@ -1,10 +1,16 @@
+import { useEffect, useRef, useState } from "react";
+import type { ChangeEvent, DragEvent } from "react";
+import BackButton from "../../components/BackButton/BackButton";
+import { type Business } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
+import { apiRequest } from "../../services/api";
+import "./DocumentUpload.css";
 
-import { useRef, useState } from 'react';
-import type { ChangeEvent, DragEvent } from 'react';
-import { Link } from 'react-router-dom';
-import './DocumentUpload.css';
-import logo from '../../assets/logo.png';
-type DocumentId = 'idFront' | 'idBack' | 'license' | 'certificate' | 'supporting';
+type DocumentId =
+  | "idFront"
+  | "idBack"
+  | "license"
+  | "certificate"
+  | "supporting";
 
 type DocumentItem = {
   id: DocumentId;
@@ -15,24 +21,39 @@ type DocumentItem = {
 
 type SelectedDocument = {
   file: File;
-  status: 'selected' | 'uploading' | 'complete' | 'failed';
+  status: "selected" | "uploading" | "complete" | "failed";
   message: string;
 };
 
+type BusinessState = {
+  status: "loading" | "ready" | "error";
+  business: Business | null;
+};
+
 const documents: DocumentItem[] = [
-  { id: 'idFront', label: 'Government ID (front)', required: true },
-  { id: 'idBack', label: 'Government ID (back)', required: true },
-  { id: 'license', label: 'Business license', required: true },
-  { id: 'certificate', label: 'Vet / breeder / vendor certificate', required: true, wide: true },
-  { id: 'supporting', label: 'Any other supporting documents', required: false, wide: true },
+  { id: "idFront", label: "Government ID (front)", required: true },
+  { id: "idBack", label: "Government ID (back)", required: true },
+  { id: "license", label: "Business license", required: true },
+  {
+    id: "certificate",
+    label: "Vet / breeder / vendor certificate",
+    required: true,
+    wide: true,
+  },
+  {
+    id: "supporting",
+    label: "Any other supporting documents",
+    required: false,
+    wide: true,
+  },
 ];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = [
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'image/webp',
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
 ];
 
 export default function DocumentUpload() {
@@ -40,27 +61,48 @@ export default function DocumentUpload() {
     Partial<Record<DocumentId, SelectedDocument>>
   >({});
   const [confirmed, setConfirmed] = useState(false);
-  const [notice, setNotice] = useState('');
-  const [noticeType, setNoticeType] = useState<'success' | 'error' | ''>('');
+  const [notice, setNotice] = useState("");
+  const [noticeType, setNoticeType] = useState<"success" | "error" | "">("");
   const [saving, setSaving] = useState(false);
+  const [businessState, setBusinessState] = useState<BusinessState>({
+    status: "loading",
+    business: null,
+  });
 
   const inputRefs = useRef<
     Partial<Record<DocumentId, HTMLInputElement | null>>
   >({});
 
+  useEffect(() => {
+    let cancelled = false;
+    apiRequest<Business[] | { results?: Business[] }>("/businesses/")
+      .then((data) => {
+        const list = Array.isArray(data) ? data : (data.results ?? []);
+        if (!cancelled) {
+          setBusinessState({ status: "ready", business: list[0] ?? null });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBusinessState({ status: "error", business: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleFile = (id: DocumentId, file?: File) => {
     if (!file) return;
 
-    setNotice('');
-    setNoticeType('');
+    setNotice("");
+    setNoticeType("");
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setFiles((previous) => ({
         ...previous,
         [id]: {
           file,
-          status: 'failed',
-          message: 'Unsupported file type. Use PDF, JPG, PNG or WEBP.',
+          status: "failed",
+          message: "Unsupported file type. Use PDF, JPG, PNG or WEBP.",
         },
       }));
       return;
@@ -71,8 +113,8 @@ export default function DocumentUpload() {
         ...previous,
         [id]: {
           file,
-          status: 'failed',
-          message: 'File is too large. Maximum size is 10 MB.',
+          status: "failed",
+          message: "File is too large. Maximum size is 10 MB.",
         },
       }));
       return;
@@ -82,8 +124,8 @@ export default function DocumentUpload() {
       ...previous,
       [id]: {
         file,
-        status: 'selected',
-        message: 'Selected — ready to upload',
+        status: "selected",
+        message: "Selected — ready to upload",
       },
     }));
   };
@@ -93,13 +135,10 @@ export default function DocumentUpload() {
     event: ChangeEvent<HTMLInputElement>,
   ) => {
     handleFile(id, event.target.files?.[0]);
-    event.target.value = '';
+    event.target.value = "";
   };
 
-  const handleDrop = (
-    id: DocumentId,
-    event: DragEvent<HTMLDivElement>,
-  ) => {
+  const handleDrop = (id: DocumentId, event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     handleFile(id, event.dataTransfer.files[0]);
   };
@@ -110,72 +149,57 @@ export default function DocumentUpload() {
       delete updated[id];
       return updated;
     });
-    setNotice('');
+    setNotice("");
   };
 
   const requiredDocumentsReady = documents
     .filter((document) => document.required)
     .every((document) => {
       const selected = files[document.id];
-      return selected && selected.status !== 'failed';
+      return selected && selected.status !== "failed";
     });
 
   const handleSubmit = async () => {
     if (!requiredDocumentsReady) {
-      setNoticeType('error');
-      setNotice('Please select a valid file for every required document.');
+      setNoticeType("error");
+      setNotice("Please select a valid file for every required document.");
       return;
     }
 
     if (!confirmed) {
-      setNoticeType('error');
-      setNotice('Please confirm that the information belongs to your business.');
+      setNoticeType("error");
+      setNotice(
+        "Please confirm that the information belongs to your business.",
+      );
       return;
     }
 
     // Files are selected locally at this stage. Connect your backend's
     // document-upload endpoint here before marking uploads as complete.
-    setNoticeType('error');
+    setNoticeType("error");
     setNotice(
-      'Your documents are selected, but server upload is not connected yet. Please connect the document-upload API before submitting for verification.',
+      "Your documents are selected, but server upload is not connected yet. Please connect the document-upload API before submitting for verification.",
     );
   };
 
   const handleSaveExit = () => {
-    setNoticeType('success');
+    setNoticeType("success");
     setNotice(
-      'Your selected files remain on this page for now. Connect the save-progress API to save them permanently.',
+      "Your selected files remain on this page for now. Connect the save-progress API to save them permanently.",
     );
   };
 
+  const business = businessState.business;
+  const businessName = business?.name || business?.business_name;
+  const category = business?.category_name || business?.vendor_category;
+  const location = business?.city_district || business?.location_district;
+  const phone = business?.phone || business?.contact;
+
   return (
     <div className="document-page">
-      <header className="document-header">
-        <Link to="/" className="document-brand" aria-label="Pawdigree home">
-          <Link to="/" className="document-brand" aria-label="Pawdigree home">
-  <img src={logo} alt="Pawdigree" />
-          </Link>
-        </Link>
-
-        <nav className="document-nav" aria-label="Main navigation">
-          <Link to="/">Sell Pets</Link>
-          <Link to="/">Sell Merch</Link>
-          <Link to="/">Sell Services</Link>
-          <Link to="/">How it works</Link>
-          <Link to="/">Pricing</Link>
-        </nav>
-
-        <div className="document-header-actions">
-          <span>
-            Need help? <a href="mailto:support@pawdigree.com">Contact Support</a>
-          </span>
-          <Link className="vendor-login-button" to="/vendor/login">
-            Vendor Login
-          </Link>
-        </div>
-      </header>
-
       <main className="document-main">
+        <BackButton fallback="/vendor/dashboard" label="Back to dashboard" />
+
         <div className="document-title-row">
           <div>
             <h1>Verify your business</h1>
@@ -188,24 +212,42 @@ export default function DocumentUpload() {
 
         <section className="business-details">
           <h2>Business Details</h2>
-          <div className="business-details-grid">
-            <div>
-              <span>Business Name</span>
-              <strong>Bella's Pet Grooming</strong>
+          {businessState.status === "loading" ? (
+            <p role="status">Loading your business details…</p>
+          ) : businessState.status === "error" ? (
+            <p role="alert">
+              We couldn't load your business details. Please refresh the page.
+            </p>
+          ) : !business ? (
+            <p>No business found yet. Add your business details first.</p>
+          ) : (
+            <div className="business-details-grid">
+              {businessName && (
+                <div>
+                  <span>Business Name</span>
+                  <strong>{businessName}</strong>
+                </div>
+              )}
+              {category && (
+                <div>
+                  <span>Business Category</span>
+                  <strong>{category}</strong>
+                </div>
+              )}
+              {location && (
+                <div>
+                  <span>Business Location</span>
+                  <strong>{location}</strong>
+                </div>
+              )}
+              {phone && (
+                <div>
+                  <span>Business Phone</span>
+                  <strong>{phone}</strong>
+                </div>
+              )}
             </div>
-            <div>
-              <span>Business Category</span>
-              <strong>Pet Grooming</strong>
-            </div>
-            <div>
-              <span>Business Location</span>
-              <strong>Kampala, Central Region</strong>
-            </div>
-            <div>
-              <span>Business Phone</span>
-              <strong>+256 700 123 456</strong>
-            </div>
-          </div>
+          )}
         </section>
 
         <section className="upload-section">
@@ -221,7 +263,7 @@ export default function DocumentUpload() {
               return (
                 <div
                   key={document.id}
-                  className={`upload-field ${document.wide ? 'upload-field-wide' : ''}`}
+                  className={`upload-field ${document.wide ? "upload-field-wide" : ""}`}
                 >
                   <label className="upload-label">
                     {document.label}
@@ -237,21 +279,21 @@ export default function DocumentUpload() {
                     className="visually-hidden"
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png,.webp"
-                    onChange={(event) =>
-                      handleInputChange(document.id, event)
-                    }
+                    onChange={(event) => handleInputChange(document.id, event)}
                     aria-label={`Choose ${document.label}`}
                   />
 
                   <div
                     className={`upload-dropzone ${
-                      selected?.status === 'failed' ? 'upload-dropzone-error' : ''
+                      selected?.status === "failed"
+                        ? "upload-dropzone-error"
+                        : ""
                     }`}
                     role="button"
                     tabIndex={0}
                     onClick={() => inputRefs.current[document.id]?.click()}
                     onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
+                      if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
                         inputRefs.current[document.id]?.click();
                       }
@@ -262,7 +304,7 @@ export default function DocumentUpload() {
                     {selected ? (
                       <div className="selected-file">
                         <span className="file-symbol" aria-hidden="true">
-                          {selected.status === 'failed' ? '!' : '✓'}
+                          {selected.status === "failed" ? "!" : "✓"}
                         </span>
                         <strong className="selected-file-name">
                           {selected.file.name}
@@ -315,15 +357,17 @@ export default function DocumentUpload() {
               onChange={(event) => setConfirmed(event.target.checked)}
             />
             <span>
-              I confirm that the information provided is accurate and belongs
-              to my business.
+              I confirm that the information provided is accurate and belongs to
+              my business.
               <small>Required before you can submit for verification.</small>
             </span>
           </label>
         </section>
 
         <aside className="next-steps">
-          <span className="info-icon" aria-hidden="true">i</span>
+          <span className="info-icon" aria-hidden="true">
+            i
+          </span>
           <div>
             <strong>What happens next?</strong>
             <p>
@@ -357,7 +401,7 @@ export default function DocumentUpload() {
               }
             }}
           >
-            {saving ? 'Please wait...' : 'Submit and Continue'}
+            {saving ? "Please wait..." : "Submit and Continue"}
           </button>
 
           <button

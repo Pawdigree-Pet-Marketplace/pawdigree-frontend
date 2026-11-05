@@ -1,133 +1,112 @@
+/* ---------- Vendor registration page ---------- */
 
-/* =========================================
-   PAWDIGREE VENDOR REGISTRATION PAGE
-   Page layout, image background and responsive design
-   ========================================= */
+/* Desktop: the photo and the dark overlay are two layers behind the page
+   (::before and ::after) instead of one background on the wrapper. That lets
+   the photo be slid to the left, so the lady and her pets are not hidden
+   under the form. Tablet and phone still use the original single background
+   (see the 1100px rule below). */
 
 .vendor-registration-page-wrapper {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  color: #2c302f;
+  min-height: 100svh;
+  color: var(--cream, #faf6ec);
   font-family: "Nunito", sans-serif;
-
   background-color: #4b5047;
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(35, 38, 35, 0.78) 0%,
-      rgba(35, 38, 35, 0.68) 27%,
-      rgba(35, 38, 35, 0.42) 46%,
-      rgba(35, 38, 35, 0.12) 66%,
-      rgba(35, 38, 35, 0.04) 100%
-    ),
-    url("../../assets/images/vendorsmilelady.png");
-
-  background-size: cover;
-  background-position: center 25%;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
 }
 
-/* =========================================
-   HEADER
-   ========================================= */
-
-.vendor-page-topbar {
-  position: relative;
-  z-index: 3;
-  flex-shrink: 0;
-
-  width: 100%;
-  min-height: 76px;
-  padding: 12px 5%;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 2px solid #fb8665;
+/* The photo. It starts 12% to the left of the screen, so everything in it
+   moves left. To move the subjects further left, make the left value more
+   negative and the width larger (for example -18% and 118%). To move them back
+   toward the centre, use a smaller value (for example -6% and 106%). */
+.vendor-registration-page-wrapper::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -12%;
+  width: 112%;
+  z-index: -2;
+  background: url("../../assets/images/vendorsmilelady.png") center 25% /
+    cover no-repeat;
+  content: "";
 }
 
-.vendor-brand {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
+/* The dark overlay stays fixed to the screen so the text is always readable. */
+.vendor-registration-page-wrapper::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 28, 27, 0.82) 0%,
+    rgba(20, 28, 27, 0.62) 35%,
+    rgba(20, 28, 27, 0.3) 65%,
+    rgba(20, 28, 27, 0.12) 100%
+  );
+  content: "";
+  pointer-events: none;
 }
 
-.vendor-logo-img {
-  display: block;
-  width: 150px;
-  max-width: 100%;
-  height: auto;
-}
-
-.vendor-signin-link {
-  color: #216c68;
-  font-size: 15px;
-  font-weight: 800;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.vendor-signin-link:hover {
-  color: #fb8665;
-}
-
-/* =========================================
-   MAIN CONTENT LAYOUT
-   ========================================= */
-
-/* Main content: align the introduction and form side by side */
 .vendor-registration-main {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
   align-items: center;
-  gap: clamp(24px, 3vw, 40px);
-
+  gap: clamp(28px, 4vw, 64px);
   width: 100%;
-  min-height: 0;
-  padding: clamp(20px, 3vh, 32px) 5%;
-
+  min-height: 100vh;
+  min-height: 100svh;
+  /* More space on the left so the text is not tight against the edge */
+  padding: 84px clamp(24px, 5vw, 72px) 24px clamp(32px, 7vw, 128px);
   box-sizing: border-box;
 }
 
-/* =========================================
-   LEFT INTRODUCTION
-   ========================================= */
+/* ----- Left: intro ----- */
 
 .vendor-registration-intro {
-  position: relative;
-  z-index: 1;
-
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
   width: 100%;
-  max-width: 540px;
+  max-width: 500px;
   min-width: 0;
   justify-self: start;
-  padding: 16px 0;
+  /* Lifts the text block a little above the vertical centre of the form */
+  margin-bottom: clamp(24px, 14vh, 130px);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
 
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  box-sizing: border-box;
+.vendor-registration-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.vendor-registration-nav .back-button {
+  margin-bottom: 4px;
+  color: var(--white, #fff);
+  background: rgba(20, 28, 27, 0.45);
+  border-color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;;
+  backdrop-filter: blur(6px);
+  text-shadow: none;
+}
+
+.vendor-registration-nav .back-button:hover {
+  background: rgba(20, 28, 27, 0.65);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .vendor-registration-eyebrow {
   display: inline-block;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   padding-bottom: 8px;
-
-  color: #ffad91;
+  color: var(--coral-light, #fbd9c9);
   border-bottom: 3px solid #fb8665;
-
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 2px;
@@ -135,371 +114,153 @@
 }
 
 .vendor-registration-intro h1 {
-  margin: 0 0 18px;
-  color: #ffffff;
-
+  margin: 0 0 14px;
+  color: var(--white, #fff);
   font-family: "Fredoka", sans-serif;
-  font-size: clamp(34px, 3.4vw, 50px);
+  font-size: clamp(30px, 3.3vw, 48px);
   font-weight: 600;
-  line-height: 1.13;
-
+  line-height: 1.12;
   overflow-wrap: break-word;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 .vendor-registration-intro h1 span {
   display: block;
-  margin-top: 5px;
-  color: #ffad91;
+  margin-top: 4px;
+  color: var(--coral-light, #fbd9c9);
 }
 
 .vendor-registration-description {
   max-width: 450px;
-  margin: 0 0 24px;
+  margin: 0;
   padding-left: 14px;
-
-  color: #ffffff;
+  color: var(--cream, #faf6ec);
   border-left: 4px solid #fb8665;
-
   font-size: 15px;
-  line-height: 1.75;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+  line-height: 1.65;
 }
 
-/* =========================================
-   BENEFITS
-   ========================================= */
+/* ----- Benefits ----- */
 
 .vendor-registration-benefits {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  gap: 14px;
   margin-top: 22px;
 }
 
 .vendor-registration-benefit {
   display: flex;
   align-items: flex-start;
-  gap: 13px;
+  gap: 14px;
 }
 
-.vendor-registration-benefit-icon {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-
+.vendor-benefit-icon {
   display: flex;
+  flex: 0 0 42px;
   align-items: center;
   justify-content: center;
-
-  color: #ffffff;
-  background: #fb8665;
-  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--white, #fff);
+  backdrop-filter: blur(4px);
 }
 
-.vendor-registration-benefit h3 {
-  margin: 0 0 4px;
-  color: #ffffff;
-  font-size: 15px;
-  font-weight: 800;
-  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+.vendor-registration-benefit h2 {
+  margin: 0 0 2px;
+  color: var(--white, #fff);
+  font-family: "Fredoka", sans-serif;
+  font-size: 17px;
+  font-weight: 500;
 }
 
 .vendor-registration-benefit p {
   margin: 0;
-  color: #ffffff;
+  color: var(--cream, #faf6ec);
   font-size: 13px;
-  line-height: 1.55;
-  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+  line-height: 1.45;
 }
 
-/* =========================================
-   RIGHT REGISTRATION CARD
-   Internal form styling remains in its own CSS
-   ========================================= */
+/* ----- Right: form ----- */
 
-/* Form sits directly on the background image */
 .vendor-registration-form-section {
-  position: relative;
-  z-index: 2;
-
+  display: flex;
+  justify-content: flex-end;
   width: 100%;
-  max-width: 540px;
   min-width: 0;
-  justify-self: end;
-  align-self: center;
-
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
 }
 
-.vendor-registration-form-section form {
+.vendor-registration-form-section .vreg-card {
   width: 100%;
-  max-width: 100%;
+  max-width: 780px;
 }
 
-.vendor-registration-form-section input,
-.vendor-registration-form-section select,
-.vendor-registration-form-section textarea {
-  max-width: 100%;
-  box-sizing: border-box;
-}
+/* ----- Responsive ----- */
 
-.vendor-registration-form-section h1,
-.vendor-registration-form-section h2,
-.vendor-registration-form-section h3 {
-  color: #2c302f;
-}
-
-.vendor-registration-form-section input:focus,
-.vendor-registration-form-section select:focus,
-.vendor-registration-form-section textarea:focus {
-  outline: 2px solid rgba(33, 108, 104, 0.2);
-  outline-offset: 1px;
-  border-color: #216c68;
-}
-
-/* Primary action button */
-
-.vendor-registration-form-section button[type="submit"],
-.vendor-registration-form-section .vendor-continue-button {
-  color: #ffffff;
-  background-color: #fb8665;
-  border-color: #fb8665;
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.vendor-registration-form-section button[type="submit"]:hover,
-.vendor-registration-form-section .vendor-continue-button:hover {
-  background-color: #ed7656;
-  border-color: #ed7656;
-}
-
-/* =========================================
-   FOOTER
-   ========================================= */
-
-.vendor-page-footer {
-  position: relative;
-  z-index: 3;
-  flex-shrink: 0;
-
-  width: 100%;
-  padding: 16px 5% 18px;
-  text-align: center;
-
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.96);
-  border-top: 2px solid #fb8665;
-}
-
-.vendor-page-footer p {
-  margin: 0 0 7px;
-  color: #555b58;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.vendor-page-footer a {
-  color: #216c68;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.vendor-page-footer a:hover {
-  color: #fb8665;
-}
-
-.vendor-page-footer .legal {
-  max-width: 720px;
-  margin: 0 auto;
-  color: #777d79;
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-/* =========================================
-   SHORT DESKTOP SCREENS
-   Adjust spacing without hiding content
-   ========================================= */
-
-@media (min-width: 1001px) and (max-height: 800px) {
-  .vendor-registration-main {
-    padding-top: 18px;
-    padding-bottom: 18px;
-    gap: 30px;
-  }
-
-  .vendor-registration-intro {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .vendor-registration-eyebrow {
-    margin-bottom: 12px;
-  }
-
-  .vendor-registration-intro h1 {
-    font-size: clamp(32px, 3vw, 44px);
-    margin-bottom: 14px;
-  }
-
-  .vendor-registration-description {
-    margin-bottom: 16px;
-    line-height: 1.6;
-  }
-
-  .vendor-registration-benefits {
-    margin-top: 14px;
-    gap: 11px;
-  }
-
-  .vendor-registration-form-section {
-    padding: 22px 26px;
-  }
-}
-
-/* =========================================
-   TABLET
-   ========================================= */
-
-@media (max-width: 1000px) {
-  .vendor-registration-main {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 24px;
-    padding: 28px 3%;
-  }
-
-  .vendor-registration-intro h1 {
-    font-size: clamp(30px, 4vw, 42px);
-  }
-
-  .vendor-registration-description {
-    font-size: 14px;
-  }
-
-  .vendor-registration-benefits {
-    gap: 13px;
-  }
-
-  .vendor-registration-form-section {
-    padding: 24px;
-  }
-}
-
-/* =========================================
-   MOBILE
-   Keep natural scrolling enabled
-   ========================================= */
-
-@media (max-width: 720px) {
+/* Tablet and phone: exactly as before. One background on the wrapper, and the
+   desktop photo layers are switched off. */
+@media (max-width: 1100px) {
   .vendor-registration-page-wrapper {
-    background-attachment: scroll;
-    background-position: center top;
+    background-image:
+      linear-gradient(rgba(20, 28, 27, 0.66), rgba(20, 28, 27, 0.66)),
+      url("../../assets/images/vendorsmilelady.png");
+    background-size: cover;
+    background-position: center 25%;
+    background-repeat: no-repeat;
   }
 
-  .vendor-page-topbar {
-    min-height: 68px;
-    padding: 10px 5%;
-  }
-
-  .vendor-logo-img {
-    width: 125px;
-  }
-
-  .vendor-signin-link {
-    font-size: 13px;
-    text-align: right;
+  .vendor-registration-page-wrapper::before,
+  .vendor-registration-page-wrapper::after {
+    display: none;
   }
 
   .vendor-registration-main {
-    min-height: 0;
-    padding: 26px 5% 30px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
     gap: 22px;
+    padding: 84px 24px 40px;
   }
 
   .vendor-registration-intro {
-    max-width: 100%;
-    padding: 12px 0;
-  }
-
-  .vendor-registration-intro h1 {
-    font-size: clamp(30px, 7vw, 40px);
-  }
-
-  .vendor-registration-description {
-    font-size: 14px;
-    line-height: 1.65;
+    max-width: 780px;
+    justify-self: center;
+    margin-bottom: 0;
   }
 
   .vendor-registration-benefits {
-    gap: 13px;
-    margin-top: 18px;
-  }
-
-  .vendor-registration-benefit h3 {
-    font-size: 14px;
-  }
-
-  .vendor-registration-benefit p {
-    font-size: 12px;
+    display: none;
   }
 
   .vendor-registration-form-section {
-    width: 100%;
-    max-width: 100%;
-    align-self: stretch;
-    padding: 22px 18px;
-    border-radius: 16px;
-  }
-
-  .vendor-page-footer {
-    padding: 15px 5%;
+    justify-content: center;
   }
 }
 
-/* =========================================
-   SMALL MOBILE
-   ========================================= */
-
-@media (max-width: 380px) {
+@media (max-width: 600px) {
   .vendor-registration-main {
-    padding: 20px 4% 24px;
+    gap: 16px;
+    padding: 78px 12px 28px;
   }
 
   .vendor-registration-intro h1 {
-    font-size: 29px;
+    font-size: 28px;
   }
 
-  .vendor-registration-form-section {
-    padding: 18px 14px;
-  }
-
-  .vendor-signin-link {
-    font-size: 12px;
+  .vendor-registration-description,
+  .vendor-registration-eyebrow {
+    display: none; /* the form comes first on phones */
   }
 }
 
-/* Make the three vendor benefit statements visible */
-.vendor-registration-benefits > div > p {
-  color: #fb8665;
-  opacity: 1;
-  visibility: visible;
-  font-weight: 600;
-}
+/* Short desktop screens: shrink the intro so the form fits without scrolling */
+@media (max-height: 800px) and (min-width: 1101px) {
+  .vendor-registration-main {
+    padding-top: 76px;
+    padding-bottom: 12px;
+  }
 
-.vendor-registration-benefit .vendor-benefit-mark {
-  color: #FB8665;
+  .vendor-registration-benefits {
+    display: none;
+  }
 }

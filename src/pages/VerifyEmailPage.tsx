@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, MailCheck } from "lucide-react";
+import { MailCheck } from "lucide-react";
 import { apiRequest } from "../services/api";
 import { saveAuthSession } from "../services/auth/authStorage";
+import { getPostLoginPath } from "../services/auth/authRedirect";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logos/icon-logo.svg";
+import BackButton from "../components/BackButton/BackButton";
 import "./Customer/CustomerLoginPage.css";
 import "./VerifyEmailPage.css";
 
@@ -11,6 +12,7 @@ type VerificationState = {
   verificationToken: string;
   email: string;
   role: "CUSTOMER" | "VENDOR";
+  redirectTo?: string;
   keepLoggedIn: boolean;
   expiresAt: number;
   resendAt: number;
@@ -23,7 +25,11 @@ function readVerificationState(): VerificationState | null {
     const value = sessionStorage.getItem("pawdigree_email_verification");
     if (!value) return null;
     const parsed = JSON.parse(value) as VerificationState;
-    if (!parsed.verificationToken || !["CUSTOMER", "VENDOR"].includes(parsed.role)) return null;
+    if (
+      !parsed.verificationToken ||
+      !["CUSTOMER", "VENDOR"].includes(parsed.role)
+    )
+      return null;
     return parsed;
   } catch {
     return null;
@@ -37,7 +43,9 @@ function loginPath(role?: string) {
 export default function VerifyEmailPage() {
   const navigate = useNavigate();
   const [verification, setVerification] = useState(readVerificationState);
-  const [loginRole, setLoginRole] = useState(() => readVerificationState()?.role);
+  const [loginRole, setLoginRole] = useState(
+    () => readVerificationState()?.role,
+  );
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -51,7 +59,9 @@ export default function VerifyEmailPage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const isExpired = Boolean(verification && now > 0 && verification.expiresAt <= now);
+  const isExpired = Boolean(
+    verification && now > 0 && verification.expiresAt <= now,
+  );
 
   useEffect(() => {
     if (isExpired) sessionStorage.removeItem("pawdigree_email_verification");
@@ -75,24 +85,45 @@ export default function VerifyEmailPage() {
     try {
       const tokens = await apiRequest<AuthTokens>("/auth/verify-email/", {
         method: "POST",
-        body: JSON.stringify({ verification_token: verification.verificationToken, code }),
+        body: JSON.stringify({
+          verification_token: verification.verificationToken,
+          code,
+        }),
       });
       if (!tokens.access || !tokens.refresh) {
-        throw new Error("Verification succeeded, but the login response did not include both access and refresh tokens.");
+        throw new Error(
+          "Verification succeeded, but the login response did not include both access and refresh tokens.",
+        );
       }
-      saveAuthSession({ access: tokens.access, refresh: tokens.refresh, role: verification.role }, verification.keepLoggedIn);
+      saveAuthSession(
+        {
+          access: tokens.access,
+          refresh: tokens.refresh,
+          role: verification.role,
+        },
+        verification.keepLoggedIn,
+      );
       sessionStorage.removeItem("pawdigree_email_verification");
-      navigate(verification.role === "VENDOR" ? "/vendor/dashboard" : "/customer/dashboard", { replace: true });
+      navigate(
+        getPostLoginPath({ from: verification.redirectTo }, verification.role),
+        { replace: true },
+      );
     } catch (err) {
-      const message = err instanceof Error ? err.message : "We couldn't verify that code. Please try again.";
+      const message =
+        err instanceof Error
+          ? err.message
+          : "We couldn't verify that code. Please try again.";
       if (/expired.*token|token.*expired|invalid.*token/i.test(message)) {
         sessionStorage.removeItem("pawdigree_email_verification");
-        setLoginRole(verification.role);
         setLoginRole(verification.role);
         setVerification(null);
         setError("This verification session has expired. Please log in again.");
       } else {
-        setError(/code|invalid|incorrect/i.test(message) ? "That code is incorrect or has expired. Check it and try again." : message);
+        setError(
+          /code|invalid|incorrect/i.test(message)
+            ? "That code is incorrect or has expired. Check it and try again."
+            : message,
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -107,21 +138,35 @@ export default function VerifyEmailPage() {
     try {
       await apiRequest("/auth/verify-email/resend/", {
         method: "POST",
-        body: JSON.stringify({ verification_token: verification.verificationToken }),
+        body: JSON.stringify({
+          verification_token: verification.verificationToken,
+        }),
       });
       const resendAt = Date.now() + 60_000;
       const updated = { ...verification, resendAt };
-      sessionStorage.setItem("pawdigree_email_verification", JSON.stringify(updated));
+      sessionStorage.setItem(
+        "pawdigree_email_verification",
+        JSON.stringify(updated),
+      );
       setVerification(updated);
       setNotice("A new verification code has been sent.");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "We couldn't resend your code.";
+      const message =
+        err instanceof Error ? err.message : "We couldn't resend your code.";
       const retry = message.match(/retry_after\D*(\d+)/i);
       if (retry) {
-        const updated = { ...verification, resendAt: Date.now() + Number(retry[1]) * 1000 };
-        sessionStorage.setItem("pawdigree_email_verification", JSON.stringify(updated));
+        const updated = {
+          ...verification,
+          resendAt: Date.now() + Number(retry[1]) * 1000,
+        };
+        sessionStorage.setItem(
+          "pawdigree_email_verification",
+          JSON.stringify(updated),
+        );
         setVerification(updated);
-      } else if (/expired.*token|token.*expired|invalid.*token/i.test(message)) {
+      } else if (
+        /expired.*token|token.*expired|invalid.*token/i.test(message)
+      ) {
         sessionStorage.removeItem("pawdigree_email_verification");
         setLoginRole(verification.role);
         setVerification(null);
@@ -136,38 +181,90 @@ export default function VerifyEmailPage() {
 
   return (
     <main className="login-page verify-email-page">
-      <header className="top-bar verify-email-topbar">
-        <button type="button" className="back-btn" onClick={() => {
-          navigate(loginPath(verification?.role ?? loginRole));
-        }} aria-label="Back to login"><ArrowLeft size={20} /></button>
-        <span className="top-bar-title">Verify your email</span>
-        <div className="spacer" />
-      </header>
       <section className="login-card verify-email-card">
-        <div className="login-logo"><img src={logo} alt="Pawdigree logo" className="real-logo" /></div>
-        <div className="verify-email-icon" aria-hidden="true"><MailCheck size={26} /></div>
+        <BackButton
+          label="Back to login"
+          onClick={() => navigate(loginPath(verification?.role ?? loginRole))}
+        />
+        <div className="verify-email-icon" aria-hidden="true">
+          <MailCheck size={26} />
+        </div>
         <p className="role-eyebrow">EMAIL VERIFICATION</p>
         <h1>Check your inbox</h1>
         {activeVerification ? (
           <>
-            <p className="verify-email-description">Enter the 6-digit code we sent to <strong>{activeVerification.email}</strong>.</p>
-            {error && <div id="verification-error" className="login-error" role="alert">{error}</div>}
-            {notice && <div className="verify-email-notice" role="status">{notice}</div>}
+            <p className="verify-email-description">
+              Enter the 6-digit code we sent to{" "}
+              <strong>{activeVerification.email}</strong>.
+            </p>
+            {error && (
+              <div id="verification-error" className="login-error" role="alert">
+                {error}
+              </div>
+            )}
+            {notice && (
+              <div className="verify-email-notice" role="status">
+                {notice}
+              </div>
+            )}
             <form onSubmit={handleSubmit} noValidate>
-              <label className="verify-email-label" htmlFor="verification-code">Verification code</label>
-              <input id="verification-code" className="verify-email-code" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" value={code} onChange={(event) => { setCode(event.target.value.replace(/\D/g, "").slice(0, 6)); setError(""); }} aria-describedby={error ? "verification-error" : undefined} />
-              <button type="submit" className="btn-primary full verify-email-submit" disabled={isSubmitting}>{isSubmitting ? "Verifying..." : "Verify email and log in"}</button>
+              <label className="verify-email-label" htmlFor="verification-code">
+                Verification code
+              </label>
+              <input
+                id="verification-code"
+                className="verify-email-code"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                placeholder="000000"
+                value={code}
+                onChange={(event) => {
+                  setCode(event.target.value.replace(/\D/g, "").slice(0, 6));
+                  setError("");
+                }}
+                aria-describedby={error ? "verification-error" : undefined}
+              />
+              <button
+                type="submit"
+                className="btn-primary full verify-email-submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Verifying..." : "Verify email and log in"}
+              </button>
             </form>
             <p className="verify-email-resend">Didn't receive a code?</p>
-            <button type="button" className="resend" onClick={handleResend} disabled={isResending || secondsToResend > 0}>
-              {isResending ? "Sending..." : secondsToResend > 0 ? `Resend code in ${secondsToResend}s` : "Resend code"}
+            <button
+              type="button"
+              className="resend"
+              onClick={handleResend}
+              disabled={isResending || secondsToResend > 0}
+            >
+              {isResending
+                ? "Sending..."
+                : secondsToResend > 0
+                  ? `Resend code in ${secondsToResend}s`
+                  : "Resend code"}
             </button>
-            <p className="verify-email-expiry">This code expires in 10 minutes.</p>
+            <p className="verify-email-expiry">
+              This code expires in 10 minutes.
+            </p>
           </>
         ) : (
           <>
-            <p className="verify-email-description">{error || (isExpired ? "This verification session has expired. Please log in again." : "Your verification session is unavailable. Please log in again to request a new code.")}</p>
-            <Link className="btn-primary full verify-email-login-link" to={loginPath(loginRole)}>Back to login</Link>
+            <p className="verify-email-description">
+              {error ||
+                (isExpired
+                  ? "This verification session has expired. Please log in again."
+                  : "Your verification session is unavailable. Please log in again to request a new code.")}
+            </p>
+            <Link
+              className="btn-primary full verify-email-login-link"
+              to={loginPath(loginRole)}
+            >
+              Back to login
+            </Link>
           </>
         )}
       </section>

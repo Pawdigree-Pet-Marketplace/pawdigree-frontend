@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
-import { ArrowRight, Search, Heart, Sparkles } from "lucide-react";
-import { apiRequest } from "../../services/api";
+import { ArrowRight, Search, Heart, PawPrint, Sparkles } from "lucide-react";
+import API_BASE_URL, { apiRequest } from "../../services/api";
 import { Link, useSearchParams } from "react-router-dom";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 import "./CustomerPetCataloguePage.css";
@@ -10,6 +10,16 @@ type Pet = {
   gender: "MALE" | "FEMALE" | "UNKNOWN"; listing_type: "ADOPTION" | "SALE";
   price?: string | number | null; images?: { image?: string | null; is_primary?: boolean }[];
 };
+function petImageUrl(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  if (/^(https?:|data:|blob:)/i.test(path)) return path;
+  if (!API_BASE_URL) return path;
+  try {
+    return new URL(path, `${new URL(API_BASE_URL).origin}/`).href;
+  } catch {
+    return path;
+  }
+}
 type Filters = { search: string; purpose: string; gender: string; breed: string; minAge: string; maxAge: string; page: number };
 function readFilters(search: string): Filters {
   const query = new URLSearchParams(search);
@@ -55,7 +65,16 @@ export default function CustomerPetCataloguePage() {
       setLoading(true); setError("");
       try {
         const response = await apiRequest<{ count: number; results: Pet[] }>(`/pets/public/?${queryFor(filters)}`);
-        if (!cancelled) { setPets(response.results); setCount(response.count); }
+        if (!cancelled) {
+          setPets(response.results.map((pet) => ({
+            ...pet,
+            images: pet.images?.map((image) => ({
+              ...image,
+              image: petImageUrl(image.image) ?? image.image,
+            })),
+          })));
+          setCount(response.count);
+        }
       } catch { if (!cancelled) setError("We could not load pet listings. Please try again later."); }
       finally { if (!cancelled) setLoading(false); }
     }
@@ -80,7 +99,7 @@ export default function CustomerPetCataloguePage() {
   if (!authorized) return null;
   const pages = Math.ceil(count / 20);
   return <div className="customer-dashboard-layout"><CustomerDashboardNav /><main className="customer-dashboard-main customer-dashboard pet-catalogue">
-    <header className="catalogue-heading"><p className="dashboard-eyebrow">PAWDIGREE PET CATALOGUE</p><h1>Find your new companion</h1><p>Browse available pets from Pawdigree vendors and narrow the list to what you are looking for.</p></header>
+    <header className="catalogue-heading"><div className="catalogue-heading-decor" aria-hidden="true"><PawPrint className="catalogue-decor-paw catalogue-decor-paw-one"/><PawPrint className="catalogue-decor-paw catalogue-decor-paw-two"/><Sparkles className="catalogue-decor-sparkle"/></div><p className="dashboard-eyebrow">PAWDIGREE PET CATALOGUE</p><h1>Find your new companion</h1><p>Browse available pets from Pawdigree vendors and narrow the list to what you are looking for.</p></header>
     <form className="dashboard-search" onSubmit={apply} aria-label="Search pet catalogue"><label htmlFor="catalogue-search">Search pet listings</label><div className="dashboard-search-row"><Search size={22} aria-hidden="true"/><input id="catalogue-search" type="text" placeholder="Name, breed, species or listing details" value={draft.search} onChange={e => setDraft({ ...draft, search: e.target.value })}/><button type="submit" aria-label="Search pets"><ArrowRight size={21}/></button></div></form>
     <form className="dashboard-filters" onSubmit={apply} aria-label="Filter pet catalogue"><div className="dashboard-filter-grid">
       <label>Species / category<input value={draft.search} onChange={e => setDraft({ ...draft, search: e.target.value })} placeholder="e.g. dog, cat, bird" /></label>

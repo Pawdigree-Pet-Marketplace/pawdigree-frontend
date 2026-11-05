@@ -7,6 +7,17 @@ export type AuthSession = {
 };
 
 const authKeys = ["token", "access", "access_token", "refresh", "role"] as const;
+export const AUTH_SESSION_CHANGE_EVENT = "auth-session-change";
+
+function notifyAuthSessionChange(): void {
+  window.dispatchEvent(new Event(AUTH_SESSION_CHANGE_EVENT));
+}
+
+function removeAuthSession(): void {
+  for (const storage of [localStorage, sessionStorage]) {
+    for (const key of authKeys) storage.removeItem(key);
+  }
+}
 
 export function getAuthStorage(): Storage | null {
   for (const storage of [localStorage, sessionStorage]) {
@@ -33,17 +44,17 @@ export function getSessionToken(): string | null {
 }
 
 export function saveAuthSession(session: AuthSession, remember: boolean): void {
-  clearAuthSession();
+  removeAuthSession();
   const storage = remember ? localStorage : sessionStorage;
   storage.setItem("token", session.access);
   storage.setItem("access", session.access);
   storage.setItem("access_token", session.access);
   storage.setItem("refresh", session.refresh);
   storage.setItem("role", session.role);
+  notifyAuthSessionChange();
 }
 
 export function clearAuthSession(): void {
-  for (const storage of [localStorage, sessionStorage]) {
-    for (const key of authKeys) storage.removeItem(key);
-  }
+  removeAuthSession();
+  notifyAuthSessionChange();
 }

@@ -31,13 +31,6 @@
   box-shadow: 0 2px 10px rgba(44, 48, 47, 0.08);
 }
 
-/* Login screens keep the fixed navigation visually light over their photo backgrounds. */
-.top-navbar--auth-overlay,
-.top-navbar--auth-overlay.top-navbar--scrolled {
-  background: transparent;
-  border-bottom-color: transparent;
-  box-shadow: none;
-}
 
 .top-navbar-brand {
   display: flex;
@@ -46,25 +39,6 @@
   gap: clamp(8px, 1vw, 14px);
 }
 
-.top-navbar-back {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  border: 1px solid rgb(255 255 255 / 42%);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 10%);
-  color: #fff;
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-}
-
-.top-navbar-back:hover {
-  background: rgb(255 255 255 / 20%);
-}
 
 /* =========================
    LOGO
@@ -220,22 +194,6 @@
   background: var(--white);
 }
 
-.top-navbar--auth-overlay .desktop-links a,
-.top-navbar--auth-overlay.top-navbar--scrolled .desktop-links a {
-  color: var(--white);
-}
-
-.top-navbar--auth-overlay .desktop-links a:hover,
-.top-navbar--auth-overlay.top-navbar--scrolled .desktop-links a:hover {
-  color: var(--coral);
-}
-
-.top-navbar--auth-overlay .hamburger,
-.top-navbar--auth-overlay.top-navbar--scrolled .hamburger {
-  color: var(--white);
-  background: transparent;
-}
-
 /* =========================
    ACTIVE LINK COLOR
    (must come after the colour rules above, same or higher specificity)
@@ -245,6 +203,17 @@
 .top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a.is-active,
 .top-navbar--scrolled .desktop-links a.is-active {
   color: var(--coral);
+}
+
+/* Explore Pets keeps every navbar label black in both scroll states. */
+.top-navbar--explore .desktop-links a,
+.top-navbar--explore .desktop-links a:hover,
+.top-navbar--explore .desktop-links a.is-active {
+  color: #000;
+}
+
+.top-navbar--explore .hamburger {
+  color: #000;
 }
 
 /* =========================

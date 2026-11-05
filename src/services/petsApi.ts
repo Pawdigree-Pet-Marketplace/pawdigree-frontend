@@ -1,9 +1,6 @@
 /**
  * Explore Pets data layer: the ONLY place that knows where pets come from.
- *
- * - Mock mode (default): serves sample listings from ./petsMock so you can preview the page.
- *   Set VITE_USE_MOCK_PETS=false in .env to go live.
- * - Real mode: calls your Django API (apiRequest adds the base URL and "/api").
+ * Calls the Django API (apiRequest adds the base URL and "/api").
  *
  * Live endpoints (all GET, no login):
  *   /pets/public/?search=&breed=&gender=&listing_type=&age_min=&age_max=
@@ -21,13 +18,8 @@ import { PAGE_SIZE, SPECIES, type FeaturedPet, type PagedPets, type PetQuery, ty
 import { matchScore, pickDiverse, queryToParams } from "../utils/petUtils";
 import API_BASE_URL, { apiRequest } from "./api";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_PETS !== "false";
-
 /** Set to true once the backend has GET /api/pets/trending-searches/. */
 const TRENDING_READY = false;
-
-/** Loaded on demand, so the mock data is a separate chunk and is not used in real mode. */
-const mock = () => import("./petsMock");
 
 type RawPage = PublicPet[] | { count?: number; results: PublicPet[] };
 
@@ -52,19 +44,57 @@ function toPaged(res: RawPage, page: number): PagedPets {
 }
 
 export async function fetchPets(q: PetQuery): Promise<PagedPets> {
-  if (USE_MOCK) return (await mock()).mockFetchPets(q);
   const res = await apiRequest<RawPage>(`/pets/public/?${queryToParams(q, true).toString()}`);
   return toPaged(res, q.page);
 }
 
+/** One pet, for the detail page. */
+export async function fetchPet(id: string): Promise<PublicPet> {
+  const res = await apiRequest<PublicPet>(`/pets/public/${encodeURIComponent(id)}/`);
+  return withAbsoluteImages(res);
+}
+
+
+/**
+ * All public pets of one business.
+ * The API has no business-id filter, so we search by name (partial match)
+ * and keep only the pets that belong to this exact business.
+ */
+export async function fetchPetsByBusiness(
+  businessId: string,
+  businessName: string,
+): Promise<PublicPet[]> {
+  const pageSize = 50; // the API maximum
+  const owned = (p: PublicPet) =>
+    p.business !== undefined
+      ? String(p.business) === businessId
+      : p.business_name?.toLowerCase() === businessName.toLowerCase();
+
+  const matches: PublicPet[] = [];
+  for (let page = 1; page <= 5; page++) {
+    const params = new URLSearchParams({
+      vendor: businessName,
+      page_size: String(pageSize),
+      page: String(page),
+    });
+    const res = await apiRequest<RawPage>(`/pets/public/?${params.toString()}`);
+    const list = Array.isArray(res) ? res : res.results;
+    const count = Array.isArray(res) ? res.length : (res.count ?? list.length);
+
+    matches.push(...list.map(withAbsoluteImages).filter(owned));
+    if (list.length === 0 || page * pageSize >= count) break;
+  }
+  return matches;
+}
+
+
+
 export async function fetchFeatured(): Promise<FeaturedPet[]> {
-  if (USE_MOCK) return (await mock()).mockFetchFeatured();
   const res = await apiRequest<RawPage>("/pets/public/?page_size=30");
   return pickDiverse(toPaged(res, 1).results, 8);
 }
 
 export async function fetchTrendingSearches(): Promise<TrendingSearch[]> {
-  if (USE_MOCK) return (await mock()).mockFetchTrending();
   if (!TRENDING_READY) return [];
   return apiRequest<TrendingSearch[]>("/pets/trending-searches/");
 }
@@ -83,14 +113,12 @@ function fetchLocations(): Promise<string[]> {
 }
 
 /**
- * Suggestions in real mode are matched here, on the client:
+ * Suggestions are matched here, on the client:
  *  - "breed" -> the five species
  *  - "location" -> the list from /pets/public/locations/
  * "pet" and "vendor" have no suggestion source yet, so they return nothing.
  */
 export async function fetchSuggestions(q: string, kinds: SuggestionKind[]): Promise<Suggestion[]> {
-  if (USE_MOCK) return (await mock()).mockFetchSuggestions(q, kinds);
-
   const single = kinds.length === 1;
   const limit = single ? 6 : 4;
   const out: Suggestion[] = [];

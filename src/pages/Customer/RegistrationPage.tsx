@@ -1,74 +1,49 @@
-import { useState } from "react";
+import { Heart, ShieldCheck } from "lucide-react";
+import BackButton from "../../components/BackButton/BackButton";
 import CustomerRegistrationForm from "../../components/CustomerRegistrationForm/CustomerRegistrationForm";
-import Footer from "../../components/layout/Footer";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
 import "./RegistrationPage.css";
 
 export default function RegistrationPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   return (
-    <>
-      <TopNavbar
-        isLoggedIn={false}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
+    <main className="registration-page registration-page--layout">
+      <section className="registration-intro">
+        <BackButton fallback="/" label="Back" />
 
-      <SideMenu
-        isOpen={isMenuOpen}
-        setIsOpen={setIsMenuOpen}
-        isLoggedIn={false}
-        onClose={() => setIsMenuOpen(false)}
-      />
+        <span className="registration-eyebrow">WELCOME TO PAWDIGREE</span>
 
-      <main className="registration-page registration-page--layout">
-        <section className="registration-intro">
-          <span className="registration-eyebrow">
-            WELCOME TO PAWDIGREE
-          </span>
+        <h1>Your journey to a happier pet life starts here.</h1>
 
-          <h1>
-            Your journey to a happier pet life starts here.
-          </h1>
+        <p>
+          Join our community to discover pets, connect with trusted vendors, and
+          explore veterinary and pet-care services.
+        </p>
 
-          <p>
-            Join our community to discover pets, connect with trusted
-            vendors, and explore veterinary and pet-care services.
-          </p>
-
-          <div className="registration-benefits">
-            <div className="registration-benefit">
-              <span className="benefit-icon" aria-hidden="true">
-                ♥
-              </span>
-              <div>
-                <h2>A community that cares</h2>
-                <p>Connect with people who love pets as much as you do.</p>
-              </div>
-            </div>
-
-            <div className="registration-benefit">
-              <span className="benefit-icon" aria-hidden="true">
-                ✓
-              </span>
-              <div>
-                <h2>Trusted connections</h2>
-                <p>Discover pet services and marketplace listings.</p>
-              </div>
+        <div className="registration-benefits">
+          <div className="registration-benefit">
+            <span className="benefit-icon" aria-hidden="true">
+              <Heart size={20} />
+            </span>
+            <div>
+              <h2>A community that cares</h2>
+              <p>Connect with people who love pets as much as you do.</p>
             </div>
           </div>
-        </section>
 
-        <div className="registration-form-container">
-          <CustomerRegistrationForm />
+          <div className="registration-benefit">
+            <span className="benefit-icon" aria-hidden="true">
+              <ShieldCheck size={20} />
+            </span>
+            <div>
+              <h2>Trusted connections</h2>
+              <p>Discover pet services and marketplace listings.</p>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
 
-      <Footer />
-      <BottomNavbar />
-    </>
+      <div className="registration-form-container">
+        <CustomerRegistrationForm />
+      </div>
+    </main>
   );
 }

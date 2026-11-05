@@ -282,7 +282,7 @@ export default function VendorCataloguePage() {
               next home.
             </p>
 
-            <Link className="catalogue-add-button" to="/business-registration">
+            <Link className="catalogue-add-button" to="/vendor/business-profile">
               <Plus size={18} />
               Register your business
             </Link>

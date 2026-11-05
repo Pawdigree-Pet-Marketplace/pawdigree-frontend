@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent, useRef } from "react";
 import {
-  ArrowLeft,
   ImagePlus,
   LoaderCircle,
   PawPrint,
@@ -8,6 +7,7 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
+import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
@@ -182,7 +182,9 @@ export default function VendorEditPetListing() {
     if (isIdMissing) return;
     async function loadBusinesses() {
       try {
-        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
+        const res = await vendorAuthenticatedFetch(
+          `${API_BASE_URL}/api/businesses/`,
+        );
         if (!res.ok) throw new Error(await readError(res));
         const data = (await res.json()) as BusinessResponse;
         const items = Array.isArray(data) ? data : data.results;
@@ -210,9 +212,7 @@ export default function VendorEditPetListing() {
         setDescription(pet.description || "");
         setPrice(pet.price != null ? String(pet.price) : "");
         setListingType(
-          pet.listing_type === "SALE"
-            ? "SALE"
-            : pet.listing_type || "ADOPTION",
+          pet.listing_type === "SALE" ? "SALE" : pet.listing_type || "ADOPTION",
         );
         setBusinessId(pet.business != null ? String(pet.business) : "");
         setExistingPhotos(pet.images || []);
@@ -228,13 +228,17 @@ export default function VendorEditPetListing() {
 
   if (isIdMissing) {
     return (
-      <VendorLayout title="Edit pet listing" description="No pet selected" vendorWorkspace>
+      <VendorLayout
+        title="Edit pet listing"
+        description="No pet selected"
+        vendorWorkspace
+      >
         <div className="dashboard-content vendor-pet-page">
           <div className="pet-form-section">
             <h2>No Pet ID</h2>
             <p>
-              Go to <Link to="/vendor/listings">/vendor/listings</Link> and click
-              Edit.
+              Go to <Link to="/vendor/listings">/vendor/listings</Link> and
+              click Edit.
             </p>
           </div>
         </div>
@@ -278,10 +282,7 @@ export default function VendorEditPetListing() {
     }
     const formData = new FormData();
     formData.append("business", businessId);
-    formData.append(
-      "listing_type",
-      listingType,
-    );
+    formData.append("listing_type", listingType);
     formData.append("name", name.trim());
     formData.append("species", species.trim());
     formData.append("breed", breed.trim());
@@ -298,10 +299,13 @@ export default function VendorEditPetListing() {
     });
     setSubmitting(true);
     try {
-      const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/${id}/edit/`, {
-        method: "PATCH",
-        body: formData,
-      });
+      const res = await vendorAuthenticatedFetch(
+        `${API_BASE_URL}/api/pets/${id}/edit/`,
+        {
+          method: "PATCH",
+          body: formData,
+        },
+      );
       if (!res.ok) throw new Error(await readError(res));
       setSuccess("Pet updated!");
       setTimeout(() => {
@@ -333,9 +337,7 @@ export default function VendorEditPetListing() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <Link className="pet-back-link" to="/vendor/listings">
-          <ArrowLeft size={17} /> Back to catalogue
-        </Link>
+        <BackButton fallback="/vendor/listings" label="Back to listings" />
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
             <div className="pet-section-heading">
@@ -605,4 +607,3 @@ export default function VendorEditPetListing() {
     </VendorLayout>
   );
 }
-

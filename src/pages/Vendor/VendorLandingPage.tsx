@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import "./VendorLandingPage.css";
 import vendorHero from "../../assets/images/vendor-hero.jpg";
-import logo from "../../assets/logos/darkmode-logo.svg";
-
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useSession from "../../hooks/useSession";
 
 import {
   ArrowUpRight,
@@ -195,30 +193,18 @@ function VendorSteps({
 }
 
 function VendorLandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hideFloaties, setHideFloaties] = useState(false);
+  const navigate = useNavigate();
+  const isVendorSignedIn = useSession("VENDOR");
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      const role = localStorage.getItem("role") || sessionStorage.getItem("role");
-      setIsLoggedIn(Boolean(token && role === "VENDOR"));
-    };
-
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    window.addEventListener("focus", checkAuth);
-
-    return () => {
-      window.removeEventListener("storage", checkAuth);
-      window.removeEventListener("focus", checkAuth);
-    };
-  }, []);
+    if (isVendorSignedIn) {
+      navigate("/vendor/dashboard", { replace: true });
+    }
+  }, [isVendorSignedIn, navigate]);
 
   useEffect(() => {
-    const footer = document.querySelector(".vendor-footer");
+    const footer = document.querySelector(".footer");
     if (!footer) return;
 
     const observer = new IntersectionObserver(
@@ -273,459 +259,452 @@ function VendorLandingPage() {
     return () => observer.disconnect();
   }, []);
 
+  if (isVendorSignedIn) return null;
+
   return (
-    <>
-      <TopNavbar
-        audience="vendor"
-        isLoggedIn={isLoggedIn}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
+    <main className="vendor-page" id="home">
+      {/* HERO */}
+      <section className="vendor-hero">
+        <div className="vendor-cta-decoration" aria-hidden="true">
+          <PawPrint className="vendor-cta-paw vendor-hero-paw-one" />
+          <PawPrint className="vendor-cta-paw vendor-hero-paw-two" />
+        </div>
+        <img
+          className="vendor-hero-bg"
+          src={vendorHero}
+          alt="A pet owner spending time with a dog"
+        />
 
-      <main className="vendor-page" id="home">
-        {/* HERO */}
-        <section className="vendor-hero">
-          <div className="vendor-cta-decoration" aria-hidden="true">
-            <PawPrint className="vendor-cta-paw vendor-hero-paw-one" />
-            <PawPrint className="vendor-cta-paw vendor-hero-paw-two" />
-          </div>
-          <img
-            className="vendor-hero-bg"
-            src={vendorHero}
-            alt="A pet owner spending time with a dog"
-          />
+        <div className="vendor-hero-inner">
+          <div className="vendor-hero-copy">
+            <span className="vendor-eyebrow">For pet businesses</span>
 
-          <div className="vendor-hero-inner">
-            <div className="vendor-hero-copy">
-              <span className="vendor-eyebrow">For pet businesses</span>
-
-              <h1>
-                Grow your pet
-                <br />
-                business with
-                <br />
-                <span>Pawdigree</span>
-              </h1>
-
-              <p>
-                Reach more pet owners, showcase your products and services, and
-                manage your business from one place.
-              </p>
-
-              <div className="vendor-hero-actions">
-                <Link
-                  className="vendor-button vendor-button-primary"
-                  to="/vendor/register"
-                >
-                  Become a Vendor
-                  <ArrowUpRight size={17} aria-hidden="true" />
-                </Link>
-
-                <Link
-                  className="vendor-button vendor-button-outline"
-                  to="/vendor/login"
-                >
-                  Log In
-                </Link>
-              </div>
-
-              <p className="vendor-trust-note">
-                <ShieldCheck size={16} aria-hidden="true" />
-                Trusted by pet shops, vets &amp; groomers across Uganda
-              </p>
-            </div>
-          </div>
-          <div
-            className={`vl-hero-floaties ${hideFloaties ? "v1-hidden" : ""}`}
-            aria-hidden="true"
-          >
-            {/* Paw prints */}
-            <svg
-              className="vl-floaty vl-floaty-paw vl-paw-a"
-              viewBox="0 0 100 100"
-              fill="none"
-            >
-              <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
-                <ellipse
-                  cx="30"
-                  cy="29"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(-25 30 29)"
-                />
-                <ellipse
-                  cx="43"
-                  cy="18"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(-8 43 18)"
-                />
-                <ellipse
-                  cx="60"
-                  cy="18"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(8 60 18)"
-                />
-                <ellipse
-                  cx="73"
-                  cy="29"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(25 73 29)"
-                />
-                <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
-              </g>
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-bone vl-bone-a"
-              viewBox="0 0 100 60"
-              fill="none"
-            >
-              <path
-                d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                transform="rotate(-25 50 30)"
-              />
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-heart vl-heart-a"
-              viewBox="0 0 40 40"
-              fill="none"
-            >
-              <path
-                d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-sparkle vl-sparkle-a"
-              viewBox="0 0 40 40"
-              fill="none"
-            >
-              <path
-                d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-paw vl-paw-b"
-              viewBox="0 0 100 100"
-              fill="none"
-            >
-              <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
-                <ellipse
-                  cx="30"
-                  cy="29"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(-25 30 29)"
-                />
-                <ellipse
-                  cx="43"
-                  cy="18"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(-8 43 18)"
-                />
-                <ellipse
-                  cx="60"
-                  cy="18"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(8 60 18)"
-                />
-                <ellipse
-                  cx="73"
-                  cy="29"
-                  rx="9"
-                  ry="15"
-                  transform="rotate(25 73 29)"
-                />
-                <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
-              </g>
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-sparkle vl-sparkle-b"
-              viewBox="0 0 40 40"
-              fill="none"
-            >
-              <path
-                d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-bone vl-bone-b"
-              viewBox="0 0 100 60"
-              fill="none"
-            >
-              <path
-                d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                transform="rotate(-25 50 30)"
-              />
-            </svg>
-
-            <svg
-              className="vl-floaty vl-floaty-heart vl-heart-b"
-              viewBox="0 0 40 40"
-              fill="none"
-            >
-              <path
-                d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        </section>
-
-        {/* MARKETPLACE STATISTICS */}
-        <section
-          className="vendor-stats vendor-reveal"
-          aria-label="Marketplace highlights"
-        >
-          <article className="vendor-stat-card">
-            <UsersRound size={23} aria-hidden="true" />
-            <strong>More customers</strong>
-            <span>Expand your reach</span>
-          </article>
-
-          <article className="vendor-stat-card">
-            <ShoppingBag size={23} aria-hidden="true" />
-            <strong>More visibility</strong>
-            <span>Showcase your offerings</span>
-          </article>
-
-          <article className="vendor-stat-card">
-            <CalendarCheck size={23} aria-hidden="true" />
-            <strong>Easy management</strong>
-            <span>Keep bookings organized</span>
-          </article>
-
-          <article className="vendor-stat-card">
-            <ChartNoAxesCombined size={23} aria-hidden="true" />
-            <strong>One dashboard</strong>
-            <span>Manage your business</span>
-          </article>
-        </section>
-
-        {/* BENEFITS */}
-        <section
-          className="vendor-benefits section-container vendor-reveal"
-          id="benefits"
-        >
-          <div className="vendor-section-heading">
-            <span className="vendor-eyebrow">Why choose Pawdigree?</span>
-            <h2>Everything you need to grow your pet business</h2>
-            <p>
-              One platform to reach customers, sell products, offer services and
-              stay organized.
-            </p>
-          </div>
-
-          <div className="vendor-benefit-grid">
-            {benefits.map((benefit) => {
-              const Icon = benefit.icon;
-
-              return (
-                <article className="vendor-benefit-card" key={benefit.title}>
-                  <span className="vendor-benefit-icon" aria-hidden="true">
-                    <Icon size={26} strokeWidth={1.8} />
-                  </span>
-
-                  <h3>{benefit.title}</h3>
-                  <p>{benefit.description}</p>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* HOW IT WORKS */}
-        <section
-          className="vendor-how-it-works section-container vendor-reveal"
-          id="how-it-works"
-        >
-          <div className="vendor-section-heading">
-            <span className="vendor-eyebrow">Getting started</span>
-            <h2>How it works</h2>
-            <p>Get your business live on Pawdigree in four simple steps.</p>
-          </div>
-
-          <VendorSteps steps={steps} />
-        </section>
-
-        {/* DASHBOARD PREVIEW */}
-        <section className="vendor-dashboard-section section-container vendor-reveal">
-          <div className="vendor-dashboard-copy">
-            <span className="vendor-eyebrow">Your business at a glance</span>
-
-            <h2>
-              Your business.
+            <h1>
+              Grow your pet
               <br />
-              One dashboard.
-            </h2>
+              business with
+              <br />
+              <span>Pawdigree</span>
+            </h1>
 
             <p>
-              Manage your products, pets, services, bookings and orders from one
-              organized workspace.
+              Reach more pet owners, showcase your products and services, and
+              manage your business from one place.
             </p>
 
-            <ul>
-              <li>
-                <CheckCircle2 size={18} aria-hidden="true" />
-                Real-time order &amp; booking tracking
-              </li>
-              <li>
-                <CheckCircle2 size={18} aria-hidden="true" />
-                Simple listing management
-              </li>
-              <li>
-                <CheckCircle2 size={18} aria-hidden="true" />
-                Business performance at a glance
-              </li>
-            </ul>
+            <div className="vendor-hero-actions">
+              <Link
+                className="vendor-button vendor-button-primary"
+                to="/vendor/register"
+              >
+                Become a Vendor
+                <ArrowUpRight size={17} aria-hidden="true" />
+              </Link>
 
-            <Link className="vendor-text-link" to="/vendor/register">
-              Start growing your business
-              <ArrowUpRight size={17} aria-hidden="true" />
-            </Link>
+              <Link
+                className="vendor-button vendor-button-outline"
+                to="/vendor/login"
+              >
+                Log In
+              </Link>
+            </div>
+
+            <p className="vendor-trust-note">
+              <ShieldCheck size={16} aria-hidden="true" />
+              Trusted by pet shops, vets &amp; groomers across Uganda
+            </p>
           </div>
-
-          <div
-            className="vendor-dashboard-preview"
-            aria-label="Illustrative vendor dashboard preview"
+        </div>
+        <div
+          className={`vl-hero-floaties ${hideFloaties ? "v1-hidden" : ""}`}
+          aria-hidden="true"
+        >
+          {/* Paw prints */}
+          <svg
+            className="vl-floaty vl-floaty-paw vl-paw-a"
+            viewBox="0 0 100 100"
+            fill="none"
           >
-            <div className="vendor-dashboard-topbar">
-              <span className="vendor-dashboard-title">
-                <LayoutDashboard size={19} aria-hidden="true" />
-                Vendor Dashboard
-              </span>
-              <span className="vendor-dashboard-avatar" aria-hidden="true" />
-            </div>
+            <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
+              <ellipse
+                cx="30"
+                cy="29"
+                rx="9"
+                ry="15"
+                transform="rotate(-25 30 29)"
+              />
+              <ellipse
+                cx="43"
+                cy="18"
+                rx="9"
+                ry="15"
+                transform="rotate(-8 43 18)"
+              />
+              <ellipse
+                cx="60"
+                cy="18"
+                rx="9"
+                ry="15"
+                transform="rotate(8 60 18)"
+              />
+              <ellipse
+                cx="73"
+                cy="29"
+                rx="9"
+                ry="15"
+                transform="rotate(25 73 29)"
+              />
+              <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
+            </g>
+          </svg>
 
-            <div className="vendor-dashboard-content">
-              <div className="vendor-dashboard-stats">
-                {dashboardStats.map((stat) => (
-                  <article className="vendor-dashboard-stat" key={stat.label}>
-                    <span>{stat.label}</span>
-                    <strong>{stat.value}</strong>
-                  </article>
-                ))}
-              </div>
+          <svg
+            className="vl-floaty vl-floaty-bone vl-bone-a"
+            viewBox="0 0 100 60"
+            fill="none"
+          >
+            <path
+              d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
+              stroke="currentColor"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              transform="rotate(-25 50 30)"
+            />
+          </svg>
 
-              <div className="vendor-dashboard-panels">
-                <section className="vendor-chart-panel">
-                  <h3>
-                    <ChartNoAxesCombined size={17} aria-hidden="true" />
-                    Sales this month
-                  </h3>
+          <svg
+            className="vl-floaty vl-floaty-heart vl-heart-a"
+            viewBox="0 0 40 40"
+            fill="none"
+          >
+            <path
+              d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+          </svg>
 
-                  <div
-                    className="vendor-chart"
-                    role="img"
-                    aria-label="Illustrative monthly sales bar chart"
-                  >
-                    {salesBars.map((height, index) => (
-                      <span
-                        className={
-                          index === 5
-                            ? "vendor-chart-bar highlight"
-                            : "vendor-chart-bar"
-                        }
-                        style={{ height: `${height}%` }}
-                        key={index}
-                      />
-                    ))}
-                  </div>
-                </section>
+          <svg
+            className="vl-floaty vl-floaty-sparkle vl-sparkle-a"
+            viewBox="0 0 40 40"
+            fill="none"
+          >
+            <path
+              d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </svg>
 
-                <section className="vendor-orders-panel">
-                  <h3>
-                    <ShoppingBag size={17} aria-hidden="true" />
-                    Recent orders
-                  </h3>
+          <svg
+            className="vl-floaty vl-floaty-paw vl-paw-b"
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
+              <ellipse
+                cx="30"
+                cy="29"
+                rx="9"
+                ry="15"
+                transform="rotate(-25 30 29)"
+              />
+              <ellipse
+                cx="43"
+                cy="18"
+                rx="9"
+                ry="15"
+                transform="rotate(-8 43 18)"
+              />
+              <ellipse
+                cx="60"
+                cy="18"
+                rx="9"
+                ry="15"
+                transform="rotate(8 60 18)"
+              />
+              <ellipse
+                cx="73"
+                cy="29"
+                rx="9"
+                ry="15"
+                transform="rotate(25 73 29)"
+              />
+              <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
+            </g>
+          </svg>
 
-                  {recentOrders.map((order) => (
-                    <div className="vendor-order-row" key={order.name}>
-                      <span>{order.name}</span>
+          <svg
+            className="vl-floaty vl-floaty-sparkle vl-sparkle-b"
+            viewBox="0 0 40 40"
+            fill="none"
+          >
+            <path
+              d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </svg>
 
-                      <strong
-                        className={`vendor-order-status vendor-status-${order.status
-                          .toLowerCase()
-                          .replace(" ", "-")}`}
-                      >
-                        {order.status}
-                      </strong>
-                    </div>
-                  ))}
-                </section>
-              </div>
+          <svg
+            className="vl-floaty vl-floaty-bone vl-bone-b"
+            viewBox="0 0 100 60"
+            fill="none"
+          >
+            <path
+              d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
+              stroke="currentColor"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              transform="rotate(-25 50 30)"
+            />
+          </svg>
 
-              <p className="vendor-preview-note">
-                Illustrative dashboard preview
-              </p>
-            </div>
-          </div>
-        </section>
+          <svg
+            className="vl-floaty vl-floaty-heart vl-heart-b"
+            viewBox="0 0 40 40"
+            fill="none"
+          >
+            <path
+              d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      </section>
 
-        {/* FINAL CALL TO ACTION */}
-        <section className="vendor-cta-section section-container vendor-reveal">
-          <div className="vendor-cta-decoration" aria-hidden="true">
-            <PawPrint className="vendor-cta-paw vendor-cta-paw-one" />
-            <PawPrint className="vendor-cta-paw vendor-cta-paw-two" />
-          </div>
+      {/* MARKETPLACE STATISTICS */}
+      <section
+        className="vendor-stats vendor-reveal"
+        aria-label="Marketplace highlights"
+      >
+        <article className="vendor-stat-card">
+          <UsersRound size={23} aria-hidden="true" />
+          <strong>More customers</strong>
+          <span>Expand your reach</span>
+        </article>
 
-          <div className="vendor-cta-content">
-            <span className="vendor-eyebrow">
-              Your next chapter starts here
+        <article className="vendor-stat-card">
+          <ShoppingBag size={23} aria-hidden="true" />
+          <strong>More visibility</strong>
+          <span>Showcase your offerings</span>
+        </article>
+
+        <article className="vendor-stat-card">
+          <CalendarCheck size={23} aria-hidden="true" />
+          <strong>Easy management</strong>
+          <span>Keep bookings organized</span>
+        </article>
+
+        <article className="vendor-stat-card">
+          <ChartNoAxesCombined size={23} aria-hidden="true" />
+          <strong>One dashboard</strong>
+          <span>Manage your business</span>
+        </article>
+      </section>
+
+      {/* BENEFITS */}
+      <section
+        className="vendor-benefits section-container vendor-reveal"
+        id="benefits"
+      >
+        <div className="vendor-section-heading">
+          <span className="vendor-eyebrow">Why choose Pawdigree?</span>
+          <h2>Everything you need to grow your pet business</h2>
+          <p>
+            One platform to reach customers, sell products, offer services and
+            stay organized.
+          </p>
+        </div>
+
+        <div className="vendor-benefit-grid">
+          {benefits.map((benefit) => {
+            const Icon = benefit.icon;
+
+            return (
+              <article className="vendor-benefit-card" key={benefit.title}>
+                <span className="vendor-benefit-icon" aria-hidden="true">
+                  <Icon size={26} strokeWidth={1.8} />
+                </span>
+
+                <h3>{benefit.title}</h3>
+                <p>{benefit.description}</p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section
+        className="vendor-how-it-works section-container vendor-reveal"
+        id="how-it-works"
+      >
+        <div className="vendor-section-heading">
+          <span className="vendor-eyebrow">Getting started</span>
+          <h2>How it works</h2>
+          <p>Get your business live on Pawdigree in four simple steps.</p>
+        </div>
+
+        <VendorSteps steps={steps} />
+      </section>
+
+      {/* DASHBOARD PREVIEW */}
+      <section className="vendor-dashboard-section section-container vendor-reveal">
+        <div className="vendor-dashboard-copy">
+          <span className="vendor-eyebrow">Your business at a glance</span>
+
+          <h2>
+            Your business.
+            <br />
+            One dashboard.
+          </h2>
+
+          <p>
+            Manage your products, pets, services, bookings and orders from one
+            organized workspace.
+          </p>
+
+          <ul>
+            <li>
+              <CheckCircle2 size={18} aria-hidden="true" />
+              Real-time order &amp; booking tracking
+            </li>
+            <li>
+              <CheckCircle2 size={18} aria-hidden="true" />
+              Simple listing management
+            </li>
+            <li>
+              <CheckCircle2 size={18} aria-hidden="true" />
+              Business performance at a glance
+            </li>
+          </ul>
+
+          <Link className="vendor-text-link" to="/vendor/register">
+            Start growing your business
+            <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div
+          className="vendor-dashboard-preview"
+          aria-label="Illustrative vendor dashboard preview"
+        >
+          <div className="vendor-dashboard-topbar">
+            <span className="vendor-dashboard-title">
+              <LayoutDashboard size={19} aria-hidden="true" />
+              Vendor Dashboard
             </span>
+            <span className="vendor-dashboard-avatar" aria-hidden="true" />
+          </div>
 
-            <h2>Ready to grow with Pawdigree?</h2>
+          <div className="vendor-dashboard-content">
+            <div className="vendor-dashboard-stats">
+              {dashboardStats.map((stat) => (
+                <article className="vendor-dashboard-stat" key={stat.label}>
+                  <span>{stat.label}</span>
+                  <strong>{stat.value}</strong>
+                </article>
+              ))}
+            </div>
 
-            <p>
-              Bring your pet business to a platform built to connect you
-              <br className="vendor-desktop-break" />
-              with the people who care about pets.
-            </p>
+            <div className="vendor-dashboard-panels">
+              <section className="vendor-chart-panel">
+                <h3>
+                  <ChartNoAxesCombined size={17} aria-hidden="true" />
+                  Sales this month
+                </h3>
 
-            <Link
-              className="vendor-button vendor-button-primary-cta"
-              to="/vendor/register"
-            >
-              Become a Vendor
-              <ArrowUpRight size={17} aria-hidden="true" />
-            </Link>
+                <div
+                  className="vendor-chart"
+                  role="img"
+                  aria-label="Illustrative monthly sales bar chart"
+                >
+                  {salesBars.map((height, index) => (
+                    <span
+                      className={
+                        index === 5
+                          ? "vendor-chart-bar highlight"
+                          : "vendor-chart-bar"
+                      }
+                      style={{ height: `${height}%` }}
+                      key={index}
+                    />
+                  ))}
+                </div>
+              </section>
 
-            <p className="vendor-cta-login">
-              Already have a vendor account? <Link to="/vendor/login">Log in</Link>
+              <section className="vendor-orders-panel">
+                <h3>
+                  <ShoppingBag size={17} aria-hidden="true" />
+                  Recent orders
+                </h3>
+
+                {recentOrders.map((order) => (
+                  <div className="vendor-order-row" key={order.name}>
+                    <span>{order.name}</span>
+
+                    <strong
+                      className={`vendor-order-status vendor-status-${order.status
+                        .toLowerCase()
+                        .replace(" ", "-")}`}
+                    >
+                      {order.status}
+                    </strong>
+                  </div>
+                ))}
+              </section>
+            </div>
+
+            <p className="vendor-preview-note">
+              Illustrative dashboard preview
             </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FOOTER */}
-        <footer className="vendor-footer" id="vendor-footer">
+      {/* FINAL CALL TO ACTION */}
+      <section className="vendor-cta-section section-container vendor-reveal">
+        <div className="vendor-cta-decoration" aria-hidden="true">
+          <PawPrint className="vendor-cta-paw vendor-cta-paw-one" />
+          <PawPrint className="vendor-cta-paw vendor-cta-paw-two" />
+        </div>
+
+        <div className="vendor-cta-content">
+          <span className="vendor-eyebrow">Your next chapter starts here</span>
+
+          <h2>Ready to grow with Pawdigree?</h2>
+
+          <p>
+            Bring your pet business to a platform built to connect you
+            <br className="vendor-desktop-break" />
+            with the people who care about pets.
+          </p>
+
+          <Link
+            className="vendor-button vendor-button-primary-cta"
+            to="/vendor/register"
+          >
+            Become a Vendor
+            <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
+
+          <p className="vendor-cta-login">
+            Already have a vendor account?{" "}
+            <Link to="/vendor/login">Log in</Link>
+          </p>
+        </div>
+      </section>
+
+      {/* FOOTER - Commented out temporarily till vendor-footer is added to the shared folder*/}
+      {/*<footer className="vendor-footer" id="vendor-footer">
           <div className="vendor-footer-inner">
             <div className="vendor-footer-brand">
               <a
@@ -768,9 +747,8 @@ function VendorLandingPage() {
               </div>
             </div>
           </div>
-        </footer>
-      </main>
-    </>
+        </footer>*/}
+    </main>
   );
 }
 

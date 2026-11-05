@@ -1,270 +1,308 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
-  Heart,
-  ShoppingCart,
-  UserRound,
-  Menu,
-  Search,
   MapPin,
+  PawPrint,
   ShieldCheck,
-  Star,
-  MessageCircle,
   ChevronLeft,
   ChevronRight,
-  PawPrint,
 } from "lucide-react";
+import BackButton from "../../components/BackButton/BackButton";
+import { DEFAULT_QUERY, type PublicPet } from "../../data/pets";
+import { fetchPet, fetchPets } from "../../services/petsApi";
 import "./PetsDetailPage.css";
 
-export type PetDetails = {
-  id: string;
-  name: string;
-  breed: string;
-  gender: string;
-  age: string;
-  size: string;
-  vaccinated: boolean;
-  location: string;
-  feeLabel: string;
-  description: string;
-  photos: string[];
-  listingStatus: string;
-  vendor: {
-    name: string;
-    location: string;
-    rating: number;
-    verified: boolean;
-    photo: string;
-  };
+type Loaded = { id: string; pet?: PublicPet; similar: PublicPet[] };
+
+const STATUS_LABEL: Record<string, string> = {
+  AVAILABLE: "Available",
+  PENDING: "Adoption pending",
+  ADOPTED: "Adopted",
 };
 
-type SuggestedPet = {
-  name: string;
-  type: string;
-  location: string;
-  photo: string;
-};
+function photosOf(pet: PublicPet): string[] {
+  return [...(pet.images ?? [])]
+    .sort(
+      (a, b) =>
+        Number(b.is_primary ?? false) - Number(a.is_primary ?? false) ||
+        (a.position ?? 0) - (b.position ?? 0),
+    )
+    .map((i) => i.image)
+    .filter((src): src is string => Boolean(src));
+}
 
-type PetDetailsPageProps = {
-  pet?: PetDetails;
-  suggestedPets?: SuggestedPet[];
-  onAdopt?: (pet: PetDetails) => void;
-  onMessageVendor?: (pet: PetDetails) => void;
-  onViewVendor?: (pet: PetDetails) => void;
-};
+function formatAge(months: number) {
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"}`;
+  const years = Math.floor(months / 12);
+  return `${years} year${years === 1 ? "" : "s"}`;
+}
 
-const demoPet: PetDetails = {
-  id: "amber-001",
-  name: "Amber",
-  breed: "Golden Retriever",
-  gender: "Female",
-  age: "8 months",
-  size: "Large",
-  vaccinated: true,
-  location: "Kampala",
-  feeLabel: "UGX 150,000",
-  description:
-    "Amber is a friendly, house-trained 8-month-old Golden Retriever surrendered by a family relocating abroad. She is great with children and other dogs, walks well on a leash, and is looking for an active home with space to play.",
-  photos: [
-    "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1551717743-49959800b1f6?auto=format&fit=crop&w=700&q=80",
-    "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=700&q=80",
-    "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=700&q=80",
-  ],
-  listingStatus: "Available for Adoption",
-  vendor: {
-    name: "Sunrise Animal Shelter",
-    location: "Mukono",
-    rating: 4.9,
-    verified: true,
-    photo:
-      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=160&q=80",
-  },
-};
+const titleCase = (s?: string) =>
+  s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
 
-const demoSuggestions: SuggestedPet[] = [
-  {
-    name: "Miso",
-    type: "Cat",
-    location: "Entebbe",
-    photo:
-      "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    name: "Coco",
-    type: "Rabbit",
-    location: "Jinja",
-    photo:
-      "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    name: "Rex",
-    type: "Dog",
-    location: "Kampala",
-    photo:
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80",
-  },
-];
+function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
+  const [active, setActive] = useState(0);
+  const change = (dir: number) =>
+    setActive((cur) => (cur + dir + photos.length) % photos.length);
 
-export default function PetDetailsPage({
-  pet = demoPet,
-  suggestedPets = demoSuggestions,
-  onAdopt,
-  onMessageVendor,
-  onViewVendor,
-}: PetDetailsPageProps) {
-  const [activePhoto, setActivePhoto] = useState(0);
-  const [isSaved, setIsSaved] = useState(false);
+  return (
+    <>
+      <div className="pd-main-photo">
+        {photos.length > 0 ? (
+          <img src={photos[active]} alt={alt} />
+        ) : (
+          <div className="pd-photo-empty" aria-label="No photo available">
+            <PawPrint size={64} aria-hidden="true" />
+          </div>
+        )}
+        {photos.length > 1 && (
+          <>
+            <button
+              className="pd-photo-arrow pd-photo-prev"
+              onClick={() => change(-1)}
+              aria-label="Previous photo"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              className="pd-photo-arrow pd-photo-next"
+              onClick={() => change(1)}
+              aria-label="Next photo"
+            >
+              <ChevronRight size={22} />
+            </button>
+            <span className="pd-photo-count">
+              {active + 1} / {photos.length}
+            </span>
+          </>
+        )}
+      </div>
+      {photos.length > 1 && (
+        <div className="pd-thumbnails">
+          {photos.map((photo, index) => (
+            <button
+              key={`${photo}-${index}`}
+              className={`pd-thumbnail ${active === index ? "active" : ""}`}
+              onClick={() => setActive(index)}
+              aria-label={`View photo ${index + 1}`}
+              aria-pressed={active === index}
+            >
+              <img src={photo} alt="" />
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
 
-  const changePhoto = (direction: number) => {
-    setActivePhoto((current) => {
-      const count = pet.photos.length;
-      return (current + direction + count) % count;
-    });
-  };
+export default function PetDetailsPage() {
+  const { petId } = useParams<{ petId: string }>();
+  const [loaded, setLoaded] = useState<Loaded | null>(null);
+
+  useEffect(() => {
+    if (!petId) return;
+    let cancelled = false;
+
+    const petReq = fetchPet(petId);
+    const similarReq = fetchPets(DEFAULT_QUERY)
+      .then((res) =>
+        res.results.filter((p) => String(p.pet_id) !== petId).slice(0, 3),
+      )
+      .catch(() => [] as PublicPet[]);
+
+    Promise.all([petReq, similarReq])
+      .then(([pet, similar]) => {
+        if (!cancelled) setLoaded({ id: petId, pet, similar });
+      })
+      .catch(() => {
+        if (!cancelled) setLoaded({ id: petId, similar: [] });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [petId]);
+
+  const current = loaded?.id === petId ? loaded : null;
+  const pet = current?.pet;
+
+  if (!current) {
+    return (
+      <div className="pet-details-page">
+        <div className="pd-back">
+          <BackButton fallback="/explore-pets" label="Back to pets" />
+        </div>
+        <main className="pd-main" aria-busy="true">
+          <p role="status">Loading pet…</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (!pet) {
+    return (
+      <div className="pet-details-page">
+        <div className="pd-back">
+          <BackButton fallback="/explore-pets" label="Back to pets" />
+        </div>
+        <main className="pd-main">
+          <section role="alert">
+            <h1>Pet not found</h1>
+            <p>This listing may have been removed or is no longer available.</p>
+            <Link to="/explore-pets">Browse all pets</Link>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  const photos = photosOf(pet);
+  const hasPrice = pet.price != null && pet.price !== "";
+  const fee = hasPrice
+    ? `${pet.listing_type === "ADOPTION" ? "Adoption fee: " : ""}UGX ${Number(pet.price).toLocaleString("en-UG")}`
+    : pet.listing_type === "ADOPTION"
+      ? "Adoption fee: ask the vendor"
+      : "Price: ask the vendor";
+  const statusLabel =
+    STATUS_LABEL[pet.adoption_status ?? "AVAILABLE"] ??
+    (pet.listing_type === "ADOPTION" ? "For adoption" : "For sale");
 
   return (
     <div className="pet-details-page">
-      <header className="pd-header">
-        <button className="pd-icon-button" aria-label="Open menu">
-          <Menu size={21} />
-        </button>
-        <Link className="pd-brand" to="/" aria-label="Pawdigree home">
-          <span className="pd-brand-mark"><PawPrint size={20} /></span>
-          <span>Pawdigree<small>Pets deserve a loving home</small></span>
-        </Link>
-
-        <label className="pd-search">
-          <Search size={16} />
-          <input aria-label="Search pets and vets" placeholder="Search pets, vets..." />
-        </label>
-
-        <nav className="pd-header-actions" aria-label="Quick links">
-          <button
-            className={`pd-icon-button ${isSaved ? "is-saved" : ""}`}
-            aria-label={isSaved ? "Remove from favourites" : "Add to favourites"}
-            aria-pressed={isSaved}
-            onClick={() => setIsSaved((saved) => !saved)}
-          >
-            <Heart size={23} fill={isSaved ? "currentColor" : "none"} />
-          </button>
-          <button className="pd-icon-button" aria-label="Shopping cart">
-            <ShoppingCart size={22} />
-          </button>
-          <button className="pd-icon-button" aria-label="Your account">
-            <UserRound size={22} />
-          </button>
-        </nav>
-      </header>
+      <div className="pd-back">
+        <BackButton fallback="/explore-pets" label="Back to pets" />
+      </div>
 
       <div className="pd-breadcrumb">
-        <Link to="/">Home</Link><span>/</span><Link to="/pets">Explore Pets</Link>
-        <span>/</span><strong>{pet.name} — {pet.breed}</strong>
+        <Link to="/">Home</Link>
+        <span>/</span>
+        <Link to="/explore-pets">Browse Pets</Link>
+        <span>/</span>
+        <strong>
+          {pet.name}
+          {pet.breed ? ` — ${pet.breed}` : ""}
+        </strong>
       </div>
 
       <main className="pd-main">
         <section className="pd-gallery" aria-label={`${pet.name} photos`}>
-          <div className="pd-main-photo">
-            <img src={pet.photos[activePhoto]} alt={`${pet.name}, ${pet.breed}`} />
-            {pet.photos.length > 1 && (
-              <>
-                <button className="pd-photo-arrow pd-photo-prev" onClick={() => changePhoto(-1)} aria-label="Previous photo">
-                  <ChevronLeft size={22} />
-                </button>
-                <button className="pd-photo-arrow pd-photo-next" onClick={() => changePhoto(1)} aria-label="Next photo">
-                  <ChevronRight size={22} />
-                </button>
-                <span className="pd-photo-count">{activePhoto + 1} / {pet.photos.length}</span>
-              </>
-            )}
-          </div>
-          <div className="pd-thumbnails">
-            {pet.photos.map((photo, index) => (
-              <button
-                key={`${photo}-${index}`}
-                className={`pd-thumbnail ${activePhoto === index ? "active" : ""}`}
-                onClick={() => setActivePhoto(index)}
-                aria-label={`View photo ${index + 1} of ${pet.name}`}
-                aria-pressed={activePhoto === index}
-              >
-                <img src={photo} alt="" />
-              </button>
-            ))}
-          </div>
+          <Gallery
+            key={pet.pet_id}
+            photos={photos}
+            alt={`${pet.name}${pet.breed ? `, ${pet.breed}` : ""}`}
+          />
 
-          <section className="pd-recommendations">
-            <h2>More pets you may like</h2>
-            <div className="pd-suggested-grid">
-              {suggestedPets.map((suggestion) => (
-                <Link className="pd-suggested-card" to="/pets" key={suggestion.name}>
-                  <div className="pd-suggested-image">
-                    <img src={suggestion.photo} alt={suggestion.name} />
-                    <span>{suggestion.type}</span>
-                  </div>
-                  <div className="pd-suggested-info">
-                    <strong>{suggestion.name}</strong>
-                    <small><MapPin size={12} /> {suggestion.location}</small>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
+          {current.similar.length > 0 && (
+            <section className="pd-recommendations">
+              <h2>More pets you may like</h2>
+              <div className="pd-suggested-grid">
+                {current.similar.map((s) => {
+                  const img = photosOf(s)[0];
+                  return (
+                    <Link
+                      className="pd-suggested-card"
+                      to={`/pets/${s.pet_id}`}
+                      key={s.pet_id}
+                    >
+                      <div className="pd-suggested-image">
+                        {img ? (
+                          <img src={img} alt={s.name} />
+                        ) : (
+                          <PawPrint size={36} aria-hidden="true" />
+                        )}
+                        <span>{titleCase(s.species)}</span>
+                      </div>
+                      <div className="pd-suggested-info">
+                        <strong>{s.name}</strong>
+                        {s.location && (
+                          <small>
+                            <MapPin size={12} /> {s.location}
+                          </small>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </section>
 
         <section className="pd-information" aria-labelledby="pd-pet-name">
           <h1 id="pd-pet-name">{pet.name}</h1>
-          <p className="pd-subtitle">{pet.breed} · {pet.gender}</p>
+          <p className="pd-subtitle">
+            {[pet.breed, titleCase(pet.gender)].filter(Boolean).join(" · ")}
+          </p>
 
           <div className="pd-badges">
-            {pet.vendor.verified && (
-              <span className="pd-badge pd-badge-verified"><ShieldCheck size={13} /> Verified Listing</span>
+            <span className="pd-badge pd-badge-status">{statusLabel}</span>
+            {pet.location && (
+              <span className="pd-badge pd-badge-location">
+                <MapPin size={13} /> {pet.location}
+              </span>
             )}
-            <span className="pd-badge pd-badge-status">{pet.listingStatus}</span>
-            <span className="pd-badge pd-badge-location"><MapPin size={13} /> {pet.location}</span>
           </div>
 
-          <h2 className="pd-fee">{pet.feeLabel.startsWith("UGX") ? "Adoption fee: " : ""}{pet.feeLabel}</h2>
-          <p className="pd-description">{pet.description}</p>
+          <h2 className="pd-fee">{fee}</h2>
+          {pet.description && (
+            <p className="pd-description">{pet.description}</p>
+          )}
+
+          {pet.listing_type === "ADOPTION" &&
+            (pet.adoption_status ?? "AVAILABLE") === "AVAILABLE" && (
+              <Link
+                className="pd-button pd-button-primary"
+                to={`/adoption-request?pet_id=${pet.pet_id}`}
+              >
+                Apply to adopt {pet.name}
+              </Link>
+            )}
 
           <div className="pd-facts" aria-label="Pet details">
-            <div><strong>{pet.age}</strong><span>Age</span></div>
-            <div><strong>{pet.gender}</strong><span>Gender</span></div>
-            <div><strong>{pet.vaccinated ? "Yes" : "Not confirmed"}</strong><span>Vaccinated</span></div>
-            <div><strong>{pet.size}</strong><span>Size</span></div>
-          </div>
-
-          <section className="pd-vendor-card" aria-label="Vendor information">
-            <img className="pd-vendor-photo" src={pet.vendor.photo} alt="" />
-            <div className="pd-vendor-copy">
-              <strong>
-                {pet.vendor.name}
-                {pet.vendor.verified && <ShieldCheck className="pd-inline-verified" size={14} />}
-              </strong>
-              <span><Star size={13} fill="currentColor" /> <b>{pet.vendor.rating.toFixed(1)}</b> · {pet.vendor.location}</span>
+            <div>
+              <strong>{formatAge(pet.age)}</strong>
+              <span>Age</span>
             </div>
-            <button className="pd-button pd-button-outline pd-vendor-button" onClick={() => onViewVendor?.(pet)}>
-              View Profile
-            </button>
-          </section>
-
-          <div className="pd-primary-actions">
-            <button className="pd-button pd-button-primary" onClick={() => onAdopt?.(pet)}>
-              Adopt {pet.name}
-            </button>
-            <button className="pd-button pd-button-outline pd-message-button" onClick={() => onMessageVendor?.(pet)}>
-              <MessageCircle size={17} /> Message
-            </button>
+            <div>
+              <strong>{titleCase(pet.gender)}</strong>
+              <span>Gender</span>
+            </div>
+            {pet.size && (
+              <div>
+                <strong>{titleCase(pet.size)}</strong>
+                <span>Size</span>
+              </div>
+            )}
+            <div>
+              <strong>{titleCase(pet.species)}</strong>
+              <span>Species</span>
+            </div>
           </div>
-          <p className="pd-safety-note"><ShieldCheck size={14} /> Ask questions and confirm details with the vendor before arranging a visit.</p>
+
+          {pet.business_name && (
+            <section className="pd-vendor-card" aria-label="Vendor information">
+              <div className="pd-vendor-copy">
+                <strong>{pet.business_name}</strong>
+                <span>Listed by this vendor</span>
+              </div>
+              {pet.business !== undefined && (
+                <Link
+                  className="pd-button pd-button-outline pd-vendor-button"
+                  to={`/vendors/${pet.business}`}
+                >
+                  View Profile
+                </Link>
+              )}
+            </section>
+          )}
+
+          <p className="pd-safety-note">
+            <ShieldCheck size={14} /> Ask questions and confirm details with the
+            vendor before arranging a visit.
+          </p>
         </section>
       </main>
-
-      <footer className="pd-footer">
-        <span>© 2026 Pawdigree. All rights reserved.</span>
-        <nav aria-label="Footer links">
-          <Link to="/about">About</Link><Link to="/vendors">Vendors</Link><Link to="/support">Support</Link><Link to="/privacy">Privacy</Link>
-        </nav>
-      </footer>
     </div>
   );
 }

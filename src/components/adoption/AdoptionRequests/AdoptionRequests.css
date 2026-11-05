@@ -1,0 +1,202 @@
+/* Adoption requests */
+
+.adoption-req { min-width: 0; }
+.adoption-req-refresh { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Status badge */
+.adoption-req-status { display: inline-flex; align-items: center; justify-content: center; padding: 6px 11px; border-radius: 999px; background: #f0f1ef; color: #646b67; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.adoption-req-status--pending, .adoption-req-status--info_requested { background: #fff2d9; color: #875a17; }
+.adoption-req-status--approved { background: #e6f4e9; color: #24663b; }
+.adoption-req-status--rejected { background: #fbe9e6; color: #9b3d31; }
+.adoption-req-status--cancelled { background: #eceeed; color: #5d6460; }
+
+/* Pet thumbnail */
+.adoption-req-thumb { display: inline-grid; flex: 0 0 auto; place-items: center; width: 52px; height: 52px; overflow: hidden; border-radius: 12px; background: #e9f1ec; }
+.adoption-req-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Filters */
+.adoption-req-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.adoption-req-filters button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 13px; border: 1px solid var(--dashboard-border); border-radius: 999px; background: #fff; color: var(--dashboard-muted); cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; }
+.adoption-req-filters button span { min-width: 20px; padding: 1px 6px; border-radius: 999px; background: #f0f1ef; color: var(--dashboard-muted); font-size: 11px; text-align: center; }
+.adoption-req-filters button.is-active { border-color: var(--dashboard-teal); background: var(--dashboard-teal); color: #fff; }
+.adoption-req-filters button.is-active span { background: rgb(255 255 255 / 22%); color: #fff; }
+
+/* Split layout */
+.adoption-req-split { display: grid; grid-template-columns: minmax(300px, 390px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.adoption-req-pane { position: sticky; top: 16px; min-width: 0; }
+
+/* List  */
+.adoption-req-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.adoption-req-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border: 1px solid var(--dashboard-border); border-radius: 14px; background: #fff; color: inherit; cursor: pointer; font: inherit; text-align: left; transition: border-color .15s ease, background .15s ease; }
+.adoption-req-item:hover { border-color: var(--dashboard-teal); }
+.adoption-req-item:focus-visible { outline: 2px solid var(--dashboard-teal); outline-offset: 2px; }
+.adoption-req-item.is-selected { border-color: var(--dashboard-teal); background: #f1f7f4; box-shadow: inset 3px 0 0 var(--dashboard-teal); }
+.adoption-req-item .adoption-req-thumb { width: 46px; height: 46px; }
+.adoption-req-item-main { display: grid; gap: 3px; min-width: 0; }
+.adoption-req-item-main strong { overflow: hidden; color: var(--dashboard-ink); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.adoption-req-item-main span { overflow: hidden; color: var(--dashboard-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.adoption-req-chevron { display: none; color: var(--dashboard-muted); }
+
+/* Empty detail pane (desktop) */
+.adoption-req-empty { display: grid; justify-items: center; gap: 8px; min-height: 320px; padding: 36px 24px; border: 1px dashed var(--dashboard-border); border-radius: 15px; background: var(--dashboard-paper); color: var(--dashboard-muted); text-align: center; align-content: center; }
+.adoption-req-empty h3, .adoption-req-empty p { margin: 0; }
+.adoption-req-empty h3 { color: var(--dashboard-ink); }
+.adoption-req-empty p { max-width: 320px; font-size: 13px; line-height: 1.55; }
+.adoption-req-empty-art { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: #e9f1ec; }
+
+/* Detail */
+.adoption-req-detail { display: grid; gap: 14px; }
+.adoption-req-back { display: none; align-items: center; gap: 6px; justify-self: start; min-height: 40px; padding: 0; border: 0; background: none; color: var(--dashboard-teal); cursor: pointer; font: inherit; font-size: 14px; font-weight: 800; }
+.adoption-req-detail-title { margin: 0; color: var(--dashboard-ink); font-size: 1.4rem; }
+.adoption-req-detail-title:focus { outline: none; }
+
+.adoption-req-pet-card { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--dashboard-border); border-radius: 14px; background: #fff; }
+.adoption-req-pet-card > div { flex: 1; min-width: 0; }
+.adoption-req-pet-card h3 { margin: 0 0 3px; color: var(--dashboard-ink); font-size: 16px; overflow-wrap: anywhere; }
+.adoption-req-pet-card p { margin: 0; color: var(--dashboard-muted); font-size: 13px; overflow-wrap: anywhere; }
+.adoption-req-pet-card .adoption-req-thumb { width: 60px; height: 60px; }
+
+.adoption-req-banner { display: flex; gap: 14px; padding: 18px; border-radius: 14px; background: #eef1f0; }
+.adoption-req-banner h3 { margin: 0 0 4px; color: var(--dashboard-ink); font-size: 16px; }
+.adoption-req-banner p { margin: 0; color: #4d5652; font-size: 13px; line-height: 1.55; }
+.adoption-req-banner .adoption-req-note { margin-top: 8px; }
+.adoption-req-banner-icon { display: grid; flex: 0 0 auto; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #5b6561; color: #fff; }
+.adoption-req-banner--approved { background: #e3f0ea; }
+.adoption-req-banner--approved .adoption-req-banner-icon { background: var(--dashboard-teal); }
+.adoption-req-banner--pending, .adoption-req-banner--info_requested { background: #fff5df; }
+.adoption-req-banner--pending .adoption-req-banner-icon, .adoption-req-banner--info_requested .adoption-req-banner-icon { background: #b98228; }
+.adoption-req-banner--rejected { background: #fbe9e6; }
+.adoption-req-banner--rejected .adoption-req-banner-icon { background: #b9503f; }
+
+.adoption-req-timeline, .adoption-req-answers { padding: 18px; border: 1px solid var(--dashboard-border); border-radius: 14px; background: #fff; }
+.adoption-req-timeline h3, .adoption-req-answers h3 { margin: 0 0 14px; color: var(--dashboard-ink); font-size: 15px; }
+.adoption-req-timeline ol { display: grid; margin: 0; padding: 0; list-style: none; }
+.adoption-req-timeline li { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: baseline; column-gap: 12px; padding-bottom: 18px; }
+.adoption-req-timeline li:last-child { padding-bottom: 0; }
+.adoption-req-timeline li:not(:last-child)::before { position: absolute; top: 20px; bottom: 0; left: 10px; width: 2px; background: var(--dashboard-border); content: ""; }
+.adoption-req-timeline li.is-done:not(:last-child)::before { background: var(--dashboard-teal); }
+.adoption-req-dot { display: grid; place-items: center; align-self: start; width: 22px; height: 22px; margin-top: 1px; border: 2px solid var(--dashboard-border); border-radius: 50%; background: #fff; color: #fff; }
+.is-done .adoption-req-dot { border-color: var(--dashboard-teal); background: var(--dashboard-teal); }
+.is-current .adoption-req-dot { border-color: var(--dashboard-teal); box-shadow: inset 0 0 0 4px #fff, inset 0 0 0 11px var(--dashboard-teal); }
+.is-stopped .adoption-req-dot { border-color: #b9503f; background: #b9503f; }
+.adoption-req-step-label { color: var(--dashboard-ink); font-size: 14px; font-weight: 800; }
+.is-upcoming .adoption-req-step-label { color: var(--dashboard-muted); font-weight: 600; }
+.adoption-req-step-meta { color: var(--dashboard-muted); font-size: 12px; text-align: right; }
+
+.adoption-req-answers dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 18px; margin: 0; }
+.adoption-req-answers dt { margin-bottom: 2px; color: var(--dashboard-muted); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.adoption-req-answers dd { margin: 0; color: var(--dashboard-ink); font-size: 14px; overflow-wrap: anywhere; }
+.adoption-req-answers h4 { margin: 16px 0 4px; color: var(--dashboard-ink); font-size: 13px; }
+.adoption-req-answers h4 + p { margin: 0; color: #4d5652; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-line; }
+
+.adoption-req-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.adoption-req-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 18px; border-radius: 10px; background: var(--dashboard-teal); color: #fff; font-size: 13px; font-weight: 800; text-decoration: none; }
+.adoption-req-primary:hover { filter: brightness(1.08); }
+
+/*BUTTONS SETTINGS*/
+
+/* All buttons in My requests: fully rounded pills */
+.customer-adoption-state button,
+.customer-adoption-refresh,
+.adoption-req-refresh,
+.adoption-req-primary,
+.adoption-req-back,
+.adoption-req-filters button {
+  border-radius: 999px !important;
+}
+
+/*  Button transitions  */
+.customer-adoption-state button,
+.customer-adoption-refresh,
+.adoption-req-primary,
+.adoption-req-back,
+.adoption-req-filters button {
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+/*  Hover: filled teal buttons (Find a pet, Try again, Refresh, View pet)  */
+.customer-adoption-state button:hover:not(:disabled),
+.customer-adoption-refresh:hover:not(:disabled),
+.adoption-req-primary:hover {
+  background: #174f4c;
+  box-shadow: 0 4px 12px rgb(33 108 104 / 28%);
+  filter: none;
+}
+
+/* Hover: filter chips  */
+.adoption-req-filters button:hover:not(.is-active) {
+  border-color: var(--dashboard-teal);
+  background: #eef5f1;
+  color: var(--dashboard-teal);
+}
+.adoption-req-filters button.is-active:hover {
+  background: #174f4c;
+  border-color: #174f4c;
+}
+
+/* Hover: back button ("All requests")  */
+.adoption-req-back {
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+}
+.adoption-req-back:hover {
+  background: #eef5f1;
+  color: #174f4c;
+}
+
+/* Pressed */
+.customer-adoption-state button:active:not(:disabled),
+.customer-adoption-refresh:active:not(:disabled),
+.adoption-req-primary:active,
+.adoption-req-filters button:active,
+.adoption-req-back:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Keyboard focus  */
+.customer-adoption-state button:focus-visible,
+.customer-adoption-refresh:focus-visible,
+.adoption-req-primary:focus-visible,
+.adoption-req-back:focus-visible,
+.adoption-req-filters button:focus-visible {
+  outline: 2px solid var(--dashboard-teal);
+  outline-offset: 3px;
+}
+
+/* Disabled  */
+.customer-adoption-state button:disabled,
+.customer-adoption-refresh:disabled {
+  background: var(--dashboard-teal);
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/*End of buttonsettings*/
+
+/* Tablet and phone: list OR detail */
+@media (max-width: 899px) {
+  .adoption-req-split { grid-template-columns: minmax(0, 1fr); }
+  .adoption-req-pane { position: static; }
+  .adoption-req-chevron { display: block; }
+
+  .adoption-req:not(.has-selection) .adoption-req-pane { display: none; }
+  .adoption-req.has-selection .adoption-req-list-col,
+  .adoption-req.has-selection .adoption-req-top { display: none; }
+  .adoption-req-back { display: inline-flex; }
+}
+
+@media (max-width: 560px) {
+  .adoption-req-filters { flex-wrap: nowrap; margin-right: -4px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .adoption-req-filters::-webkit-scrollbar { display: none; }
+  .adoption-req-filters button { flex: 0 0 auto; }
+  .adoption-req-item { grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; padding: 12px; }
+  .adoption-req-item .adoption-req-status { padding: 5px 9px; }
+  .adoption-req-pet-card { flex-wrap: wrap; }
+  .adoption-req-pet-card > div { flex-basis: calc(100% - 80px); }
+  .adoption-req-banner { padding: 14px; }
+  .adoption-req-timeline li { grid-template-columns: 22px minmax(0, 1fr); }
+  .adoption-req-step-meta { grid-column: 2; text-align: left; }
+  .adoption-req-primary { flex: 1 1 100%; }
+}

@@ -1,51 +1,19 @@
 import "./LegalPages.css";
-import lightLogo from "../assets/logos/lightmode-logo.svg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-
-function LegalHeader() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const handleBack = () => {
-    if (location.key !== "default") {
-      navigate(-1);
-    } else {
-      navigate("/vendor");
-    }
-  };
-
-  return (
-    <header className="legal-navbar">
-      <Link className="legal-brand" to="/" aria-label="Pawdigree home">
-        <img src={lightLogo} alt="Pawdigree" className="legal-logo" />
-      </Link>
-
-      <button
-        className="legal-back-link"
-        type="button"
-        onClick={handleBack}
-      >
-        <span aria-hidden="true">←</span>
-        Back
-      </button>
-    </header>
-  );
-}
+import { Link } from "react-router-dom";
+import BackButton from "../components/BackButton/BackButton";
 
 function PrivacyPage() {
   return (
     <main className="legal-page">
-        <LegalHeader />
-
       <article className="legal-content">
+        <BackButton fallback="/" label="Back" />
         <span className="legal-eyebrow">Your privacy matters</span>
         <h1>Privacy Policy</h1>
-        <p className="legal-updated">
-          Effective date: [] · Last updated: []
-        </p>
+        <p className="legal-updated">Effective date: [] · Last updated: []</p>
 
         <p className="legal-intro">
-          This Privacy Policy explains how Pawdigree collects, uses, stores
-          and shares personal data when people visit or use our marketplace.
+          This Privacy Policy explains how Pawdigree collects, uses, stores and
+          shares personal data when people visit or use our marketplace.
         </p>
 
         <div className="legal-note">
@@ -58,20 +26,35 @@ function PrivacyPage() {
         <section>
           <h2>1. Who is responsible for your data?</h2>
           <p>
-            The data controller is [insert full legal name of operating
-            entity], located at [insert address]. Contact our privacy team at
-            [insert privacy email].
+            The data controller is [insert full legal name of operating entity],
+            located at [insert address]. Contact our privacy team at [insert
+            privacy email].
           </p>
         </section>
 
         <section>
           <h2>2. Information we may collect</h2>
           <ul>
-            <li>Account details, such as your name, username, email and phone number.</li>
-            <li>Vendor and business information needed to manage listings and verification.</li>
-            <li>Listing details, photographs, reviews and marketplace communications.</li>
-            <li>Order, booking, delivery, payment-status and refund information where those features are enabled.</li>
-            <li>Technical logs and device information where collected by the Platform.</li>
+            <li>
+              Account details, such as your name, username, email and phone
+              number.
+            </li>
+            <li>
+              Vendor and business information needed to manage listings and
+              verification.
+            </li>
+            <li>
+              Listing details, photographs, reviews and marketplace
+              communications.
+            </li>
+            <li>
+              Order, booking, delivery, payment-status and refund information
+              where those features are enabled.
+            </li>
+            <li>
+              Technical logs and device information where collected by the
+              Platform.
+            </li>
           </ul>
         </section>
 
@@ -113,8 +96,8 @@ function PrivacyPage() {
         <section>
           <h2>6. Data security and retention</h2>
           <p>
-            We aim to use appropriate technical and organisational safeguards
-            to protect personal data. We retain information only as long as
+            We aim to use appropriate technical and organisational safeguards to
+            protect personal data. We retain information only as long as
             reasonably necessary for the purposes described in this Policy and
             applicable legal obligations.
           </p>
@@ -124,30 +107,28 @@ function PrivacyPage() {
           <h2>7. Transfers outside Uganda</h2>
           <p>
             Some service providers may process or store information outside
-            Uganda. Pawdigree must assess applicable legal requirements and
-            use required safeguards before such transfers take place.
+            Uganda. Pawdigree must assess applicable legal requirements and use
+            required safeguards before such transfers take place.
           </p>
         </section>
 
         <section>
           <h2>8. Your privacy rights</h2>
           <p>
-            Subject to applicable law, you may have rights to be informed
-            about processing, access personal data, request correction or
-            deletion where available, withdraw consent where applicable, and
-            raise a complaint about the handling of your information.
+            Subject to applicable law, you may have rights to be informed about
+            processing, access personal data, request correction or deletion
+            where available, withdraw consent where applicable, and raise a
+            complaint about the handling of your information.
           </p>
-          <p>
-            Contact [insert privacy email] to submit a request.
-          </p>
+          <p>Contact [insert privacy email] to submit a request.</p>
         </section>
 
         <section>
           <h2>9. Children’s privacy</h2>
           <p>
-            Pawdigree will apply age restrictions and appropriate safeguards
-            in accordance with applicable law. Contact [insert privacy email]
-            if you have a concern about a child's personal data.
+            Pawdigree will apply age restrictions and appropriate safeguards in
+            accordance with applicable law. Contact [insert privacy email] if
+            you have a concern about a child's personal data.
           </p>
         </section>
 
@@ -155,9 +136,9 @@ function PrivacyPage() {
           <h2>10. Cookies and third-party services</h2>
           <p>
             If implemented, cookies and similar technologies may support
-            sessions, security, preferences and analytics. The final policy
-            must identify the technologies actually used and explain any
-            applicable choices or consent requirements.
+            sessions, security, preferences and analytics. The final policy must
+            identify the technologies actually used and explain any applicable
+            choices or consent requirements.
           </p>
         </section>
 
@@ -183,13 +164,6 @@ function PrivacyPage() {
           <Link to="/terms-and-conditions">Read the Terms and Conditions</Link>
         </p>
       </article>
-
-      <footer className="legal-footer">
-        <p>
-          © 2026 Pawdigree · <Link to="/terms-and-conditions">Terms</Link> ·{" "}
-          <Link to="/privacy">Privacy Policy</Link>
-        </p>
-      </footer>
     </main>
   );
 }
