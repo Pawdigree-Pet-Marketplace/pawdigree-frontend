@@ -208,8 +208,7 @@
 /* Explore Pets keeps every navbar label black in both scroll states. */
 .top-navbar--explore .desktop-links a,
 .top-navbar--explore .desktop-links a:hover,
-.top-navbar--explore .desktop-links a.is-active,
-.top-navbar--explore .desktop-actions .auth-btn {
+.top-navbar--explore .desktop-links a.is-active {
   color: #000;
 }
 

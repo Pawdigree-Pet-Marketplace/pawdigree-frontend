@@ -15,6 +15,7 @@ export default function Listings() {
   const navigate = useNavigate()
   const [pets, setPets] = useState<PublicPet[]>([])
   const [favourites, setFavourites] = useState<number[]>([])
+  const customerFavourites = isCustomerSignedIn ? favourites : []
   const [loading, setLoading] = useState(true)
   const [pendingPet, setPendingPet] = useState<number | null>(null)
 
@@ -29,10 +30,7 @@ export default function Listings() {
 
   useEffect(() => {
     let cancelled = false
-    if (!isCustomerSignedIn) {
-      setFavourites([])
-      return
-    }
+    if (!isCustomerSignedIn) return
     customerAuthenticatedFetch('/api/favourites/ids/')
       .then(async (response) => {
         if (!response.ok) throw new Error('Could not load favourites')
@@ -50,7 +48,7 @@ export default function Listings() {
     }
     if (pendingPet !== null) return
     setPendingPet(petId)
-    const isFavourite = favourites.includes(petId)
+    const isFavourite = customerFavourites.includes(petId)
     try {
       const response = await customerAuthenticatedFetch(`/api/favourites/${petId}/`, {
         method: isFavourite ? 'DELETE' : 'PUT',
@@ -80,7 +78,7 @@ export default function Listings() {
         {loading ? <p role="status">Loading popular pets…</p> : pets.length === 0 ? <p>No pet listings are available right now.</p> : pets.map((pet, index) => {
           const image = pet.images?.find((item) => item.is_primary)?.image || pet.images?.[0]?.image
           const age = pet.age < 12 ? `${pet.age} months` : `${Math.floor(pet.age / 12)} ${Math.floor(pet.age / 12) === 1 ? 'year' : 'years'}`
-          const isFavourite = favourites.includes(pet.pet_id)
+          const isFavourite = customerFavourites.includes(pet.pet_id)
           return (
           <article
             key={pet.pet_id}
