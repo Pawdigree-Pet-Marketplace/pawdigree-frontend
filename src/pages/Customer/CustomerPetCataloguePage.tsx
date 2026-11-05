@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { ArrowRight, Search, Heart, PawPrint, Sparkles } from "lucide-react";
-import { apiRequest } from "../../services/api";
+import API_BASE_URL, { apiRequest } from "../../services/api";
 import { Link, useSearchParams } from "react-router-dom";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 import "./CustomerPetCataloguePage.css";
@@ -10,6 +10,16 @@ type Pet = {
   gender: "MALE" | "FEMALE" | "UNKNOWN"; listing_type: "ADOPTION" | "SALE";
   price?: string | number | null; images?: { image?: string | null; is_primary?: boolean }[];
 };
+function petImageUrl(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  if (/^(https?:|data:|blob:)/i.test(path)) return path;
+  if (!API_BASE_URL) return path;
+  try {
+    return new URL(path, `${new URL(API_BASE_URL).origin}/`).href;
+  } catch {
+    return path;
+  }
+}
 type Filters = { search: string; purpose: string; gender: string; breed: string; minAge: string; maxAge: string; page: number };
 function readFilters(search: string): Filters {
   const query = new URLSearchParams(search);
@@ -55,7 +65,16 @@ export default function CustomerPetCataloguePage() {
       setLoading(true); setError("");
       try {
         const response = await apiRequest<{ count: number; results: Pet[] }>(`/pets/public/?${queryFor(filters)}`);
-        if (!cancelled) { setPets(response.results); setCount(response.count); }
+        if (!cancelled) {
+          setPets(response.results.map((pet) => ({
+            ...pet,
+            images: pet.images?.map((image) => ({
+              ...image,
+              image: petImageUrl(image.image) ?? image.image,
+            })),
+          })));
+          setCount(response.count);
+        }
       } catch { if (!cancelled) setError("We could not load pet listings. Please try again later."); }
       finally { if (!cancelled) setLoading(false); }
     }

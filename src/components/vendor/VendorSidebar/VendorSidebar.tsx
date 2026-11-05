@@ -26,6 +26,7 @@ const implementedVendorPages = new Set([
   "/vendor/listings",
   "/vendor/adoption-applications",
   "/vendor/services/new",
+  "/vendor/business-profile",
 ]);
 
 const navigationGroups = [
@@ -56,7 +57,7 @@ const navigationGroups = [
     title: "BUSINESS",
     items: [
       { label: "Store Profile", path: "/vendor/profile", icon: Store },
-      { label: "Business & Payout", path: "/vendor/business", icon: Wallet },
+      { label: "Business & Payout", path: "/vendor/business-profile", icon: Wallet },
       { label: "Settings", path: "/vendor/settings", icon: Settings },
       { label: "Support", path: "/vendor/support", icon: Headset },
     ],
