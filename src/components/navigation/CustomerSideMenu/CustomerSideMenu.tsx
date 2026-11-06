@@ -5,13 +5,17 @@ import "./CustomerSidemenu.css";
 
 type SideMenuProps = {
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
   audience?: "customer" | "vendor";
   onClose: () => void;
 };
 
-const SideMenu = ({ isOpen, isLoggedIn, audience = "customer", onClose }: SideMenuProps) => {
+const SideMenu = ({
+  isOpen,
+  isLoggedIn,
+  audience = "customer",
+  onClose,
+}: SideMenuProps) => {
   const navigate = useNavigate();
   if (!isOpen) return null;
   const customer = audience === "customer";
@@ -28,53 +32,84 @@ const SideMenu = ({ isOpen, isLoggedIn, audience = "customer", onClose }: SideMe
             alt="Pawdigree"
             className="sidemenu-logo-img"
           />
-          <button className="close-btn" onClick={onClose} aria-label="Close menu">
+          <button
+            type="button"
+            className="close-btn"
+            onClick={onClose}
+            aria-label="Close menu"
+          >
             <X size={22} />
           </button>
         </div>
 
         <div className="sidemenu-content">
-          <Link to={homeHash("#pets")} className="sidemenu-item" onClick={onClose}>
+          <Link to="/explore-pets" className="sidemenu-item" onClick={onClose}>
             Browse Pets
           </Link>
-          <Link to={homeHash("#services")} className="sidemenu-item" onClick={onClose}>
+          <Link
+            to={homeHash("#services")}
+            className="sidemenu-item"
+            onClick={onClose}
+          >
             Services
           </Link>
-          <Link to={homeHash("#merchandise")} className="sidemenu-item" onClick={onClose}>
+          <Link
+            to={homeHash("#merchandise")}
+            className="sidemenu-item"
+            onClick={onClose}
+          >
             Merchandise
           </Link>
           <Link to="/vendor" className="sidemenu-item" onClick={onClose}>
             {customer ? "Become a Seller" : "Vendor Home"}
           </Link>
           <div className="sidemenu-divider" />
-          <Link to={homeHash("#help")} className="sidemenu-item" onClick={onClose}>
+          <Link
+            to={homeHash("#help")}
+            className="sidemenu-item"
+            onClick={onClose}
+          >
             <HelpCircle size={18} /> Help Center
           </Link>
 
           {isLoggedIn ? (
             <Link
-              to={audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard"}
+              to={
+                audience === "vendor"
+                  ? "/vendor/dashboard"
+                  : "/customer/dashboard"
+              }
               className="sidemenu-item"
               onClick={onClose}
             >
-              {audience === "vendor" ? "Vendor Dashboard" : "Customer Dashboard"}
+              {audience === "vendor"
+                ? "Vendor Dashboard"
+                : "Customer Dashboard"}
             </Link>
           ) : (
             <div className="sidemenu-auth">
               <button
+                type="button"
                 className="login-btn-full"
                 onClick={() => {
                   onClose();
-                  navigate(audience === "vendor" ? "/vendor/login" : "/customer-login");
+                  navigate(
+                    audience === "vendor" ? "/vendor/login" : "/customer-login",
+                  );
                 }}
               >
                 Log In
               </button>
               <button
+                type="button"
                 className="signup-btn-full"
                 onClick={() => {
                   onClose();
-                  navigate(audience === "vendor" ? "/vendor/register" : "/registration");
+                  navigate(
+                    audience === "vendor"
+                      ? "/vendor/register"
+                      : "/registration",
+                  );
                 }}
               >
                 Sign Up

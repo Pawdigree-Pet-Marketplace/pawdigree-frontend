@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Breather from "../../components/common/Breather";
 import Button from "../../components/common/Button";
-import CtaBanner from "../../components/common/CtaBanner";
+import CommonCtaBanner from "../../components/common/CommonCtaBanner";
 import EmptyState from "../../components/common/EmptyState";
 import Pagination from "../../components/common/Pagination";
 import Reveal from "../../components/common/Reveal";
@@ -660,7 +660,7 @@ export default function ExplorePets() {
 
       {/* VENDOR CTA */}
       <Reveal className="ep-container ep-section">
-        <CtaBanner
+        <CommonCtaBanner
           eyebrow="For pet businesses"
           title="Have pets that need a loving home?"
           text="Become a Pawdigree vendor and reach pet seekers across Uganda."

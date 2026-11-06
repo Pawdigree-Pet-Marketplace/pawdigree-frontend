@@ -2,7 +2,12 @@
   padding: var(--space-8) var(--space-4);
   border: 1px solid rgba(251, 134, 101, 0.25);
   border-radius: var(--space-4);
-  background: var(--coral-tint);
+  background: linear-gradient(
+    115deg,
+    #e7f3ec,
+    #fbf5e9 68%,
+    #ffeae1
+  );
   text-align: center;
   transition:
     border-color 0.3s ease,

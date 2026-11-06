@@ -15,6 +15,7 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <button
+      type="button"
       className={`btn btn-${variant} ${className || ""}`}
       onClick={onClick}
     >

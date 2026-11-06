@@ -563,11 +563,11 @@
 .vendor-workspace .catalogue-toolbar p,
 .vendor-workspace .catalogue-pet-details,
 .vendor-workspace .catalogue-footnote { color: rgb(44 48 47 / 66%); }
-.vendor-workspace .catalogue-add-button {
+.vendor-workspace .catalogue-toolbar .catalogue-add-button {
   border: 1px solid #216C68;
   border-radius: 999px;
   background: #216C68;
-  color: #FBFAF7;
+  color: #fff;
   font-family: "Inter", "Nunito", sans-serif;
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
