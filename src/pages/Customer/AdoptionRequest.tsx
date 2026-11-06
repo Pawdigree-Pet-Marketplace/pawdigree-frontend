@@ -229,6 +229,7 @@ export default function AdoptionRequest() {
                   </select><ChevronDown size={19} /></div>
                   {errors.home_type && <small className="field-error">{errors.home_type}</small>}
                 </div>
+                
                 <BooleanField label="Do you have outdoor space?" value={form.has_outdoor_space} onChange={(value) => update("has_outdoor_space", value)} error={errors.has_outdoor_space} />
                 <BooleanField label="Do you currently have other pets?" value={form.has_other_pets} onChange={(value) => update("has_other_pets", value)} error={errors.has_other_pets} />
                 {form.has_other_pets && <div className="field">

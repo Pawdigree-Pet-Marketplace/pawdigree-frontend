@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-
+import CustomerShell from "./layouts/CustomerShell/CustomerShell";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -10,7 +10,6 @@ import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
-import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import AdoptionRequest from "./pages/Customer/AdoptionRequest";
 import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
 import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
@@ -122,22 +121,19 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/customer/adoption"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <CustomerAdoptionPage />
-          </ProtectedRoute>
-        }
-      />
+
       <Route
         path="/adoption-request"
         element={
           <ProtectedRoute role="CUSTOMER">
-            <AdoptionRequest />
+            <CustomerShell />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<AdoptionRequest />} />
+      </Route>
+
+      {/* VENDOR AREA */}
       {/* VENDOR AREA */}
       <Route
         path="/vendor/business-registration"
