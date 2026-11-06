@@ -140,7 +140,7 @@ function App() {
       />
       {/* VENDOR AREA */}
       <Route
-        path="/business-registration"
+        path="/vendor/business-registration"
         element={
           <ProtectedRoute role="VENDOR">
             <BusinessRegistrationForm />
@@ -219,8 +219,8 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/vendor/documents"
+          <Route
+        path="/vendor/documents/:businessId"
         element={
           <ProtectedRoute role="VENDOR">
             <DocumentUpload />
