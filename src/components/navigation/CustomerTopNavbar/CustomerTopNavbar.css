@@ -205,15 +205,29 @@
   color: var(--coral);
 }
 
-/* Explore Pets keeps every navbar label black in both scroll states. */
-.top-navbar--explore .desktop-links a,
-.top-navbar--explore .desktop-links a:hover,
-.top-navbar--explore .desktop-links a.is-active {
-  color: #000;
+/* =========================
+   EXPLORE PETS (LIGHT BACKGROUND)
+========================= */
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .desktop-links a {
+  color: var(--charcoal);
 }
 
-.top-navbar--explore .hamburger {
-  color: #000;
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .desktop-links a:hover {
+  color: var(--teal);
+}
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .desktop-links a.is-active {
+  color: var(--coral);
+}
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .hamburger {
+  color: var(--charcoal);
+  background: transparent;
 }
 
 /* =========================
