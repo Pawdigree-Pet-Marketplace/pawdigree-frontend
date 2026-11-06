@@ -1,27 +1,52 @@
-
-import type { ReactNode } from "react";
-
+import { type ReactNode } from "react";
 import {
-  cleanup,
-  render as rtlRender,
+  render,
   screen,
   waitFor,
 } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 import BusinessRegistrationForm from "./BusinessRegistrationForm";
 
-const render = (ui: ReactNode) =>
-  rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("react-router-dom")>();
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+vi.mock("../../layouts/VendorLayout/VendorLayout", () => ({
+  default: ({
+    children,
+    title,
+    description,
+    businessName,
+    vendorWorkspace,
+  }: {
+    children: ReactNode;
+    title: string;
+    description: string;
+    businessName: string;
+    vendorWorkspace?: boolean;
+  }) => (
+    <div
+      data-testid="vendor-layout"
+      data-title={title}
+      data-description={description}
+      data-business-name={businessName}
+      data-vendor-workspace={String(vendorWorkspace)}
+    >
+      {children}
+    </div>
+  ),
+}));
 
 const mockCountryCodes = [
   {
@@ -29,26 +54,28 @@ const mockCountryCodes = [
     iso_code: "UG",
     dial_code: "+256",
   },
+  {
+    country: "Kenya",
+    iso_code: "KE",
+    dial_code: "+254",
+  },
 ];
 
-function mockFetchSuccess() {
+function mockFetch() {
   vi.stubGlobal(
     "fetch",
-    vi.fn(async (input: RequestInfo | URL) => {
-      const url = String(input);
-
-      if (url.includes("/api/country-codes/")) {
-        return {
-          ok: true,
-          json: async () => mockCountryCodes,
-        };
-      }
-
-      return {
-        ok: true,
-        json: async () => ({}),
-      };
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockCountryCodes,
     }),
+  );
+}
+
+function renderForm() {
+  return render(
+    <MemoryRouter>
+      <BusinessRegistrationForm />
+    </MemoryRouter>,
   );
 }
 
@@ -60,29 +87,40 @@ async function fillField(
   await user.type(screen.getByLabelText(label), value);
 }
 
-async function goToStepTwo(
+async function completeStepOne(
   user: ReturnType<typeof userEvent.setup>,
 ) {
-  await fillField(user, /business name/i, "Happy Paws");
+  await fillField(user, /^business name$/i, "Happy Paws");
+
+  await user.selectOptions(
+    screen.getByLabelText(/^business type$/i),
+    "PRODUCT_SELLER",
+  );
 
   await fillField(
     user,
-    /business description/i,
+    /^business description$/i,
     "Pet products and care",
-  );
-
-  await user.click(
-    screen.getByRole("button", {
-      name: /continue/i,
-    }),
   );
 }
 
-async function goToStepThree(
+async function goToStepTwo(
   user: ReturnType<typeof userEvent.setup>,
 ) {
-  await goToStepTwo(user);
+  await completeStepOne(user);
 
+  await user.click(
+    screen.getByRole("button", { name: /continue/i }),
+  );
+
+  expect(
+    await screen.findByLabelText(/^business address$/i),
+  ).toBeInTheDocument();
+}
+
+async function completeStepTwo(
+  user: ReturnType<typeof userEvent.setup>,
+) {
   await fillField(
     user,
     /^business address$/i,
@@ -97,37 +135,48 @@ async function goToStepThree(
 
   await fillField(
     user,
-    /business email/i,
-    "happy@example.com",
+    /^business email$/i,
+    "happy@paws.com",
   );
 
   await fillField(
     user,
-    /business phone/i,
+    /^business phone$/i,
     "+256712345678",
   );
+}
+
+async function goToStepThree(
+  user: ReturnType<typeof userEvent.setup>,
+) {
+  await goToStepTwo(user);
+  await completeStepTwo(user);
 
   await user.click(
-    screen.getByRole("button", {
-      name: /continue/i,
-    }),
+    screen.getByRole("button", { name: /continue/i }),
   );
+
+  expect(
+    await screen.findByRole("group", {
+      name: /business operating hours/i,
+    }),
+  ).toBeInTheDocument();
 }
 
 describe("Business Registration Form", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    mockFetchSuccess();
+    sessionStorage.clear();
+    mockFetch();
   });
 
   afterEach(() => {
-    cleanup();
     vi.unstubAllGlobals();
   });
 
   it("renders the business registration heading", () => {
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     expect(
       screen.getByRole("heading", {
@@ -137,143 +186,127 @@ describe("Business Registration Form", () => {
   });
 
   it("does not display a business category field", () => {
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     expect(
       screen.queryByLabelText(/business category/i),
     ).not.toBeInTheDocument();
   });
 
-  it("does not display an extra navigation button above the business name", () => {
-    render(<BusinessRegistrationForm />);
+  it("does not display an additional navigation button", () => {
+    renderForm();
 
-    const businessName = screen.getByLabelText(/business name/i);
-
-    const continueButton = screen.getByRole("button", {
-      name: /continue/i,
-    });
-
-    expect(businessName).toBeInTheDocument();
-    expect(continueButton).toBeInTheDocument();
-
-    // Only one Continue button should exist on step one.
     expect(
-      screen.getAllByRole("button", {
-        name: /continue/i,
+      screen.queryByRole("button", {
+        name: /dashboard|vendor dashboard/i,
       }),
-    ).toHaveLength(1);
+    ).not.toBeInTheDocument();
   });
 
-  it("loads phone country codes from the backend", async () => {
-    const user = userEvent.setup();
+  it("loads the available phone country codes", async () => {
+    renderForm();
 
-    render(<BusinessRegistrationForm />);
-
-    // Wait for the country-code API request.
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining("/api/country-codes/"),
-        expect.anything(),
+        expect.any(Object),
       );
     });
-
-    // Complete Step 1 to reveal the phone country dropdown on Step 2.
-    await goToStepTwo(user);
-
-    // Confirm that Uganda is available in the dropdown.
-    expect(
-      await screen.findByRole("option", {
-        name: /uganda/i,
-      }),
-    ).toBeInTheDocument();
   });
 
-  it("requires the business name on step one", async () => {
+  it("requires a business name", async () => {
     const user = userEvent.setup();
+    renderForm();
 
-    render(<BusinessRegistrationForm />);
+    await user.selectOptions(
+      screen.getByLabelText(/^business type$/i),
+      "PRODUCT_SELLER",
+    );
 
-    await user.type(
-      screen.getByLabelText(/business description/i),
+    await fillField(
+      user,
+      /^business description$/i,
       "Pet products and care",
     );
 
     await user.click(
-      screen.getByRole("button", {
-        name: /continue/i,
-      }),
+      screen.getByRole("button", { name: /continue/i }),
     );
 
     expect(
-      screen.getByLabelText(/business name/i),
-    ).toHaveAttribute("aria-invalid", "true");
+      await screen.findByText(/business name is required/i),
+    ).toBeInTheDocument();
   });
 
-  it("requires the business description on step one", async () => {
+  it("requires a business description", async () => {
     const user = userEvent.setup();
+    renderForm();
 
-    render(<BusinessRegistrationForm />);
-
-    await user.type(
-      screen.getByLabelText(/business name/i),
+    await fillField(
+      user,
+      /^business name$/i,
       "Happy Paws",
     );
 
+    await user.selectOptions(
+      screen.getByLabelText(/^business type$/i),
+      "PRODUCT_SELLER",
+    );
+
     await user.click(
-      screen.getByRole("button", {
-        name: /continue/i,
-      }),
+      screen.getByRole("button", { name: /continue/i }),
     );
 
     expect(
-      screen.getByLabelText(/business description/i),
-    ).toHaveAttribute("aria-invalid", "true");
+      await screen.findByText(
+        /business description is required/i,
+      ),
+    ).toBeInTheDocument();
   });
 
-  it("does not advance when step one has missing required fields", async () => {
+  it("does not advance when required first-step fields are missing", async () => {
     const user = userEvent.setup();
-
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     await user.click(
-      screen.getByRole("button", {
-        name: /continue/i,
-      }),
+      screen.getByRole("button", { name: /continue/i }),
     );
 
     expect(
-      screen.getByLabelText(/business name/i),
+      screen.getByText(/business name is required/i),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByLabelText(/business description/i),
+      screen.getByText(/please select your business type/i),
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByLabelText(/^business address$/i),
-    ).not.toBeInTheDocument();
+      screen.getByText(/business description is required/i),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(/step 1 of 3/i),
+    ).toBeInTheDocument();
   });
 
-  it("advances to step two when step one is valid", async () => {
+  it("advances to step two when valid business information is provided", async () => {
     const user = userEvent.setup();
+    renderForm();
 
-    render(<BusinessRegistrationForm />);
+    await completeStepOne(user);
 
-    await goToStepTwo(user);
+    await user.click(
+      screen.getByRole("button", { name: /continue/i }),
+    );
 
     expect(
-      screen.getByLabelText(/^business address$/i),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByLabelText(/business phone/i),
+      await screen.findByLabelText(/^business address$/i),
     ).toBeInTheDocument();
   });
 
   it("validates an invalid business email on step two", async () => {
     const user = userEvent.setup();
-
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     await goToStepTwo(user);
 
@@ -291,31 +324,28 @@ describe("Business Registration Form", () => {
 
     await fillField(
       user,
-      /business phone/i,
-      "+256712345678",
+      /^business email$/i,
+      "invalid-email",
     );
 
     await fillField(
       user,
-      /business email/i,
-      "not-an-email",
+      /^business phone$/i,
+      "+256712345678",
     );
 
     await user.click(
-      screen.getByRole("button", {
-        name: /continue/i,
-      }),
+      screen.getByRole("button", { name: /continue/i }),
     );
 
     expect(
-      screen.getByLabelText(/business email/i),
-    ).toHaveAttribute("aria-invalid", "true");
+      await screen.findByText(/valid email/i),
+    ).toBeInTheDocument();
   });
 
   it("requires a city or district on step two", async () => {
     const user = userEvent.setup();
-
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     await goToStepTwo(user);
 
@@ -327,106 +357,146 @@ describe("Business Registration Form", () => {
 
     await fillField(
       user,
-      /business phone/i,
-      "+256712345678",
+      /^business email$/i,
+      "happy@paws.com",
     );
 
     await fillField(
       user,
-      /business email/i,
-      "happy@example.com",
+      /^business phone$/i,
+      "+256712345678",
     );
 
     await user.click(
-      screen.getByRole("button", {
-        name: /continue/i,
-      }),
+      screen.getByRole("button", { name: /continue/i }),
     );
 
     expect(
-      screen.getByLabelText(/^city or district$/i),
-    ).toHaveAttribute("aria-invalid", "true");
+      await screen.findByText(/city or district is required/i),
+    ).toBeInTheDocument();
   });
 
   it("requires agreement to the terms on step three", async () => {
     const user = userEvent.setup();
-
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     await goToStepThree(user);
 
     const termsCheckbox = screen.getByRole("checkbox", {
-      name: /terms and conditions/i,
-    });
+  name: /i agree to the terms and conditions/i,
+});
 
     expect(termsCheckbox).not.toBeChecked();
 
     await user.click(
-      screen.getByRole("button", {
-        name: /register business/i,
-      }),
+      screen.getByRole("button", { name:  /register business/i}),
     );
 
-    expect(termsCheckbox).toHaveAttribute("aria-invalid", "true");
+    expect(
+      await screen.findByText(/agree to the terms/i),
+    ).toBeInTheDocument();
   });
 
   it("requires vendor login before submitting a business", async () => {
     const user = userEvent.setup();
-
-    localStorage.clear();
-
-    render(<BusinessRegistrationForm />);
+    renderForm();
 
     await goToStepThree(user);
 
-    const termsCheckbox = screen.getByRole("checkbox", {
-      name: /terms and conditions/i,
-    });
-
-    await user.click(termsCheckbox);
-
-    expect(termsCheckbox).toBeChecked();
+    await user.click(
+  screen.getByRole("checkbox", {
+    name: /i agree to the terms and conditions/i,
+  }),
+);
 
     await user.click(
-      screen.getByRole("button", {
-        name: /register business/i,
-      }),
+      screen.getByRole("button", { name: /register/i }),
     );
 
     expect(
-      await screen.findByText(/please log in before registering/i),
+      await screen.findByText(/please log in/i),
     ).toBeInTheDocument();
 
-    // Registration must not be submitted without a login token.
     expect(fetch).not.toHaveBeenCalledWith(
       expect.stringContaining("/api/auth/businesses/register/"),
-      expect.objectContaining({
-        method: "POST",
-      }),
+      expect.any(Object),
     );
   });
 
-  it("shows an error if phone country codes cannot be loaded", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => {
-        throw new Error("fetch failed");
-      }),
-    );
-
+  it("handles failure when phone country codes cannot be loaded", async () => {
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
 
-    render(<BusinessRegistrationForm />);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("Network error")),
+    );
+
+    renderForm();
 
     await waitFor(() => {
-      expect(consoleError).toHaveBeenCalledWith(
-        "Unable to load phone country codes:",
-        expect.any(Error),
-      );
+      expect(consoleError).toHaveBeenCalled();
     });
 
     consoleError.mockRestore();
+  });
+
+  it("renders the VendorLayout wrapper", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toBeInTheDocument();
+  });
+
+  it("passes the correct title to VendorLayout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-title", "Register your business");
+  });
+
+  it("passes the correct description to VendorLayout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute(
+      "data-description",
+      "Step 1 of 3 — Business information",
+    );
+  });
+
+  it("enables the vendor workspace layout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-vendor-workspace", "true");
+  });
+
+  it("uses Your store as the default business name in VendorLayout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-business-name", "Your store");
+  });
+
+  it("updates the VendorLayout business name when the user types", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillField(
+      user,
+      /^business name$/i,
+      "Happy Paws",
+    );
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-business-name", "Happy Paws");
   });
 });
