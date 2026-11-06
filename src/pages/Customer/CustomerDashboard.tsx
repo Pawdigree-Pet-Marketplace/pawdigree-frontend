@@ -1,4 +1,11 @@
-import { type CSSProperties, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -25,8 +32,20 @@ import Categories from "../../components/home/Categories";
 import "./CustomerDashboard.css";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 
-type PetFilters = { purpose: string; gender: string; breed: string; minAge: string; maxAge: string };
-const emptyFilters: PetFilters = { purpose: "", gender: "", breed: "", minAge: "", maxAge: "" };
+type PetFilters = {
+  purpose: string;
+  gender: string;
+  breed: string;
+  minAge: string;
+  maxAge: string;
+};
+const emptyFilters: PetFilters = {
+  purpose: "",
+  gender: "",
+  breed: "",
+  minAge: "",
+  maxAge: "",
+};
 
 function petImageUrl(path?: string | null): string | undefined {
   if (!path) return undefined;
@@ -89,7 +108,8 @@ export default function CustomerDashboard() {
   const [breed, setBreed] = useState("");
   const [minAge, setMinAge] = useState("");
   const [maxAge, setMaxAge] = useState("");
-  const [appliedFilters, setAppliedFilters] = useState<PetFilters>(emptyFilters);
+  const [appliedFilters, setAppliedFilters] =
+    useState<PetFilters>(emptyFilters);
   const [filterError, setFilterError] = useState("");
 
   useEffect(() => {
@@ -103,10 +123,13 @@ export default function CustomerDashboard() {
 
       try {
         const params = new URLSearchParams();
-        if (submittedSearch.trim()) params.set("search", submittedSearch.trim());
-        if (appliedFilters.purpose) params.set("listing_type", appliedFilters.purpose);
+        if (submittedSearch.trim())
+          params.set("search", submittedSearch.trim());
+        if (appliedFilters.purpose)
+          params.set("listing_type", appliedFilters.purpose);
         if (appliedFilters.gender) params.set("gender", appliedFilters.gender);
-        if (appliedFilters.breed.trim()) params.set("breed", appliedFilters.breed.trim());
+        if (appliedFilters.breed.trim())
+          params.set("breed", appliedFilters.breed.trim());
         if (appliedFilters.minAge) params.set("age_min", appliedFilters.minAge);
         if (appliedFilters.maxAge) params.set("age_max", appliedFilters.maxAge);
         const query = params.toString();
@@ -134,7 +157,9 @@ export default function CustomerDashboard() {
     };
   }, [isAuthorized, submittedSearch, appliedFilters]);
 
-  const hasActiveCriteria = Boolean(submittedSearch.trim() || Object.values(appliedFilters).some(Boolean));
+  const hasActiveCriteria = Boolean(
+    submittedSearch.trim() || Object.values(appliedFilters).some(Boolean),
+  );
   const filteredPets = useMemo(() => {
     return hasActiveCriteria ? pets : pets.slice(0, 4);
   }, [pets, hasActiveCriteria]);
@@ -150,7 +175,9 @@ export default function CustomerDashboard() {
 
   function handleApplyFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if ([minAge, maxAge].some((value) => value !== "" && !/^\d+$/.test(value))) {
+    if (
+      [minAge, maxAge].some((value) => value !== "" && !/^\d+$/.test(value))
+    ) {
       setFilterError("Enter ages as nonnegative whole numbers of months.");
       return;
     }
@@ -160,12 +187,21 @@ export default function CustomerDashboard() {
     }
     setFilterError("");
     setAppliedFilters({ purpose, gender, breed, minAge, maxAge });
-    document.getElementById("dashboard-listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById("dashboard-listings")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function clearCriteria() {
-    setSearchTerm(""); setSubmittedSearch(""); setPurpose(""); setGender("");
-    setBreed(""); setMinAge(""); setMaxAge(""); setAppliedFilters(emptyFilters); setFilterError("");
+    setSearchTerm("");
+    setSubmittedSearch("");
+    setPurpose("");
+    setGender("");
+    setBreed("");
+    setMinAge("");
+    setMaxAge("");
+    setAppliedFilters(emptyFilters);
+    setFilterError("");
   }
 
   if (!isAuthorized) return null;
@@ -248,16 +284,82 @@ export default function CustomerDashboard() {
           </div>
         </section>
 
-        <form className="dashboard-filters" onSubmit={handleApplyFilters} aria-label="Filter pet listings">
+        <form
+          className="dashboard-filters"
+          onSubmit={handleApplyFilters}
+          aria-label="Filter pet listings"
+        >
           <div className="dashboard-filter-grid">
-            <label>Purpose<select value={purpose} onChange={(event) => setPurpose(event.target.value)}><option value="">Any purpose</option><option value="ADOPTION">Adoption</option><option value="SALE">For sale</option></select></label>
-            <label>Gender<select value={gender} onChange={(event) => setGender(event.target.value)}><option value="">Any gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select></label>
-            <label>Breed<input value={breed} onChange={(event) => setBreed(event.target.value)} placeholder="Any breed" /></label>
-            <label>Minimum age (months)<input type="number" min="0" step="1" inputMode="numeric" value={minAge} onChange={(event) => setMinAge(event.target.value)} /></label>
-            <label>Maximum age (months)<input type="number" min="0" step="1" inputMode="numeric" value={maxAge} onChange={(event) => setMaxAge(event.target.value)} /></label>
+            <label>
+              Purpose
+              <select
+                value={purpose}
+                onChange={(event) => setPurpose(event.target.value)}
+              >
+                <option value="">Any purpose</option>
+                <option value="ADOPTION">Adoption</option>
+                <option value="SALE">For sale</option>
+              </select>
+            </label>
+            <label>
+              Gender
+              <select
+                value={gender}
+                onChange={(event) => setGender(event.target.value)}
+              >
+                <option value="">Any gender</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+              </select>
+            </label>
+            <label>
+              Breed
+              <input
+                value={breed}
+                onChange={(event) => setBreed(event.target.value)}
+                placeholder="Any breed"
+              />
+            </label>
+            <label>
+              Minimum age (months)
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={minAge}
+                onChange={(event) => setMinAge(event.target.value)}
+              />
+            </label>
+            <label>
+              Maximum age (months)
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={maxAge}
+                onChange={(event) => setMaxAge(event.target.value)}
+              />
+            </label>
           </div>
-          <div className="dashboard-filter-actions"><button type="submit">Apply filters</button>{hasActiveCriteria && <button type="button" className="dashboard-filter-clear" onClick={clearCriteria}>Clear search and filters</button>}</div>
-          {filterError && <p className="dashboard-filter-error" role="alert">{filterError}</p>}
+          <div className="dashboard-filter-actions">
+            <button type="submit">Apply filters</button>
+            {hasActiveCriteria && (
+              <button
+                type="button"
+                className="dashboard-filter-clear"
+                onClick={clearCriteria}
+              >
+                Clear search and filters
+              </button>
+            )}
+          </div>
+          {filterError && (
+            <p className="dashboard-filter-error" role="alert">
+              {filterError}
+            </p>
+          )}
         </form>
 
         <section
@@ -272,14 +374,43 @@ export default function CustomerDashboard() {
                 Everything you need to help pets thrive, all in one place.
               </p>
             </div>
-            <div className="dashboard-explore-controls" aria-label="Explore Pawdigree slider controls">
-              <button type="button" aria-label="Previous Explore Pawdigree slide" onClick={() => scrollExploreSlider(-1)}><ArrowRight size={18} className="dashboard-explore-prev" /></button>
-              <button type="button" aria-label="Next Explore Pawdigree slide" onClick={() => scrollExploreSlider(1)}><ArrowRight size={18} /></button>
+            <div
+              className="dashboard-explore-controls"
+              aria-label="Explore Pawdigree slider controls"
+            >
+              <button
+                type="button"
+                aria-label="Previous Explore Pawdigree slide"
+                onClick={() => scrollExploreSlider(-1)}
+              >
+                <ArrowRight size={18} className="dashboard-explore-prev" />
+              </button>
+              <button
+                type="button"
+                aria-label="Next Explore Pawdigree slide"
+                onClick={() => scrollExploreSlider(1)}
+              >
+                <ArrowRight size={18} />
+              </button>
             </div>
           </div>
 
-          <div className="dashboard-explore-track" ref={exploreSliderRef} role="group" aria-label="Explore Pawdigree slides" tabIndex={0}>
-            <Link to="/pets" className="dashboard-explore-slide" style={{ "--explore-image": `url(${catsFeatureImage})` } as CSSProperties}>
+          <div
+            className="dashboard-explore-track"
+            ref={exploreSliderRef}
+            role="group"
+            aria-label="Explore Pawdigree slides"
+            tabIndex={0}
+          >
+            <Link
+              to="/pets"
+              className="dashboard-explore-slide"
+              style={
+                {
+                  "--explore-image": `url(${catsFeatureImage})`,
+                } as CSSProperties
+              }
+            >
               <span className="dashboard-marketplace-icon">
                 <Heart size={22} />
               </span>
@@ -290,7 +421,15 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </Link>
 
-            <div className="dashboard-explore-slide dashboard-explore-slide--unavailable" aria-disabled="true" style={{ "--explore-image": `url(${veterinaryFeatureImage})` } as CSSProperties}>
+            <Link
+              to="/vendors"
+              className="dashboard-explore-slide"
+              style={
+                {
+                  "--explore-image": `url(${veterinaryFeatureImage})`,
+                } as CSSProperties
+              }
+            >
               <span className="dashboard-marketplace-icon">
                 <Stethoscope size={22} />
               </span>
@@ -298,9 +437,18 @@ export default function CustomerDashboard() {
                 <strong>Pet services</strong>
                 <span>Explore services for happier, healthier pets.</span>
               </span>
-            </div>
+              <ArrowRight size={18} className="dashboard-marketplace-arrow" />
+            </Link>
 
-            <div className="dashboard-explore-slide dashboard-explore-slide--unavailable" aria-disabled="true" style={{ "--explore-image": `url(${bellaFeatureImage})` } as CSSProperties}>
+            <div
+              className="dashboard-explore-slide dashboard-explore-slide--unavailable"
+              aria-disabled="true"
+              style={
+                {
+                  "--explore-image": `url(${bellaFeatureImage})`,
+                } as CSSProperties
+              }
+            >
               <span className="dashboard-marketplace-icon">
                 <Sparkles size={22} />
               </span>
@@ -310,7 +458,15 @@ export default function CustomerDashboard() {
               </span>
             </div>
 
-            <Link to="/vendor" className="dashboard-explore-slide" style={{ "--explore-image": `url(${petWalkingFeatureImage})` } as CSSProperties}>
+            <Link
+              to="/vendor"
+              className="dashboard-explore-slide"
+              style={
+                {
+                  "--explore-image": `url(${petWalkingFeatureImage})`,
+                } as CSSProperties
+              }
+            >
               <span className="dashboard-marketplace-icon">
                 <Store size={22} />
               </span>
@@ -321,7 +477,15 @@ export default function CustomerDashboard() {
               <ArrowRight size={18} className="dashboard-marketplace-arrow" />
             </Link>
 
-            <Link to="/pets" className="dashboard-explore-slide" style={{ "--explore-image": `url(${groomingFeatureImage})` } as CSSProperties}>
+            <Link
+              to="/pets"
+              className="dashboard-explore-slide"
+              style={
+                {
+                  "--explore-image": `url(${groomingFeatureImage})`,
+                } as CSSProperties
+              }
+            >
               <span className="dashboard-marketplace-icon">
                 <ShoppingBag size={22} />
               </span>
@@ -339,7 +503,9 @@ export default function CustomerDashboard() {
           title="Browse by category"
           className="dashboard-category-carousel"
           items={dashboardCategories}
-          getHref={(category) => `/pets?search=${encodeURIComponent(category.name === "Other pets" ? "rabbit" : category.name.replace(/s$/i, ""))}`}
+          getHref={(category) =>
+            `/pets?search=${encodeURIComponent(category.name === "Other pets" ? "rabbit" : category.name.replace(/s$/i, ""))}`
+          }
         />
 
         <form className="dashboard-search" onSubmit={handleSearch}>
@@ -372,15 +538,22 @@ export default function CustomerDashboard() {
             <div>
               <p className="dashboard-eyebrow">A NEW DISCOVERY AWAITS</p>
               <h2>{hasActiveCriteria ? "Pet listings" : "Pets to discover"}</h2>
-              {hasActiveCriteria && <p className="dashboard-section-description">{submittedSearch.trim() ? `Results for “${submittedSearch.trim()}”` : "Filtered pet listings"}</p>}
+              {hasActiveCriteria && (
+                <p className="dashboard-section-description">
+                  {submittedSearch.trim()
+                    ? `Results for “${submittedSearch.trim()}”`
+                    : "Filtered pet listings"}
+                </p>
+              )}
             </div>
-            <Link to={`/pets?${new URLSearchParams({ ...(submittedSearch.trim() ? { search: submittedSearch.trim() } : {}), ...(appliedFilters.purpose ? { listing_type: appliedFilters.purpose } : {}), ...(appliedFilters.gender ? { gender: appliedFilters.gender } : {}), ...(appliedFilters.breed.trim() ? { breed: appliedFilters.breed.trim() } : {}), ...(appliedFilters.minAge ? { age_min: appliedFilters.minAge } : {}), ...(appliedFilters.maxAge ? { age_max: appliedFilters.maxAge } : {}) }).toString()}`} className="dashboard-text-link">
+            <Link
+              to={`/pets?${new URLSearchParams({ ...(submittedSearch.trim() ? { search: submittedSearch.trim() } : {}), ...(appliedFilters.purpose ? { listing_type: appliedFilters.purpose } : {}), ...(appliedFilters.gender ? { gender: appliedFilters.gender } : {}), ...(appliedFilters.breed.trim() ? { breed: appliedFilters.breed.trim() } : {}), ...(appliedFilters.minAge ? { age_min: appliedFilters.minAge } : {}), ...(appliedFilters.maxAge ? { age_max: appliedFilters.maxAge } : {}) }).toString()}`}
+              className="dashboard-text-link"
+            >
               Explore more <ArrowRight size={16} />
             </Link>
           </div>
-<Link to="/customer/my-requests">
-  My Adoption Requests
-</Link>
+          <Link to="/customer/my-requests">My Adoption Requests</Link>
           {isLoadingPets ? (
             <div className="dashboard-empty-state" role="status">
               <div className="dashboard-empty-icon" aria-hidden="true">
@@ -424,7 +597,7 @@ export default function CustomerDashboard() {
               {filteredPets.map((pet) => {
                 const primaryImage = petImageUrl(
                   pet.images?.find((image) => image.is_primary)?.image ||
-                  pet.images?.[0]?.image,
+                    pet.images?.[0]?.image,
                 );
 
                 const ageInYears = Math.floor(pet.age / 12);
@@ -434,7 +607,11 @@ export default function CustomerDashboard() {
                     : `${ageInYears} year${ageInYears === 1 ? "" : "s"} old`;
 
                 return (
-                  <article className="dashboard-pet-card" key={pet.pet_id}>
+                  <Link
+                    to={`/pets/${pet.pet_id}`}
+                    className="dashboard-pet-card"
+                    key={pet.pet_id}
+                  >
                     {primaryImage ? (
                       <img src={primaryImage} alt={pet.name} loading="lazy" />
                     ) : (
@@ -461,7 +638,7 @@ export default function CustomerDashboard() {
                         </p>
                       )}
                     </div>
-                  </article>
+                  </Link>
                 );
               })}
             </div>
