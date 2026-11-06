@@ -76,7 +76,7 @@
   gap: 24px;
   padding: clamp(28px, 4vw, 52px);
   overflow: hidden;
-  color: #fff;
+  color: var(--charcoal) !important;
   background: linear-gradient(
     115deg,
     #e7f3ec,
@@ -93,7 +93,7 @@
 }
 
 .common-cta-banner h2 {
-  color: #fff;
+  color: var(--charcoal);
   font-family: var(--font-heading);
   font-size: clamp(1.5rem, 2.6vw, 2.2rem);
   line-height: 1.2;
@@ -101,7 +101,7 @@
 
 .common-cta-banner__copy > p:last-child {
   margin-top: 8px;
-  color: rgb(255 255 255 / 85%);
+  color: var(--gray);
 }
 
 .common-cta-banner__btn {
@@ -151,7 +151,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-  color: var(--coral-light);
+  color: var(--teal);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
