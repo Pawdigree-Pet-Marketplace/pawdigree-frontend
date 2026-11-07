@@ -181,7 +181,7 @@
   border-radius: 8px;
 }
 
-/* Remember me and forgot password */
+/* forgot password */
 
 .customer-login-form .login-options {
   display: flex;
@@ -192,28 +192,6 @@
   margin: 2px 0 15px;
 }
 
-/*
-.customer-login-form .remember-me {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--gray);
-  font-size: 0.78rem;
-  cursor: pointer;
-}
-
-.customer-login-form .remember-me input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: #216c68;
-  cursor: pointer;
-}
-
-.customer-login-form .remember-me input:hover {
-  filter: brightness(1.2);
-}
-*/
 
 .customer-login-form .login-options a {
   color: #216c68;

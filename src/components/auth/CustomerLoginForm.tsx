@@ -19,7 +19,6 @@ export default function CustomerLoginForm() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepLoggedIn] = useState(true);
   const [touched, setTouched] = useState({
     email: false,
     password: false,
@@ -80,7 +79,6 @@ export default function CustomerLoginForm() {
             email: data.masked_email ?? data.email ?? identifier.trim(),
             role: "CUSTOMER",
             redirectTo: postLoginPath,
-            keepLoggedIn,
             expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
             resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
           }),
@@ -93,10 +91,11 @@ export default function CustomerLoginForm() {
         throw new Error("The login response was incomplete. Please try again.");
       }
 
-      saveAuthSession(
-        { access: data.access, refresh: data.refresh, role: "CUSTOMER" },
-        keepLoggedIn,
-      );
+      saveAuthSession({
+        access: data.access,
+        refresh: data.refresh,
+        role: "CUSTOMER",
+      });
 
       navigate(postLoginPath, { replace: true });
     } catch (err) {
@@ -136,10 +135,11 @@ export default function CustomerLoginForm() {
         }),
       });
 
-      saveAuthSession(
-        { access: data.access, refresh: data.refresh, role: "CUSTOMER" },
-        keepLoggedIn,
-      );
+      saveAuthSession({
+        access: data.access,
+        refresh: data.refresh,
+        role: "CUSTOMER",
+      });
 
       navigate(postLoginPath, { replace: true });
     } catch (err) {
@@ -239,18 +239,6 @@ export default function CustomerLoginForm() {
         </div>
 
         <div className="login-options">
-          {/*
-          <label className="remember-me">
-            <input
-              className="remember-checkbox"
-              type="checkbox"
-              checked={keepLoggedIn}
-              onChange={(e) => setKeepLoggedIn(e.target.checked)}
-            />
-            <span>Keep me logged in</span>
-          </label>
-          */}
-
           <Link to="/forgot-password">Forgot password?</Link>
         </div>
 
@@ -315,7 +303,9 @@ export default function CustomerLoginForm() {
 
       <p className="login-register-link">
         Don't have an account?{" "}
-        <Link to="/registration" state={location.state}>Sign up</Link>
+        <Link to="/registration" state={location.state}>
+          Sign up
+        </Link>
       </p>
 
       <p className="login-terms">
