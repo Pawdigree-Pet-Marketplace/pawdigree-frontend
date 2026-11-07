@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   parsePhoneNumberFromString,
@@ -6,6 +5,7 @@ import {
 } from "libphonenumber-js";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import { Link, useNavigate } from "react-router-dom";
+import { getSessionToken } from "../../services/auth/authStorage";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./BusinessRegistrationForm.css";
 import API_BASE_URL from "../../services/api";
@@ -86,8 +86,7 @@ function BusinessRegistrationForm() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
   const [countries, setCountries] = useState<CountryOption[]>([]);
-  const [selectedCountry, setSelectedCountry] =
-    useState<CountryCode>("UG");
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("UG");
   const [loadingCountries, setLoadingCountries] = useState(true);
 
   const [businessHours, setBusinessHours] =
@@ -97,9 +96,7 @@ function BusinessRegistrationForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">(
-    "error"
-  );
+  const [messageType, setMessageType] = useState<"success" | "error">("error");
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
@@ -116,13 +113,10 @@ function BusinessRegistrationForm() {
 
     async function loadCountries() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/country-codes/`,
-          {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-          }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/country-codes/`, {
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        });
 
         if (!response.ok) {
           throw new Error("Unable to load phone country codes.");
@@ -139,8 +133,7 @@ function BusinessRegistrationForm() {
         setCountries(countryList);
 
         const defaultCountry =
-          countryList.find((item) => item.iso_code === "UG") ??
-          countryList[0];
+          countryList.find((item) => item.iso_code === "UG") ?? countryList[0];
 
         if (defaultCountry) {
           setSelectedCountry(defaultCountry.iso_code as CountryCode);
@@ -167,7 +160,7 @@ function BusinessRegistrationForm() {
   function handleChange(
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) {
     const { name, value, type } = event.target;
 
@@ -192,7 +185,7 @@ function BusinessRegistrationForm() {
   function handleHoursChange(
     day: string,
     field: keyof DayHours,
-    value: string | boolean
+    value: string | boolean,
   ) {
     setBusinessHours((previous) => ({
       ...previous,
@@ -225,8 +218,7 @@ function BusinessRegistrationForm() {
       if (!formData.description.trim()) {
         newErrors.description = "Business description is required.";
       } else if (formData.description.trim().length > 500) {
-        newErrors.description =
-          "Description cannot exceed 500 characters.";
+        newErrors.description = "Description cannot exceed 500 characters.";
       }
     }
 
@@ -271,11 +263,7 @@ function BusinessRegistrationForm() {
           return false;
         }
 
-        return (
-          !hours.open ||
-          !hours.close ||
-          hours.open >= hours.close
-        );
+        return !hours.open || !hours.close || hours.open >= hours.close;
       });
 
       if (invalidHours) {
@@ -284,8 +272,7 @@ function BusinessRegistrationForm() {
       }
 
       if (!formData.agreeToTerms) {
-        newErrors.agreeToTerms =
-          "You must agree to the terms and conditions.";
+        newErrors.agreeToTerms = "You must agree to the terms and conditions.";
       }
     }
 
@@ -294,12 +281,7 @@ function BusinessRegistrationForm() {
 
       const fieldsByStep: Record<number, string[]> = {
         1: ["businessName", "businessType", "description"],
-        2: [
-          "address",
-          "cityDistrict",
-          "businessPhone",
-          "businessEmail",
-        ],
+        2: ["address", "cityDistrict", "businessPhone", "businessEmail"],
         3: ["businessHours", "agreeToTerms"],
       };
 
@@ -343,12 +325,12 @@ function BusinessRegistrationForm() {
       return;
     }
 
-    const accessToken = localStorage.getItem("access");
+    const accessToken = getSessionToken();
 
     if (!accessToken) {
       setMessageType("error");
       setMessage(
-        "Please log in before registering your business. Your login session may have expired."
+        "Please log in before registering your business. Your login session may have expired.",
       );
       return;
     }
@@ -385,17 +367,16 @@ function BusinessRegistrationForm() {
             city_district: formData.cityDistrict.trim(),
             business_hours: businessHours,
           }),
-        }
+        },
       );
 
-      const responseData: BusinessRegistrationResponse =
-        await response.json().catch(
-          () => ({} as BusinessRegistrationResponse)
-        );
+      const responseData: BusinessRegistrationResponse = await response
+        .json()
+        .catch(() => ({}) as BusinessRegistrationResponse);
 
       if (response.status === 401) {
         throw new Error(
-          "Your login session is invalid or expired. Please log in again."
+          "Your login session is invalid or expired. Please log in again.",
         );
       }
 
@@ -413,7 +394,7 @@ function BusinessRegistrationForm() {
           .join(" ");
 
         throw new Error(
-          details || "Business registration failed. Please try again."
+          details || "Business registration failed. Please try again.",
         );
       }
 
@@ -421,15 +402,12 @@ function BusinessRegistrationForm() {
 
       if (!businessId) {
         throw new Error(
-          "Your business was registered, but its ID was not returned. Please contact support before registering again."
+          "Your business was registered, but its ID was not returned. Please contact support before registering again.",
         );
       }
 
       sessionStorage.setItem("onboardingBusinessId", businessId);
-      sessionStorage.setItem(
-        "onboardingBusinessType",
-        formData.businessType
-      );
+      sessionStorage.setItem("onboardingBusinessType", formData.businessType);
 
       navigate(`/vendor/documents/${businessId}`);
     } catch (error) {
@@ -437,7 +415,7 @@ function BusinessRegistrationForm() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again."
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -458,9 +436,7 @@ function BusinessRegistrationForm() {
 
             <h1>Register Your Business</h1>
 
-            <p>
-              Tell us about your business to get started on Pawdigree.
-            </p>
+            <p>Tell us about your business to get started on Pawdigree.</p>
           </header>
 
           {/* Three-step progress indicator */}
@@ -558,7 +534,8 @@ function BusinessRegistrationForm() {
                   </select>
 
                   <small>
-                    Choose the type that best describes what your business offers.
+                    Choose the type that best describes what your business
+                    offers.
                   </small>
 
                   {errors.businessType && (
@@ -580,9 +557,7 @@ function BusinessRegistrationForm() {
                     aria-invalid={Boolean(errors.description)}
                   />
 
-                  <small>
-                    {formData.description.length}/500 characters
-                  </small>
+                  <small>{formData.description.length}/500 characters</small>
 
                   {errors.description && (
                     <p className="field-error">{errors.description}</p>
@@ -638,13 +613,9 @@ function BusinessRegistrationForm() {
                       <select
                         aria-label="Phone country"
                         value={selectedCountry}
-                        disabled={
-                          loadingCountries || countries.length === 0
-                        }
+                        disabled={loadingCountries || countries.length === 0}
                         onChange={(event) => {
-                          setSelectedCountry(
-                            event.target.value as CountryCode
-                          );
+                          setSelectedCountry(event.target.value as CountryCode);
 
                           setErrors((previous) => {
                             const updated = { ...previous };
@@ -654,10 +625,7 @@ function BusinessRegistrationForm() {
                         }}
                       >
                         {countries.map((item) => (
-                          <option
-                            key={item.iso_code}
-                            value={item.iso_code}
-                          >
+                          <option key={item.iso_code} value={item.iso_code}>
                             {item.country} ({item.dial_code})
                           </option>
                         ))}
@@ -707,7 +675,8 @@ function BusinessRegistrationForm() {
                   <legend>Business operating hours</legend>
 
                   <p className="hours-description">
-                    Select the days your business is open and set your operating times.
+                    Select the days your business is open and set your operating
+                    times.
                   </p>
 
                   <div className="business-hours-grid">
@@ -727,7 +696,7 @@ function BusinessRegistrationForm() {
                                 handleHoursChange(
                                   day,
                                   "is_open",
-                                  event.target.checked
+                                  event.target.checked,
                                 )
                               }
                             />
@@ -745,7 +714,7 @@ function BusinessRegistrationForm() {
                                 handleHoursChange(
                                   day,
                                   "open",
-                                  event.target.value
+                                  event.target.value,
                                 )
                               }
                             />
@@ -760,7 +729,7 @@ function BusinessRegistrationForm() {
                                 handleHoursChange(
                                   day,
                                   "close",
-                                  event.target.value
+                                  event.target.value,
                                 )
                               }
                             />
@@ -789,9 +758,7 @@ function BusinessRegistrationForm() {
 
                   <label htmlFor="agreeToTerms">
                     I agree to the{" "}
-                    <Link to="/terms-and-conditions">
-                      Terms and Conditions
-                    </Link>
+                    <Link to="/terms-and-conditions">Terms and Conditions</Link>
                     .
                   </label>
 
@@ -837,7 +804,8 @@ function BusinessRegistrationForm() {
           </form>
 
           <p className="registration-footer">
-            Your business information will help us build a trusted pet-care community.
+            Your business information will help us build a trusted pet-care
+            community.
           </p>
         </main>
       </div>
