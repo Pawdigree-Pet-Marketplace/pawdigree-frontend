@@ -43,14 +43,13 @@ export function getSessionToken(): string | null {
   return storage ? getAccessToken(storage) : null;
 }
 
-export function saveAuthSession(session: AuthSession, remember: boolean): void {
+export function saveAuthSession(session: AuthSession): void {
   removeAuthSession();
-  const storage = remember ? localStorage : sessionStorage;
-  storage.setItem("token", session.access);
-  storage.setItem("access", session.access);
-  storage.setItem("access_token", session.access);
-  storage.setItem("refresh", session.refresh);
-  storage.setItem("role", session.role);
+  localStorage.setItem("token", session.access);
+  localStorage.setItem("access", session.access);
+  localStorage.setItem("access_token", session.access);
+  localStorage.setItem("refresh", session.refresh);
+  localStorage.setItem("role", session.role);
   notifyAuthSessionChange();
 }
 

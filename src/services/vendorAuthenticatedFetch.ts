@@ -1,12 +1,12 @@
 import API_BASE_URL from "./api";
-import { getAccessToken, getAuthStorage } from "./auth/authStorage";
+import { clearAuthSession, getAccessToken, getAuthStorage } from "./auth/authStorage";
 
 type TokenResponse = {
   access?: string;
   refresh?: string;
 };
 
-let refreshInFlight: Promise<string | null> | null = null;
+const refreshesInFlight = new WeakMap<Storage, Promise<string | null>>();
 
 function withAccessToken(init: RequestInit, accessToken: string): RequestInit {
   const headers = new Headers(init.headers);
@@ -15,9 +15,10 @@ function withAccessToken(init: RequestInit, accessToken: string): RequestInit {
 }
 
 function refreshAccessToken(storage: Storage): Promise<string | null> {
-  if (refreshInFlight) return refreshInFlight;
+  const currentRefresh = refreshesInFlight.get(storage);
+  if (currentRefresh) return currentRefresh;
 
-  refreshInFlight = (async () => {
+  const refreshPromise = (async () => {
     const refresh = storage.getItem("refresh");
     if (!refresh) return null;
 
@@ -39,12 +40,12 @@ function refreshAccessToken(storage: Storage): Promise<string | null> {
       return tokens.access;
     } catch {
       return null;
-    } finally {
-      refreshInFlight = null;
     }
   })();
 
-  return refreshInFlight;
+  refreshesInFlight.set(storage, refreshPromise);
+  void refreshPromise.finally(() => refreshesInFlight.delete(storage));
+  return refreshPromise;
 }
 
 /** Makes a vendor API request and retries once after refreshing an expired JWT. */
@@ -62,7 +63,12 @@ export async function vendorAuthenticatedFetch(
   if (firstResponse.status !== 401 || !storage) return firstResponse;
 
   const refreshedToken = await refreshAccessToken(storage);
-  if (!refreshedToken) return firstResponse;
+  if (!refreshedToken) {
+    clearAuthSession();
+    return firstResponse;
+  }
 
-  return fetch(input, withAccessToken(init, refreshedToken));
+  const retryResponse = await fetch(input, withAccessToken(init, refreshedToken));
+  if (retryResponse.status === 401) clearAuthSession();
+  return retryResponse;
 }

@@ -469,14 +469,11 @@ export default function VendorRegistrationForm() {
         return;
       }
 
-      saveAuthSession(
-        {
-          access: tokens.access,
-          refresh: tokens.refresh,
-          role: "VENDOR",
-        },
-        true,
-      );
+      saveAuthSession({
+        access: tokens.access,
+        refresh: tokens.refresh,
+        role: "VENDOR",
+      });
 
       navigate("/vendor/dashboard", { replace: true });
     } catch (error) {
