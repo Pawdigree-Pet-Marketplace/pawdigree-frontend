@@ -214,6 +214,46 @@ describe("Business Registration Form", () => {
     });
   });
 
+  it("allows a vendor to select Pet Sale / Adoption as their business type", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const businessTypeSelect = screen.getByLabelText(
+      /^business type$/i,
+    );
+
+    await user.selectOptions(
+      businessTypeSelect,
+      "PET_SALE_ADOPTION",
+    );
+
+    expect(businessTypeSelect).toHaveValue("PET_SALE_ADOPTION");
+  });
+
+  it("requires a business name", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.selectOptions(
+      screen.getByLabelText(/^business type$/i),
+      "PRODUCT_SELLER",
+    );
+
+    await fillField(
+      user,
+      /^business description$/i,
+      "Pet products and care",
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: /continue/i }),
+    );
+
+    expect(
+      await screen.findByText(/business name is required/i),
+    ).toBeInTheDocument();
+  });
+
   it("requires a business name", async () => {
     const user = userEvent.setup();
     renderForm();
