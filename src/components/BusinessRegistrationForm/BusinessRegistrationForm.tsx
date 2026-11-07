@@ -24,7 +24,11 @@ interface DayHours {
 
 type BusinessHours = Record<string, DayHours>;
 
-type BusinessType = "" | "PRODUCT_SELLER" | "SERVICE_PROVIDER";
+type BusinessType =
+  | ""
+  | "PRODUCT_SELLER"
+  | "SERVICE_PROVIDER"
+  | "PET_SALE_ADOPTION";
 
 interface FormData {
   businessName: string;
@@ -531,6 +535,7 @@ function BusinessRegistrationForm() {
                     <option value="">Select your business type</option>
                     <option value="PRODUCT_SELLER">Product Seller</option>
                     <option value="SERVICE_PROVIDER">Service Provider</option>
+                    <option value="PET_SALE_ADOPTION">Pet Sale / Adoption</option>
                   </select>
 
                   <small>
