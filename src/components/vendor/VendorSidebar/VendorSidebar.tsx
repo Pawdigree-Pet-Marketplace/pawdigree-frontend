@@ -1,6 +1,5 @@
 import {
   Activity,
-  BriefcaseBusiness,
   CalendarDays,
   ChartNoAxesCombined,
   ChevronRight,
@@ -11,9 +10,9 @@ import {
   Settings,
   ShoppingBag,
   Store,
-  Wallet,
   Headset,
   FileText,
+  BriefcaseBusiness,
 } from "lucide-react";
 import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
@@ -74,17 +73,19 @@ const navigationGroups = [
     ],
   },
   {
-    title: "BUSINESS",
-    items: [
-      { label: "Store Profile", path: "/vendor/business-profile", icon: Store },
-      {
-        label: "Business & Payout",
-        path: "/vendor/payout",
-        icon: Wallet,
-      },
-      { label: "Settings", path: "/vendor/settings", icon: Settings },
-      { label: "Support", path: "/vendor/support", icon: Headset },
-    ],
+  
+  title: "BUSINESS",
+  items: [
+    { label: "Store Profile", path: "/vendor/profile", icon: Store },
+    {
+      label: "Businesses",
+      path: "/vendor/business-profile",
+      icon: BriefcaseBusiness,
+    },
+    { label: "Settings", path: "/vendor/settings", icon: Settings },
+    { label: "Support", path: "/vendor/support", icon: Headset },
+  ],
+
   },
 ];
 

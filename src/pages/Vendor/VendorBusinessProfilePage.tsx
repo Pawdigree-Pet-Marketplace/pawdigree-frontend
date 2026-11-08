@@ -9,7 +9,9 @@ import {
   Store,
   ImagePlus,
   LoaderCircle,
+  Plus,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import VendorBusinessUpdateForm, {
   type Business,
 } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
@@ -129,12 +131,11 @@ function ImageFallback({ kind }: { kind: "cover" | "logo" | "pet" }) {
 /* ---------- page ---------- */
 
 export default function VendorBusinessProfilePage() {
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(
-    null,
-  );
-  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(
-    null,
-  );
+  const navigate = useNavigate();
+
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
+  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
+
   const [state, setState] = useState<PageState>({
     status: "loading",
     businesses: [],
@@ -202,8 +203,8 @@ export default function VendorBusinessProfilePage() {
 
   return (
     <VendorLayout
-      title="Store Profile"
-      description="See how your business appears to customers and keep its details up to date."
+      title="Businesses"
+      description="Manage your businesses, registration applications, and verification status."
       vendorWorkspace
     >
       <div className="dashboard-content bp-page">
@@ -218,6 +219,34 @@ export default function VendorBusinessProfilePage() {
           </div>
         ) : (
           <>
+            {/* Registration card moved to the top */}
+            <section
+              className="bp-register-section"
+              aria-labelledby="bp-register-heading"
+            >
+              <div>
+                <h2 id="bp-register-heading">
+                  {state.businesses.length > 0
+                    ? "Need another business profile?"
+                    : "Register your business"}
+                </h2>
+
+                <p>Each business can have its own profile and listings.</p>
+              </div>
+
+              <button
+                type="button"
+                className="bp-register-button"
+                onClick={() => navigate("/vendor/business-registration")}
+              >
+                <Plus size={18} strokeWidth={2.5} />
+
+                {state.businesses.length > 0
+                  ? "Register New Business"
+                  : "Register Business"}
+              </button>
+            </section>
+
             {state.businesses.length > 0 ? (
               <section
                 className="bp-business-section"
@@ -228,11 +257,13 @@ export default function VendorBusinessProfilePage() {
                     <h2 id="bp-businesses-heading">Your businesses</h2>
                     <p>Select a business to view or edit its profile.</p>
                   </div>
+
                   <span>
                     {state.businesses.length}{" "}
                     {state.businesses.length === 1 ? "business" : "businesses"}
                   </span>
                 </div>
+
                 <div className="bp-business-grid">
                   {state.businesses.map((business) => {
                     const id = String(business.id);
@@ -285,8 +316,8 @@ export default function VendorBusinessProfilePage() {
               </div>
             )}
 
-            {selectedBusiness &&
-              (editingBusinessId === selectedBusinessId ? (
+            {selectedBusiness && (
+              editingBusinessId === selectedBusinessId ? (
                 <VendorBusinessUpdateForm
                   business={selectedBusiness}
                   onSaved={saveBusiness}
@@ -408,7 +439,7 @@ function VendorProfileView({
   const pets = loadedForThis?.pets ?? [];
   const showsPets = catTab === "all" || catTab === "pets";
   const visible = showAll ? pets : pets.slice(0, 6);
-  const verified = verification?.status === "verified";
+  const verified = verification?.status === "approved" || verification?.status === "verified";
   const location = business.city_district || business.location_district;
   const hours = formatHours(business.working_hours || business.business_hours);
   const cover = imageUrl(business.cover_image);

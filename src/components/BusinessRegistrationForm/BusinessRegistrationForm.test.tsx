@@ -1,3 +1,4 @@
+
 import { type ReactNode } from "react";
 import {
   render,
@@ -6,7 +7,14 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import {
+  beforeEach,
+  afterEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import BusinessRegistrationForm from "./BusinessRegistrationForm";
 
@@ -69,6 +77,31 @@ function mockFetch() {
       json: async () => mockCountryCodes,
     }),
   );
+}
+
+// Mock both the country-code request and registration response.
+function mockFetchWithRegistrationResponse(
+  responseData: Record<string, unknown>,
+  status = 201,
+) {
+  const fetchMock = vi.fn().mockImplementation((url: RequestInfo | URL) => {
+    if (String(url).includes("/api/country-codes/")) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockCountryCodes,
+      });
+    }
+
+    return Promise.resolve({
+      ok: status >= 200 && status < 300,
+      status,
+      json: async () => responseData,
+    });
+  });
+
+  vi.stubGlobal("fetch", fetchMock);
+
+  return fetchMock;
 }
 
 function renderForm() {
@@ -163,6 +196,18 @@ async function goToStepThree(
   ).toBeInTheDocument();
 }
 
+async function prepareValidSubmission(
+  user: ReturnType<typeof userEvent.setup>,
+) {
+  await goToStepThree(user);
+
+  await user.click(
+    screen.getByRole("checkbox", {
+      name: /i agree to the terms and conditions/i,
+    }),
+  );
+}
+
 describe("Business Registration Form", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -175,14 +220,24 @@ describe("Business Registration Form", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders the business registration heading", () => {
+  // Initial rendering
+
+  it("renders the VendorLayout wrapper", () => {
     renderForm();
 
     expect(
-      screen.getByRole("heading", {
-        name: /register your business/i,
-      }),
+      screen.getByTestId("vendor-layout"),
     ).toBeInTheDocument();
+  });
+
+  it("does not display a repeated registration heading inside the form", () => {
+    renderForm();
+
+    expect(
+      screen.queryByRole("heading", {
+        name: /^register your business$/i,
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it("does not display a business category field", () => {
@@ -203,6 +258,60 @@ describe("Business Registration Form", () => {
     ).not.toBeInTheDocument();
   });
 
+  // Vendor layout
+
+  it("passes the correct title to VendorLayout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-title", "Register your business");
+  });
+
+  it("passes the correct description to VendorLayout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute(
+      "data-description",
+      "Step 1 of 3 — Business information",
+    );
+  });
+
+  it("enables the vendor workspace layout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-vendor-workspace", "true");
+  });
+
+  it("uses Your store as the default business name in VendorLayout", () => {
+    renderForm();
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-business-name", "Your store");
+  });
+
+  it("updates the VendorLayout business name when the user types", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillField(
+      user,
+      /^business name$/i,
+      "Happy Paws",
+    );
+
+    expect(
+      screen.getByTestId("vendor-layout"),
+    ).toHaveAttribute("data-business-name", "Happy Paws");
+  });
+
+  // Country codes
+
   it("loads the available phone country codes", async () => {
     renderForm();
 
@@ -213,6 +322,27 @@ describe("Business Registration Form", () => {
       );
     });
   });
+
+  it("handles failure when phone country codes cannot be loaded", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("Network error")),
+    );
+
+    renderForm();
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalled();
+    });
+
+    consoleError.mockRestore();
+  });
+
+  // Step one: Business information
 
   it("allows a vendor to select Pet Sale / Adoption as their business type", async () => {
     const user = userEvent.setup();
@@ -228,30 +358,6 @@ describe("Business Registration Form", () => {
     );
 
     expect(businessTypeSelect).toHaveValue("PET_SALE_ADOPTION");
-  });
-
-  it("requires a business name", async () => {
-    const user = userEvent.setup();
-    renderForm();
-
-    await user.selectOptions(
-      screen.getByLabelText(/^business type$/i),
-      "PRODUCT_SELLER",
-    );
-
-    await fillField(
-      user,
-      /^business description$/i,
-      "Pet products and care",
-    );
-
-    await user.click(
-      screen.getByRole("button", { name: /continue/i }),
-    );
-
-    expect(
-      await screen.findByText(/business name is required/i),
-    ).toBeInTheDocument();
   });
 
   it("requires a business name", async () => {
@@ -344,6 +450,8 @@ describe("Business Registration Form", () => {
     ).toBeInTheDocument();
   });
 
+  // Step two: Business contact information
+
   it("validates an invalid business email on step two", async () => {
     const user = userEvent.setup();
     renderForm();
@@ -416,6 +524,8 @@ describe("Business Registration Form", () => {
     ).toBeInTheDocument();
   });
 
+  // Step three: Operating hours and terms
+
   it("requires agreement to the terms on step three", async () => {
     const user = userEvent.setup();
     renderForm();
@@ -423,13 +533,15 @@ describe("Business Registration Form", () => {
     await goToStepThree(user);
 
     const termsCheckbox = screen.getByRole("checkbox", {
-  name: /i agree to the terms and conditions/i,
-});
+      name: /i agree to the terms and conditions/i,
+    });
 
     expect(termsCheckbox).not.toBeChecked();
 
     await user.click(
-      screen.getByRole("button", { name:  /register business/i}),
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
     );
 
     expect(
@@ -441,16 +553,12 @@ describe("Business Registration Form", () => {
     const user = userEvent.setup();
     renderForm();
 
-    await goToStepThree(user);
+    await prepareValidSubmission(user);
 
     await user.click(
-  screen.getByRole("checkbox", {
-    name: /i agree to the terms and conditions/i,
-  }),
-);
-
-    await user.click(
-      screen.getByRole("button", { name: /register/i }),
+      screen.getByRole("button", {
+        name: /register/i,
+      }),
     );
 
     expect(
@@ -458,85 +566,239 @@ describe("Business Registration Form", () => {
     ).toBeInTheDocument();
 
     expect(fetch).not.toHaveBeenCalledWith(
-      expect.stringContaining("/api/auth/businesses/register/"),
+      expect.stringContaining(
+        "/api/auth/businesses/register/",
+      ),
       expect.any(Object),
     );
   });
 
-  it("handles failure when phone country codes cannot be loaded", async () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
+  // Business registration API submission
 
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new Error("Network error")),
-    );
+  it("sends the correct registration data and authentication token to the backend", async () => {
+    const user = userEvent.setup();
 
-    renderForm();
+    localStorage.setItem("access", "test-access-token");
 
-    await waitFor(() => {
-      expect(consoleError).toHaveBeenCalled();
+    const fetchMock = mockFetchWithRegistrationResponse({
+      id: "business-123",
+      name: "Happy Paws",
+      business_type: "PRODUCT_SELLER",
     });
 
-    consoleError.mockRestore();
-  });
-
-  it("renders the VendorLayout wrapper", () => {
     renderForm();
 
-    expect(
-      screen.getByTestId("vendor-layout"),
-    ).toBeInTheDocument();
-  });
+    await prepareValidSubmission(user);
 
-  it("passes the correct title to VendorLayout", () => {
-    renderForm();
-
-    expect(
-      screen.getByTestId("vendor-layout"),
-    ).toHaveAttribute("data-title", "Register your business");
-  });
-
-  it("passes the correct description to VendorLayout", () => {
-    renderForm();
-
-    expect(
-      screen.getByTestId("vendor-layout"),
-    ).toHaveAttribute(
-      "data-description",
-      "Step 1 of 3 — Business information",
+    await user.click(
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
     );
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "/api/auth/businesses/register/",
+        ),
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer test-access-token",
+          }),
+        }),
+      );
+    });
+
+    const registrationCall = fetchMock.mock.calls.find(
+      ([url]) =>
+        String(url).includes("/api/auth/businesses/register/"),
+    );
+
+    expect(registrationCall).toBeDefined();
+
+    const requestOptions = registrationCall?.[1];
+    const submittedData = JSON.parse(
+      requestOptions?.body as string,
+    );
+
+    expect(submittedData).toEqual({
+      name: "Happy Paws",
+      business_type: "PRODUCT_SELLER",
+      description: "Pet products and care",
+      contact: "+256712345678",
+      email: "happy@paws.com",
+      address: "Kampala Road",
+      city_district: "Kampala",
+      business_hours: expect.objectContaining({
+        monday: {
+          is_open: true,
+          open: "09:00",
+          close: "17:00",
+        },
+        sunday: {
+          is_open: false,
+          open: "09:00",
+          close: "17:00",
+        },
+      }),
+    });
   });
 
-  it("enables the vendor workspace layout", () => {
-    renderForm();
-
-    expect(
-      screen.getByTestId("vendor-layout"),
-    ).toHaveAttribute("data-vendor-workspace", "true");
-  });
-
-  it("uses Your store as the default business name in VendorLayout", () => {
-    renderForm();
-
-    expect(
-      screen.getByTestId("vendor-layout"),
-    ).toHaveAttribute("data-business-name", "Your store");
-  });
-
-  it("updates the VendorLayout business name when the user types", async () => {
+  it("saves the returned business ID and business type in session storage", async () => {
     const user = userEvent.setup();
+
+    localStorage.setItem("access", "test-access-token");
+
+    mockFetchWithRegistrationResponse({
+      id: "business-123",
+      name: "Happy Paws",
+      business_type: "PRODUCT_SELLER",
+    });
+
     renderForm();
 
-    await fillField(
-      user,
-      /^business name$/i,
-      "Happy Paws",
+    await prepareValidSubmission(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        sessionStorage.getItem("onboardingBusinessId"),
+      ).toBe("business-123");
+    });
+
+    expect(
+      sessionStorage.getItem("onboardingBusinessType"),
+    ).toBe("PRODUCT_SELLER");
+  });
+
+  it("redirects to the document upload page after successful registration", async () => {
+    const user = userEvent.setup();
+
+    localStorage.setItem("access", "test-access-token");
+
+    mockFetchWithRegistrationResponse({
+      id: "business-123",
+      name: "Happy Paws",
+      business_type: "PRODUCT_SELLER",
+    });
+
+    renderForm();
+
+    await prepareValidSubmission(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/vendor/documents/business-123",
+      );
+    });
+  });
+
+  it("displays backend validation errors when registration fails", async () => {
+    const user = userEvent.setup();
+
+    localStorage.setItem("access", "test-access-token");
+
+    mockFetchWithRegistrationResponse(
+      {
+        email: ["A business with this email already exists."],
+      },
+      400,
+    );
+
+    renderForm();
+
+    await prepareValidSubmission(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
     );
 
     expect(
-      screen.getByTestId("vendor-layout"),
-    ).toHaveAttribute("data-business-name", "Happy Paws");
+      await screen.findByRole("alert"),
+    ).toHaveTextContent(
+      "email: A business with this email already exists.",
+    );
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("displays an expired-session message when the backend returns 401", async () => {
+    const user = userEvent.setup();
+
+    localStorage.setItem("access", "expired-access-token");
+
+    mockFetchWithRegistrationResponse(
+      {
+        detail: "Authentication credentials were not provided.",
+      },
+      401,
+    );
+
+    renderForm();
+
+    await prepareValidSubmission(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
+    );
+
+    expect(
+      await screen.findByRole("alert"),
+    ).toHaveTextContent(
+      /login session is invalid or expired/i,
+    );
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("displays an error if the successful response does not contain a business ID", async () => {
+    const user = userEvent.setup();
+
+    localStorage.setItem("access", "test-access-token");
+
+    mockFetchWithRegistrationResponse({
+      name: "Happy Paws",
+      business_type: "PRODUCT_SELLER",
+    });
+
+    renderForm();
+
+    await prepareValidSubmission(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /register business/i,
+      }),
+    );
+
+    expect(
+      await screen.findByRole("alert"),
+    ).toHaveTextContent(
+      /business was registered, but its ID was not returned/i,
+    );
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+
+    expect(
+      sessionStorage.getItem("onboardingBusinessId"),
+    ).toBeNull();
   });
 });
