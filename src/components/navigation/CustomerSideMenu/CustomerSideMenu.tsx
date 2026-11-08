@@ -53,11 +53,7 @@ const SideMenu = ({
           >
             Services
           </Link>
-          <Link
-            to={homeHash("#merchandise")}
-            className="sidemenu-item"
-            onClick={onClose}
-          >
+          <Link to="/merchandise" className="sidemenu-item" onClick={onClose}>
             Merchandise
           </Link>
           <Link to="/vendor" className="sidemenu-item" onClick={onClose}>

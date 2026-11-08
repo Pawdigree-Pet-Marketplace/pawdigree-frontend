@@ -16,7 +16,7 @@ type TopNavbarProps = {
 const navLinks = [
   { label: "Browse Pets", href: "/explore-pets" },
   { label: "Services", href: "#services" },
-  { label: "Merchandise", href: "#merchandise" },
+  { label: "Merchandise", href: "/merchandise" },
   { label: "Become a Vendor", href: "/vendor" },
   { label: "Help Center", href: "#" },
 ];
@@ -34,7 +34,9 @@ const TopNavbar = ({
   const path = location.pathname;
   const isLandingPage = path === "/";
   const isExplorePetsPage = path === "/explore-pets";
-  const isTransparentPage = isLandingPage || isExplorePetsPage;
+  const isMerchandisePage = path === "/merchandise";
+  const isTransparentPage =
+    isLandingPage || isExplorePetsPage || isMerchandisePage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,7 +61,7 @@ const TopNavbar = ({
   const navbarClass = [
     "top-navbar",
     isTransparentPage ? "top-navbar--transparent" : "",
-    isExplorePetsPage ? "top-navbar--explore" : "",
+    isExplorePetsPage || isMerchandisePage ? "top-navbar--explore" : "",
     isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
   ]
     .filter(Boolean)
