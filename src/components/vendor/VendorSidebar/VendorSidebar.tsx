@@ -54,6 +54,11 @@ const navigationGroups = [
         path: "/vendor/services/new",
         icon: BriefcaseBusiness,
       },
+      {
+  label: "Merchandise",
+  path: "/vendor/merchandise",
+  icon: ShoppingBag,
+},
     ],
   },
   {
