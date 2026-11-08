@@ -45,7 +45,6 @@ export default function VendorLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepLoggedIn] = useState(true);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
@@ -112,7 +111,6 @@ export default function VendorLoginPage() {
             email: data.masked_email ?? data.email ?? email.trim(),
             role: "VENDOR",
             redirectTo: postLoginPath,
-            keepLoggedIn,
             expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
             resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
           }),
@@ -130,10 +128,11 @@ export default function VendorLoginPage() {
         return;
       }
 
-      saveAuthSession(
-        { access: accessToken, refresh: refreshToken, role: "VENDOR" },
-        keepLoggedIn,
-      );
+      saveAuthSession({
+        access: accessToken,
+        refresh: refreshToken,
+        role: "VENDOR",
+      });
 
       navigate(postLoginPath, { replace: true });
     } catch (err) {
@@ -293,17 +292,6 @@ export default function VendorLoginPage() {
           </div>
 
           <div className="vendor-login-options">
-            {/*
-            <label className="vendor-remember">
-              <input
-                type="checkbox"
-                checked={keepLoggedIn}
-                onChange={(event) => setKeepLoggedIn(event.target.checked)}
-              />
-              Keep me logged in
-            </label>
-            */}
-
             <Link to="/forgot-password">Forgot password?</Link>
           </div>
 

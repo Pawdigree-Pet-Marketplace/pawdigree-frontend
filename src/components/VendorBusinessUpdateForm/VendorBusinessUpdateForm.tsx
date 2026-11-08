@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import API_BASE_URL from "../../services/api";
+import { getSessionToken } from "../../services/auth/authStorage";
 import "./VendorBusinessUpdateForm.css";
 
 export type DayHours = { is_open: boolean; open: string; close: string };
@@ -94,28 +95,12 @@ export default function VendorBusinessUpdateForm({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
-  const getImageUrl = (path?: string | null) => {
-    if (!path) return undefined;
-    if (/^(https?:|data:|blob:)/i.test(path)) return path;
-    return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-  };
-
-  useEffect(() => () => {
-    if (logoPreview) URL.revokeObjectURL(logoPreview);
-  }, [logoPreview]);
-
-  useEffect(() => () => {
-    if (coverPreview) URL.revokeObjectURL(coverPreview);
-  }, [coverPreview]);
+  const isExistingBusiness =
+    Boolean(business?.id) && String(business?.id) !== "1";
 
   // The form values shown on screen = values derived from `business`
   // (and the loaded categories) + whatever the user has typed so far.
-  // Deriving them during render means no setState inside an effect.
   const baseForm = useMemo<FormState>(() => {
     let categoryId = "";
     if (business?.category) categoryId = String(business.category);
@@ -156,20 +141,15 @@ export default function VendorBusinessUpdateForm({
   const [hoursEdits, setHoursEdits] = useState<BusinessHours | null>(null);
   const hours = hoursEdits ?? baseHours;
 
+  // Load the category list once.
   useEffect(() => {
     let cancelled = false;
-    const token =
-      localStorage.getItem("access") ||
-      localStorage.getItem("access_token") ||
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("access") ||
-      sessionStorage.getItem("access_token") ||
-      sessionStorage.getItem("token");
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-    fetch(`${API_BASE_URL}/api/categories/`, { headers })
+    fetch(`${API_BASE_URL}/api/categories/`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${getSessionToken()}`,
+      },
+    })
       .then((r) => r.json())
       .then((d: unknown) => {
         const data = d as { results?: Category[] };
@@ -197,35 +177,6 @@ export default function VendorBusinessUpdateForm({
       delete n[name];
       return n;
     });
-  };
-
-  const handleImageChange = (
-    event: ChangeEvent<HTMLInputElement>,
-    kind: "logo" | "cover",
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setMessage("Choose a JPEG, PNG, or WebP image.");
-      event.target.value = "";
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage("Each image must be 5 MB or smaller.");
-      event.target.value = "";
-      return;
-    }
-
-    setMessage("");
-    const preview = URL.createObjectURL(file);
-    if (kind === "logo") {
-      setLogoFile(file);
-      setLogoPreview(preview);
-    } else {
-      setCoverFile(file);
-      setCoverPreview(preview);
-    }
   };
 
   const handleHoursChange = (
@@ -281,13 +232,7 @@ export default function VendorBusinessUpdateForm({
       setMessage("Please correct the highlighted fields.");
       return;
     }
-    const token =
-      localStorage.getItem("access") ||
-      localStorage.getItem("access_token") ||
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("access") ||
-      sessionStorage.getItem("access_token") ||
-      sessionStorage.getItem("token");
+    const token = getSessionToken();
     if (!token) {
       setMessage("Login session expired. Please log in again.");
       return;
@@ -305,40 +250,19 @@ export default function VendorBusinessUpdateForm({
         category: Number(form.businessType),
         business_hours: hours,
       };
-      const isExistingBusiness =
-        Boolean(business?.id) && String(business?.id) !== "1";
       const url = isExistingBusiness
         ? `${API_BASE_URL}/api/businesses/${business?.id}/`
         : `${API_BASE_URL}/api/businesses/`;
       const method = isExistingBusiness ? "PATCH" : "POST";
-      const headers: Record<string, string> = {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-      let body: BodyInit;
-
-      if (logoFile || coverFile) {
-        const formData = new FormData();
-        Object.entries(payload).forEach(([key, value]) => {
-          if (value !== undefined) {
-            formData.append(
-              key,
-              typeof value === "object" ? JSON.stringify(value) : String(value),
-            );
-          }
-        });
-        if (logoFile) formData.append("logo", logoFile);
-        if (coverFile) formData.append("cover_image", coverFile);
-        body = formData;
-      } else {
-        headers["Content-Type"] = "application/json";
-        body = JSON.stringify(payload);
-      }
 
       const res = await fetch(url, {
         method,
-        headers,
-        body,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
       });
       const data = (await res.json().catch(() => ({}))) as Record<
         string,
@@ -366,7 +290,7 @@ export default function VendorBusinessUpdateForm({
     <div className="vendor-business-form-wrapper">
       <div className="vendor-business-form-header">
         <h3>
-          {business?.id && String(business.id) !== "1"
+          {isExistingBusiness
             ? "Update Business Information"
             : "Add Business Information"}
         </h3>
@@ -416,50 +340,6 @@ export default function VendorBusinessUpdateForm({
           <p className="field-error">{errors.description}</p>
         )}
       </div>
-
-      <section className="business-image-fields" aria-label="Business images">
-        <div className="business-image-field">
-          <label htmlFor="businessLogo">Business profile image</label>
-          <div className="business-image-preview business-image-preview--logo">
-            {(logoPreview || getImageUrl(business?.logo)) ? (
-              <img
-                src={logoPreview || getImageUrl(business?.logo)}
-                alt="Business profile preview"
-              />
-            ) : (
-              <span>Logo preview</span>
-            )}
-          </div>
-          <input
-            id="businessLogo"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={(event) => handleImageChange(event, "logo")}
-          />
-          <small>JPEG, PNG, or WebP. Maximum 5 MB.</small>
-        </div>
-
-        <div className="business-image-field">
-          <label htmlFor="businessCover">Business hero image</label>
-          <div className="business-image-preview business-image-preview--cover">
-            {(coverPreview || getImageUrl(business?.cover_image)) ? (
-              <img
-                src={coverPreview || getImageUrl(business?.cover_image)}
-                alt="Business hero preview"
-              />
-            ) : (
-              <span>Hero image preview</span>
-            )}
-          </div>
-          <input
-            id="businessCover"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={(event) => handleImageChange(event, "cover")}
-          />
-          <small>JPEG, PNG, or WebP. Maximum 5 MB.</small>
-        </div>
-      </section>
 
       <div className="form-group">
         <label htmlFor="businessType">
@@ -574,6 +454,7 @@ export default function VendorBusinessUpdateForm({
               <>
                 <input
                   type="time"
+                  aria-label={`${day} opening time`}
                   value={hours[day].open}
                   onChange={(e) =>
                     handleHoursChange(day, "open", e.target.value)
@@ -582,6 +463,7 @@ export default function VendorBusinessUpdateForm({
                 <span>to</span>
                 <input
                   type="time"
+                  aria-label={`${day} closing time`}
                   value={hours[day].close}
                   onChange={(e) =>
                     handleHoursChange(day, "close", e.target.value)
@@ -608,7 +490,7 @@ export default function VendorBusinessUpdateForm({
         >
           {saving
             ? "Saving..."
-            : business?.id && String(business.id) !== "1"
+            : isExistingBusiness
               ? "Update Business"
               : "Register Business"}
         </button>

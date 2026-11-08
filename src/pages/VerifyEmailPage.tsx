@@ -13,7 +13,6 @@ type VerificationState = {
   email: string;
   role: "CUSTOMER" | "VENDOR";
   redirectTo?: string;
-  keepLoggedIn: boolean;
   expiresAt: number;
   resendAt: number;
 };
@@ -95,14 +94,11 @@ export default function VerifyEmailPage() {
           "Verification succeeded, but the login response did not include both access and refresh tokens.",
         );
       }
-      saveAuthSession(
-        {
-          access: tokens.access,
-          refresh: tokens.refresh,
-          role: verification.role,
-        },
-        verification.keepLoggedIn,
-      );
+      saveAuthSession({
+        access: tokens.access,
+        refresh: tokens.refresh,
+        role: verification.role,
+      });
       sessionStorage.removeItem("pawdigree_email_verification");
       navigate(
         getPostLoginPath({ from: verification.redirectTo }, verification.role),

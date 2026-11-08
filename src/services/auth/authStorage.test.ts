@@ -16,7 +16,7 @@ describe("authStorage", () => {
     localStorage.setItem("theme", "dark");
     sessionStorage.setItem("draft", "keep me");
 
-    saveAuthSession({ access: "customer-access", refresh: "customer-refresh", role: "CUSTOMER" }, true);
+    saveAuthSession({ access: "customer-access", refresh: "customer-refresh", role: "CUSTOMER" });
 
     expect(getSessionToken()).toBe("customer-access");
     expect(getSessionRole()).toBe("CUSTOMER");
@@ -28,7 +28,7 @@ describe("authStorage", () => {
 
   it("keeps a temporary session in sessionStorage and removes only auth keys", () => {
     localStorage.setItem("theme", "dark");
-    saveAuthSession({ access: "vendor-access", refresh: "vendor-refresh", role: "VENDOR" }, false);
+    saveAuthSession({ access: "vendor-access", refresh: "vendor-refresh", role: "VENDOR" });
     clearAuthSession();
 
     expect(localStorage.getItem("theme")).toBe("dark");
