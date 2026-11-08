@@ -1,0 +1,400 @@
+
+.vm-page {
+  padding: 28px 32px;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+}
+
+.vm-toolbar,
+.vm-form-heading,
+.vm-products-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vm-toolbar {
+  margin-bottom: 24px;
+}
+
+.vm-toolbar h2,
+.vm-products-heading h3 {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  color: #216c68;
+}
+
+.vm-toolbar p {
+  margin: 6px 0 0;
+  color: #707774;
+}
+
+.vm-primary-button,
+.vm-secondary-button,
+.vm-danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.vm-primary-button {
+  background: #216c68;
+  color: white;
+}
+
+.vm-primary-button:hover {
+  background: #185752;
+}
+
+.vm-primary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.vm-secondary-button {
+  background: #e8f1ef;
+  color: #216c68;
+}
+
+.vm-danger-button {
+  background: #fff0ec;
+  color: #b8432b;
+}
+
+.vm-close-button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: #f4f4f1;
+  color: #2c302f;
+  cursor: pointer;
+}
+
+.vm-business-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.vm-business-picker label {
+  font-weight: 700;
+}
+
+.vm-business-picker select {
+  min-width: 220px;
+  padding: 10px;
+  border: 1px solid #d8dfdc;
+  border-radius: 8px;
+  background: white;
+}
+
+.vm-message {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-radius: 9px;
+  font-size: 14px;
+}
+
+.vm-message--error {
+  background: #fff0ec;
+  color: #a83220;
+}
+
+.vm-message--success {
+  background: #e8f4ed;
+  color: #246444;
+}
+
+.vm-notice,
+.vm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 24px;
+  text-align: center;
+  border: 1px dashed #cbd8d4;
+  border-radius: 14px;
+  background: #fbfaf7;
+}
+
+.vm-notice h3,
+.vm-empty h3,
+.vm-notice p,
+.vm-empty p {
+  margin: 0;
+}
+
+.vm-notice a {
+  color: #216c68;
+  font-weight: 700;
+}
+
+.vm-form-card {
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid #e1e5e1;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgb(44 48 47 / 5%);
+}
+
+.vm-form-heading {
+  margin-bottom: 20px;
+}
+
+.vm-form-heading h3 {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  color: #216c68;
+}
+
+.vm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.vm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.vm-field--full {
+  grid-column: 1 / -1;
+}
+
+.vm-field label {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.vm-field input,
+.vm-field select,
+.vm-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d8dfdc;
+  border-radius: 9px;
+  background: #fff;
+  color: #2c302f;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.vm-field input:focus,
+.vm-field select:focus,
+.vm-field textarea:focus {
+  outline: 2px solid rgb(33 108 104 / 20%);
+  border-color: #216c68;
+}
+
+.vm-field small {
+  color: #737a76;
+  font-size: 12px;
+}
+
+.vm-photo-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.vm-photo-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e0e5e1;
+}
+
+.vm-photo-preview button {
+  border: 0;
+  background: transparent;
+  color: #b8432b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.vm-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.vm-products-section {
+  margin-top: 32px;
+}
+
+.vm-products-heading {
+  margin-bottom: 18px;
+}
+
+.vm-products-heading span {
+  padding: 6px 12px;
+  border-radius: 30px;
+  background: #e8f1ef;
+  color: #216c68;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vm-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.vm-product-card {
+  overflow: hidden;
+  border: 1px solid #e1e5e1;
+  border-radius: 13px;
+  background: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vm-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgb(44 48 47 / 8%);
+}
+
+.vm-product-card.is-inactive {
+  opacity: 0.7;
+}
+
+.vm-product-image {
+  display: grid;
+  place-items: center;
+  height: 190px;
+  background: #e8f1ef;
+  color: #216c68;
+}
+
+.vm-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vm-product-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+}
+
+.vm-product-status {
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #f0f0ed;
+  color: #666;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.vm-product-status.is-active {
+  background: #e8f4ed;
+  color: #246444;
+}
+
+.vm-product-details h4 {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: 18px;
+}
+
+.vm-product-description {
+  margin: 0;
+  color: #737a76;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vm-product-price {
+  color: #216c68;
+  font-size: 17px;
+}
+
+.vm-product-stock {
+  font-size: 13px;
+  color: #737a76;
+}
+
+.vm-product-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.vm-spinner {
+  animation: vm-spin 1s linear infinite;
+}
+
+@keyframes vm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .vm-page {
+    padding: 20px 16px;
+  }
+
+  .vm-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vm-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vm-field--full {
+    grid-column: auto;
+  }
+
+  .vm-form-card {
+    padding: 16px;
+  }
+
+  .vm-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .vm-form-actions button {
+    width: 100%;
+  }
+
+  .vm-business-picker {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vm-business-picker select {
+    width: 100%;
+  }
+}

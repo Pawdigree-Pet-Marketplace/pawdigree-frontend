@@ -40,6 +40,7 @@ import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionRequests from "./pages/Customer/CustomerAdoptionRequests";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
+import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 function App() {
   return (
     <Routes>
@@ -69,6 +70,14 @@ function App() {
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
+        <Route
+  path="/vendor/merchandise"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorMerchandisePage />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/profile"
           element={
