@@ -20,6 +20,7 @@ import LandingPage from "./pages/Customer/CustomerLandingPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
+import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
@@ -122,6 +123,15 @@ function App() {
         }
       />
 
+      <Route
+        path="/customer/cart"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerCartPage />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route
         path="/adoption-request"
         element={
