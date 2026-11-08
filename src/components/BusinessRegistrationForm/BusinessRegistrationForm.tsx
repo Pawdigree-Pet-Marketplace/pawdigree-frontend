@@ -459,9 +459,6 @@ function BusinessRegistrationForm() {
         <main className="business-registration-container">
           <header className="registration-heading">
             <span className="registration-brand">PAWDIGREE</span>
-
-            <h1>Register Your Business</h1>
-
             <p>
               Tell us about your business to get started on Pawdigree.
             </p>
