@@ -3,6 +3,7 @@ import {
   PawPrint,
   House,
   ShoppingBag,
+  ShoppingCart,
   Stethoscope,
   HeartHandshake,
   BookOpen,
@@ -25,6 +26,7 @@ const navigationItems = [
   { label: "Browse Pets", href: "/explore-pets", Icon: PawPrint },
   { label: "Pet Catalogue", href: "/pets", Icon: BookOpen },
   { label: "Pet Store", href: "/merchandise", Icon: ShoppingBag },
+  { label: "Cart", href: "/customer/cart", Icon: ShoppingCart },
   { label: "Pet Services", href: "/vendors", Icon: Stethoscope },
   { label: "Adoption", href: "/customer/adoption", Icon: HeartHandshake },
 ];
@@ -47,10 +49,12 @@ export default function CustomerDashboardNav() {
         return pathname === "/customer/dashboard";
       case "Browse Pets":
         return pathname === "/explore-pets" || pathname.startsWith("/pets/");
-      case "Pet Store":
-        return pathname.startsWith("/merchandise");
       case "Pet Catalogue":
         return pathname === "/pets" && !isAdoption;
+      case "Pet Store":
+        return pathname.startsWith("/merchandise");
+      case "Cart":
+        return pathname === "/customer/cart";
       case "Pet Services":
         return pathname.startsWith("/vendors");
       case "Adoption":

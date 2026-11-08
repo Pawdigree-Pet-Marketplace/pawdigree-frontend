@@ -21,6 +21,7 @@ import LandingPage from "./pages/Customer/CustomerLandingPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
+import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
@@ -40,6 +41,7 @@ import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionRequests from "./pages/Customer/CustomerAdoptionRequests";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
+import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 function App() {
   return (
     <Routes>
@@ -70,6 +72,14 @@ function App() {
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
+        <Route
+  path="/vendor/merchandise"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorMerchandisePage />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/profile"
           element={
@@ -124,6 +134,15 @@ function App() {
         }
       />
 
+      <Route
+        path="/customer/cart"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerCartPage />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route
         path="/adoption-request"
         element={
