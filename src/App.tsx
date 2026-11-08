@@ -15,6 +15,7 @@ import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePag
 import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import ExplorePets from "./pages/Customer/ExplorePets";
+import MerchandisePage from "./pages/Customer/MerchandisePage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
@@ -65,6 +66,7 @@ function App() {
       {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
+        <Route path="/merchandise" element={<MerchandisePage />} />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
@@ -152,13 +154,13 @@ function App() {
         }
       />
       <Route
-  path="/vendor/change-requests"
-  element={
-    <ProtectedRoute role="VENDOR">
-      <VendorChangeRequests />
-    </ProtectedRoute>
-  }
-/>
+        path="/vendor/change-requests"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorChangeRequests />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/vendor/listings"
         element={
@@ -215,7 +217,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-          <Route
+      <Route
         path="/vendor/documents/:businessId"
         element={
           <ProtectedRoute role="VENDOR">
