@@ -20,7 +20,7 @@ import { type PublicPet } from "../../data/pets";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { fetchPetsByBusiness } from "../../services/petsApi";
-import { Link } from "react-router-dom";
+
 import "./VendorBusinessProfilePage.css";
 
 interface Verification {
@@ -349,27 +349,7 @@ export default function VendorBusinessProfilePage() {
                 </>
               ))}
 
-            <section
-              className="bp-register-section"
-              aria-labelledby="bp-register-heading"
-            >
-              <div>
-                <h2 id="bp-register-heading">
-                  {state.businesses.length > 0
-                    ? "Need another business profile?"
-                    : "Register your business"}
-                </h2>
-                <p>Each business can have its own profile and listings.</p>
-              </div>
-              <Link
-                to="/vendor/business-registration"
-                className="bp-register-button"
-              >
-                {state.businesses.length > 0
-                  ? "Register another business"
-                  : "Register your business"}
-              </Link>
-            </section>
+          
           </>
         )}
       </div>
