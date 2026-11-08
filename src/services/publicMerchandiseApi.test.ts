@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { apiRequest } from "./api";
-import { fetchProducts } from "./merchandiseApi";
+import { fetchProducts } from "./publicMerchandiseApi";
 import { readMerchQuery } from "../data/merchandise";
 
 vi.mock("./api", () => ({ apiRequest: vi.fn() }));

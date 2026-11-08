@@ -33,7 +33,7 @@ import {
 import {
   fetchMerchCategories,
   fetchProducts,
-} from "../../services/merchandiseApi";
+} from "../../services/publicMerchandiseApi";
 import { prefersReducedMotion } from "../../utils/petUtils";
 import "./MerchandisePage.css";
 

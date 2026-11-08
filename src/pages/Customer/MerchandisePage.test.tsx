@@ -12,10 +12,10 @@ import MerchandisePage from "./MerchandisePage";
 import {
   fetchMerchCategories,
   fetchProducts,
-} from "../../services/merchandiseApi";
+} from "../../services/publicMerchandiseApi";
 import type { Product } from "../../data/merchandise";
 
-vi.mock("../../services/merchandiseApi", () => ({
+vi.mock("../../services/publicMerchandiseApi", () => ({
   fetchProducts: vi.fn(),
   fetchMerchCategories: vi.fn(),
 }));
