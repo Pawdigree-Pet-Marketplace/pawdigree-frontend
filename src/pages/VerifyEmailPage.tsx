@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { MailCheck } from "lucide-react";
+import { MailCheck, PawPrint } from "lucide-react";
 import { apiRequest } from "../services/api";
 import { saveAuthSession } from "../services/auth/authStorage";
 import { getPostLoginPath } from "../services/auth/authRedirect";
@@ -177,6 +177,8 @@ export default function VerifyEmailPage() {
 
   return (
     <main className="login-page verify-email-page">
+      <PawPrint className="verify-email-paw verify-email-paw--teal" aria-hidden="true" />
+      <PawPrint className="verify-email-paw verify-email-paw--coral" aria-hidden="true" />
       <section className="login-card verify-email-card">
         <BackButton
           label="Back to login"
@@ -209,7 +211,7 @@ export default function VerifyEmailPage() {
               </label>
               <input
                 id="verification-code"
-                className="verify-email-code"
+                className={`verify-email-code${error ? " has-error" : ""}`}
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
@@ -220,6 +222,7 @@ export default function VerifyEmailPage() {
                   setCode(event.target.value.replace(/\D/g, "").slice(0, 6));
                   setError("");
                 }}
+                aria-invalid={Boolean(error)}
                 aria-describedby={error ? "verification-error" : undefined}
               />
               <button

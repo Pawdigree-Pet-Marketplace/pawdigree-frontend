@@ -14,7 +14,28 @@ type CustomerProfileResponse = {
   last_name: string;
   email: string;
   phone: string;
+  location?: string | null;
+  city?: string | null;
+  city_district?: string | null;
 };
+
+const locationStorageKey = (email: string) =>
+  `pawdigree-customer-location:${email.trim().toLowerCase()}`;
+
+function savedLocationFor(email: string): string {
+  try {
+    return localStorage.getItem(locationStorageKey(email))?.trim() ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function profileLocation(data: CustomerProfileResponse): string {
+  for (const value of [data.location, data.city, data.city_district]) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
@@ -52,12 +73,13 @@ export default function EditProfilePage() {
         const data: CustomerProfileResponse = await response.json();
 
         if (!cancelled) {
+          const email = data.email ?? "";
           setProfile({
             fullName:
               `${data.first_name} ${data.last_name}`.trim() || data.username,
-            email: data.email,
+            email,
             phone: data.phone || "",
-            location: "",
+            location: profileLocation(data) || savedLocationFor(email),
           });
         }
       } catch (err) {
@@ -137,6 +159,17 @@ export default function EditProfilePage() {
         throw new Error(message);
       }
 
+      try {
+        localStorage.setItem(
+          locationStorageKey(values.email),
+          values.location.trim(),
+        );
+      } catch {
+        setError(
+          "Your profile was updated, but this browser couldn't save your city for next time.",
+        );
+        return;
+      }
       navigate("/profile");
     } catch (err) {
       setError(
