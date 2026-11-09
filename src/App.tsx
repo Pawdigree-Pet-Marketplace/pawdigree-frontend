@@ -12,7 +12,7 @@ import EditProfilePage from "./pages/Customer/EditProfilePage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage"; 
-//import AdoptionRequest from "./pages/Customer/AdoptionRequest";
+import AdoptionRequest from "./pages/Customer/AdoptionRequest";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
@@ -40,6 +40,7 @@ function App() {
       <Route path="/pets" element={<CustomerPetCataloguePage />} />
       <Route path="/pets/:petId" element={<PetsDetailPage />} />
       <Route path="/vendors" element={<CustomerVendorsPage />} />
+      <Route path="/AdoptionRequest" element={<AdoptionRequest />} />
       <Route
         path="/vendors/:vendorId"
         element={<CustomerVendorProfilePage />}
