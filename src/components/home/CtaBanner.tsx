@@ -1,11 +1,7 @@
 import useScrollReveal from "../../hooks/useScrollReveal";
 import "./CtaBanner.css";
 
-type CtaBannerProps = {
-  isLoggedIn?: boolean;
-};
-
-export default function CtaBanner({ isLoggedIn = false }: CtaBannerProps) {
+export default function CtaBanner() {
   const ctaRef = useScrollReveal<HTMLDivElement>();
 
   return (
@@ -16,23 +12,13 @@ export default function CtaBanner({ isLoggedIn = false }: CtaBannerProps) {
         Join thousands of buyers and sellers across Uganda
       </p>
 
-      {!isLoggedIn ? (
-        <button
-          type="button"
-          className="btn reveal reveal-delay-2"
-          onClick={() => (window.location.href = "/registration")}
-        >
-          Create Account
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="btn reveal reveal-delay-2"
-          onClick={() => (window.location.href = "/marketplace")}
-        >
-          Explore Marketplace
-        </button>
-      )}
+      <button
+        type="button"
+        className="btn reveal reveal-delay-2"
+        onClick={() => (window.location.href = "/registration")}
+      >
+        Create Account
+      </button>
     </section>
   );
 }

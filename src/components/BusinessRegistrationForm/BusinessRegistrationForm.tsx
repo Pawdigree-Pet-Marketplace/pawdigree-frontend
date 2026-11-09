@@ -84,6 +84,9 @@ function BusinessRegistrationForm() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error">("error");
+    // NEW: Controls which step of the form is displayed
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 3;
 
   // Load available phone countries from the backend.
   useEffect(() => {
@@ -158,7 +161,7 @@ function BusinessRegistrationForm() {
           headers,
           signal: controller.signal,
         });
-
+        
         if (response.status === 401) {
           throw new Error(
             "The categories endpoint requires valid authentication. Please log in again."
@@ -262,9 +265,12 @@ function BusinessRegistrationForm() {
     });
   }
 
-  function validateForm(): boolean {
-    const newErrors: Record<string, string> = {};
+ 
+function validateForm(step: number = currentStep): boolean {
+  const newErrors: Record<string, string> = {};
 
+  // STEP 1: Business basics
+  if (step === 1) {
     if (!formData.businessName.trim()) {
       newErrors.businessName = "Business name is required.";
     }
@@ -278,17 +284,17 @@ function BusinessRegistrationForm() {
 
     if (!formData.businessType) {
       newErrors.businessType = "Please select a business category.";
-    }
-
-    if (
-      formData.businessType &&
+    } else if (
       !categories.some(
         (category) => String(category.id) === formData.businessType
       )
     ) {
       newErrors.businessType = "Please select a valid category.";
     }
+  }
 
+  // STEP 2: Location, contact details and operating hours
+  if (step === 2) {
     if (!formData.address.trim()) {
       newErrors.address = "Business address is required.";
     }
@@ -297,10 +303,12 @@ function BusinessRegistrationForm() {
       newErrors.cityDistrict = "City or district is required.";
     }
 
+    // Validate business phone
     if (!formData.businessPhone.trim()) {
       newErrors.businessPhone = "Business phone number is required.";
     } else {
       const phoneInput = formData.businessPhone.trim();
+
       const phone = phoneInput.startsWith("+")
         ? parsePhoneNumberFromString(phoneInput)
         : parsePhoneNumberFromString(phoneInput, selectedCountry);
@@ -311,6 +319,7 @@ function BusinessRegistrationForm() {
       }
     }
 
+    // Validate business email
     if (!formData.businessEmail.trim()) {
       newErrors.businessEmail = "Business email is required.";
     } else if (
@@ -319,11 +328,7 @@ function BusinessRegistrationForm() {
       newErrors.businessEmail = "Enter a valid email address.";
     }
 
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms =
-        "You must agree to the terms and conditions.";
-    }
-
+    // Validate operating hours
     const invalidHours = weekdays.some((day) => {
       const hours = businessHours[day];
 
@@ -331,17 +336,73 @@ function BusinessRegistrationForm() {
         return false;
       }
 
-      return !hours.open || !hours.close || hours.open >= hours.close;
+      return (
+        !hours.open ||
+        !hours.close ||
+        hours.open >= hours.close
+      );
     });
 
     if (invalidHours) {
       newErrors.businessHours =
         "For each open day, provide valid opening and closing times.";
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   }
+
+  // STEP 3: Terms and conditions
+  if (step === 3 && !formData.agreeToTerms) {
+    newErrors.agreeToTerms =
+      "You must agree to the terms and conditions.";
+  }
+
+  // Clear previous errors for the current step,
+  // then add any errors found during this validation.
+  setErrors((previous) => {
+    const updated = { ...previous };
+
+    const fieldsByStep: Record<number, string[]> = {
+      1: ["businessName", "description", "businessType"],
+      2: [
+        "address",
+        "cityDistrict",
+        "businessPhone",
+        "businessEmail",
+        "businessHours",
+      ],
+      3: ["agreeToTerms"],
+    };
+
+    fieldsByStep[step].forEach((field) => {
+      delete updated[field];
+    });
+
+    return { ...updated, ...newErrors };
+  });
+
+  return Object.keys(newErrors).length === 0;
+}
+
+function handleNextStep() {
+  setMessage("");
+
+  if (!validateForm(currentStep)) {
+   if (!validateForm(currentStep)) {
+  return;
+}
+
+  return;
+}
+
+  if (currentStep < totalSteps) {
+    setCurrentStep((previous) => previous + 1);
+  }
+}
+
+function handlePreviousStep() {
+  setMessage("");
+  setCurrentStep((previous) => Math.max(1, previous - 1));
+}
+
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -449,19 +510,42 @@ function BusinessRegistrationForm() {
         <p>
           Tell us about your business to get started on Pawdigree.
         </p>
+        <div className="step-navigation">
+  {currentStep > 1 && (
+    <button
+      type="button"
+      className="back-button"
+      onClick={handlePreviousStep}
+      disabled={submitting}
+    >
+      Back
+    </button>
+  )}
 
-        {message && (
-          <div
-            className={`form-message ${messageType}`}
-            role="alert"
-          >
-            {message}
-          </div>
-        )}
+{currentStep < totalSteps ? (
+  <button
+    type="button"
+    onClick={handleNextStep}
+    disabled={submitting}
+  >
+  </button>
+) : (
+  <button type="submit" disabled={submitting}>
+    {submitting ? "Submitting..." : "Register Business"}
+  </button>
+)}
+</div>
+{message && messageType === "success" && (
+  <div className="form-message success" role="status">
+    {message}
+  </div>
+)}
 
         <form onSubmit={handleSubmit} noValidate>
+            {currentStep === 1 && (
+             <>
           <div className="form-group">
-            <label htmlFor="businessName">Business name *</label>
+            <label htmlFor="businessName">Business name </label>
             <input
               id="businessName"
               name="businessName"
@@ -475,7 +559,7 @@ function BusinessRegistrationForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Business description *</label>
+            <label htmlFor="description">Business description </label>
             <textarea
               id="description"
               name="description"
@@ -492,7 +576,7 @@ function BusinessRegistrationForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="businessType">Business category *</label>
+            <label htmlFor="businessType">Business category </label>
             <select
               id="businessType"
               name="businessType"
@@ -518,9 +602,14 @@ function BusinessRegistrationForm() {
               <p className="field-error">{errors.businessType}</p>
             )}
           </div>
+                      </>
+          )}
+
+                    {currentStep === 2 && (
+            <>
 
           <div className="form-group">
-            <label htmlFor="address">Business address *</label>
+            <label htmlFor="address">Business address </label>
             <input
               id="address"
               name="address"
@@ -534,7 +623,7 @@ function BusinessRegistrationForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="cityDistrict">City or district *</label>
+            <label htmlFor="cityDistrict">City or district </label>
             <input
               id="cityDistrict"
               name="cityDistrict"
@@ -548,7 +637,7 @@ function BusinessRegistrationForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="businessPhone">Business phone*</label>
+            <label htmlFor="businessPhone">Business phone</label>
             <div className="business-phone-row">
               <div className="business-country-select">
                 <CountryFlag countryCode={selectedCountry} />
@@ -588,7 +677,7 @@ function BusinessRegistrationForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="businessEmail">Business email *</label>
+            <label htmlFor="businessEmail">Business email </label>
             <input
               id="businessEmail"
               name="businessEmail"
@@ -664,6 +753,11 @@ function BusinessRegistrationForm() {
               <p className="field-error">{errors.businessHours}</p>
             )}
           </fieldset>
+                      </>
+          )}
+
+                    {currentStep === 3 && (
+            <>
 
           <div className="form-group terms-checkbox">
             <input
@@ -687,10 +781,35 @@ function BusinessRegistrationForm() {
               <p className="field-error">{errors.agreeToTerms}</p>
             )}
           </div>
+                      </>
+          )}
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Submitting..." : "Register Business"}
-          </button>
+                   <div className="step-navigation">
+            {currentStep > 1 && (
+              <button
+                type="button"
+                className="back-button"
+                onClick={handlePreviousStep}
+                disabled={submitting}
+              >
+                Back
+              </button>
+            )}
+
+            {currentStep < totalSteps ? (
+              <button
+                type="button"
+                onClick={handleNextStep}
+                disabled={submitting}
+              >
+                Continue
+              </button>
+            ) : (
+              <button type="submit" disabled={submitting}>
+                {submitting ? "Submitting..." : "Register Business"}
+              </button>
+            )}
+          </div>
         </form>
       </section>
     </main>

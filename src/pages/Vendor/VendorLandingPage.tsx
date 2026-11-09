@@ -202,7 +202,8 @@ function VendorLandingPage() {
     const checkAuth = () => {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
-      setIsLoggedIn(!!token);
+      const role = localStorage.getItem("role") || sessionStorage.getItem("role");
+      setIsLoggedIn(Boolean(token && role === "VENDOR"));
     };
 
     checkAuth();
@@ -274,6 +275,7 @@ function VendorLandingPage() {
   return (
     <>
       <TopNavbar
+        audience="vendor"
         isLoggedIn={isLoggedIn}
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}

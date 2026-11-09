@@ -1,5 +1,6 @@
 import {
   Activity,
+  BriefcaseBusiness,
   CalendarDays,
   ChartNoAxesCombined,
   ChevronRight,
@@ -17,25 +18,37 @@ import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
 import iconLogo from "../../../assets/logos/icon-logo.svg";
 
+const implementedVendorPages = new Set([
+  "/vendor/dashboard",
+  "/vendor/listings",
+  "/vendor/services/new",
+]);
+
 const navigationGroups = [
   {
-    title: "OVERVIEW",
+    title: "WORKSPACE",
     items: [
       { label: "Dashboard", path: "/vendor/dashboard", icon: LayoutDashboard },
       { label: "Sales & Payouts", path: "/vendor/sales", icon: ChartNoAxesCombined },
     ],
   },
   {
-    title: "MANAGE YOUR STORE",
+    title: "YOUR STORE",
     items: [
       { label: "Catalogue", path: "/vendor/listings", icon: Package },
+      { label: "Add Service", path: "/vendor/services/new", icon: BriefcaseBusiness },
+    ],
+  },
+  {
+    title: "CUSTOMER CARE",
+    items: [
       { label: "Orders & Bookings", path: "/vendor/orders", icon: ShoppingBag },
       { label: "Customers & Messages", path: "/vendor/customers", icon: MessageCircle },
       { label: "Availability", path: "/vendor/availability", icon: CalendarDays },
     ],
   },
   {
-    title: "YOUR BUSINESS",
+    title: "BUSINESS",
     items: [
       { label: "Store Profile", path: "/vendor/profile", icon: Store },
       { label: "Business & Payout", path: "/vendor/business", icon: Wallet },
@@ -94,20 +107,16 @@ export default function VendorSidebar({
                 currentPath === item.path ||
                 (item.path === "/vendor/listings" &&
                   currentPath.startsWith("/vendor/listings/")) ||
+                (item.path === "/vendor/services/new" &&
+                  currentPath.startsWith("/vendor/services/")) ||
                 (item.path === "/vendor/orders" &&
                   (currentPath.startsWith("/vendor/orders/") ||
                     currentPath === "/vendor/bookings")) ||
                 (item.path === "/vendor/customers" &&
                   currentPath === "/vendor/messages");
 
-              return (
-                <a
-                  key={item.path}
-                  href={item.path}
-                  className={`dashboard-nav-item${isActive ? " active" : ""}`}
-                  aria-current={isActive ? "page" : undefined}
-                  title={item.label}
-                >
+              const itemContent = (
+                <>
                   <Icon className="dashboard-nav-icon" size={18} strokeWidth={1.9} />
                   <span>{item.label}</span>
                   {isActive && (
@@ -117,6 +126,31 @@ export default function VendorSidebar({
                       aria-hidden="true"
                     />
                   )}
+                </>
+              );
+
+              if (!implementedVendorPages.has(item.path)) {
+                return (
+                  <span
+                    key={item.path}
+                    className="dashboard-nav-item dashboard-nav-item-unavailable"
+                    aria-disabled="true"
+                    title={`${item.label} isn't available yet`}
+                  >
+                    {itemContent}
+                  </span>
+                );
+              }
+
+              return (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  className={`dashboard-nav-item${isActive ? " active" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
+                  title={item.label}
+                >
+                  {itemContent}
                 </a>
               );
             })}
@@ -142,3 +176,4 @@ export default function VendorSidebar({
     </aside>
   );
 }
+

@@ -1,0 +1,43 @@
+/* Species colour tokens (--sp-bg / --sp-fg), shared by the pet card, filters and quick picks. */
+
+.pet-card[data-species="dog"],
+.pet-filters [data-species="dog"],
+.species-picks [data-species="dog"] {
+  --sp-bg: #e5f1eb;
+  --sp-fg: #216c68;
+}
+
+.pet-card[data-species="cat"],
+.pet-filters [data-species="cat"],
+.species-picks [data-species="cat"] {
+  --sp-bg: #ffe6dc;
+  --sp-fg: #a45e3d;
+}
+
+.pet-card[data-species="rabbit"],
+.pet-filters [data-species="rabbit"],
+.species-picks [data-species="rabbit"] {
+  --sp-bg: #f8e3ec;
+  --sp-fg: #8b5b70;
+}
+
+.pet-card[data-species="bird"],
+.pet-filters [data-species="bird"],
+.species-picks [data-species="bird"] {
+  --sp-bg: #fff1c9;
+  --sp-fg: #7a6940;
+}
+
+.pet-card[data-species="fish"],
+.pet-filters [data-species="fish"],
+.species-picks [data-species="fish"] {
+  --sp-bg: #e3edf6;
+  --sp-fg: #526b83;
+}
+
+.pet-card[data-species="other"],
+.pet-filters [data-species="other"],
+.species-picks [data-species="other"] {
+  --sp-bg: #f3f0ea;
+  --sp-fg: #6f7371;
+}

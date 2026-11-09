@@ -35,11 +35,9 @@ export default function VendorTopbar({
       <button
         type="button"
         className="dashboard-notification-button"
-        aria-label="Notifications"
-        title="Notifications"
-        onClick={() => {
-          window.location.href = "/vendor/notifications";
-        }}
+        aria-label="Notifications are not available yet"
+        title="Notifications are not available yet"
+        disabled
       >
         <Bell size={18} aria-hidden="true" />
       </button>
@@ -47,11 +45,9 @@ export default function VendorTopbar({
       <button
         type="button"
         className="dashboard-avatar"
-        aria-label={`Open ${businessName} profile`}
-        title={businessName}
-        onClick={() => {
-          window.location.href = "/vendor/profile";
-        }}
+        aria-label={`${businessName} profile is not available yet`}
+        title="Store profile is not available yet"
+        disabled
       >
         <Store size={17} aria-hidden="true" />
       </button>

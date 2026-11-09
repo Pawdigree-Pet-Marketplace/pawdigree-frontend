@@ -1,0 +1,48 @@
+/* Brand button (primary / ghost).
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+.pw-btn--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 24px;
+  color: #fff;
+  background: var(--teal);
+  border: 0;
+  border-radius: 999px;
+  font-weight: 800;
+  transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pw-btn--primary:hover {
+  background: var(--teal-dark);
+  box-shadow: 0 7px 16px rgb(33 108 104 / 24%);
+  transform: translateY(-1px);
+}
+
+.pw-btn--ghost {
+  min-height: 46px;
+  padding: 0 18px;
+  color: var(--teal);
+  background: transparent;
+  border: 1px solid rgb(33 108 104 / 28%);
+  border-radius: 999px;
+  font-weight: 800;
+  transition: background-color 0.18s ease;
+}
+
+.pw-btn--ghost:hover {
+  background: var(--teal-light);
+}
+
+.pw-btn {
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-btn {
+    transition: none;
+  }
+}

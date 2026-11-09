@@ -1,0 +1,144 @@
+/* Species shortcut buttons.
+   Self-contained: uses only the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+/* base: makes this component look right wherever it is dropped */
+.species-picks,
+.species-picks *,
+.species-picks *::before,
+.species-picks *::after {
+  box-sizing: border-box;
+}
+
+.species-picks {
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+:where(.species-picks) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.species-picks) h1,
+:where(.species-picks) h2,
+:where(.species-picks) h3,
+:where(.species-picks) p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+:where(.species-picks) h2,
+:where(.species-picks) h3 {
+  color: var(--ink);
+}
+
+:where(.species-picks) p {
+  line-height: 1.6;
+}
+
+:where(.species-picks) ul,
+:where(.species-picks) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.species-picks) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.species-picks) img {
+  display: block;
+  max-width: 100%;
+}
+
+.species-picks svg {
+  flex-shrink: 0;
+}
+
+.species-picks :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.species-picks {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(8px, 1.6vw, 18px);
+  max-width: 840px;
+  margin-top: 26px;
+}
+
+.species-picks__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 4px;
+  color: var(--ink);
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  transition: background-color 0.2s ease, transform 0.25s cubic-bezier(0.2, 0.75, 0.25, 1), border-color 0.2s ease;
+}
+
+.species-picks__icon {
+  display: grid;
+  width: clamp(52px, 6vw, 68px);
+  height: clamp(52px, 6vw, 68px);
+  place-items: center;
+  color: var(--sp-fg);
+  background: var(--sp-bg);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgb(44 48 47 / 10%);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.3s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.species-picks__btn:hover {
+  background: rgb(255 255 255 / 70%);
+  transform: translateY(-3px);
+}
+
+.species-picks__btn:hover .species-picks__icon {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.species-picks__btn.is-on {
+  background: #fff;
+  border-color: var(--teal);
+}
+
+.species-picks__btn.is-on .species-picks__icon {
+  color: #fff;
+  background: var(--sp-fg);
+}
+
+@media (max-width: 720px) {
+  .species-picks__btn {
+    padding: 8px 2px;
+    font-size: 0.76rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .species-picks__btn:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .species-picks,
+  .species-picks *,
+  .species-picks *::before,
+  .species-picks *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

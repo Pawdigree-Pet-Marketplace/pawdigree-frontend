@@ -1,11 +1,6 @@
 import darkLogo from "../../../assets/logos/darkmode-logo.svg";
 import lightLogo from "../../../assets/logos/lightmode-logo.svg";
 import {
-  Heart,
-  ShoppingCart,
-  Bell,
-  MessageCircle,
-  UserRound,
   Menu,
   X,
 } from "lucide-react";
@@ -15,6 +10,7 @@ import "./CustomerTopNavbar.css";
 
 type TopNavbarProps = {
   isLoggedIn: boolean;
+  audience?: "customer" | "vendor";
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -29,6 +25,7 @@ const navLinks = [
 
 const TopNavbar = ({
   isLoggedIn,
+  audience = "customer",
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
@@ -101,7 +98,7 @@ const TopNavbar = ({
               className="auth-btn"
               variant="primary"
               onClick={() => {
-                window.location.href = "/customer-login";
+                window.location.href = audience === "vendor" ? "/vendor/login" : "/customer-login";
               }}
             >
               Log In
@@ -110,29 +107,23 @@ const TopNavbar = ({
               className="auth-btn"
               variant="secondary"
               onClick={() => {
-                window.location.href = "/registration";
+                window.location.href = audience === "vendor" ? "/vendor/register" : "/registration";
               }}
             >
               Sign Up
             </Button>
           </>
         ) : (
-          <div className="topnav-icons">
-            <Heart size={22} strokeWidth={1.6} />
-            <ShoppingCart size={22} strokeWidth={1.6} />
-            <Bell size={22} strokeWidth={1.6} />
-            <MessageCircle size={22} strokeWidth={1.6} />
-            <button
-              type="button"
-              className="topnav-icon-button"
-              aria-label="Open profile"
-              onClick={() => {
-                window.location.href = "/profile";
-              }}
-            >
-              <UserRound size={22} strokeWidth={1.6} />
-            </button>
-          </div>
+          <Button
+            className="auth-btn dashboard-redirect-btn"
+            variant="secondary"
+            onClick={() => {
+              window.location.href =
+                audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard";
+            }}
+          >
+            {audience === "vendor" ? "Vendor Dashboard" : "Go to Dashboard"}
+          </Button>
         )}
 
         <button
