@@ -5,6 +5,7 @@ import {
   ClipboardList,
   HeartHandshake,
   Search,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import AdoptionRequests from "../../components/adoption/AdoptionRequests/AdoptionRequests";
@@ -15,6 +16,9 @@ import {
   type PublicPet,
   type PetQuery,
   DEFAULT_QUERY,
+  EMPTY_FILTERS,
+  SPECIES,
+  type PetFilters,
 } from "../../data/pets";
 import { useFavourites } from "../../hooks/useFavourites";
 import { fetchPets } from "../../services/petsApi";
@@ -26,28 +30,26 @@ export default function CustomerAdoptionPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const section: Section =
     searchParams.get("view") === "requests" ? "requests" : "pets";
-  const [authorized] = useState(() =>
-    Boolean(
-      (localStorage.getItem("token") || sessionStorage.getItem("token")) &&
-      (localStorage.getItem("role") || sessionStorage.getItem("role")) ===
-        "CUSTOMER",
-    ),
-  );
   const [pets, setPets] = useState<PublicPet[]>([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
   const [reloadPets, setReloadPets] = useState(0);
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
+  const [draftFilters, setDraftFilters] = useState<PetFilters>(EMPTY_FILTERS);
+  const [filters, setFilters] = useState<PetFilters>(EMPTY_FILTERS);
+  const [breed, setBreed] = useState("");
+  const [appliedBreed, setAppliedBreed] = useState("");
   const [loadingPets, setLoadingPets] = useState(true);
   const [petError, setPetError] = useState("");
   const { ids: favourites, toggle: toggleFavourite } = useFavourites();
 
   useEffect(() => {
-    if (!authorized) return;
     let cancelled = false;
     const query: PetQuery = {
       ...DEFAULT_QUERY,
+      ...filters,
+      breed: appliedBreed,
       listingType: "ADOPTION",
       search: appliedSearch,
       page,
@@ -70,9 +72,7 @@ export default function CustomerAdoptionPage() {
     return () => {
       cancelled = true;
     };
-  }, [authorized, appliedSearch, page, reloadPets]);
-
-  if (!authorized) return null;
+  }, [appliedSearch, appliedBreed, filters, page, reloadPets]);
   const pages = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const changeSection = (next: Section) =>
     setSearchParams(next === "requests" ? { view: "requests" } : {}, {
@@ -133,6 +133,10 @@ export default function CustomerAdoptionPage() {
                   setPage(1);
                   setAppliedSearch(nextSearch);
                 }
+                setLoadingPets(true);
+                setPage(1);
+                setFilters(draftFilters);
+                setAppliedBreed(breed.trim());
               }}
             >
               <label htmlFor="adoption-search">Find an adoption pet</label>
@@ -146,6 +150,32 @@ export default function CustomerAdoptionPage() {
                 />
                 <button type="submit">Search</button>
               </div>
+              <div className="customer-adoption-filter-grid" aria-label="Pet filters">
+                <label>Pet type
+                  <select value={draftFilters.species[0] ?? ""} onChange={(event) => setDraftFilters({ ...draftFilters, species: event.target.value ? [event.target.value as PetFilters["species"][number]] : [] })}>
+                    <option value="">Any type</option>
+                    {SPECIES.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
+                  </select>
+                </label>
+                <label>Breed
+                  <input value={breed} onChange={(event) => setBreed(event.target.value)} placeholder="Any breed" />
+                </label>
+                <label>Gender
+                  <select value={draftFilters.gender} onChange={(event) => setDraftFilters({ ...draftFilters, gender: event.target.value as PetFilters["gender"] })}>
+                    <option value="">Any gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option>
+                  </select>
+                </label>
+                <label>Location
+                  <input value={draftFilters.locations[0] ?? ""} onChange={(event) => setDraftFilters({ ...draftFilters, locations: event.target.value ? [event.target.value] : [] })} placeholder="Any location" />
+                </label>
+                <label>Min age (months)
+                  <input type="number" min="0" value={draftFilters.minAge} onChange={(event) => setDraftFilters({ ...draftFilters, minAge: event.target.value })} />
+                </label>
+                <label>Max age (months)
+                  <input type="number" min="0" value={draftFilters.maxAge} onChange={(event) => setDraftFilters({ ...draftFilters, maxAge: event.target.value })} />
+                </label>
+              </div>
+              <p className="customer-adoption-filter-note"><SlidersHorizontal size={14} /> Filters use the live adoption listings.</p>
             </form>
             <div className="customer-adoption-section-heading">
               <div>
@@ -174,6 +204,7 @@ export default function CustomerAdoptionPage() {
                 loading={loadingPets}
                 favs={favourites}
                 onToggleFav={toggleFavourite}
+                showAdoptionAction
               />
             )}
             {!loadingPets && !petError && pets.length === 0 && (

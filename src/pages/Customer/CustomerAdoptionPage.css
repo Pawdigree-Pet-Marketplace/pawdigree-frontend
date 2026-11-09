@@ -13,9 +13,14 @@
 .customer-adoption-tabs { display: flex; gap: 8px; margin: 20px 0 26px; padding: 5px; border: 1px solid var(--dashboard-border); border-radius: 13px; background: #f5f4ef; }
 .customer-adoption-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; padding: 0 16px; border: 0; border-radius: 9px; background: transparent; color: var(--dashboard-muted); cursor: pointer; font: inherit; font-weight: 800; }
 .customer-adoption-tabs button.is-active { background: #fff; color: var(--dashboard-teal); box-shadow: 0 2px 9px rgb(44 48 47 / 7%); }
-.customer-adoption-search { display: grid; gap: 7px; max-width: 650px; margin: 0 0 24px; color: var(--dashboard-ink); font-size: 13px; font-weight: 800; }
-.customer-adoption-search > div { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 0 9px 0 13px; border: 1px solid var(--dashboard-border); border-radius: 11px; background: #fff; color: var(--dashboard-muted); }
+.customer-adoption-search { display: grid; gap: 9px; width: 100%; max-width: none; margin: 0 0 28px; color: var(--dashboard-ink); font-size: 13px; font-weight: 800; }
+.customer-adoption-search > div:not(.customer-adoption-filter-grid) { display: flex; align-items: center; gap: 11px; min-height: 54px; padding: 0 10px 0 15px; border: 1px solid var(--dashboard-border); border-radius: 13px; background: #fff; color: var(--dashboard-muted); }
 .customer-adoption-search input { flex: 1; min-width: 0; border: 0; outline: 0; color: var(--dashboard-ink); font: inherit; font-weight: 500; }
+.customer-adoption-filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px 18px; margin-top: 5px; padding: clamp(16px, 2.3vw, 24px); border: 1px solid var(--dashboard-border); border-radius: 16px; background: rgb(255 255 255 / 78%); box-shadow: 0 5px 18px rgb(44 48 47 / 4%); }
+.customer-adoption-filter-grid label { display: grid; align-content: start; gap: 8px; min-width: 0; color: var(--dashboard-ink); font-size: 13px; font-weight: 750; }
+.customer-adoption-filter-grid input, .customer-adoption-filter-grid select { width: 100%; min-width: 0; min-height: 46px; padding: 0 12px; border: 1px solid var(--dashboard-border); border-radius: 10px; background: #fff; color: var(--dashboard-ink); font: inherit; font-size: 14px; font-weight: 500; transition: border-color .18s ease, box-shadow .18s ease; }
+.customer-adoption-filter-grid input:focus, .customer-adoption-filter-grid select:focus { border-color: var(--dashboard-teal); outline: 0; box-shadow: 0 0 0 3px rgb(33 108 104 / 12%); }
+.customer-adoption-filter-note { display: flex; align-items: center; gap: 6px; margin: 0 2px; color: var(--dashboard-muted); font-size: 12px; font-weight: 600; }
 .customer-adoption-search button, .customer-adoption-state button, .customer-adoption-refresh { min-height: 36px; padding: 0 13px; border: 0; border-radius: 8px; background: var(--dashboard-teal); color: #fff; cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; }
 .customer-adoption-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 17px; }
 .customer-adoption-section-heading h2 { margin: 0; color: var(--dashboard-ink); font-size: 1.35rem; }
@@ -33,10 +38,14 @@
 .customer-adoption-status--approved { background: #e6f4e9; color: #24663b; }
 .customer-adoption-status--rejected, .customer-adoption-status--cancelled { background: #fbe9e6; color: #9b3d31; }
 @media (max-width: 650px) {
+  .customer-adoption-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
   .adoption-decor-bone { right: 7%; width: 42px; opacity: .7; }
   .adoption-decor-bone-small { right: 22%; width: 26px; }
   .customer-adoption-tabs button { flex: 1; padding: 0 8px; }
   .customer-adoption-section-heading { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 420px) {
+  .customer-adoption-filter-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   .customer-adoption-hero, .adoption-decor-bone, .adoption-decor-dot { animation: none; }

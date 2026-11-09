@@ -27,6 +27,11 @@ export async function fetchProducts(query: MerchQuery): Promise<PagedProducts> {
   return Array.isArray(res) ? { count: res.length, results: res } : res;
 }
 
+/** Public details for one merchandise listing. */
+export async function fetchProduct(id: string | number): Promise<Product> {
+  return apiRequest<Product>(`/products/public/${encodeURIComponent(id)}/`);
+}
+
 /** Category list for the filter. Callers should treat a failure as "no categories". */
 export async function fetchMerchCategories(): Promise<MerchCategory[]> {
   const res = await apiRequest<MerchCategory[] | { results?: MerchCategory[] }>(

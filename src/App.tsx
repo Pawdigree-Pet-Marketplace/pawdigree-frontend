@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import CustomerShell from "./layouts/CustomerShell/CustomerShell";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
@@ -16,6 +16,7 @@ import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import ExplorePets from "./pages/Customer/ExplorePets";
 import MerchandisePage from "./pages/Customer/MerchandisePage";
+import ProductDetailsPage from "./pages/Customer/ProductDetailsPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
@@ -39,7 +40,7 @@ import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
-import CustomerAdoptionRequests from "./pages/Customer/CustomerAdoptionRequests";
+import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 function App() {
@@ -61,7 +62,7 @@ function App() {
         path="/customer/my-requests"
         element={
           <ProtectedRoute role="CUSTOMER">
-            <CustomerAdoptionRequests />
+            <Navigate to="/customer/adoption?view=requests" replace />
           </ProtectedRoute>
         }
       />
@@ -69,6 +70,7 @@ function App() {
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
         <Route path="/merchandise" element={<MerchandisePage />} />
+        <Route path="/merchandise/:productId" element={<ProductDetailsPage />} />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
@@ -122,6 +124,14 @@ function App() {
         element={
           <ProtectedRoute role="CUSTOMER">
             <CustomerDashboardLayout />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/adoption"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerAdoptionPage />
           </ProtectedRoute>
         }
       />
