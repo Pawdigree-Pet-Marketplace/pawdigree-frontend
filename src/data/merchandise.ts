@@ -10,6 +10,16 @@ export interface Product {
   business_name: string | null;
   /** Full image URL, or null when the vendor has not uploaded one. */
   main_image: string | null;
+  /** Present on GET /api/products/public/{id}/. */
+  description?: string;
+  images?: ProductImage[];
+}
+
+export interface ProductImage {
+  id: number;
+  image: string;
+  alt_text: string;
+  display_order: number;
 }
 
 export interface PagedProducts {

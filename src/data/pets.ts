@@ -63,6 +63,8 @@ export interface PetFilters {
 
 export interface PetQuery extends PetFilters {
   search: string;
+  /** Exact breed filter supported by the public pet endpoint. */
+  breed?: string;
   sort: SortKey;
   page: number;
 }

@@ -69,6 +69,7 @@ export function queryToParams(q: PetQuery, includePageSize = false): URLSearchPa
   const p = new URLSearchParams();
   const search = q.search.trim();
   if (search) p.set("search", search);
+  if (q.breed?.trim()) p.set("breed", q.breed.trim());
   if (q.species.length) p.set("species", q.species.join(","));
   if (q.listingType) p.set("listing_type", q.listingType);
   if (q.locations.length) p.set("location", q.locations.join(","));

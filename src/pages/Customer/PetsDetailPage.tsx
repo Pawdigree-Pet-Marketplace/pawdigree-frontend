@@ -255,7 +255,7 @@ export default function PetDetailsPage() {
                 className="pd-button pd-button-primary"
                 to={`/adoption-request?pet_id=${pet.pet_id}`}
               >
-                Apply to adopt {pet.name}
+                Adopt This Pet
               </Link>
             )}
 
