@@ -877,7 +877,7 @@ export default function DocumentUpload() {
               disabled={saving}
               onClick={handleSaveExit}
             >
-              Save &amp; Exit
+              Save as Draft &amp; Exit
             </button>
           </div>
         </main>
