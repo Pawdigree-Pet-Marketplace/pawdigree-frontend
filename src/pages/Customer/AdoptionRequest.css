@@ -123,3 +123,77 @@
 .boolean-options input { accent-color: #216c68; width: 17px; height: 17px; }
 .character-count { display: block; text-align: right; color: #777b78; font-size: 12px; margin-top: 5px; }
 .primary-button:disabled { opacity: .65; cursor: wait; }
+
+/* FIX: keep adoption columns within their available width */
+.adoption-columns {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.6fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.adoption-columns,
+.adoption-sidebar,
+.adoption-form {
+  min-width: 0;
+}
+
+.pet-summary,
+.next-steps {
+  width: 100%;
+  min-width: 0;
+}
+
+.adoption-form {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* FIX: separate question labels from Yes/No controls */
+.adoption-form .field {
+  display: block;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.adoption-form .field-label {
+  display: block;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.adoption-form .boolean-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.adoption-form .boolean-options label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-width: 125px;
+  min-height: 64px;
+  margin: 0;
+  padding: 14px 18px;
+  line-height: 1.4;
+}
+
+/* FIX: responsive layout */
+@media (max-width: 1000px) {
+  .adoption-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adoption-sidebar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .adoption-sidebar {
+    grid-template-columns: 1fr;
+  }
+}
