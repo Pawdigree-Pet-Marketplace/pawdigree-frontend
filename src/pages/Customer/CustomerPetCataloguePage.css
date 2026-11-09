@@ -19,3 +19,17 @@
 @media (max-width: 700px) { .pet-catalogue .dashboard-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .catalogue-decor-paw-one { right: 7%; width: 34px; height: 34px; } .catalogue-decor-paw-two { right: 20%; width: 23px; height: 23px; } }
 @media (prefers-reduced-motion: reduce) { .pet-catalogue .catalogue-heading, .catalogue-decor-paw, .catalogue-decor-sparkle { animation: none; } }
+
+/* Make each pet card clickable without changing its design */
+.pet-catalogue .dashboard-pet-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  height: 100%;
+}
+
+.pet-catalogue .dashboard-pet-card-link:focus-visible {
+  outline: 3px solid var(--dashboard-teal-dark);
+  outline-offset: 4px;
+  border-radius: 12px;
+}

@@ -433,6 +433,9 @@
   background: var(--dashboard-paper);
   border: 1px solid var(--dashboard-border);
   border-radius: 17px;
+  display: block;
+  color: inherit;
+  text-decoration: none;
   box-shadow: 0 4px 13px rgb(44 48 47 / 4%);
   transition: transform 160ms ease, box-shadow 160ms ease;
 }

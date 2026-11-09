@@ -9,7 +9,9 @@ import {
   Store,
   ImagePlus,
   LoaderCircle,
+  Plus,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import VendorBusinessUpdateForm, {
   type Business,
 } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
@@ -18,6 +20,7 @@ import { type PublicPet } from "../../data/pets";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { fetchPetsByBusiness } from "../../services/petsApi";
+
 import "./VendorBusinessProfilePage.css";
 
 interface Verification {
@@ -128,9 +131,11 @@ function ImageFallback({ kind }: { kind: "cover" | "logo" | "pet" }) {
 /* ---------- page ---------- */
 
 export default function VendorBusinessProfilePage() {
+  const navigate = useNavigate();
+
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
   const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
-  const [isRegistering, setIsRegistering] = useState(false);
+
   const [state, setState] = useState<PageState>({
     status: "loading",
     businesses: [],
@@ -146,14 +151,15 @@ export default function VendorBusinessProfilePage() {
         );
         if (!response.ok) throw new Error("Could not load your businesses.");
         const data = (await response.json()) as BusinessListResponse;
-        const businesses = Array.isArray(data) ? data : data.results ?? [];
+        const businesses = Array.isArray(data) ? data : (data.results ?? []);
         if (!cancelled) {
           setState({ status: "ready", businesses });
-          setSelectedBusinessId(businesses[0]?.id ? String(businesses[0].id) : null);
+          setSelectedBusinessId(
+            businesses[0]?.id ? String(businesses[0].id) : null,
+          );
         }
       } catch {
-        if (!cancelled)
-          setState({ status: "error", businesses: [] });
+        if (!cancelled) setState({ status: "error", businesses: [] });
       }
     })();
 
@@ -162,9 +168,10 @@ export default function VendorBusinessProfilePage() {
     };
   }, []);
 
-  const selectedBusiness = state.businesses.find(
-    (business) => String(business.id) === selectedBusinessId,
-  ) ?? null;
+  const selectedBusiness =
+    state.businesses.find(
+      (business) => String(business.id) === selectedBusinessId,
+    ) ?? null;
 
   function saveBusiness(savedBusiness: Business) {
     setState((current) => ({
@@ -181,7 +188,6 @@ export default function VendorBusinessProfilePage() {
     }));
     setSelectedBusinessId(savedBusiness.id ? String(savedBusiness.id) : null);
     setEditingBusinessId(null);
-    setIsRegistering(false);
   }
 
   function updateBusinessImages(updatedBusiness: Business) {
@@ -197,8 +203,8 @@ export default function VendorBusinessProfilePage() {
 
   return (
     <VendorLayout
-      title="Business & Payout"
-      description="View your business profiles or register another business."
+      title="Businesses"
+      description="Manage your businesses, registration applications, and verification status."
       vendorWorkspace
     >
       <div className="dashboard-content bp-page">
@@ -213,29 +219,86 @@ export default function VendorBusinessProfilePage() {
           </div>
         ) : (
           <>
+            {/* Registration card moved to the top */}
+            <section
+              className="bp-register-section"
+              aria-labelledby="bp-register-heading"
+            >
+              <div>
+                <h2 id="bp-register-heading">
+                  {state.businesses.length > 0
+                    ? "Need another business profile?"
+                    : "Register your business"}
+                </h2>
+
+                <p>Each business can have its own profile and listings.</p>
+              </div>
+
+              <button
+                type="button"
+                className="bp-register-button"
+                onClick={() => navigate("/vendor/business-registration")}
+              >
+                <Plus size={18} strokeWidth={2.5} />
+
+                {state.businesses.length > 0
+                  ? "Register New Business"
+                  : "Register Business"}
+              </button>
+            </section>
+
             {state.businesses.length > 0 ? (
-              <section className="bp-business-section" aria-labelledby="bp-businesses-heading">
+              <section
+                className="bp-business-section"
+                aria-labelledby="bp-businesses-heading"
+              >
                 <div className="bp-business-section-heading">
                   <div>
                     <h2 id="bp-businesses-heading">Your businesses</h2>
                     <p>Select a business to view or edit its profile.</p>
                   </div>
-                  <span>{state.businesses.length} {state.businesses.length === 1 ? "business" : "businesses"}</span>
+
+                  <span>
+                    {state.businesses.length}{" "}
+                    {state.businesses.length === 1 ? "business" : "businesses"}
+                  </span>
                 </div>
+
                 <div className="bp-business-grid">
                   {state.businesses.map((business) => {
                     const id = String(business.id);
                     const isSelected = id === selectedBusinessId;
                     return (
-                      <article className={`bp-business-card${isSelected ? " is-selected" : ""}`} key={id}>
+                      <article
+                        className={`bp-business-card${isSelected ? " is-selected" : ""}`}
+                        key={id}
+                      >
                         <div>
-                          <h3>{business.name || business.business_name || "Business"}</h3>
-                          <p>{business.city_district || business.location_district || business.city || "Location not set"}</p>
-                          <span className={`bp-business-status bp-business-status--${(business.verification_status || "draft").toLowerCase()}`}>
+                          <h3>
+                            {business.name ||
+                              business.business_name ||
+                              "Business"}
+                          </h3>
+                          <p>
+                            {business.city_district ||
+                              business.location_district ||
+                              business.city ||
+                              "Location not set"}
+                          </p>
+                          <span
+                            className={`bp-business-status bp-business-status--${(business.verification_status || "draft").toLowerCase()}`}
+                          >
                             {cap(business.verification_status || "draft")}
                           </span>
                         </div>
-                        <button type="button" className="bp-business-select" onClick={() => { setSelectedBusinessId(id); setEditingBusinessId(null); }}>
+                        <button
+                          type="button"
+                          className="bp-business-select"
+                          onClick={() => {
+                            setSelectedBusinessId(id);
+                            setEditingBusinessId(null);
+                          }}
+                        >
                           {isSelected ? "Viewing" : "View business"}
                         </button>
                       </article>
@@ -246,11 +309,14 @@ export default function VendorBusinessProfilePage() {
             ) : (
               <div className="bp-empty-card">
                 <h2>No business registered yet</h2>
-                <p>Register your first business to start adding listings and offering services.</p>
+                <p>
+                  Register your first business to start adding listings and
+                  offering services.
+                </p>
               </div>
             )}
 
-            {selectedBusiness && !isRegistering && (
+            {selectedBusiness && (
               editingBusinessId === selectedBusinessId ? (
                 <VendorBusinessUpdateForm
                   business={selectedBusiness}
@@ -260,8 +326,14 @@ export default function VendorBusinessProfilePage() {
               ) : (
                 <>
                   <div className="bp-profile-actions">
-                    <h2>{selectedBusiness.name || selectedBusiness.business_name}</h2>
-                    <button type="button" className="bp-business-select" onClick={() => setEditingBusinessId(selectedBusinessId)}>
+                    <h2>
+                      {selectedBusiness.name || selectedBusiness.business_name}
+                    </h2>
+                    <button
+                      type="button"
+                      className="bp-business-select"
+                      onClick={() => setEditingBusinessId(selectedBusinessId)}
+                    >
                       Edit business
                     </button>
                   </div>
@@ -275,32 +347,9 @@ export default function VendorBusinessProfilePage() {
                     onBusinessUpdated={updateBusinessImages}
                   />
                 </>
-              )
-            )}
+              ))}
 
-            <section className="bp-register-section" aria-labelledby="bp-register-heading">
-              <div>
-                <h2 id="bp-register-heading">
-                  {state.businesses.length > 0
-                    ? "Need another business profile?"
-                    : "Register your business"}
-                </h2>
-                <p>Each business can have its own profile and listings.</p>
-              </div>
-              {isRegistering ? (
-                <VendorBusinessUpdateForm
-                  business={null}
-                  onSaved={saveBusiness}
-                  onCancel={() => setIsRegistering(false)}
-                />
-              ) : (
-                <button type="button" className="bp-register-button" onClick={() => { setEditingBusinessId(null); setIsRegistering(true); }}>
-                  {state.businesses.length > 0
-                    ? "Register another business"
-                    : "Register your business"}
-                </button>
-              )}
-            </section>
+          
           </>
         )}
       </div>
@@ -319,12 +368,19 @@ type ViewProps = {
 
 type PetsLoaded = { key: string; pets: PublicPet[] | null };
 
-function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }: ViewProps) {
+function VendorProfileView({
+  business,
+  verification,
+  onEdit,
+  onBusinessUpdated,
+}: ViewProps) {
   const [copied, setCopied] = useState(false);
   const [catTab, setCatTab] = useState<CatTab>("all");
   const [showAll, setShowAll] = useState(false);
   const [petsLoaded, setPetsLoaded] = useState<PetsLoaded | null>(null);
-  const [uploadingImage, setUploadingImage] = useState<"logo" | "cover" | null>(null);
+  const [uploadingImage, setUploadingImage] = useState<"logo" | "cover" | null>(
+    null,
+  );
   const [imageUploadError, setImageUploadError] = useState("");
   const [imageUploadSuccess, setImageUploadSuccess] = useState("");
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -363,13 +419,16 @@ function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }
   const pets = loadedForThis?.pets ?? [];
   const showsPets = catTab === "all" || catTab === "pets";
   const visible = showAll ? pets : pets.slice(0, 6);
-  const verified = verification?.status === "verified";
+  const verified = verification?.status === "approved" || verification?.status === "verified";
   const location = business.city_district || business.location_district;
   const hours = formatHours(business.working_hours || business.business_hours);
   const cover = imageUrl(business.cover_image);
   const logo = imageUrl(business.logo);
 
-  async function uploadBusinessImage(file: File, field: "logo" | "cover_image") {
+  async function uploadBusinessImage(
+    file: File,
+    field: "logo" | "cover_image",
+  ) {
     setImageUploadError("");
     setImageUploadSuccess("");
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
@@ -391,18 +450,26 @@ function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }
       );
       if (!response.ok) {
         const data: unknown = await response.json().catch(() => null);
-        const details = data && typeof data === "object"
-          ? Object.entries(data as Record<string, unknown>)
-              .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(" ") : String(value)}`)
-              .join(" ")
-          : "";
+        const details =
+          data && typeof data === "object"
+            ? Object.entries(data as Record<string, unknown>)
+                .map(
+                  ([key, value]) =>
+                    `${key}: ${Array.isArray(value) ? value.join(" ") : String(value)}`,
+                )
+                .join(" ")
+            : "";
         throw new Error(details || `Image upload failed (${response.status}).`);
       }
       const updatedBusiness = (await response.json()) as Business;
       onBusinessUpdated(updatedBusiness);
       setImageUploadSuccess("Business image uploaded successfully.");
     } catch (error) {
-      setImageUploadError(error instanceof Error ? error.message : "Could not upload the image. Please try again.");
+      setImageUploadError(
+        error instanceof Error
+          ? error.message
+          : "Could not upload the image. Please try again.",
+      );
     } finally {
       setUploadingImage(null);
     }
@@ -435,9 +502,7 @@ function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }
   return (
     <div className="bp-content">
       <div className="bp-banner-card">
-        <div
-          className="bp-cover"
-        >
+        <div className="bp-cover">
           {cover ? (
             <img
               src={cover}
@@ -466,9 +531,15 @@ function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }
             onClick={() => coverInputRef.current?.click()}
           >
             {uploadingImage === "cover" ? (
-              <><LoaderCircle className="bp-upload-spinner" size={17} /> Uploading hero image…</>
+              <>
+                <LoaderCircle className="bp-upload-spinner" size={17} />{" "}
+                Uploading hero image…
+              </>
             ) : (
-              <><ImagePlus size={17} /> {cover ? "Change hero image" : "Upload hero image"}</>
+              <>
+                <ImagePlus size={17} />{" "}
+                {cover ? "Change hero image" : "Upload hero image"}
+              </>
             )}
           </button>
         </div>
@@ -539,9 +610,15 @@ function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }
                   onClick={() => logoInputRef.current?.click()}
                 >
                   {uploadingImage === "logo" ? (
-                    <><LoaderCircle className="bp-upload-spinner" size={14} /> Uploading…</>
+                    <>
+                      <LoaderCircle className="bp-upload-spinner" size={14} />{" "}
+                      Uploading…
+                    </>
                   ) : (
-                    <><ImagePlus size={14} /> {logo ? "Change profile image" : "Upload profile image"}</>
+                    <>
+                      <ImagePlus size={14} />{" "}
+                      {logo ? "Change profile image" : "Upload profile image"}
+                    </>
                   )}
                 </button>
               </div>
@@ -560,11 +637,16 @@ function VendorProfileView({ business, verification, onEdit, onBusinessUpdated }
       </div>
 
       {(imageUploadError || imageUploadSuccess) && (
-        <p className={`bp-image-upload-feedback${imageUploadError ? " is-error" : " is-success"}`} role={imageUploadError ? "alert" : "status"}>
+        <p
+          className={`bp-image-upload-feedback${imageUploadError ? " is-error" : " is-success"}`}
+          role={imageUploadError ? "alert" : "status"}
+        >
           {imageUploadError || imageUploadSuccess}
         </p>
       )}
-      <p className="bp-image-review-note">Image changes to an approved business may be sent for review.</p>
+      <p className="bp-image-review-note">
+        Image changes to an approved business may be sent for review.
+      </p>
 
       <div className="bp-grid">
         <div className="bp-left">

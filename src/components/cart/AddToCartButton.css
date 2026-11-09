@@ -1,0 +1,37 @@
+
+.add-to-cart-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #216c68;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.add-to-cart-button:hover {
+  background: #195653;
+  transform: translateY(-1px);
+}
+
+.add-to-cart-button:focus-visible {
+  outline: 3px solid #fb8665;
+  outline-offset: 3px;
+}
+
+.add-to-cart-button.added {
+  background: #2f8060;
+}
+
+@media (max-width: 480px) {
+  .add-to-cart-button {
+    width: 100%;
+  }
+}

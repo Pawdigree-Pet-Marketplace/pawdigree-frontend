@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-
+import CustomerShell from "./layouts/CustomerShell/CustomerShell";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -10,17 +10,18 @@ import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
-import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import AdoptionRequest from "./pages/Customer/AdoptionRequest";
 import CustomerVendorProfilePage from "./pages/Customer/CustomerVendorProfilePage";
 import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import ExplorePets from "./pages/Customer/ExplorePets";
+import MerchandisePage from "./pages/Customer/MerchandisePage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
+import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
@@ -40,6 +41,7 @@ import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionRequests from "./pages/Customer/CustomerAdoptionRequests";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
+import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 function App() {
   return (
     <Routes>
@@ -66,9 +68,18 @@ function App() {
       {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
+        <Route path="/merchandise" element={<MerchandisePage />} />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
+        <Route
+  path="/vendor/merchandise"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorMerchandisePage />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/profile"
           element={
@@ -122,25 +133,31 @@ function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
-        path="/customer/adoption"
+        path="/customer/cart"
         element={
           <ProtectedRoute role="CUSTOMER">
-            <CustomerAdoptionPage />
+            <CustomerCartPage />
           </ProtectedRoute>
         }
       />
+      
       <Route
         path="/adoption-request"
         element={
           <ProtectedRoute role="CUSTOMER">
-            <AdoptionRequest />
+            <CustomerShell />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<AdoptionRequest />} />
+      </Route>
+
+      {/* VENDOR AREA */}
       {/* VENDOR AREA */}
       <Route
-        path="/business-registration"
+        path="/vendor/business-registration"
         element={
           <ProtectedRoute role="VENDOR">
             <BusinessRegistrationForm />
@@ -156,13 +173,13 @@ function App() {
         }
       />
       <Route
-  path="/vendor/change-requests"
-  element={
-    <ProtectedRoute role="VENDOR">
-      <VendorChangeRequests />
-    </ProtectedRoute>
-  }
-/>
+        path="/vendor/change-requests"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorChangeRequests />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/vendor/listings"
         element={
@@ -220,7 +237,7 @@ function App() {
         }
       />
       <Route
-        path="/vendor/documents"
+        path="/vendor/documents/:businessId"
         element={
           <ProtectedRoute role="VENDOR">
             <DocumentUpload />

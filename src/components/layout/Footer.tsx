@@ -29,9 +29,9 @@ export default function Footer() {
           <div className="footer-links reveal reveal-delay-1">
             <div className="footer-column">
               <h3>Marketplace</h3>
-              <a href="#pets">Browse Pets</a>
+              <Link to="/explore-pets">Browse Pets</Link>
               <a href="#categories">Categories</a>
-              <a href="#merchandise">Shop Merchandise</a>
+              <Link to="/merchandise">Shop Merchandise</Link>
               <a href="#services">Pet Services</a>
             </div>
 

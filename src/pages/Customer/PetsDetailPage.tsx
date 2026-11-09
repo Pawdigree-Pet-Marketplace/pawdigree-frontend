@@ -286,7 +286,7 @@ export default function PetDetailsPage() {
                 <strong>{pet.business_name}</strong>
                 <span>Listed by this vendor</span>
               </div>
-              {pet.business !== undefined && (
+              {pet.business != null && (
                 <Link
                   className="pd-button pd-button-outline pd-vendor-button"
                   to={`/vendors/${pet.business}`}

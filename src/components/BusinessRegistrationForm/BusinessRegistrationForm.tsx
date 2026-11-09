@@ -1,11 +1,12 @@
-
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   parsePhoneNumberFromString,
   type CountryCode,
 } from "libphonenumber-js";
 import CountryFlag from "../CountryFlag/CountryFlag";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getSessionToken } from "../../services/auth/authStorage";
+import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import "./BusinessRegistrationForm.css";
 import API_BASE_URL from "../../services/api";
 
@@ -23,14 +24,33 @@ interface DayHours {
 
 type BusinessHours = Record<string, DayHours>;
 
+type BusinessType =
+  | ""
+  | "PRODUCT_SELLER"
+  | "SERVICE_PROVIDER"
+  | "PET_SALE_ADOPTION";
+
 interface FormData {
   businessName: string;
+  businessType: BusinessType;
   description: string;
   address: string;
   cityDistrict: string;
   businessPhone: string;
   businessEmail: string;
   agreeToTerms: boolean;
+}
+
+interface BusinessRegistrationResponse {
+  id: string;
+  name: string;
+  business_type: BusinessType;
+  description: string;
+  contact: string;
+  email: string;
+  address: string;
+  city_district: string;
+  business_hours: BusinessHours;
 }
 
 const weekdays = [
@@ -55,6 +75,7 @@ const initialBusinessHours: BusinessHours = {
 
 const initialFormData: FormData = {
   businessName: "",
+  businessType: "",
   description: "",
   address: "",
   cityDistrict: "",
@@ -64,11 +85,12 @@ const initialFormData: FormData = {
 };
 
 function BusinessRegistrationForm() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
   const [countries, setCountries] = useState<CountryOption[]>([]);
-  const [selectedCountry, setSelectedCountry] =
-    useState<CountryCode>("UG");
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("UG");
   const [loadingCountries, setLoadingCountries] = useState(true);
 
   const [businessHours, setBusinessHours] =
@@ -78,13 +100,16 @@ function BusinessRegistrationForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">(
-    "error"
-  );
+  const [messageType, setMessageType] = useState<"success" | "error">("error");
 
-  // Controls the currently displayed form step.
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
+
+  const stepLabels = [
+    "Business Information",
+    "Contact & Location",
+    "Operating Hours",
+  ];
 
   // Load available phone countries from the backend.
   useEffect(() => {
@@ -92,13 +117,10 @@ function BusinessRegistrationForm() {
 
     async function loadCountries() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/country-codes/`,
-          {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-          }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/country-codes/`, {
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        });
 
         if (!response.ok) {
           throw new Error("Unable to load phone country codes.");
@@ -115,8 +137,7 @@ function BusinessRegistrationForm() {
         setCountries(countryList);
 
         const defaultCountry =
-          countryList.find((item) => item.iso_code === "UG") ??
-          countryList[0];
+          countryList.find((item) => item.iso_code === "UG") ?? countryList[0];
 
         if (defaultCountry) {
           setSelectedCountry(defaultCountry.iso_code as CountryCode);
@@ -143,7 +164,7 @@ function BusinessRegistrationForm() {
   function handleChange(
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) {
     const { name, value, type } = event.target;
 
@@ -168,7 +189,7 @@ function BusinessRegistrationForm() {
   function handleHoursChange(
     day: string,
     field: keyof DayHours,
-    value: string | boolean
+    value: string | boolean,
   ) {
     setBusinessHours((previous) => ({
       ...previous,
@@ -189,21 +210,22 @@ function BusinessRegistrationForm() {
   function validateForm(step: number = currentStep): boolean {
     const newErrors: Record<string, string> = {};
 
-    // STEP 1: Business information.
     if (step === 1) {
       if (!formData.businessName.trim()) {
         newErrors.businessName = "Business name is required.";
       }
 
+      if (!formData.businessType) {
+        newErrors.businessType = "Please select your business type.";
+      }
+
       if (!formData.description.trim()) {
         newErrors.description = "Business description is required.";
       } else if (formData.description.trim().length > 500) {
-        newErrors.description =
-          "Description cannot exceed 500 characters.";
+        newErrors.description = "Description cannot exceed 500 characters.";
       }
     }
 
-    // STEP 2: Contact and location.
     if (step === 2) {
       if (!formData.address.trim()) {
         newErrors.address = "Business address is required.";
@@ -213,7 +235,6 @@ function BusinessRegistrationForm() {
         newErrors.cityDistrict = "City or district is required.";
       }
 
-      // Validate business phone.
       if (!formData.businessPhone.trim()) {
         newErrors.businessPhone = "Business phone number is required.";
       } else {
@@ -229,7 +250,6 @@ function BusinessRegistrationForm() {
         }
       }
 
-      // Validate business email.
       if (!formData.businessEmail.trim()) {
         newErrors.businessEmail = "Business email is required.";
       } else if (
@@ -239,7 +259,6 @@ function BusinessRegistrationForm() {
       }
     }
 
-    // STEP 3: Operating hours and terms.
     if (step === 3) {
       const invalidHours = weekdays.some((day) => {
         const hours = businessHours[day];
@@ -248,11 +267,7 @@ function BusinessRegistrationForm() {
           return false;
         }
 
-        return (
-          !hours.open ||
-          !hours.close ||
-          hours.open >= hours.close
-        );
+        return !hours.open || !hours.close || hours.open >= hours.close;
       });
 
       if (invalidHours) {
@@ -261,23 +276,16 @@ function BusinessRegistrationForm() {
       }
 
       if (!formData.agreeToTerms) {
-        newErrors.agreeToTerms =
-          "You must agree to the terms and conditions.";
+        newErrors.agreeToTerms = "You must agree to the terms and conditions.";
       }
     }
 
-    // Clear previous errors for this step and add new errors.
     setErrors((previous) => {
       const updated = { ...previous };
 
       const fieldsByStep: Record<number, string[]> = {
-        1: ["businessName", "description"],
-        2: [
-          "address",
-          "cityDistrict",
-          "businessPhone",
-          "businessEmail",
-        ],
+        1: ["businessName", "businessType", "description"],
+        2: ["address", "cityDistrict", "businessPhone", "businessEmail"],
         3: ["businessHours", "agreeToTerms"],
       };
 
@@ -321,12 +329,12 @@ function BusinessRegistrationForm() {
       return;
     }
 
-    const accessToken = localStorage.getItem("access");
+    const accessToken = getSessionToken();
 
     if (!accessToken) {
       setMessageType("error");
       setMessage(
-        "Please log in before registering your business. Your login session may have expired."
+        "Please log in before registering your business. Your login session may have expired.",
       );
       return;
     }
@@ -355,6 +363,7 @@ function BusinessRegistrationForm() {
           },
           body: JSON.stringify({
             name: formData.businessName.trim(),
+            business_type: formData.businessType,
             description: formData.description.trim(),
             contact: phone.number,
             email: formData.businessEmail.trim(),
@@ -362,14 +371,16 @@ function BusinessRegistrationForm() {
             city_district: formData.cityDistrict.trim(),
             business_hours: businessHours,
           }),
-        }
+        },
       );
 
-      const responseData = await response.json().catch(() => ({}));
+      const responseData: BusinessRegistrationResponse = await response
+        .json()
+        .catch(() => ({}) as BusinessRegistrationResponse);
 
       if (response.status === 401) {
         throw new Error(
-          "Your login session is invalid or expired. Please log in again."
+          "Your login session is invalid or expired. Please log in again.",
         );
       }
 
@@ -387,25 +398,28 @@ function BusinessRegistrationForm() {
           .join(" ");
 
         throw new Error(
-          details || "Business registration failed. Please try again."
+          details || "Business registration failed. Please try again.",
         );
       }
 
-      setMessageType("success");
-      setMessage(
-        "Your business registration has been submitted successfully."
-      );
+      const businessId = responseData.id;
 
-      setFormData(initialFormData);
-      setBusinessHours(initialBusinessHours);
-      setErrors({});
-      setCurrentStep(1);
+      if (!businessId) {
+        throw new Error(
+          "Your business was registered, but its ID was not returned. Please contact support before registering again.",
+        );
+      }
+
+      sessionStorage.setItem("onboardingBusinessId", businessId);
+      sessionStorage.setItem("onboardingBusinessType", formData.businessType);
+
+      navigate(`/vendor/documents/${businessId}`);
     } catch (error) {
       setMessageType("error");
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again."
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -413,305 +427,393 @@ function BusinessRegistrationForm() {
   }
 
   return (
-    <main className="business-registration-page">
-      <section className="business-registration-container">
-        <h1>Register Your Business</h1>
+    <VendorLayout
+      title="Register your business"
+      description="Step 1 of 3 — Business information"
+      businessName={formData.businessName || "Your store"}
+      vendorWorkspace
+    >
+      <div className="vendor-page-content business-registration-page">
+        <main className="business-registration-container">
+          <header className="registration-heading">
+            <span className="registration-brand">PAWDIGREE</span>
+            <p>
+              Tell us about your business to get started on Pawdigree.
+            </p>
+          </header>
 
-        <p>
-          Tell us about your business to get started on Pawdigree.
-        </p>
+          {/* Three-step progress indicator */}
+          <div className="registration-progress">
+            <div className="progress-heading">
+              <span>
+                Step {currentStep} of {totalSteps}
+              </span>
 
-        {/* Display success and error messages. */}
-        {message && (
-          <div
-            className={`form-message ${messageType}`}
-            role={messageType === "success" ? "status" : "alert"}
-          >
-            {message}
+              <span>
+                {Math.round((currentStep / totalSteps) * 100)}% complete
+              </span>
+            </div>
+
+            <div className="progress-track">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${(currentStep / totalSteps) * 100}%`,
+                }}
+              />
+            </div>
+
+            <div className="progress-steps">
+              {stepLabels.map((label, index) => {
+                const stepNumber = index + 1;
+
+                return (
+                  <div
+                    key={label}
+                    className={`progress-step ${
+                      currentStep === stepNumber
+                        ? "active"
+                        : currentStep > stepNumber
+                          ? "completed"
+                          : ""
+                    }`}
+                  >
+                    <span className="progress-step-number">
+                      {currentStep > stepNumber ? "✓" : stepNumber}
+                    </span>
+
+                    <span className="progress-step-label">{label}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} noValidate>
-          {/* STEP 1: Business information. */}
-          {currentStep === 1 && (
-            <>
-              <div className="form-group">
-                <label htmlFor="businessName">Business name</label>
-
-                <input
-                  id="businessName"
-                  name="businessName"
-                  value={formData.businessName}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.businessName)}
-                />
-
-                {errors.businessName && (
-                  <p className="field-error">{errors.businessName}</p>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">Business description</label>
-
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  maxLength={500}
-                  rows={4}
-                  aria-invalid={Boolean(errors.description)}
-                />
-
-                <small>
-                  {formData.description.length}/500 characters
-                </small>
-
-                {errors.description && (
-                  <p className="field-error">{errors.description}</p>
-                )}
-              </div>
-            </>
+          {/* Success and error messages */}
+          {message && (
+            <div
+              className={`form-message ${messageType}`}
+              role={messageType === "success" ? "status" : "alert"}
+            >
+              {message}
+            </div>
           )}
 
-          {/* STEP 2: Contact and location. */}
-          {currentStep === 2 && (
-            <>
-              <div className="form-group">
-                <label htmlFor="address">Business address</label>
-
-                <input
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.address)}
-                />
-
-                {errors.address && (
-                  <p className="field-error">{errors.address}</p>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="cityDistrict">City or district</label>
-
-                <input
-                  id="cityDistrict"
-                  name="cityDistrict"
-                  value={formData.cityDistrict}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.cityDistrict)}
-                />
-
-                {errors.cityDistrict && (
-                  <p className="field-error">{errors.cityDistrict}</p>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="businessPhone">Business phone</label>
-
-                <div className="business-phone-row">
-                  <div className="business-country-select">
-                    <CountryFlag countryCode={selectedCountry} />
-
-                    <select
-                      aria-label="Phone country"
-                      value={selectedCountry}
-                      disabled={loadingCountries || countries.length === 0}
-                      onChange={(event) => {
-                        setSelectedCountry(
-                          event.target.value as CountryCode
-                        );
-
-                        setErrors((previous) => {
-                          const updated = { ...previous };
-                          delete updated.businessPhone;
-                          return updated;
-                        });
-                      }}
-                    >
-                      {countries.map((item) => (
-                        <option
-                          key={item.iso_code}
-                          value={item.iso_code}
-                        >
-                          {item.country} ({item.dial_code})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+          <form onSubmit={handleSubmit} noValidate>
+            {/* STEP 1: Business information */}
+            {currentStep === 1 && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="businessName">Business name</label>
 
                   <input
-                    id="businessPhone"
-                    name="businessPhone"
-                    type="tel"
-                    placeholder="+256..."
-                    value={formData.businessPhone}
+                    id="businessName"
+                    name="businessName"
+                    value={formData.businessName}
                     onChange={handleChange}
-                    aria-invalid={Boolean(errors.businessPhone)}
+                    placeholder="Enter your business name"
+                    aria-invalid={Boolean(errors.businessName)}
                   />
+
+                  {errors.businessName && (
+                    <p className="field-error">{errors.businessName}</p>
+                  )}
                 </div>
 
-                {errors.businessPhone && (
-                  <p className="field-error">{errors.businessPhone}</p>
-                )}
-              </div>
+                <div className="form-group">
+                  <label htmlFor="businessType">Business type</label>
 
-              <div className="form-group">
-                <label htmlFor="businessEmail">Business email</label>
+                  <select
+                    id="businessType"
+                    name="businessType"
+                    value={formData.businessType}
+                    onChange={handleChange}
+                    aria-invalid={Boolean(errors.businessType)}
+                    required
+                  >
+                    <option value="">Select your business type</option>
+                    <option value="PRODUCT_SELLER">Product Seller</option>
+                    <option value="SERVICE_PROVIDER">Service Provider</option>
+                    <option value="PET_SALE_ADOPTION">Pet Sale / Adoption</option>
+                  </select>
 
-                <input
-                  id="businessEmail"
-                  name="businessEmail"
-                  type="email"
-                  value={formData.businessEmail}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.businessEmail)}
-                />
+                  <small>
+                    Choose the type that best describes what your business
+                    offers.
+                  </small>
 
-                {errors.businessEmail && (
-                  <p className="field-error">{errors.businessEmail}</p>
-                )}
-              </div>
-            </>
-          )}
+                  {errors.businessType && (
+                    <p className="field-error">{errors.businessType}</p>
+                  )}
+                </div>
 
-          {/* STEP 3: Operating hours and terms. */}
-          {currentStep === 3 && (
-            <>
-              <fieldset className="business-hours">
-                <legend>Business operating hours</legend>
+                <div className="form-group">
+                  <label htmlFor="description">Business description</label>
 
-                <div className="business-hours-grid">
-                  {weekdays.map((day) => (
-                    <div className="business-hours-card" key={day}>
-                      <div className="business-hours-heading">
-                        <label htmlFor={`${day}-open`}>
-                          {day.charAt(0).toUpperCase() + day.slice(1)}
-                        </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Briefly describe your business and what you offer..."
+                    maxLength={500}
+                    rows={4}
+                    aria-invalid={Boolean(errors.description)}
+                  />
 
-                        <label className="business-hours-toggle">
-                          <input
-                            id={`${day}-open`}
-                            type="checkbox"
-                            checked={businessHours[day].is_open}
-                            onChange={(event) =>
-                              handleHoursChange(
-                                day,
-                                "is_open",
-                                event.target.checked
-                              )
-                            }
-                          />
-                          <span>Open</span>
-                        </label>
-                      </div>
+                  <small>{formData.description.length}/500 characters</small>
 
-                      {businessHours[day].is_open ? (
-                        <div className="business-hours-times">
-                          <input
-                            type="time"
-                            aria-label={`${day} opening time`}
-                            value={businessHours[day].open}
-                            onChange={(event) =>
-                              handleHoursChange(
-                                day,
-                                "open",
-                                event.target.value
-                              )
-                            }
-                          />
+                  {errors.description && (
+                    <p className="field-error">{errors.description}</p>
+                  )}
+                </div>
+              </>
+            )}
 
-                          <span>to</span>
+            {/* STEP 2: Contact and location */}
+            {currentStep === 2 && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="address">Business address</label>
 
-                          <input
-                            type="time"
-                            aria-label={`${day} closing time`}
-                            value={businessHours[day].close}
-                            onChange={(event) =>
-                              handleHoursChange(
-                                day,
-                                "close",
-                                event.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      ) : (
-                        <p className="business-closed-label">Closed</p>
-                      )}
+                  <input
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Enter your business address"
+                    aria-invalid={Boolean(errors.address)}
+                  />
+
+                  {errors.address && (
+                    <p className="field-error">{errors.address}</p>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="cityDistrict">City or district</label>
+
+                  <input
+                    id="cityDistrict"
+                    name="cityDistrict"
+                    value={formData.cityDistrict}
+                    onChange={handleChange}
+                    placeholder="e.g. Kampala"
+                    aria-invalid={Boolean(errors.cityDistrict)}
+                  />
+
+                  {errors.cityDistrict && (
+                    <p className="field-error">{errors.cityDistrict}</p>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="businessPhone">Business phone</label>
+
+                  <div className="business-phone-row">
+                    <div className="business-country-select">
+                      <CountryFlag countryCode={selectedCountry} />
+
+                      <select
+                        aria-label="Phone country"
+                        value={selectedCountry}
+                        disabled={loadingCountries || countries.length === 0}
+                        onChange={(event) => {
+                          setSelectedCountry(event.target.value as CountryCode);
+
+                          setErrors((previous) => {
+                            const updated = { ...previous };
+                            delete updated.businessPhone;
+                            return updated;
+                          });
+                        }}
+                      >
+                        {countries.map((item) => (
+                          <option key={item.iso_code} value={item.iso_code}>
+                            {item.country} ({item.dial_code})
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  ))}
+
+                    <input
+                      id="businessPhone"
+                      name="businessPhone"
+                      type="tel"
+                      placeholder="+256..."
+                      value={formData.businessPhone}
+                      onChange={handleChange}
+                      aria-invalid={Boolean(errors.businessPhone)}
+                    />
+                  </div>
+
+                  {errors.businessPhone && (
+                    <p className="field-error">{errors.businessPhone}</p>
+                  )}
                 </div>
 
-                {errors.businessHours && (
-                  <p className="field-error">{errors.businessHours}</p>
-                )}
-              </fieldset>
+                <div className="form-group">
+                  <label htmlFor="businessEmail">Business email</label>
 
-              <div className="form-group terms-checkbox">
-                <input
-                  id="agreeToTerms"
-                  name="agreeToTerms"
-                  type="checkbox"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.agreeToTerms)}
-                />
+                  <input
+                    id="businessEmail"
+                    name="businessEmail"
+                    type="email"
+                    value={formData.businessEmail}
+                    onChange={handleChange}
+                    placeholder="business@example.com"
+                    aria-invalid={Boolean(errors.businessEmail)}
+                  />
 
-                <label htmlFor="agreeToTerms">
-                  I agree to the{" "}
-                  <Link to="/terms-and-conditions">
-                    Terms and Conditions
-                  </Link>
-                  .
-                </label>
-
-                {errors.agreeToTerms && (
-                  <p className="field-error">{errors.agreeToTerms}</p>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Navigation buttons. */}
-          <div className="step-navigation">
-            {currentStep > 1 && (
-              <button
-                type="button"
-                className="back-button"
-                onClick={handlePreviousStep}
-                disabled={submitting}
-              >
-                Back
-              </button>
+                  {errors.businessEmail && (
+                    <p className="field-error">{errors.businessEmail}</p>
+                  )}
+                </div>
+              </>
             )}
 
-            {currentStep < totalSteps ? (
-              <button
-                type="button"
-                className="continue-button"
-                onClick={handleNextStep}
-                disabled={submitting}
-              >
-                Continue
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="submit-button"
-                disabled={submitting}
-              >
-                {submitting ? "Submitting..." : "Register Business"}
-              </button>
+            {/* STEP 3: Operating hours and terms */}
+            {currentStep === 3 && (
+              <>
+                <fieldset className="business-hours">
+                  <legend>Business operating hours</legend>
+
+                  <p className="hours-description">
+                    Select the days your business is open and set your operating
+                    times.
+                  </p>
+
+                  <div className="business-hours-grid">
+                    {weekdays.map((day) => (
+                      <div className="business-hours-card" key={day}>
+                        <div className="business-hours-heading">
+                          <label htmlFor={`${day}-open`}>
+                            {day.charAt(0).toUpperCase() + day.slice(1)}
+                          </label>
+
+                          <label className="business-hours-toggle">
+                            <input
+                              id={`${day}-open`}
+                              type="checkbox"
+                              checked={businessHours[day].is_open}
+                              onChange={(event) =>
+                                handleHoursChange(
+                                  day,
+                                  "is_open",
+                                  event.target.checked,
+                                )
+                              }
+                            />
+                            <span>Open</span>
+                          </label>
+                        </div>
+
+                        {businessHours[day].is_open ? (
+                          <div className="business-hours-times">
+                            <input
+                              type="time"
+                              aria-label={`${day} opening time`}
+                              value={businessHours[day].open}
+                              onChange={(event) =>
+                                handleHoursChange(
+                                  day,
+                                  "open",
+                                  event.target.value,
+                                )
+                              }
+                            />
+
+                            <span>to</span>
+
+                            <input
+                              type="time"
+                              aria-label={`${day} closing time`}
+                              value={businessHours[day].close}
+                              onChange={(event) =>
+                                handleHoursChange(
+                                  day,
+                                  "close",
+                                  event.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                        ) : (
+                          <p className="business-closed-label">Closed</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {errors.businessHours && (
+                    <p className="field-error">{errors.businessHours}</p>
+                  )}
+                </fieldset>
+
+                <div className="terms-checkbox">
+                  <input
+                    id="agreeToTerms"
+                    name="agreeToTerms"
+                    type="checkbox"
+                    checked={formData.agreeToTerms}
+                    onChange={handleChange}
+                    aria-invalid={Boolean(errors.agreeToTerms)}
+                  />
+
+                  <label htmlFor="agreeToTerms">
+                    I agree to the{" "}
+                    <Link to="/terms-and-conditions">Terms and Conditions</Link>
+                    .
+                  </label>
+
+                  {errors.agreeToTerms && (
+                    <p className="field-error">{errors.agreeToTerms}</p>
+                  )}
+                </div>
+              </>
             )}
-          </div>
-        </form>
-      </section>
-    </main>
+
+            {/* Navigation buttons */}
+            <div className="step-navigation">
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  className="back-button"
+                  onClick={handlePreviousStep}
+                  disabled={submitting}
+                >
+                  Back
+                </button>
+              )}
+
+              {currentStep < totalSteps ? (
+                <button
+                  type="button"
+                  className="continue-button"
+                  onClick={handleNextStep}
+                  disabled={submitting}
+                >
+                  Continue
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="submit-button"
+                  disabled={submitting}
+                >
+                  {submitting ? "Submitting..." : "Register Business"}
+                </button>
+              )}
+            </div>
+          </form>
+
+          <p className="registration-footer">
+            Your business information will help us build a trusted pet-care
+            community.
+          </p>
+        </main>
+      </div>
+    </VendorLayout>
   );
 }
 

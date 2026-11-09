@@ -1,6 +1,5 @@
 import {
   Activity,
-  BriefcaseBusiness,
   CalendarDays,
   ChartNoAxesCombined,
   ChevronRight,
@@ -11,9 +10,9 @@ import {
   Settings,
   ShoppingBag,
   Store,
-  Wallet,
   Headset,
   FileText,
+  BriefcaseBusiness,
 } from "lucide-react";
 import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
@@ -34,33 +33,64 @@ const navigationGroups = [
     title: "WORKSPACE",
     items: [
       { label: "Dashboard", path: "/vendor/dashboard", icon: LayoutDashboard },
-      { label: "Sales & Payouts", path: "/vendor/sales", icon: ChartNoAxesCombined },
+      {
+        label: "Sales & Payouts",
+        path: "/vendor/sales",
+        icon: ChartNoAxesCombined,
+      },
     ],
   },
   {
     title: "YOUR STORE",
     items: [
       { label: "Catalogue", path: "/vendor/listings", icon: Package },
-      { label: "Adoption applications", path: "/vendor/adoption-applications", icon: FileText },
-      { label: "Add Service", path: "/vendor/services/new", icon: BriefcaseBusiness },
+      {
+        label: "Adoption applications",
+        path: "/vendor/adoption-applications",
+        icon: FileText,
+      },
+      {
+        label: "Add Service",
+        path: "/vendor/services/new",
+        icon: BriefcaseBusiness,
+      },
+      {
+  label: "Merchandise",
+  path: "/vendor/merchandise",
+  icon: ShoppingBag,
+},
     ],
   },
   {
     title: "CUSTOMER CARE",
     items: [
       { label: "Orders & Bookings", path: "/vendor/orders", icon: ShoppingBag },
-      { label: "Customers & Messages", path: "/vendor/customers", icon: MessageCircle },
-      { label: "Availability", path: "/vendor/availability", icon: CalendarDays },
+      {
+        label: "Customers & Messages",
+        path: "/vendor/customers",
+        icon: MessageCircle,
+      },
+      {
+        label: "Availability",
+        path: "/vendor/availability",
+        icon: CalendarDays,
+      },
     ],
   },
   {
-    title: "BUSINESS",
-    items: [
-      { label: "Store Profile", path: "/vendor/profile", icon: Store },
-      { label: "Business & Payout", path: "/vendor/business-profile", icon: Wallet },
-      { label: "Settings", path: "/vendor/settings", icon: Settings },
-      { label: "Support", path: "/vendor/support", icon: Headset },
-    ],
+  
+  title: "BUSINESS",
+  items: [
+    { label: "Store Profile", path: "/vendor/profile", icon: Store },
+    {
+      label: "Businesses",
+      path: "/vendor/business-profile",
+      icon: BriefcaseBusiness,
+    },
+    { label: "Settings", path: "/vendor/settings", icon: Settings },
+    { label: "Support", path: "/vendor/support", icon: Headset },
+  ],
+
   },
 ];
 
@@ -68,7 +98,9 @@ type VendorSidebarProps = {
   currentPath?: string;
 };
 
-export default function VendorSidebar({ currentPath: providedPath }: VendorSidebarProps) {
+export default function VendorSidebar({
+  currentPath: providedPath,
+}: VendorSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = providedPath ?? location.pathname;
@@ -79,10 +111,10 @@ export default function VendorSidebar({ currentPath: providedPath }: VendorSideb
 
   return (
     <aside className="dashboard-sidebar">
-     <Link
-       className="dashboard-brand"
-       to="/vendor"
-       aria-label="Pawdigree vendor home"
+      <Link
+        className="dashboard-brand"
+        to="/vendor"
+        aria-label="Pawdigree vendor home"
       >
         <img
           className="dashboard-brand-logo"
@@ -96,7 +128,7 @@ export default function VendorSidebar({ currentPath: providedPath }: VendorSideb
           alt=""
           aria-hidden="true"
         />
-     </Link>
+      </Link>
 
       <nav className="dashboard-navigation" aria-label="Vendor navigation">
         {navigationGroups.map((group) => (
@@ -119,7 +151,11 @@ export default function VendorSidebar({ currentPath: providedPath }: VendorSideb
 
               const itemContent = (
                 <>
-                  <Icon className="dashboard-nav-icon" size={18} strokeWidth={1.9} />
+                  <Icon
+                    className="dashboard-nav-icon"
+                    size={18}
+                    strokeWidth={1.9}
+                  />
                   <span>{item.label}</span>
                   {isActive && (
                     <ChevronRight
@@ -134,7 +170,7 @@ export default function VendorSidebar({ currentPath: providedPath }: VendorSideb
               if (!implementedVendorPages.has(item.path)) {
                 return (
                   <span
-                    key={item.path}
+                    key={item.label}
                     className="dashboard-nav-item dashboard-nav-item-unavailable"
                     aria-disabled="true"
                     title={`${item.label} isn't available yet`}
@@ -146,7 +182,7 @@ export default function VendorSidebar({ currentPath: providedPath }: VendorSideb
 
               return (
                 <Link
-                  key={item.path}
+                  key={item.label}
                   to={item.path}
                   className={`dashboard-nav-item${isActive ? " active" : ""}`}
                   aria-current={isActive ? "page" : undefined}
@@ -178,4 +214,3 @@ export default function VendorSidebar({ currentPath: providedPath }: VendorSideb
     </aside>
   );
 }
-
