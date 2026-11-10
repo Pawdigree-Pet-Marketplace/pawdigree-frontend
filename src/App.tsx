@@ -23,6 +23,7 @@ import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import CustomerCartPage from "./pages/Customer/CustomerCartPage";
+import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
@@ -144,6 +145,7 @@ function App() {
         }
       />
 
+     
       <Route
         path="/customer/cart"
         element={
@@ -152,7 +154,16 @@ function App() {
           </ProtectedRoute>
         }
       />
-      
+
+      <Route
+        path="/customer/orders"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerOrderHistoryPage />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/adoption-request"
         element={
