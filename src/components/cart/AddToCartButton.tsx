@@ -6,10 +6,12 @@ import "./AddToCartButton.css";
 
 type AddToCartButtonProps = {
   product: CartProduct;
+  disabled?: boolean;
 };
 
 export default function AddToCartButton({
   product,
+  disabled = false,
 }: AddToCartButtonProps) {
   const { addToCart } = useCart();
 
@@ -35,15 +37,16 @@ export default function AddToCartButton({
   }
 
   return (
-    <div>
+    <div className="add-to-cart-wrapper">
       <button
         type="button"
         className={`add-to-cart-button ${added ? "added" : ""}`}
         onClick={handleAddToCart}
-        disabled={loading}
+        disabled={loading || disabled}
         aria-label={`Add ${product.name} to cart`}
       >
         {added ? <Check size={18} /> : <ShoppingCart size={18} />}
+
         <span>
           {loading
             ? "Adding..."
