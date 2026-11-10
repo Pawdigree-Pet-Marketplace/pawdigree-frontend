@@ -1,13 +1,16 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag, Store } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { Product } from "../../data/merchandise";
+import AddToCartButton from "../cart/AddToCartButton";
 import "./MerchCard.css";
 
 function ProductImage({ product }: { product: Product }) {
   const src = product.main_image;
-  // remember WHICH url failed, so a new photo is tried again
+
+  // Remember which URL failed, so a new photo can be tried again.
   const [failedSrc, setFailedSrc] = useState<string | undefined>(undefined);
 
   if (!src || failedSrc === src) {
@@ -21,6 +24,7 @@ function ProductImage({ product }: { product: Product }) {
       </div>
     );
   }
+
   return (
     <img
       src={src}
@@ -41,6 +45,13 @@ export default function MerchCard({ product, index = 0 }: MerchCardProps) {
   const inStock = product.is_available;
   const hasPrice = product.price !== null && product.price !== "";
 
+  const cartProduct = {
+    id: product.id,
+    name: product.name,
+    price: hasPrice ? Number(product.price) : undefined,
+    image: product.main_image ?? undefined,
+  };
+
   return (
     <article
       className={`merch-card${inStock ? "" : " is-unavailable"}`}
@@ -48,8 +59,11 @@ export default function MerchCard({ product, index = 0 }: MerchCardProps) {
     >
       <div className="merch-card__media">
         <ProductImage product={product} />
+
         {product.category_name && (
-          <span className="merch-card__chip">{product.category_name}</span>
+          <span className="merch-card__chip">
+            {product.category_name}
+          </span>
         )}
       </div>
 
@@ -77,6 +91,11 @@ export default function MerchCard({ product, index = 0 }: MerchCardProps) {
             </span>
           </p>
         )}
+
+        <AddToCartButton
+          product={cartProduct}
+          disabled={!inStock || !hasPrice}
+        />
 
         <Link className="merch-card__btn" to={`/merchandise/${product.id}`}>
           View details

@@ -1,3 +1,4 @@
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   cleanup,
@@ -18,6 +19,12 @@ import type { Product } from "../../data/merchandise";
 vi.mock("../../services/publicMerchandiseApi", () => ({
   fetchProducts: vi.fn(),
   fetchMerchCategories: vi.fn(),
+}));
+
+// MerchandisePage tests do not need to test cart functionality.
+// Mock the button so these tests do not require CartProvider.
+vi.mock("../../components/cart/AddToCartButton", () => ({
+  default: () => null,
 }));
 
 function makeProduct(overrides: Partial<Product> = {}): Product {
@@ -57,8 +64,11 @@ beforeEach(() => {
       dispatchEvent: () => false,
     }),
   });
+
   Element.prototype.scrollIntoView = vi.fn();
+
   vi.mocked(fetchMerchCategories).mockResolvedValue([]);
+
   vi.mocked(fetchProducts).mockResolvedValue({
     count: 2,
     results: [
@@ -80,11 +90,14 @@ describe("MerchandisePage", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Pet Merchandise" }),
     ).toBeTruthy();
+
     expect(
       await screen.findByRole("heading", { name: "Chew Bone" }),
     ).toBeTruthy();
+
     expect(screen.getByRole("heading", { name: "Dog Leash" })).toBeTruthy();
     expect(screen.getByText("Showing 1–2 of 2 products")).toBeTruthy();
+
     expect(fetchProducts).toHaveBeenCalledWith(
       expect.objectContaining({ page: 1, search: "" }),
     );
@@ -96,6 +109,7 @@ describe("MerchandisePage", () => {
     const inStockCard = (
       await screen.findByRole("heading", { name: "Chew Bone" })
     ).closest("article") as HTMLElement;
+
     const outOfStockCard = screen
       .getByRole("heading", { name: "Dog Leash" })
       .closest("article") as HTMLElement;
@@ -106,6 +120,7 @@ describe("MerchandisePage", () => {
 
   it("shows an empty state when there are no products", async () => {
     vi.mocked(fetchProducts).mockResolvedValue({ count: 0, results: [] });
+
     renderPage();
 
     expect(await screen.findByText("No products listed yet")).toBeTruthy();
@@ -113,11 +128,15 @@ describe("MerchandisePage", () => {
 
   it("shows an error and loads again when Try again is clicked", async () => {
     vi.mocked(fetchProducts).mockRejectedValueOnce(new Error("network"));
+
     renderPage();
 
-    expect(await screen.findByText(/couldn.t load the products/i)).toBeTruthy();
+    expect(
+      await screen.findByText(/couldn.t load the products/i),
+    ).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+
     expect(
       await screen.findByRole("heading", { name: "Chew Bone" }),
     ).toBeTruthy();
@@ -125,22 +144,27 @@ describe("MerchandisePage", () => {
 
   it("links each card to its details page", async () => {
     renderPage();
+
     await screen.findByRole("heading", { name: "Chew Bone" });
 
     const links = screen.getAllByRole("link", { name: "View details" });
+
     expect(links[0].getAttribute("href")).toBe("/merchandise/1");
   });
 
   it("rejects a minimum price above the maximum", async () => {
     renderPage();
+
     await screen.findByRole("heading", { name: "Chew Bone" });
 
     fireEvent.change(screen.getByLabelText("Minimum price in UGX"), {
       target: { value: "5000" },
     });
+
     fireEvent.change(screen.getByLabelText("Maximum price in UGX"), {
       target: { value: "1000" },
     });
+
     fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -150,17 +174,21 @@ describe("MerchandisePage", () => {
 
   it("shows a removable chip for an applied price filter", async () => {
     renderPage();
+
     await screen.findByRole("heading", { name: "Chew Bone" });
 
     fireEvent.change(screen.getByLabelText("Minimum price in UGX"), {
       target: { value: "1000" },
     });
+
     fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
 
     const chip = await screen.findByRole("button", {
       name: /Remove filter UGX 1000/,
     });
+
     fireEvent.click(chip);
+
     await waitFor(() =>
       expect(
         screen.queryByRole("button", { name: /Remove filter UGX/ }),
@@ -173,12 +201,15 @@ describe("MerchandisePage", () => {
       count: 30,
       results: [makeProduct()],
     });
+
     renderPage("/merchandise?page=2");
+
     await screen.findByRole("heading", { name: "Chew Bone" });
 
     fireEvent.change(screen.getByLabelText("Minimum price in UGX"), {
       target: { value: "1000" },
     });
+
     fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
 
     await waitFor(() =>
@@ -190,11 +221,13 @@ describe("MerchandisePage", () => {
 
   it("filters by vendor and shows a removable chip", async () => {
     renderPage();
+
     await screen.findByRole("heading", { name: "Chew Bone" });
 
     fireEvent.change(screen.getByLabelText("Vendor"), {
       target: { value: "Happy Paws" },
     });
+
     fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
 
     await waitFor(() =>
@@ -202,6 +235,7 @@ describe("MerchandisePage", () => {
         expect.objectContaining({ vendor: "Happy Paws" }),
       ),
     );
+
     expect(
       await screen.findByRole("button", {
         name: /Remove filter Vendor: Happy Paws/,

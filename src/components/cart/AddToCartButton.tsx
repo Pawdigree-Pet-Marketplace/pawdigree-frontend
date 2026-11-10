@@ -6,10 +6,12 @@ import "./AddToCartButton.css";
 
 type AddToCartButtonProps = {
   product: CartProduct;
+  disabled?: boolean;
 };
 
 export default function AddToCartButton({
   product,
+  disabled = false,
 }: AddToCartButtonProps) {
   const { addToCart } = useCart();
 
@@ -18,6 +20,8 @@ export default function AddToCartButton({
   const [error, setError] = useState<string | null>(null);
 
   async function handleAddToCart() {
+    if (disabled || loading) return;
+
     setLoading(true);
     setAdded(false);
     setError(null);
@@ -27,7 +31,7 @@ export default function AddToCartButton({
       setAdded(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Could not add this product."
+        err instanceof Error ? err.message : "Could not add this product.",
       );
     } finally {
       setLoading(false);
@@ -40,16 +44,18 @@ export default function AddToCartButton({
         type="button"
         className={`add-to-cart-button ${added ? "added" : ""}`}
         onClick={handleAddToCart}
-        disabled={loading}
+        disabled={disabled || loading}
         aria-label={`Add ${product.name} to cart`}
       >
         {added ? <Check size={18} /> : <ShoppingCart size={18} />}
         <span>
-          {loading
-            ? "Adding..."
-            : added
-              ? "Added to Cart"
-              : "Add to Cart"}
+          {disabled
+            ? "Unavailable"
+            : loading
+              ? "Adding..."
+              : added
+                ? "Added to Cart"
+                : "Add to Cart"}
         </span>
       </button>
 
