@@ -1,0 +1,540 @@
+
+/* =========================================
+   CUSTOMER ORDER HISTORY PAGE
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   MAIN PAGE LAYOUT
+========================================= */
+
+.customer-orders-layout {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 2vw, 36px);
+  width: 100%;
+  max-width: 1920px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px;
+  background-color: #fbfaf7;
+  background-image:
+    radial-gradient(circle at 20px 10px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
+    radial-gradient(circle at 10px 20px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
+    radial-gradient(circle at 30px 20px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
+    radial-gradient(ellipse at 20px 27px, rgb(33 108 104 / 9%) 0 7px, transparent 7.5px);
+  background-size: 140px 140px;
+}
+
+.customer-orders-main {
+  min-width: 0;
+  width: 100%;
+  font-family: "Nunito", sans-serif;
+}
+
+/* =========================================
+   HERO SECTION
+========================================= */
+
+.customer-orders-heading {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 212px;
+  width: 100%;
+  margin: 8px 0 24px;
+  padding: 38px 40px;
+  border: 1px solid #e7e5de;
+  border-radius: 22px;
+  background: linear-gradient(
+    110deg,
+    #f5f3e9 0%,
+    #eef5ef 52%,
+    #fff0e8 100%
+  );
+  box-shadow: 0 5px 18px rgba(44, 48, 47, 0.035);
+}
+
+.customer-orders-heading-content {
+  position: relative;
+  z-index: 2;
+}
+
+.customer-orders-eyebrow {
+  margin: 0 0 15px;
+  color: #216c68;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.customer-orders-heading h1 {
+  margin: 0 0 10px;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 600;
+}
+
+.customer-orders-heading-content > p:last-child {
+  margin: 0;
+  color: #747c78;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.customer-orders-decoration {
+  position: absolute;
+  top: 0;
+  right: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: 180px;
+  height: 100%;
+  color: #b9d0c9;
+}
+
+.customer-orders-decoration svg:first-child {
+  width: 65px;
+  height: 65px;
+  stroke-width: 1.5;
+}
+
+.customer-orders-decoration svg:last-child {
+  width: 35px;
+  height: 35px;
+  color: #f5a58d;
+  transform: rotate(-15deg);
+}
+
+/* =========================================
+   ERROR MESSAGE
+========================================= */
+
+.customer-orders-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border: 1px solid #f2c5bd;
+  border-radius: 12px;
+  background: #fff1ee;
+  color: #a94335;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.customer-orders-error p {
+  margin: 0;
+}
+
+.customer-orders-error button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #216c68;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================
+   EMPTY AND LOADING STATES
+========================================= */
+
+.customer-orders-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+  width: 100%;
+  padding: 40px 24px;
+  border: 1px solid #e7e5de;
+  border-radius: 18px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 5px 18px rgba(44, 48, 47, 0.04);
+}
+
+.customer-orders-empty > svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  color: #216c68;
+}
+
+.customer-orders-empty h2 {
+  margin: 8px 0;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+  font-size: 25px;
+}
+
+.customer-orders-empty p {
+  max-width: 430px;
+  margin: 5px 0 20px;
+  color: #747c78;
+  line-height: 1.6;
+}
+
+.customer-orders-shop-link {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: #216c68;
+  color: white;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.customer-orders-shop-link:hover {
+  background: #185653;
+}
+
+/* =========================================
+   ORDER LIST
+========================================= */
+
+.customer-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.customer-orders-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 2px;
+}
+
+.customer-orders-list-heading h2 {
+  margin: 0 0 4px;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+  font-size: 25px;
+}
+
+.customer-orders-list-heading p {
+  margin: 0;
+  color: #747c78;
+  font-size: 14px;
+}
+
+/* =========================================
+   ORDER CARD
+========================================= */
+
+.customer-order-card {
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid #e7e5de;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(44, 48, 47, 0.04);
+}
+
+.customer-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eeeae3;
+  background: #faf9f5;
+}
+
+.customer-order-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.customer-order-reference span {
+  color: #747c78;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.customer-order-reference strong {
+  color: #2c302f;
+  font-size: 17px;
+}
+
+/* =========================================
+   STATUS BADGES
+========================================= */
+
+.customer-order-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 13px;
+  border-radius: 20px;
+  background: #edf0ef;
+  color: #555e5b;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.customer-order-status.pending-payment {
+  background: #fff3d9;
+  color: #946315;
+}
+
+.customer-order-status.paid {
+  background: #e5f3ed;
+  color: #26744e;
+}
+
+.customer-order-status.processing {
+  background: #e6f0fb;
+  color: #28639b;
+}
+
+.customer-order-status.shipped {
+  background: #eee9fb;
+  color: #6849a3;
+}
+
+.customer-order-status.delivered {
+  background: #e1f2e7;
+  color: #267044;
+}
+
+.customer-order-status.cancelled,
+.customer-order-status.expired {
+  background: #fde9e6;
+  color: #a94335;
+}
+
+/* =========================================
+   ORDER INFORMATION
+========================================= */
+
+.customer-order-information {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  padding: 17px 24px;
+  border-bottom: 1px solid #eeeae3;
+}
+
+.customer-order-information > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #747c78;
+  font-size: 13px;
+}
+
+.customer-order-information svg {
+  flex-shrink: 0;
+  color: #216c68;
+}
+
+/* =========================================
+   VENDOR ORDERS
+========================================= */
+
+.customer-order-vendors {
+  padding: 8px 24px;
+}
+
+.customer-order-vendor {
+  padding: 17px 0;
+}
+
+.customer-order-vendor + .customer-order-vendor {
+  border-top: 1px solid #eeeae3;
+}
+
+.customer-order-vendor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 15px;
+}
+
+.customer-order-vendor-heading h3 {
+  margin: 0 0 4px;
+  color: #2c302f;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.customer-order-vendor-heading span:not(.customer-order-status) {
+  color: #8a918e;
+  font-size: 12px;
+}
+
+/* =========================================
+   PURCHASED PRODUCTS
+========================================= */
+
+.customer-order-products {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.customer-order-product {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  border: 1px solid #eeeae3;
+  border-radius: 12px;
+  background: #fdfdfb;
+}
+
+.customer-order-product-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #edf5f1;
+  color: #216c68;
+}
+
+.customer-order-product-details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.customer-order-product-details strong {
+  overflow-wrap: anywhere;
+  color: #2c302f;
+  font-size: 14px;
+}
+
+.customer-order-product-details span {
+  color: #747c78;
+  font-size: 12px;
+}
+
+.customer-order-product-price {
+  color: #216c68;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* =========================================
+   ORDER TOTAL
+========================================= */
+
+.customer-order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 19px 24px;
+  border-top: 1px solid #eeeae3;
+  background: #faf9f5;
+}
+
+.customer-order-footer span {
+  color: #555e5b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.customer-order-footer strong {
+  color: #216c68;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 900px) {
+  .customer-orders-layout {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .customer-orders-decoration {
+    right: 4%;
+  }
+}
+
+@media (max-width: 600px) {
+  .customer-orders-layout {
+    padding: 14px;
+  }
+
+  .customer-orders-heading {
+    min-height: 180px;
+    padding: 25px 22px;
+  }
+
+  .customer-orders-heading h1 {
+    font-size: 32px;
+  }
+
+  .customer-orders-decoration {
+    right: -45px;
+    opacity: 0.45;
+  }
+
+  .customer-order-header,
+  .customer-order-vendor-heading {
+    align-items: flex-start;
+  }
+
+  .customer-order-header {
+    flex-direction: column;
+  }
+
+  .customer-order-information {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .customer-order-vendors {
+    padding: 8px 15px;
+  }
+
+  .customer-order-product {
+    flex-wrap: wrap;
+  }
+
+  .customer-order-product-price {
+    width: 100%;
+    padding-left: 55px;
+  }
+
+  .customer-order-footer {
+    padding: 16px;
+  }
+
+  .customer-orders-error {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
