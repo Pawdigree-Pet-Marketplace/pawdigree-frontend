@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { ArrowLeft, Check, ChevronDown, PawPrint, ShoppingCart, UserRound } from "lucide-react";
 import API_BASE_URL from "../../services/api";
+import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
+import "./CustomerDashboard.css";
 import "./AdoptionRequest.css";
 
 type HomeType = "APARTMENT" | "HOUSE" | "OTHER";
@@ -151,7 +153,10 @@ export default function AdoptionRequest() {
 
   if (success) {
     return (
-      <main className="adoption-page">
+      <div className="customer-dashboard-layout">
+  <CustomerDashboardNav />
+
+  <main className="customer-dashboard-main adoption-page">
         <header className="adoption-header">
           <span />
           <h1>Adoption application</h1>
@@ -164,12 +169,14 @@ export default function AdoptionRequest() {
           <p>Application reference: <strong>{success.applicationId}</strong></p>
           <button className="primary-button" type="button" onClick={() => { window.location.href = "/"; }}>Back to Pawdigree</button>
         </section>
-      </main>
-    );
+        </main>
+</div>
+ )
   }
 
+
   return (
-    <main className="adoption-page">
+   <main className="customer-dashboard-main adoption-page">
       <header className="adoption-header">
         <button className="back-icon" type="button" onClick={step === 1 ? () => window.history.back() : goBack} aria-label="Go back">
           <ArrowLeft size={24} />

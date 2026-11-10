@@ -197,3 +197,131 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Adoption form layout corrections */
+.adoption-page,
+.adoption-page * {
+  box-sizing: border-box;
+}
+
+.adoption-page {
+  width: 100%;
+  min-width: 0;
+  font-family: "Nunito", sans-serif;
+  line-height: 1.5;
+}
+
+.adoption-page .adoption-content {
+  width: 100%;
+  max-width: 1240px;
+  padding: 28px 32px 64px;
+  margin: 0 auto;
+}
+
+.adoption-page .adoption-columns {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.6fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.adoption-page .adoption-form {
+  width: 100%;
+  min-width: 0;
+}
+
+.adoption-page .field {
+  display: block;
+  width: 100%;
+  margin-bottom: 26px;
+}
+
+.adoption-page .field > label,
+.adoption-page .field-label {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.adoption-page .field input,
+.adoption-page .field select,
+.adoption-page .field textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.adoption-page .boolean-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.adoption-page .boolean-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 115px;
+  min-height: 54px;
+  padding: 12px 18px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.adoption-page .boolean-options input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
+  margin: 0;
+}
+
+.adoption-page .field-error {
+  display: block;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.adoption-page .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+@media (max-width: 1000px) {
+  .adoption-page .adoption-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .adoption-page .adoption-content {
+    padding: 20px 16px 40px;
+  }
+
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .adoption-page .adoption-form {
+    padding: 24px 18px;
+  }
+
+  .adoption-page .field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

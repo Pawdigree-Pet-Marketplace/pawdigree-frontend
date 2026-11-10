@@ -40,7 +40,7 @@ function App() {
       <Route path="/pets" element={<CustomerPetCataloguePage />} />
       <Route path="/pets/:petId" element={<PetsDetailPage />} />
       <Route path="/vendors" element={<CustomerVendorsPage />} />
-      <Route path="/AdoptionRequest" element={<AdoptionRequest />} />
+      <Route path="/adoption-request" element={<AdoptionRequest />} />
       <Route
         path="/vendors/:vendorId"
         element={<CustomerVendorProfilePage />}
@@ -69,10 +69,10 @@ function App() {
         element={<ResetPasswordForm />}
       />
 
-     // {/* Adoption application */}
-     // <Route
-     //   path="/adoption-request"
-       // element={<AdoptionRequest />}
+      {/* Adoption application */}
+      <Route
+       path="/adoption-request"
+        element={<AdoptionRequest />}
       /> 
 
       {/* Vendor pages */}
