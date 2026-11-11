@@ -34,6 +34,7 @@ import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage"
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorCategorySelector from "./pages/Vendor/VendorCategorySelector";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
+import VendorAvailabilityPage from "./pages/Vendor/VendorAvailabilityPage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import VendorEditServicePage from "./pages/Vendor/VendorEditServicePage";
 import VendorServiceAvailabilityPage from "./pages/Vendor/VendorServiceAvailabilityPage";
@@ -190,6 +191,14 @@ function App() {
         element={
           <ProtectedRoute role="VENDOR">
             <VendorDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/availability"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorAvailabilityPage />
           </ProtectedRoute>
         }
       />
