@@ -1,0 +1,271 @@
+.vendor-workspace .vendor-availability-page {
+  max-width: none;
+  margin: 0;
+  padding: 22px 2px 28px;
+  color: #2C302F;
+  font-family: "Inter", "Nunito", sans-serif;
+}
+
+/* INTRODUCTION */
+.vendor-workspace .availability-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin: 20px 0 24px;
+  padding: 22px;
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 18px;
+  background: #F3F0EA;
+}
+
+.vendor-workspace .availability-intro-icon,
+.vendor-workspace .availability-service-icon {
+  display: grid;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgb(33 108 104 / 10%);
+  color: #216C68;
+}
+
+.vendor-workspace .availability-intro h2,
+.vendor-workspace .availability-section-heading h2 {
+  margin: 0 0 6px;
+  color: #2C302F;
+  font-family: "Poppins", "Fredoka", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.vendor-workspace .availability-intro p,
+.vendor-workspace .availability-section-heading p {
+  margin: 0;
+  color: rgb(44 48 47 / 68%);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* SERVICE SECTION */
+.vendor-workspace .availability-section-heading {
+  margin: 0 0 16px;
+}
+
+.vendor-workspace .availability-service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.vendor-workspace .availability-service-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 17px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 18px;
+  background: #FBFAF7;
+  box-shadow: 0 8px 24px rgb(44 48 47 / 5%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.vendor-workspace .availability-service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgb(44 48 47 / 9%);
+}
+
+.vendor-workspace .availability-service-details {
+  width: 100%;
+}
+
+.vendor-workspace .availability-service-details h3 {
+  margin: 0 0 5px;
+  color: #2C302F;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.vendor-workspace .availability-service-type {
+  margin: 0 0 15px;
+  color: rgb(44 48 47 / 65%);
+  font-size: 13px;
+}
+
+.vendor-workspace .availability-service-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+}
+
+.vendor-workspace .availability-service-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #2C302F;
+  font-size: 12px;
+}
+
+.vendor-workspace .availability-service-meta svg {
+  flex-shrink: 0;
+  color: #216C68;
+}
+
+.vendor-workspace .availability-pending-note {
+  margin: 14px 0 0;
+  color: #a65b22;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* MANAGE BUTTON */
+.vendor-workspace .availability-manage-link,
+.vendor-workspace .availability-add-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 43px;
+  padding: 0 17px;
+  border: 1px solid #216C68;
+  border-radius: 999px;
+  background: #216C68;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.vendor-workspace .availability-manage-link:hover,
+.vendor-workspace .availability-add-link:hover {
+  transform: translateY(-1px);
+  background: #195652;
+}
+
+/* LOADING, ERROR AND EMPTY STATES */
+.vendor-workspace .availability-message,
+.vendor-workspace .availability-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid rgb(44 48 47 / 12%);
+  border-radius: 14px;
+  background: #F3F0EA;
+  color: #2C302F;
+  font-size: 13px;
+}
+
+.vendor-workspace .availability-message.error {
+  border-color: rgb(166 61 34 / 20%);
+  background: #fff1ec;
+  color: #a63d22;
+}
+
+.vendor-workspace .availability-spinner {
+  flex-shrink: 0;
+  animation: availability-spin 900ms linear infinite;
+}
+
+.vendor-workspace .availability-empty-state {
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.vendor-workspace .availability-empty-state > svg {
+  color: #216C68;
+}
+
+.vendor-workspace .availability-empty-state h2 {
+  margin: 4px 0 0;
+  font-family: "Poppins", "Fredoka", sans-serif;
+  font-size: 19px;
+}
+
+.vendor-workspace .availability-empty-state p {
+  max-width: 440px;
+  margin: 0 0 8px;
+  color: rgb(44 48 47 / 68%);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.vendor-workspace .availability-manage-link:focus-visible,
+.vendor-workspace .availability-add-link:focus-visible {
+  outline: 3px solid rgb(33 108 104 / 30%);
+  outline-offset: 3px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 850px) {
+  .vendor-workspace .availability-service-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .vendor-workspace .vendor-availability-page {
+    padding: 14px 0 22px;
+  }
+
+  .vendor-workspace .availability-intro {
+    padding: 17px;
+  }
+
+  .vendor-workspace .availability-service-card {
+    padding: 18px;
+  }
+
+  .vendor-workspace .availability-manage-link,
+  .vendor-workspace .availability-add-link {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@keyframes availability-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vendor-workspace .availability-spinner,
+  .vendor-workspace .availability-service-card,
+  .vendor-workspace .availability-manage-link,
+  .vendor-workspace .availability-add-link {
+    animation: none;
+    transition: none;
+  }
+
+  .vendor-workspace .availability-service-card:hover,
+  .vendor-workspace .availability-manage-link:hover,
+  .vendor-workspace .availability-add-link:hover {
+    transform: none;
+  }
+}
+
+/* AVAILABILITY PAGE ALIGNMENT FIXES */
+
+/* Keep the introduction text beside the calendar icon */
+.vendor-workspace .vendor-availability-page .availability-intro {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 15px;
+}
+
+.vendor-workspace .vendor-availability-page .availability-intro > div:last-child {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+/* Make the Add a service button text white */
+.vendor-workspace .vendor-availability-page .availability-add-link {
+  color: #FFFFFF;
+}
