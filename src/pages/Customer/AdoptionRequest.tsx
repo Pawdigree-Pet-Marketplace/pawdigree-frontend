@@ -205,11 +205,32 @@ export default function AdoptionRequest() {
               </div>
             </section>
             <section className="next-steps">
-              <h2>What happens next</h2>
-              <div className={`timeline-item ${step >= 1 ? "current" : ""}`}><span>{step > 1 ? <Check size={17} /> : null}</span><b>Application details</b></div>
-              <div className={`timeline-item ${step >= 2 ? "current" : ""}`}><span>{step > 2 ? <Check size={17} /> : null}</span><b>Review application</b></div>
-              <div className={`timeline-item ${success ? "done" : ""}`}><span /> <b>Vendor review</b></div>
-            </section>
+  <h2>What happens next</h2>
+
+  <div className={`timeline-item ${step > 1 ? "done" : "current"}`}>
+    <span>{step > 1 ? <Check size={17} /> : "1"}</span>
+    <div className="timeline-copy">
+      <b>Application details</b>
+      <small>Tell us about your home and living environment.</small>
+    </div>
+  </div>
+
+  <div className={`timeline-item ${step > 2 ? "done" : step === 2 ? "current" : ""}`}>
+    <span>{step > 2 ? <Check size={17} /> : "2"}</span>
+    <div className="timeline-copy">
+      <b>Review application</b>
+      <small>Check your answers before submitting.</small>
+    </div>
+  </div>
+
+  <div className="timeline-item">
+    <span>3</span>
+    <div className="timeline-copy">
+      <b>Vendor review</b>
+      <small>The vendor reviews your adoption application.</small>
+    </div>
+  </div>
+</section>
           </aside>
 
           <form className="adoption-form" onSubmit={handleSubmit} noValidate>

@@ -146,8 +146,79 @@
 
 .pet-summary,
 .next-steps {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  background: #e4f0eb;
+  padding: 24px;
+  border-radius: 22px;
+  min-width: 0;
+}
+
+.next-steps h2 {
+  margin: 0 0 4px;
+  font-size: 21px;
+  font-weight: 800;
+  color: #216c68;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 13px;
   width: 100%;
   min-width: 0;
+  min-height: 0;
+  position: relative;
+  color: #777b78;
+}
+
+.timeline-item > span {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #ded8cc;
+  border-radius: 50%;
+  background: white;
+  font-weight: 800;
+}
+
+.timeline-item.done > span {
+  background: #216c68;
+  border-color: #216c68;
+  color: white;
+}
+
+.timeline-item.current {
+  color: #2c302f;
+}
+
+.timeline-item.current > span {
+  border-color: #216c68;
+  color: #216c68;
+}
+
+.timeline-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-copy b {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.timeline-copy small {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #737775;
 }
 
 .adoption-form {
