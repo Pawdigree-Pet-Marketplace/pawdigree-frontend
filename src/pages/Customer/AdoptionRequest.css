@@ -130,147 +130,238 @@
 .character-count { display: block; text-align: right; color: #777b78; font-size: 12px; margin-top: 5px; }
 .primary-button:disabled { opacity: .65; cursor: wait; }
 
-/* FIX: keep adoption columns within their available width */
-.adoption-columns {
+/* Adoption form layout corrections */
+.customer-dashboard-main.adoption-page {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.adoption-page .adoption-content {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 32px 64px;
+}
+
+.adoption-page .adoption-columns {
   display: grid;
-  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.6fr);
+  grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.6fr);
   gap: 28px;
   align-items: start;
-}
-
-.adoption-columns,
-.adoption-sidebar,
-.adoption-form {
-  min-width: 0;
-}
-
-.pet-summary,
-.next-steps {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 18px;
-  background: #e4f0eb;
-  padding: 24px;
-  border-radius: 22px;
-  min-width: 0;
-}
-
-.next-steps h2 {
-  margin: 0 0 4px;
-  font-size: 21px;
-  font-weight: 800;
-  color: #216c68;
-}
-
-.timeline-item {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 13px;
   width: 100%;
+}
+
+.adoption-page .adoption-sidebar,
+.adoption-page .adoption-form,
+.adoption-page .pet-summary,
+.adoption-page .next-steps {
   min-width: 0;
-  min-height: 0;
-  position: relative;
-  color: #777b78;
+  width: 100%;
 }
 
-.timeline-item > span {
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-  display: grid;
-  place-items: center;
-  border: 2px solid #ded8cc;
-  border-radius: 50%;
-  background: white;
-  font-weight: 800;
+.adoption-page .adoption-form {
+  padding: 32px;
 }
 
-.timeline-item.done > span {
-  background: #216c68;
-  border-color: #216c68;
-  color: white;
-}
-
-.timeline-item.current {
-  color: #2c302f;
-}
-
-.timeline-item.current > span {
-  border-color: #216c68;
-  color: #216c68;
-}
-
-.timeline-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
+.adoption-page .field,
+.adoption-page .field-grid {
   min-width: 0;
+  width: 100%;
 }
 
-.timeline-copy b {
-  font-size: 15px;
-  line-height: 1.4;
+.adoption-page .field {
+  display: block;
+  margin-bottom: 24px;
 }
 
-.timeline-copy small {
-  font-size: 13px;
+.adoption-page .field > label,
+.adoption-page .field-label {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
   line-height: 1.5;
-  color: #737775;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
-.adoption-form {
+.adoption-page .field input,
+.adoption-page .field select,
+.adoption-page .field textarea {
+  display: block;
   width: 100%;
   max-width: 100%;
-}
-
-/* FIX: separate question labels from Yes/No controls */
-.adoption-form .field {
-  display: block;
-  width: 100%;
-  margin-bottom: 28px;
-}
-
-.adoption-form .field-label {
-  display: block;
-  margin-bottom: 16px;
+  min-width: 0;
   line-height: 1.5;
 }
 
-.adoption-form .boolean-options {
+.adoption-page .boolean-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
-  align-items: stretch;
+  gap: 12px;
+  width: 100%;
 }
 
-.adoption-form .boolean-options label {
+.adoption-page .boolean-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 100px;
+  min-height: 48px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.adoption-page .boolean-options input {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+}
+
+.adoption-page .timeline-item {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  min-width: 125px;
-  min-height: 64px;
-  margin: 0;
-  padding: 14px 18px;
-  line-height: 1.4;
+  gap: 12px;
+  min-width: 0;
 }
 
-/* FIX: responsive layout */
+.adoption-page .timeline-item b {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.adoption-page .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 @media (max-width: 1000px) {
-  .adoption-columns {
+  .adoption-page .adoption-columns {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .adoption-sidebar {
+  .adoption-page .adoption-sidebar {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 620px) {
-  .adoption-sidebar {
+  .adoption-page .adoption-content {
+    padding: 20px 16px 40px;
+  }
+
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .adoption-page .adoption-form {
+    padding: 24px 18px;
+  }
+
+  .adoption-page .field-grid {
     grid-template-columns: 1fr;
   }
 }
+/* Pawdigree adoption layout — final targeted correction */
+
+/* Preserve the dashboard sidebar and let the content use remaining space */
+.customer-dashboard-layout {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.customer-dashboard-main.adoption-page {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
+  overflow-x: clip;
+}
+
+/* Keep adoption's internal sidebar and form in separate columns */
+.adoption-page .adoption-content {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px 64px;
+}
+
+.adoption-page .adoption-columns {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.6fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.adoption-page .adoption-sidebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  min-width: 0;
+}
+
+.adoption-page .adoption-form {
+  min-width: 0;
+  width: 100%;
+  padding: 36px;
+}
+
+/* Keep timeline text inside its own sidebar */
+.adoption-page .timeline-item {
+  min-width: 0;
+  width: 100%;
+}
+
+.adoption-page .timeline-item b {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Separate form labels from their options */
+.adoption-page .field-label {
+  display: block;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.adoption-page .boolean-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.adoption-page .boolean-options label {
+  min-width: 120px;
+  min-height: 60px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 1000px) {
+  .adoption-page .adoption-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adoption-page .adoption-form {
+    padding: 24px 18px;
+  }
+}
+

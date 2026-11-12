@@ -18,15 +18,15 @@ import ExplorePets from "./pages/Customer/ExplorePets";
 import MerchandisePage from "./pages/Customer/MerchandisePage";
 import ProductDetailsPage from "./pages/Customer/ProductDetailsPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
-import LandingPage from "./pages/Customer/CustomerLandingPage";
-import PetsDetailPage from "./pages/Customer/PetsDetailPage";
-import ProfilePage from "./pages/Customer/CustomerProfilePage";
-import RegistrationPage from "./pages/Customer/RegistrationPage";
-import CustomerCartPage from "./pages/Customer/CustomerCartPage";
-import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
+import PetsDetailPage from "./pages/Customer/PetsDetailPage"; 
+import AdoptionRequest from "./pages/Customer/AdoptionRequest";
+import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
+import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
+import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
+import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
+import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
+import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
+import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorAddServicePage from "./pages/Vendor/VendorAddServicePage";
@@ -50,18 +50,12 @@ import { VendorBusinessRoute } from "./services/vendorBusinessContext";
 function App() {
   return (
     <Routes>
-      {/* PUBLIC: navbar + side menu + footer + bottom bar */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/vendor" element={<VendorLandingPage />} />
-        <Route
-          path="/terms-and-conditions"
-          element={<TermsAndConditionsPage />}
-        />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        {/* Unknown URLs previously rendered the landing page. */}
-        <Route path="*" element={<LandingPage />} />
-      </Route>
+      {/* Public pages */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/pets" element={<CustomerPetCataloguePage />} />
+      <Route path="/pets/:petId" element={<PetsDetailPage />} />
+      <Route path="/vendors" element={<CustomerVendorsPage />} />
+      <Route path="/adoption-request" element={<AdoptionRequest />} />
       <Route
         path="/customer/my-requests"
         element={
@@ -160,14 +154,11 @@ function App() {
         }
       />
 
+      {/* Adoption application */}
       <Route
-        path="/customer/orders"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <CustomerOrderHistoryPage />
-          </ProtectedRoute>
-        }
-      />
+       path="/adoption-request"
+        element={<AdoptionRequest />}
+      /> 
 
       <Route
         path="/adoption-request"
