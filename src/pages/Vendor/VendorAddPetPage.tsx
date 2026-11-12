@@ -5,6 +5,8 @@ import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./VendorAddPetPage.css";
 
 type Business = {
@@ -48,6 +50,7 @@ async function readError(response: Response): Promise<string> {
 }
 
 export default function VendorAddPetPage() {
+  const activeBusiness = useVendorBusiness();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessId, setBusinessId] = useState("");
   const [listingType, setListingType] = useState<ListingType>("ADOPTION");
@@ -64,9 +67,14 @@ export default function VendorAddPetPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
+  const selectedBusinessId = activeBusinessId ?? businessId;
+  const loadingBusinessOptions = !activeBusiness && loadingBusinesses;
 
   useEffect(() => {
     document.title = "Add Pet Listing - Pawdigree";
+    if (activeBusinessId !== null) return;
+    let cancelled = false;
 
     async function loadBusinesses() {
       try {
@@ -81,23 +89,27 @@ export default function VendorAddPetPage() {
         const data = (await response.json()) as BusinessResponse;
         const items = Array.isArray(data) ? data : data.results;
 
+        if (cancelled) return;
         setBusinesses(items);
         if (items.length > 0) {
           setBusinessId(items[0].id);
         }
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Could not load your businesses.",
-        );
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Could not load your businesses.",
+          );
+        }
       } finally {
-        setLoadingBusinesses(false);
+        if (!cancelled) setLoadingBusinesses(false);
       }
     }
 
     void loadBusinesses();
-  }, []);
+    return () => { cancelled = true; };
+  }, [activeBusinessId]);
 
   function addPhotos(files: FileList | null) {
     if (!files) return;
@@ -148,7 +160,7 @@ export default function VendorAddPetPage() {
     setError("");
     setSuccess("");
 
-    if (!businessId) {
+    if (!selectedBusinessId) {
       setError("You need a registered business before adding a pet listing.");
       return;
     }
@@ -164,7 +176,7 @@ export default function VendorAddPetPage() {
     }
 
     const formData = new FormData();
-    formData.append("business", businessId);
+    formData.append("business", selectedBusinessId);
     formData.append("listing_type", listingType);
     formData.append("name", name.trim());
     formData.append("species", species.trim());
@@ -186,7 +198,7 @@ export default function VendorAddPetPage() {
 
     try {
       const response = await vendorAuthenticatedFetch(
-        `${API_BASE_URL}/api/pets/`,
+        `${API_BASE_URL}/api/pets/${activeBusiness ? `?business_id=${encodeURIComponent(selectedBusinessId)}` : ""}`,
         {
           method: "POST",
           body: formData,
@@ -230,7 +242,7 @@ export default function VendorAddPetPage() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <BackButton fallback="/vendor/listings" label="Back to listings" />
+        <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings"} label="Back to listings" />
 
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
@@ -244,16 +256,16 @@ export default function VendorAddPetPage() {
               </div>
             </div>
 
-            <label className="pet-field">
+            {!activeBusiness && <label className="pet-field">
               Your business <span></span>
               <select
                 value={businessId}
                 onChange={(event) => setBusinessId(event.target.value)}
-                disabled={loadingBusinesses || businesses.length === 0}
+                disabled={loadingBusinessOptions || businesses.length === 0}
                 required
               >
                 <option value="">
-                  {loadingBusinesses
+                  {loadingBusinessOptions
                     ? "Loading your businesses..."
                     : "Select a business"}
                 </option>
@@ -263,9 +275,9 @@ export default function VendorAddPetPage() {
                   </option>
                 ))}
               </select>
-            </label>
+            </label>}
 
-            {!loadingBusinesses && businesses.length === 0 && (
+            {!activeBusiness && !loadingBusinessOptions && businesses.length === 0 && (
               <p className="pet-inline-note">
                 No registered business was found. Register your business before
                 creating a listing.{" "}
@@ -476,7 +488,7 @@ export default function VendorAddPetPage() {
               className="pet-submit-button"
               type="submit"
               disabled={
-                submitting || loadingBusinesses || businesses.length === 0
+                submitting || loadingBusinessOptions || (!activeBusiness && businesses.length === 0)
               }
             >
               {submitting ? (

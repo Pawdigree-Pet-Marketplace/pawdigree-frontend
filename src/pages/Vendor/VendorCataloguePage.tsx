@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Plus,
   PawPrint,
@@ -13,6 +13,8 @@ import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./VendorCataloguePage.css";
 
 type PetImage = {
@@ -34,6 +36,7 @@ type Pet = {
   adoption_status?: "AVAILABLE" | "PENDING" | "ADOPTED";
   approved: boolean;
   is_active?: boolean;
+  business?: string | number;
   images?: (PetImage | string)[];
 };
 
@@ -86,6 +89,8 @@ function listingStatus(pet: Pet) {
 }
 
 export default function VendorCataloguePage() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -96,7 +101,7 @@ export default function VendorCataloguePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  async function loadPets() {
+  const loadPets = useCallback(async () => {
     const token = getToken();
 
     if (
@@ -111,7 +116,10 @@ export default function VendorCataloguePage() {
     setError("");
 
     try {
-      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`);
+      const businessQuery = activeBusinessId
+        ? `?business_id=${encodeURIComponent(activeBusinessId)}`
+        : "";
+      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/${businessQuery}`);
 
       if (!response.ok) {
         throw new Error(
@@ -122,7 +130,10 @@ export default function VendorCataloguePage() {
       }
 
       const data = (await response.json()) as PetResponse;
-      setPets(Array.isArray(data) ? data : data.results);
+      const items = Array.isArray(data) ? data : data.results;
+      setPets(activeBusinessId
+        ? items.filter((pet) => String(pet.business) === activeBusinessId)
+        : items);
     } catch (err) {
       setError(
         err instanceof Error
@@ -132,16 +143,16 @@ export default function VendorCataloguePage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [activeBusinessId]);
 
   useEffect(() => {
-  document.title = "My Catalogue - Pawdigree";
-  const timer = window.setTimeout(() => {
-    void loadPets();
-  }, 0);
+    document.title = "My Catalogue - Pawdigree";
+    const timer = window.setTimeout(() => {
+      void loadPets();
+    }, 0);
 
-  return () => window.clearTimeout(timer);
-}, []);
+    return () => window.clearTimeout(timer);
+  }, [loadPets]);
 
   function openConfirmation(pet: Pet, action: ListingAction) {
     setSelectedPet(pet);
@@ -176,7 +187,7 @@ export default function VendorCataloguePage() {
 
     try {
       const response = await vendorAuthenticatedFetch(
-        `${API_BASE_URL}/api/pets/${petId}/`,
+        `${API_BASE_URL}/api/pets/${petId}/${activeBusiness ? `?business_id=${encodeURIComponent(String(activeBusiness.id))}` : ""}`,
         { method: "DELETE" },
       );
 
@@ -228,7 +239,7 @@ export default function VendorCataloguePage() {
             </p>
           </div>
 
-          <Link className="catalogue-add-button" to="/vendor/listings/new">
+          <Link className="catalogue-add-button" to={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings/new") : "/vendor/listings/new"}>
             <Plus size={18} />
             Add pet listing
           </Link>
@@ -374,7 +385,7 @@ export default function VendorCataloguePage() {
                           : "Deactivate Listing"}
                       </button>
 
-                      <Link className="catalogue-edit-button" to={"/vendor/edit-pet/" + pet.pet_id}>
+                      <Link className="catalogue-edit-button" to={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), `edit-pet/${pet.pet_id}`) : "/vendor/edit-pet/" + pet.pet_id}>
                         <Pencil size={16} />
                         Edit listing
                       </Link>

@@ -1,0 +1,15 @@
+.vendor-business-switcher{position:relative;flex:0 0 auto}
+.vendor-business-switcher>summary{display:grid;width:40px;height:40px;place-items:center;position:relative;border:1px solid var(--dashboard-border);border-radius:50%;background:var(--dashboard-paper);color:var(--dashboard-teal);cursor:pointer;list-style:none;transition:background 160ms ease,color 160ms ease}
+.vendor-business-switcher>summary::-webkit-details-marker{display:none}
+.vendor-business-switcher>summary:hover,.vendor-business-switcher[open]>summary{background:var(--dashboard-sand);color:var(--dashboard-teal-dark)}
+.vendor-business-switcher>summary:focus-visible{outline:3px solid rgb(33 108 104 / 35%);outline-offset:2px}
+.vendor-business-switcher-chevron{position:absolute;right:-3px;bottom:-2px;border-radius:50%;background:var(--dashboard-paper)}
+.vendor-business-switcher-menu{position:absolute;top:calc(100% + 10px);right:0;z-index:20;width:min(300px,calc(100vw - 36px));padding:8px;border:1px solid var(--dashboard-border);border-radius:14px;background:var(--dashboard-paper);box-shadow:0 14px 40px rgb(35 55 50 / 16%)}
+.vendor-business-switcher-heading{margin:4px 8px 7px;color:var(--dashboard-muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.vendor-business-switcher-note{margin:8px;padding:8px;color:var(--dashboard-muted);font-size:12px}
+.vendor-business-switcher-option,.vendor-business-switcher-manage{display:flex;width:100%;align-items:center;gap:10px;border:0;border-radius:9px;background:transparent;padding:10px;color:var(--dashboard-ink);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.vendor-business-switcher-option:hover,.vendor-business-switcher-option.is-selected{background:var(--dashboard-sand)}
+.vendor-business-switcher-option>span:first-of-type{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vendor-business-switcher-current{color:var(--dashboard-teal);font-size:10px;font-weight:800}
+.vendor-business-switcher-manage{margin-top:6px;border-top:1px solid var(--dashboard-border);border-radius:0 0 8px 8px;padding-top:12px;color:var(--dashboard-teal);font-weight:800}
+.vendor-business-switcher-error{margin:8px;color:#a33b35;font-size:11px}

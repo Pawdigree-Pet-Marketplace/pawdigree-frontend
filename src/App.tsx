@@ -43,6 +43,8 @@ import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
+import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
+import { VendorBusinessRoute } from "./services/vendorBusinessContext";
 function App() {
   return (
     <Routes>
@@ -183,6 +185,14 @@ function App() {
         }
       />
       <Route
+        path="/vendor/profile"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorStoreProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/vendor/change-requests"
         element={
           <ProtectedRoute role="VENDOR">
@@ -275,6 +285,19 @@ function App() {
           </ProtectedRoute>
         }
       />
+      {/* Business workspaces reuse the existing vendor pages and layout. */}
+      <Route path="/vendor/business/:businessId/dashboard" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorDashboardPage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/businesses" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorBusinessProfilePage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/store-profile" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorStoreProfilePage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/listings" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorCataloguePage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/listings/new" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorAddPetPage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/edit-pet/:petId" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorEditPetListing /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/services/new" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorAddServicePage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/services/:serviceId/edit" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorEditServicePage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/services/:serviceId/availability" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorServiceAvailabilityPage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/merchandise" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorMerchandisePage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/adoption-applications" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><VendorAdoptionApplicationsPage /></VendorBusinessRoute></ProtectedRoute>} />
+      <Route path="/vendor/business/:businessId/documents" element={<ProtectedRoute role="VENDOR"><VendorBusinessRoute><DocumentUpload /></VendorBusinessRoute></ProtectedRoute>} />
       {/* Keep the previous catch-all behavior for other vendor URLs. */}
       <Route
         path="/vendor/*"

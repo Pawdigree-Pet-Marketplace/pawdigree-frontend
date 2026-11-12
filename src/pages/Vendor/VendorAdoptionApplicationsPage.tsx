@@ -3,6 +3,7 @@ import { Check, HeartHandshake, RefreshCw, Search, X } from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import "./VendorAdoptionApplicationsPage.css";
 
 type ApplicationStatus = "PENDING" | "INFO_REQUESTED" | "APPROVED" | "REJECTED" | "CANCELLED";
@@ -25,6 +26,7 @@ type AdoptionApplication = {
   created_at: string;
   decided_at: string | null;
   decision_reason: string;
+  business?: string | number;
 };
 type ListResponse = AdoptionApplication[] | { results?: AdoptionApplication[] };
 
@@ -59,6 +61,8 @@ async function responseMessage(response: Response) {
 }
 
 export default function VendorAdoptionApplicationsPage() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [applications, setApplications] = useState<AdoptionApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -79,7 +83,8 @@ export default function VendorAdoptionApplicationsPage() {
     setLoading(true);
     setLoadError("");
     try {
-      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/adoptions/applications/vendor/`);
+      const businessQuery = activeBusinessId ? `?business_id=${encodeURIComponent(activeBusinessId)}` : "";
+      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/adoptions/applications/vendor/${businessQuery}`);
       if (!response.ok) {
         setLoadError(response.status === 401
           ? "Your session has expired. Please sign in again."
@@ -87,18 +92,31 @@ export default function VendorAdoptionApplicationsPage() {
         return;
       }
       const data = (await response.json()) as ListResponse;
-      setApplications(Array.isArray(data) ? data : data.results ?? []);
+      const items = Array.isArray(data) ? data : data.results ?? [];
+      if (!activeBusinessId) {
+        setApplications(items);
+      } else {
+        const petsResponse = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/?business_id=${encodeURIComponent(activeBusinessId ?? "")}`);
+        if (!petsResponse.ok) throw new Error("Could not match adoption applications to this business.");
+        const petData = await petsResponse.json() as { results?: { pet_id: number; business?: string | number }[] } | { pet_id: number; business?: string | number }[];
+        const pets = Array.isArray(petData) ? petData : petData.results ?? [];
+        const petBusiness = new Map(pets.map((pet) => [pet.pet_id, String(pet.business ?? "")]));
+        setApplications(items.filter((item) => (item.business !== undefined ? String(item.business) : petBusiness.get(item.pet)) === activeBusinessId));
+      }
     } catch {
       setLoadError("We couldn't load adoption applications. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [activeBusinessId]);
 
   useEffect(() => {
-    // The initial async fetch owns its loading and error state transitions.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadApplications();
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (!cancelled) return loadApplications();
+      return undefined;
+    });
+    return () => { cancelled = true; };
   }, [loadApplications]);
 
   const statusCounts = useMemo(() => applications.reduce<Record<ApplicationStatus, number>>((counts, item) => {
@@ -119,7 +137,7 @@ export default function VendorAdoptionApplicationsPage() {
     setNotice("");
     try {
       const response = await vendorAuthenticatedFetch(
-        `${API_BASE_URL}/api/adoptions/applications/${application.application_id}/decision/`,
+        `${API_BASE_URL}/api/adoptions/applications/${application.application_id}/decision/${activeBusiness ? `?business_id=${encodeURIComponent(String(activeBusiness.id))}` : ""}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

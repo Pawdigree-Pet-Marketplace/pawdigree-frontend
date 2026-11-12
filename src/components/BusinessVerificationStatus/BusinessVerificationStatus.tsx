@@ -90,7 +90,7 @@ function getStoredToken(): string | null {
   );
 }
 
-export default function BusinessVerificationStatus() {
+export default function BusinessVerificationStatus({ businessId }: { businessId?: string }) {
   const [businesses, setBusinesses] = useState<BusinessVerification[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
 
@@ -111,7 +111,7 @@ export default function BusinessVerificationStatus() {
       try {
         const data = await apiRequest<
           BusinessVerification[] | ApiResponse
-        >("/businesses/verification-status/", {
+        >(`/businesses/verification-status/${businessId ? `?business_id=${encodeURIComponent(businessId)}` : ""}`, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -120,7 +120,8 @@ export default function BusinessVerificationStatus() {
           signal: controller.signal,
         });
 
-        const results = Array.isArray(data) ? data : data.results;
+        const allResults = Array.isArray(data) ? data : data.results ?? [];
+        const results = businessId ? allResults.filter((business) => String(business.id) === businessId) : allResults;
 
         if (!Array.isArray(results)) {
           throw new Error("Unexpected verification response.");
@@ -144,7 +145,7 @@ export default function BusinessVerificationStatus() {
     void loadVerification();
 
     return () => controller.abort();
-  }, []);
+  }, [businessId]);
 
   if (loadState === "loading") {
     return (

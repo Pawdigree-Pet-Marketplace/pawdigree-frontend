@@ -4,7 +4,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { apiRequest } from '../../services/api'
 import VendorDashboardPage from './VendorDashboardPage'
 
-vi.mock('../../services/api', () => ({ apiRequest: vi.fn() }))
+vi.mock('../../services/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/api')>()
+  return { ...actual, apiRequest: vi.fn() }
+})
 
 vi.mock('../layouts/VendorLayout/VendorLayout', () => ({
   default: ({

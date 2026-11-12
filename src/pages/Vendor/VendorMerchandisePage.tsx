@@ -24,6 +24,7 @@ import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { getCategories, type Category } from "../../services/categoryService";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
 
 import type { Business } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
 
@@ -47,8 +48,8 @@ const emptyForm: FormValues = {
   category: "",
 };
 
-function businessName(business: Business) {
-  return business.name || business.business_name || "My business";
+function businessName(business: { name?: string; business_name?: unknown }) {
+  return business.name || (typeof business.business_name === "string" ? business.business_name : "My business");
 }
 
 function imageUrl(path?: string) {
@@ -58,6 +59,8 @@ function imageUrl(path?: string) {
 }
 
 export default function VendorMerchandisePage() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessId, setBusinessId] = useState("");
   const [products, setProducts] = useState<Merchandise[]>([]);
@@ -76,17 +79,18 @@ export default function VendorMerchandisePage() {
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
 
-  const selectedBusiness = businesses.find(
+  const selectedBusiness = activeBusiness ?? businesses.find(
     (business) => String(business.id) === businessId,
   );
+  const selectedBusinessId = activeBusinessId ?? businessId;
 
   const businessProducts = useMemo(
-    () => products.filter((product) => product.business === businessId),
-    [products, businessId],
+    () => products.filter((product) => String(product.business) === selectedBusinessId),
+    [products, selectedBusinessId],
   );
 
   async function loadProducts() {
-    const items = await getMerchandise();
+    const items = await getMerchandise(activeBusinessId ?? undefined);
     setProducts(items);
   }
 
@@ -102,7 +106,7 @@ export default function VendorMerchandisePage() {
           await Promise.all([
             vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`),
             getCategories(),
-            getMerchandise(),
+            getMerchandise(activeBusinessId ?? undefined),
           ]);
 
         if (!businessResponse.ok) {
@@ -123,7 +127,7 @@ export default function VendorMerchandisePage() {
         setProducts(productResponse);
 
         setBusinessId(
-          businessList[0]?.id ? String(businessList[0].id) : "",
+          activeBusinessId ?? (businessList[0]?.id ? String(businessList[0].id) : ""),
         );
       } catch (err) {
         if (!cancelled) {
@@ -143,7 +147,7 @@ export default function VendorMerchandisePage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeBusinessId]);
 
   function openCreateForm() {
     setEditingProduct(null);
@@ -207,7 +211,7 @@ export default function VendorMerchandisePage() {
   }
 
 async function handleSubmit() {
-    if (!businessId) {
+    if (!selectedBusinessId) {
       setError("Register a business before adding merchandise.");
       return;
     }
@@ -231,7 +235,7 @@ async function handleSubmit() {
     }
 
     const payload: MerchandisePayload = {
-      business: businessId,
+      business: selectedBusinessId,
       category: Number(values.category),
       name: values.name.trim(),
       description: values.description.trim(),
@@ -245,7 +249,7 @@ async function handleSubmit() {
 
     try {
       if (editingProduct) {
-        await updateMerchandise(editingProduct.id, payload);
+        await updateMerchandise(editingProduct.id, payload, selectedBusinessId);
         setSuccess("Product updated successfully.");
       } else {
         await createMerchandise(payload);
@@ -283,7 +287,7 @@ async function handleSubmit() {
     setSuccess("");
 
     try {
-      await deactivateMerchandise(product.id);
+      await deactivateMerchandise(product.id, selectedBusinessId);
       setProducts((current) =>
         current.map((item) =>
           item.id === product.id
@@ -318,14 +322,14 @@ async function handleSubmit() {
             type="button"
             className="vm-primary-button"
             onClick={openCreateForm}
-            disabled={!businessId}
+            disabled={!selectedBusinessId}
           >
             <Plus size={18} />
             Add merchandise
           </button>
         </div>
 
-        {businesses.length > 1 && (
+        {!activeBusiness && businesses.length > 1 && (
           <div className="vm-business-picker">
             <label htmlFor="vm-business">Business</label>
             <select
@@ -342,7 +346,7 @@ async function handleSubmit() {
           </div>
         )}
 
-        {!loading && businesses.length === 0 && (
+        {!activeBusiness && !loading && businesses.length === 0 && (
           <div className="vm-notice">
             <h3>You need a registered business first</h3>
             <p>Register your business before adding merchandise.</p>
@@ -537,7 +541,7 @@ async function handleSubmit() {
               <Package size={36} />
               <h3>No merchandise yet</h3>
               <p>Add your first product to your store.</p>
-              {businessId && (
+              {selectedBusinessId && (
                 <button
                   type="button"
                   className="vm-primary-button"
