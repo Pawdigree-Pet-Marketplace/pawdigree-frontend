@@ -29,6 +29,7 @@ const implementedVendorPages = new Set([
   "/vendor/adoption-applications",
   "/vendor/services/new",
   "/vendor/business-profile",
+  "/vendor/availability",
 ]);
 
 const navigationGroups = [

@@ -211,3 +211,22 @@
     font-size: 0.85rem;
   }
 }
+
+
+/* Add to Cart button inside the merchandise card */
+.merch-card__body .add-to-cart-wrapper {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.merch-card__body .add-to-cart-button {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 999px;
+}
+
+/* Keep the View Details button neatly below Add to Cart */
+.merch-card__body .merch-card__btn {
+  width: 100%;
+  margin-top: 0;
+}
