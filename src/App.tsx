@@ -69,14 +69,7 @@ function App() {
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
-        <Route
-  path="/vendor/merchandise"
-  element={
-    <ProtectedRoute role="VENDOR">
-      <VendorMerchandisePage />
-    </ProtectedRoute>
-  }
-/>
+   
         <Route
           path="/profile"
           element={
@@ -240,6 +233,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/vendor/merchandise"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorMerchandisePage />
+    </ProtectedRoute>
+  }
+/>
       <Route
         path="/vendor/categories"
         element={

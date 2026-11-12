@@ -26,8 +26,8 @@ const implementedVendorPages = new Set([
   "/vendor/adoption-applications",
   "/vendor/services/new",
   "/vendor/business-profile",
+  "/vendor/merchandise",
 ]);
-
 const navigationGroups = [
   {
     title: "WORKSPACE",
@@ -54,6 +54,7 @@ const navigationGroups = [
         path: "/vendor/services/new",
         icon: BriefcaseBusiness,
       },
+      
       {
   label: "Merchandise",
   path: "/vendor/merchandise",
