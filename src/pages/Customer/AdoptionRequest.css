@@ -262,5 +262,100 @@
     grid-template-columns: 1fr;
   }
 }
+/* Pawdigree adoption layout — final targeted correction */
 
+/* Preserve the dashboard sidebar and let the content use remaining space */
+.customer-dashboard-layout {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.customer-dashboard-main.adoption-page {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
+  overflow-x: clip;
+}
+
+/* Keep adoption's internal sidebar and form in separate columns */
+.adoption-page .adoption-content {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px 64px;
+}
+
+.adoption-page .adoption-columns {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.6fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.adoption-page .adoption-sidebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  min-width: 0;
+}
+
+.adoption-page .adoption-form {
+  min-width: 0;
+  width: 100%;
+  padding: 36px;
+}
+
+/* Keep timeline text inside its own sidebar */
+.adoption-page .timeline-item {
+  min-width: 0;
+  width: 100%;
+}
+
+.adoption-page .timeline-item b {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Separate form labels from their options */
+.adoption-page .field-label {
+  display: block;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.adoption-page .boolean-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.adoption-page .boolean-options label {
+  min-width: 120px;
+  min-height: 60px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 1000px) {
+  .adoption-page .adoption-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .adoption-page .adoption-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adoption-page .adoption-form {
+    padding: 24px 18px;
+  }
+}
 
