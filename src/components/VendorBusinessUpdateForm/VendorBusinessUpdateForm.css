@@ -60,6 +60,74 @@
   gap: var(--space-2);
 }
 
+.vendor-business-form-wrapper .business-image-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.vendor-business-form-wrapper .business-image-field {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vendor-business-form-wrapper .business-image-preview {
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--gray);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.vendor-business-form-wrapper .business-image-preview--logo {
+  width: 132px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.vendor-business-form-wrapper .business-image-preview--cover {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  min-height: 96px;
+}
+
+.vendor-business-form-wrapper .business-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vendor-business-form-wrapper .business-image-field input[type="file"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+.vendor-business-form-wrapper .business-image-field small {
+  color: var(--gray);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+}
+
 .vendor-business-form-wrapper .field-error {
   color: var(--coral-dark);
   font-size: 12px;
@@ -162,6 +230,9 @@
 
 @media (max-width: 600px) {
   .vendor-business-form-wrapper .form-row {
+    grid-template-columns: 1fr;
+  }
+  .vendor-business-form-wrapper .business-image-fields {
     grid-template-columns: 1fr;
   }
   .vendor-business-form-wrapper .business-hours-row {

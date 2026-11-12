@@ -1,0 +1,350 @@
+/* Merchandise page layout. Page-level classes are prefixed mp-.
+   Reuses the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+
+.mp-page {
+  width: 100%;
+  min-height: 100vh;
+  /* clears the fixed navbar (72px desktop, 56px mobile) */
+  padding: 72px 0 72px;
+  overflow-x: clip;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: linear-gradient(180deg, rgb(254 235 227 / 60%) 0, rgb(254 235 227 / 0%) 560px);
+}
+
+.mp-page *,
+.mp-page *::before,
+.mp-page *::after {
+  box-sizing: border-box;
+}
+
+.mp-page h1,
+.mp-page h2,
+.mp-page p {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+.mp-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mp-page :focus-visible {
+  outline: 3px solid rgb(33 108 104 / 45%);
+  outline-offset: 3px;
+}
+
+.mp-container {
+  width: min(1316px, 100% - 48px);
+  margin-inline: auto;
+}
+
+.mp-section {
+  margin-top: clamp(40px, 6vw, 72px);
+}
+
+.mp-hero {
+  position: relative;
+  margin-top: 24px;
+  padding: clamp(24px, 4vw, 52px);
+  border: 1px solid rgb(33 108 104 / 13%);
+  border-radius: 28px;
+  background: linear-gradient(115deg, #e7f3ec, #fbf5e9 68%, #ffeae1);
+  box-shadow: 0 16px 42px rgb(44 48 47 / 6%);
+}
+
+.mp-hero-decor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.mp-decor {
+  position: absolute;
+}
+
+.mp-decor-paw {
+  top: 12%;
+  right: 9%;
+  color: rgb(33 108 104 / 20%);
+  rotate: -16deg;
+}
+
+.mp-decor-sparkle {
+  top: 40%;
+  right: 14%;
+  color: rgb(251 134 101 / 60%);
+}
+
+.mp-hero > :not(.mp-hero-decor) {
+  position: relative;
+}
+
+.mp-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #68716d;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.mp-breadcrumb a:hover {
+  color: var(--teal);
+  text-decoration: underline;
+}
+
+.mp-breadcrumb [aria-current] {
+  color: var(--ink);
+}
+
+.mp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mp-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  background: var(--coral);
+}
+
+.mp-hero h1 {
+  color: var(--teal);
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 4.4vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.mp-hero-sub {
+  max-width: 560px;
+  margin-top: 10px;
+  color: #68716d;
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.mp-results {
+  margin-top: clamp(32px, 5vw, 56px);
+  scroll-margin-top: 92px;
+}
+
+.mp-results-head {
+  margin-bottom: 16px;
+}
+
+.mp-results-head h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.25;
+}
+
+.mp-results-count {
+  margin-top: 4px;
+  color: #68716d;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .mp-page {
+    padding-top: 56px;
+  }
+}
+
+@media (max-width: 720px) {
+  .mp-container {
+    width: calc(100% - 32px);
+  }
+
+  .mp-hero {
+    margin-top: 16px;
+    border-radius: 24px;
+  }
+
+  .mp-decor-sparkle {
+    display: none;
+  }
+}
+
+/* hero search */
+.mp-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 840px;
+  min-height: 70px;
+  margin-top: 24px;
+  padding: 8px 8px 8px 22px;
+  color: #737c77;
+  background: rgb(255 255 255 / 96%);
+  border: 1px solid rgb(44 48 47 / 8%);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgb(44 48 47 / 9%);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.mp-search:focus-within {
+  border-color: rgb(33 108 104 / 42%);
+  box-shadow: 0 0 0 4px rgb(33 108 104 / 10%), 0 10px 28px rgb(44 48 47 / 8%);
+}
+
+.mp-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 4px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+}
+
+.mp-search button {
+  display: grid;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  padding: 0;
+  color: #fff;
+  background: var(--coral);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 3px 9px rgb(251 134 101 / 28%);
+  cursor: pointer;
+}
+
+.mp-search button:hover {
+  background: #e87354;
+}
+
+/* results layout: filter sidebar + product grid */
+.mp-results-layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.mp-sidebar {
+  align-self: stretch;
+}
+
+.mp-backdrop {
+  display: none;
+}
+
+.mp-results-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mp-filter-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--teal);
+  background: #fff;
+  border: 1.5px solid var(--teal);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mp-badge {
+  display: grid;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  place-items: center;
+  color: #fff;
+  background: var(--coral);
+  border-radius: 999px;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 1180px) {
+  .mp-results-layout {
+    grid-template-columns: 262px minmax(0, 1fr);
+    gap: 22px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .mp-results-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mp-sidebar {
+    display: contents;
+  }
+
+  .mp-filter-toggle {
+    display: inline-flex;
+  }
+
+  .mp-backdrop {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    display: block;
+    background: rgb(44 48 47 / 48%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+
+  .mp-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s;
+  }
+}
+
+@media (max-width: 720px) {
+  .mp-search {
+    min-height: 62px;
+    padding: 6px 6px 6px 16px;
+  }
+
+  .mp-search button {
+    flex-basis: 48px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 560px) {
+  .mp-results-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mp-filter-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+}

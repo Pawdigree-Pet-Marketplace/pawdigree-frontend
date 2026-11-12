@@ -1,8 +1,21 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Eye, EyeOff, Store } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Store,
+  Users,
+  ShieldCheck,
+  LayoutDashboard,
+} from "lucide-react";
 import { apiRequest } from "../../services/api";
-import logo from "../../assets/logos/lightmode-logo.svg";
+import {
+  clearAuthSession,
+  saveAuthSession,
+} from "../../services/auth/authStorage";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./VendorLoginPage.css";
+import BackButton from "../../components/BackButton/BackButton";
+import { getPostLoginPath } from "../../services/auth/authRedirect";
 
 type LoginResponse = {
   access?: string;
@@ -16,11 +29,22 @@ type LoginResponse = {
   resend_available_in?: number;
 };
 
+function Required() {
+  return (
+    <span className="required-star" aria-hidden="true">
+      {" "}
+      *
+    </span>
+  );
+}
+
 export default function VendorLoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const postLoginPath = getPostLoginPath(location.state, "VENDOR");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepLoggedIn, setKeepLoggedIn] = useState(true);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
@@ -60,16 +84,13 @@ export default function VendorLoginPage() {
     setIsSubmitting(true);
 
     try {
-      const data = await apiRequest<LoginResponse>(
-        "/auth/login/vendor/",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: email.trim(),
-            password,
-          }),
-        },
-      );
+      const data = await apiRequest<LoginResponse>("/auth/login/vendor/", {
+        method: "POST",
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+      });
 
       // Email verification must happen before authentication tokens are saved.
       if (data.verification_required) {
@@ -82,15 +103,19 @@ export default function VendorLoginPage() {
           return;
         }
 
-        const verificationParams = new URLSearchParams({
-          token: verificationToken,
-          email: data.email ?? "",
-          role: "VENDOR",
-          keepLoggedIn: String(keepLoggedIn),
-          emailSent: String(data.email_sent ?? false),
-        });
-
-        window.location.href = `/verify-email?${verificationParams.toString()}`;
+        clearAuthSession();
+        sessionStorage.setItem(
+          "pawdigree_email_verification",
+          JSON.stringify({
+            verificationToken,
+            email: data.masked_email ?? data.email ?? email.trim(),
+            role: "VENDOR",
+            redirectTo: postLoginPath,
+            expiresAt: Date.now() + (data.expires_in ?? 600) * 1000,
+            resendAt: Date.now() + (data.resend_available_in ?? 60) * 1000,
+          }),
+        );
+        navigate("/verify-email");
         return;
       }
 
@@ -99,26 +124,17 @@ export default function VendorLoginPage() {
       const refreshToken = data.refresh;
 
       if (!accessToken || !refreshToken) {
-        setGeneralError(
-          "We couldn't complete sign-in. Please try again.",
-        );
+        setGeneralError("We couldn't complete sign-in. Please try again.");
         return;
       }
 
-      // Clear any previous session before saving the new one.
-      for (const storage of [localStorage, sessionStorage]) {
-        storage.removeItem("token");
-        storage.removeItem("refresh");
-        storage.removeItem("role");
-      }
+      saveAuthSession({
+        access: accessToken,
+        refresh: refreshToken,
+        role: "VENDOR",
+      });
 
-      const storage = keepLoggedIn ? localStorage : sessionStorage;
-
-      storage.setItem("token", accessToken);
-      storage.setItem("refresh", refreshToken);
-      storage.setItem("role", "VENDOR");
-
-      window.location.href = "/vendor/dashboard";
+      navigate(postLoginPath, { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();
@@ -145,9 +161,7 @@ export default function VendorLoginPage() {
           "Incorrect email or password. Please check your details and try again.",
         );
       } else {
-        setGeneralError(
-          "Something went wrong. Please try again in a moment.",
-        );
+        setGeneralError("Something went wrong. Please try again in a moment.");
       }
     } finally {
       setIsSubmitting(false);
@@ -156,25 +170,13 @@ export default function VendorLoginPage() {
 
   return (
     <main className="vendor-login-page">
-      <header className="vendor-login-header">
-        <button
-          type="button"
-          className="vendor-login-back"
-          onClick={() => {
-            window.location.href = "/vendor";
-          }}
-          aria-label="Back to vendor landing page"
-        >
-          <ArrowLeft size={20} />
-          <span>Back</span>
-        </button>
-
-        <a href="/vendor" aria-label="Pawdigree vendor home">
-          <img src={logo} alt="Pawdigree" />
-        </a>
-      </header>
-
       <section className="vendor-login-card">
+        <BackButton
+          label="Back"
+          fallback="/vendor"
+          onClick={() => navigate("/vendor")}
+        />
+
         <div className="vendor-login-icon">
           <Store size={28} />
         </div>
@@ -194,8 +196,15 @@ export default function VendorLoginPage() {
         )}
 
         <form onSubmit={handleLogin} noValidate>
+          <p className="vendor-required-note">
+            Fields marked <span className="required-star">*</span> are required.
+          </p>
+
           <div className="vendor-login-field">
-            <label htmlFor="vendor-email">Email address</label>
+            <label htmlFor="vendor-email">
+              Email address
+              <Required />
+            </label>
 
             <input
               id="vendor-email"
@@ -203,10 +212,9 @@ export default function VendorLoginPage() {
               autoComplete="email"
               placeholder="you@yourbusiness.com"
               value={email}
+              aria-required="true"
               aria-invalid={Boolean(emailError)}
-              aria-describedby={
-                emailError ? "vendor-email-error" : undefined
-              }
+              aria-describedby={emailError ? "vendor-email-error" : undefined}
               onChange={(event) => {
                 setEmail(event.target.value);
                 setEmailError("");
@@ -230,7 +238,10 @@ export default function VendorLoginPage() {
           </div>
 
           <div className="vendor-login-field">
-            <label htmlFor="vendor-password">Password</label>
+            <label htmlFor="vendor-password">
+              Password
+              <Required />
+            </label>
 
             <div
               className={`vendor-password-wrapper ${
@@ -243,6 +254,7 @@ export default function VendorLoginPage() {
                 autoComplete="current-password"
                 placeholder="Enter your password"
                 value={password}
+                aria-required="true"
                 aria-invalid={Boolean(passwordError)}
                 aria-describedby={
                   passwordError ? "vendor-password-error" : undefined
@@ -259,12 +271,9 @@ export default function VendorLoginPage() {
                 className="vendor-password-toggle"
                 onClick={() => setShowPassword((visible) => !visible)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
               >
-                {showPassword ? (
-                  <EyeOff size={19} />
-                ) : (
-                  <Eye size={19} />
-                )}
+                {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
               </button>
             </div>
 
@@ -283,18 +292,7 @@ export default function VendorLoginPage() {
           </div>
 
           <div className="vendor-login-options">
-            <label className="vendor-remember">
-              <input
-                type="checkbox"
-                checked={keepLoggedIn}
-                onChange={(event) =>
-                  setKeepLoggedIn(event.target.checked)
-                }
-              />
-              Keep me logged in
-            </label>
-
-            <a href="/forgot-password">Forgot password?</a>
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
 
           <button
@@ -307,19 +305,49 @@ export default function VendorLoginPage() {
         </form>
 
         <p className="vendor-login-register">
-          Not a vendor yet?{" "}
-          <a href="/vendor/register">Become a vendor</a>
+          Not a vendor yet? <Link to="/vendor/register">Become a vendor</Link>
         </p>
       </section>
 
       <aside className="vendor-login-welcome">
-        <div className="vendor-login-welcome-copy">
-          <span className="vendor-login-welcome-kicker">PAWDIGREE FOR PET PROS</span>
-          <h1>Big things start with the care you give.</h1>
-          <p>Bring your pet business to a community that loves animals as much as you do.</p>
-          <div className="vendor-login-fact">
-            <span className="vendor-login-fact-icon" aria-hidden="true"><Store size={20} /></span>
-            <span><strong>Your business, growing with Pawdigree.</strong><small>Showcase your services and connect with local pet owners.</small></span>
+        <span className="vendor-login-welcome-kicker">
+          PAWDIGREE FOR PET PROS
+        </span>
+        <h2>Big things start with the care you give.</h2>
+        <p className="vendor-login-welcome-text">
+          Bring your pet business to a community that loves animals as much as
+          you do.
+        </p>
+
+        <div className="vendor-login-benefits">
+          <div className="vendor-login-benefit">
+            <span className="vendor-benefit-icon" aria-hidden="true">
+              <Users size={20} />
+            </span>
+            <div>
+              <h3>Reach local pet owners</h3>
+              <p>Showcase your services and connect with customers.</p>
+            </div>
+          </div>
+
+          <div className="vendor-login-benefit">
+            <span className="vendor-benefit-icon" aria-hidden="true">
+              <LayoutDashboard size={20} />
+            </span>
+            <div>
+              <h3>Manage everything in one place</h3>
+              <p>Listings, orders and bookings from a single dashboard.</p>
+            </div>
+          </div>
+
+          <div className="vendor-login-benefit">
+            <span className="vendor-benefit-icon" aria-hidden="true">
+              <ShieldCheck size={20} />
+            </span>
+            <div>
+              <h3>Build trust with verification</h3>
+              <p>Verified vendors earn more customer confidence.</p>
+            </div>
           </div>
         </div>
       </aside>

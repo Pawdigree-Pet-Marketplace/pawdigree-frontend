@@ -1,0 +1,163 @@
+
+/* Pawdigree Adoption Information Workflow */
+
+.adoption-info-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid #E7E2D8;
+  box-shadow: 0 4px 12px rgba(44, 48, 47, 0.06);
+  font-family: "Nunito", sans-serif;
+  color: #2C302F;
+}
+
+.adoption-info-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  color: #216C68;
+  margin-bottom: 22px;
+}
+
+.adoption-info-heading h3 {
+  font-family: "Fredoka", sans-serif;
+  font-size: 22px;
+  margin: 0 0 6px;
+  color: #216C68;
+}
+
+.adoption-info-heading p {
+  margin: 0;
+  color: #626866;
+  font-size: 14px;
+}
+
+.existing-questions {
+  background: #F7F3E8;
+  border-left: 4px solid #216C68;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 22px;
+}
+
+.existing-questions h4,
+.question-form h4 {
+  font-family: "Fredoka", sans-serif;
+  font-size: 18px;
+  margin: 0 0 12px;
+  color: #216C68;
+}
+
+.existing-questions p,
+.existing-questions li {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.question-form > p {
+  font-size: 14px;
+  color: #626866;
+}
+
+.question-input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.question-form input,
+.question-form textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #D7DCD8;
+  border-radius: 8px;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.question-form input:focus,
+.question-form textarea:focus {
+  border-color: #216C68;
+  box-shadow: 0 0 0 3px rgba(33, 108, 104, 0.12);
+}
+
+.question-form textarea {
+  resize: vertical;
+  margin: 12px 0;
+}
+
+.question-form label {
+  display: block;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.add-question-btn,
+.remove-question,
+.send-questions-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 11px 16px;
+}
+
+.add-question-btn {
+  color: #216C68;
+  background: #FFFFFF;
+  border: 1px solid #216C68;
+  margin: 8px 0 18px;
+}
+
+.remove-question {
+  color: #FB8665;
+  background: #FFF1EC;
+  border: none;
+}
+
+.send-questions-btn {
+  display: flex;
+  width: 100%;
+  background: #216C68;
+  color: #FFFFFF;
+  border: none;
+  margin-top: 12px;
+  transition: background 0.2s ease;
+}
+
+.send-questions-btn:hover:not(:disabled) {
+  background: #185451;
+}
+
+.send-questions-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-error {
+  color: #C0392B;
+  font-size: 13px;
+}
+
+.form-success {
+  color: #216C68;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .adoption-info-card {
+    padding: 16px;
+  }
+
+  .adoption-info-heading h3 {
+    font-size: 19px;
+  }
+}

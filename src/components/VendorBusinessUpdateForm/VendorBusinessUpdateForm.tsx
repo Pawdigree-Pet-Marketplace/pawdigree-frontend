@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import API_BASE_URL from "../../services/api";
+import { getSessionToken } from "../../services/auth/authStorage";
 import "./VendorBusinessUpdateForm.css";
 
 export type DayHours = { is_open: boolean; open: string; close: string };
@@ -14,7 +15,7 @@ export interface BusinessStats {
 }
 
 export interface Business {
-  id?: number;
+  id?: number | string;
   business_name?: string;
   name?: string;
   description?: string;
@@ -32,6 +33,8 @@ export interface Business {
   business_hours?: BusinessHours;
   working_hours?: unknown;
   created_at?: string;
+  reviewed_at?: string;
+  verification_status?: string;
   cover_image?: string;
   logo?: string;
   stats?: BusinessStats;
@@ -80,22 +83,27 @@ interface Props {
   business?: Business | null;
   onSaved: (business: Business) => void;
   onCancel: () => void;
+  showCategory?: boolean;
 }
 
 export default function VendorBusinessUpdateForm({
   business,
   onSaved,
   onCancel,
+  showCategory = true,
 }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const loadingCategories = showCategory && !categoriesLoaded;
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const isExistingBusiness =
+    Boolean(business?.id) && String(business?.id) !== "1";
+
   // The form values shown on screen = values derived from `business`
   // (and the loaded categories) + whatever the user has typed so far.
-  // Deriving them during render means no setState inside an effect.
   const baseForm = useMemo<FormState>(() => {
     let categoryId = "";
     if (business?.category) categoryId = String(business.category);
@@ -136,15 +144,16 @@ export default function VendorBusinessUpdateForm({
   const [hoursEdits, setHoursEdits] = useState<BusinessHours | null>(null);
   const hours = hoursEdits ?? baseHours;
 
+  // Load the category list only when its field is shown.
   useEffect(() => {
+    if (!showCategory) return;
     let cancelled = false;
-    const token =
-      localStorage.getItem("access") || localStorage.getItem("access_token");
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-    fetch(`${API_BASE_URL}/categories/`, { headers })
+    fetch(`${API_BASE_URL}/api/categories/`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${getSessionToken()}`,
+      },
+    })
       .then((r) => r.json())
       .then((d: unknown) => {
         const data = d as { results?: Category[] };
@@ -155,12 +164,12 @@ export default function VendorBusinessUpdateForm({
         // Leave the category list empty if the request fails
       })
       .finally(() => {
-        if (!cancelled) setLoadingCategories(false);
+        if (!cancelled) setCategoriesLoaded(true);
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [showCategory]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -197,7 +206,7 @@ export default function VendorBusinessUpdateForm({
     if (!form.description.trim()) err.description = "Description is required.";
     else if (form.description.trim().length > 500)
       err.description = "Description max 500 chars.";
-    if (!form.businessType)
+    if (showCategory && !form.businessType)
       err.businessType = "Please select a business category.";
     if (!form.address.trim()) err.address = "Address is required.";
     if (!form.cityDistrict.trim())
@@ -227,8 +236,7 @@ export default function VendorBusinessUpdateForm({
       setMessage("Please correct the highlighted fields.");
       return;
     }
-    const token =
-      localStorage.getItem("access") || localStorage.getItem("access_token");
+    const token = getSessionToken();
     if (!token) {
       setMessage("Login session expired. Please log in again.");
       return;
@@ -236,26 +244,26 @@ export default function VendorBusinessUpdateForm({
     setSaving(true);
     try {
       const phone = parsePhoneNumberFromString(form.businessPhone, "UG");
-      const payload = {
+      const payload: Record<string, unknown> = {
         name: form.businessName.trim(),
         description: form.description.trim(),
         contact: phone?.number,
         email: form.businessEmail.trim(),
         address: form.address.trim(),
         city_district: form.cityDistrict.trim(),
-        category: Number(form.businessType),
         business_hours: hours,
       };
-      const url =
-        business?.id && business.id !== 1
-          ? `${API_BASE_URL}/businesses/${business.id}/`
-          : `${API_BASE_URL}/businesses/`;
-      const method = business?.id && business.id !== 1 ? "PATCH" : "POST";
+      if (showCategory) payload.category = Number(form.businessType);
+      const url = isExistingBusiness
+        ? `${API_BASE_URL}/api/businesses/${business?.id}/`
+        : `${API_BASE_URL}/api/businesses/`;
+      const method = isExistingBusiness ? "PATCH" : "POST";
+
       const res = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
           Accept: "application/json",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
@@ -286,7 +294,7 @@ export default function VendorBusinessUpdateForm({
     <div className="vendor-business-form-wrapper">
       <div className="vendor-business-form-header">
         <h3>
-          {business?.id && business.id !== 1
+          {isExistingBusiness
             ? "Update Business Information"
             : "Add Business Information"}
         </h3>
@@ -337,7 +345,7 @@ export default function VendorBusinessUpdateForm({
         )}
       </div>
 
-      <div className="form-group">
+      {showCategory && <div className="form-group">
         <label htmlFor="businessType">
           Business category <span className="req-star">*</span>
         </label>
@@ -361,7 +369,7 @@ export default function VendorBusinessUpdateForm({
         {errors.businessType && (
           <p className="field-error">{errors.businessType}</p>
         )}
-      </div>
+      </div>}
 
       <div className="form-row">
         <div className="form-group">
@@ -450,6 +458,7 @@ export default function VendorBusinessUpdateForm({
               <>
                 <input
                   type="time"
+                  aria-label={`${day} opening time`}
                   value={hours[day].open}
                   onChange={(e) =>
                     handleHoursChange(day, "open", e.target.value)
@@ -458,6 +467,7 @@ export default function VendorBusinessUpdateForm({
                 <span>to</span>
                 <input
                   type="time"
+                  aria-label={`${day} closing time`}
                   value={hours[day].close}
                   onChange={(e) =>
                     handleHoursChange(day, "close", e.target.value)
@@ -482,7 +492,11 @@ export default function VendorBusinessUpdateForm({
           onClick={handleSubmit}
           disabled={saving}
         >
-          {saving ? "Saving..." : "Update Business"}
+          {saving
+            ? "Saving..."
+            : isExistingBusiness
+              ? "Update Business"
+              : "Register Business"}
         </button>
       </div>
     </div>

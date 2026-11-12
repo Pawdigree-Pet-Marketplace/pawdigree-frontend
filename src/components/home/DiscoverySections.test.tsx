@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import Services from './Services'
 import Merchandise from './Merchandise'
 import Testimonials from './Testimonials'
@@ -19,14 +20,14 @@ describe('landing discovery sections', () => {
       { id: 'shop-1', name: 'Paws Shop', city_district: 'Entebbe', categories: ['Pet Food'], logo: null, cover_image: null },
     ] })
 
-    render(<Services />)
+    render(<MemoryRouter><Services /></MemoryRouter>)
     expect(await screen.findByText('Paws Clinic · Kampala')).toBeInTheDocument()
     expect(screen.queryByText('Paws Shop · Entebbe')).not.toBeInTheDocument()
     expect(apiRequest).toHaveBeenCalledWith('/businesses/public/')
   })
 
   it('does not present products or testimonials as live without supporting APIs', () => {
-    render(<><Merchandise /><Testimonials /></>)
+    render(<MemoryRouter><><Merchandise /><Testimonials /></></MemoryRouter>)
     expect(screen.getByText(/Product listings will appear here when the merchandise API is available/i)).toBeInTheDocument()
     expect(screen.getByText(/Customer reviews will appear here when verified review data is available/i)).toBeInTheDocument()
   })

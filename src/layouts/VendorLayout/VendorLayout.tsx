@@ -11,6 +11,7 @@ type VendorLayoutProps = {
   description: string;
   businessName?: string;
   vendorWorkspace?: boolean;
+  showBusinessSwitcher?: boolean;
 };
 
 export default function VendorLayout({
@@ -19,6 +20,7 @@ export default function VendorLayout({
   description,
   businessName = "Your store",
   vendorWorkspace = false,
+  showBusinessSwitcher = false,
 }: VendorLayoutProps) {
   return (
     <main className={`vendor-dashboard${vendorWorkspace ? " vendor-workspace" : ""}`}>
@@ -42,7 +44,7 @@ export default function VendorLayout({
             description={description}
           />
 
-          <VendorTopbar businessName={businessName} />
+          <VendorTopbar businessName={businessName} showBusinessSwitcher={showBusinessSwitcher} />
         </header>
 
         {children}

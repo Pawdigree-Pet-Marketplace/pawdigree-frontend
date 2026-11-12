@@ -1,6 +1,5 @@
 import {
   Activity,
-  BriefcaseBusiness,
   CalendarDays,
   ChartNoAxesCombined,
   ChevronRight,
@@ -11,17 +10,26 @@ import {
   Settings,
   ShoppingBag,
   Store,
-  Wallet,
   Headset,
+  FileText,
+  BriefcaseBusiness,
 } from "lucide-react";
 import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
 import iconLogo from "../../../assets/logos/icon-logo.svg";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { clearAuthSession } from "../../../services/auth/authStorage";
+import { useVendorBusiness } from "../../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
 
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
+  "/vendor/profile",
   "/vendor/listings",
+  "/vendor/adoption-applications",
   "/vendor/services/new",
+  "/vendor/business-profile",
+  "/vendor/availability",
 ]);
 
 const navigationGroups = [
@@ -29,32 +37,64 @@ const navigationGroups = [
     title: "WORKSPACE",
     items: [
       { label: "Dashboard", path: "/vendor/dashboard", icon: LayoutDashboard },
-      { label: "Sales & Payouts", path: "/vendor/sales", icon: ChartNoAxesCombined },
+      {
+        label: "Sales & Payouts",
+        path: "/vendor/sales",
+        icon: ChartNoAxesCombined,
+      },
     ],
   },
   {
     title: "YOUR STORE",
     items: [
       { label: "Catalogue", path: "/vendor/listings", icon: Package },
-      { label: "Add Service", path: "/vendor/services/new", icon: BriefcaseBusiness },
+      {
+        label: "Adoption applications",
+        path: "/vendor/adoption-applications",
+        icon: FileText,
+      },
+      {
+        label: "Add Service",
+        path: "/vendor/services/new",
+        icon: BriefcaseBusiness,
+      },
+      {
+  label: "Merchandise",
+  path: "/vendor/merchandise",
+  icon: ShoppingBag,
+},
     ],
   },
   {
     title: "CUSTOMER CARE",
     items: [
       { label: "Orders & Bookings", path: "/vendor/orders", icon: ShoppingBag },
-      { label: "Customers & Messages", path: "/vendor/customers", icon: MessageCircle },
-      { label: "Availability", path: "/vendor/availability", icon: CalendarDays },
+      {
+        label: "Customers & Messages",
+        path: "/vendor/customers",
+        icon: MessageCircle,
+      },
+      {
+        label: "Availability",
+        path: "/vendor/availability",
+        icon: CalendarDays,
+      },
     ],
   },
   {
-    title: "BUSINESS",
-    items: [
-      { label: "Store Profile", path: "/vendor/profile", icon: Store },
-      { label: "Business & Payout", path: "/vendor/business", icon: Wallet },
-      { label: "Settings", path: "/vendor/settings", icon: Settings },
-      { label: "Support", path: "/vendor/support", icon: Headset },
-    ],
+  
+  title: "BUSINESS",
+  items: [
+    { label: "Store Profile", path: "/vendor/profile", icon: Store },
+    {
+      label: "Businesses",
+      path: "/vendor/business-profile",
+      icon: BriefcaseBusiness,
+    },
+    { label: "Settings", path: "/vendor/settings", icon: Settings },
+    { label: "Support", path: "/vendor/support", icon: Headset },
+  ],
+
   },
 ];
 
@@ -63,24 +103,23 @@ type VendorSidebarProps = {
 };
 
 export default function VendorSidebar({
-  currentPath = window.location.pathname,
+  currentPath: providedPath,
 }: VendorSidebarProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const business = useVendorBusiness();
+  const currentPath = providedPath ?? location.pathname;
   function handleLogout() {
-    for (const storage of [localStorage, sessionStorage]) {
-      storage.removeItem("token");
-      storage.removeItem("refresh");
-      storage.removeItem("role");
-    }
-
-    window.location.href = "/vendor/login";
+    clearAuthSession();
+    navigate("/vendor/login", { replace: true });
   }
 
   return (
     <aside className="dashboard-sidebar">
-     <a
-       className="dashboard-brand"
-       href="/vendor"
-       aria-label="Pawdigree vendor home"
+      <Link
+        className="dashboard-brand"
+        to="/vendor"
+        aria-label="Pawdigree vendor home"
       >
         <img
           className="dashboard-brand-logo"
@@ -94,21 +133,49 @@ export default function VendorSidebar({
           alt=""
           aria-hidden="true"
         />
-     </a>
+      </Link>
 
       <nav className="dashboard-navigation" aria-label="Vendor navigation">
-        {navigationGroups.map((group) => (
+        {navigationGroups.map((group) => {
+          const scopedItems = group.items.filter((item) => {
+            if (!business) return true;
+            if (item.path === "/vendor/listings" || item.path === "/vendor/adoption-applications") return business.business_type === "PET_SALE_ADOPTION";
+            if (item.path === "/vendor/merchandise") return business.business_type === "PRODUCT_SELLER";
+            if (item.path === "/vendor/services/new") return business.business_type === "SERVICE_PROVIDER";
+            return true;
+          });
+          if (scopedItems.length === 0) return null;
+          return (
           <div className="dashboard-nav-group" key={group.title}>
             <p className="dashboard-nav-heading">{group.title}</p>
 
-            {group.items.map((item) => {
+            {scopedItems.map((item) => {
               const Icon = item.icon;
+              const scopedPath = business
+                ? item.path === "/vendor/dashboard"
+                  ? vendorBusinessPath(String(business.id), "dashboard")
+                  : item.path === "/vendor/profile"
+                    ? vendorBusinessPath(String(business.id), "store-profile")
+                    : item.path === "/vendor/listings"
+                      ? vendorBusinessPath(String(business.id), "listings")
+                      : item.path === "/vendor/adoption-applications"
+                        ? vendorBusinessPath(String(business.id), "adoption-applications")
+                        : item.path === "/vendor/services/new"
+                          ? vendorBusinessPath(String(business.id), "services/new")
+                          : item.path === "/vendor/merchandise"
+                            ? vendorBusinessPath(String(business.id), "merchandise")
+                            : item.path === "/vendor/business-profile"
+                              ? vendorBusinessPath(String(business.id), "businesses")
+                            : item.path
+                : item.path;
               const isActive =
-                currentPath === item.path ||
+                currentPath === scopedPath ||
+                (business && item.path === "/vendor/profile" && currentPath.endsWith("/store-profile")) ||
+                (business && item.path === "/vendor/business-profile" && currentPath.endsWith("/businesses")) ||
                 (item.path === "/vendor/listings" &&
-                  currentPath.startsWith("/vendor/listings/")) ||
+                  (business ? currentPath.includes("/listings/") : currentPath.startsWith("/vendor/listings/"))) ||
                 (item.path === "/vendor/services/new" &&
-                  currentPath.startsWith("/vendor/services/")) ||
+                  (business ? currentPath.includes("/services/") : currentPath.startsWith("/vendor/services/"))) ||
                 (item.path === "/vendor/orders" &&
                   (currentPath.startsWith("/vendor/orders/") ||
                     currentPath === "/vendor/bookings")) ||
@@ -117,7 +184,11 @@ export default function VendorSidebar({
 
               const itemContent = (
                 <>
-                  <Icon className="dashboard-nav-icon" size={18} strokeWidth={1.9} />
+                  <Icon
+                    className="dashboard-nav-icon"
+                    size={18}
+                    strokeWidth={1.9}
+                  />
                   <span>{item.label}</span>
                   {isActive && (
                     <ChevronRight
@@ -129,10 +200,10 @@ export default function VendorSidebar({
                 </>
               );
 
-              if (!implementedVendorPages.has(item.path)) {
+              if (!implementedVendorPages.has(item.path) && !(business && ["/vendor/dashboard", "/vendor/profile", "/vendor/listings", "/vendor/adoption-applications", "/vendor/services/new", "/vendor/merchandise"].includes(item.path))) {
                 return (
                   <span
-                    key={item.path}
+                    key={item.label}
                     className="dashboard-nav-item dashboard-nav-item-unavailable"
                     aria-disabled="true"
                     title={`${item.label} isn't available yet`}
@@ -143,19 +214,20 @@ export default function VendorSidebar({
               }
 
               return (
-                <a
-                  key={item.path}
-                  href={item.path}
+                <Link
+                  key={item.label}
+                  to={scopedPath}
                   className={`dashboard-nav-item${isActive ? " active" : ""}`}
                   aria-current={isActive ? "page" : undefined}
                   title={item.label}
                 >
                   {itemContent}
-                </a>
+                </Link>
               );
             })}
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="dashboard-sidebar-footer">
@@ -176,4 +248,3 @@ export default function VendorSidebar({
     </aside>
   );
 }
-

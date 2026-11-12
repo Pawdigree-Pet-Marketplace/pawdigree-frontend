@@ -13,6 +13,7 @@ interface PetGridProps {
   /** Shown after the card at `breatherAfter` (only when more cards follow it). */
   breather?: ReactNode;
   breatherAfter?: number;
+  showAdoptionAction?: boolean;
 }
 
 export default function PetGrid({
@@ -23,6 +24,7 @@ export default function PetGrid({
   skeletonCount = 6,
   breather,
   breatherAfter = 5,
+  showAdoptionAction = false,
 }: PetGridProps) {
   if (loading) {
     return (
@@ -38,7 +40,7 @@ export default function PetGrid({
     <div className="pet-grid">
       {pets.map((pet, i) => (
         <Fragment key={pet.pet_id}>
-          <PetCard pet={pet} index={i} isFav={favs.includes(pet.pet_id)} onToggleFav={onToggleFav} />
+          <PetCard pet={pet} index={i} isFav={favs.includes(pet.pet_id)} onToggleFav={onToggleFav} showAdoptionAction={showAdoptionAction} />
           {breather && i === breatherAfter && pets.length > breatherAfter + 1 ? breather : null}
         </Fragment>
       ))}

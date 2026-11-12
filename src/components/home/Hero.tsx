@@ -1,11 +1,24 @@
 import heroimage from "../../assets/images/heroimage.jpg";
+import { ClipboardCheck, Heart, ShieldCheck } from "lucide-react";
 import { FilterIcon, SearchIcon } from "../icons";
 import useScrollReveal from "../../hooks/useScrollReveal";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Hero.css";
 
 
 export default function Hero() {
   const contentRef = useScrollReveal<HTMLDivElement>();
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = new URLSearchParams();
+    if (search.trim()) query.set("search", search.trim());
+    const suffix = query.toString();
+    navigate(suffix ? `/explore-pets?${suffix}` : "/explore-pets");
+  };
 
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -30,31 +43,27 @@ export default function Hero() {
         <form
           className="hero-search"
           role="search"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSearch}
         >
           <SearchIcon />
           <input
             type="search"
-            placeholder="Search pets, services, products"
-            aria-label="Search pets, services, products"
+            placeholder="Search pets, breeds, or locations"
+            aria-label="Search pets, breeds, or locations"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
           />
           <button type="submit" aria-label="Filter and search">
             <FilterIcon />
           </button>
         </form>
 
-        <>
-          <button
-            type="button"
-            className="btn reveal reveal-delay-2"
-            onClick={() => (window.location.href = "/registration")}
-          >
-            Create Account
-          </button>
-          <p className="hero-login reveal reveal-delay-3">
-            Already have an account? <a href="/customer-login">Log In</a>
-          </p>
-        </>
+        <ul className="hero-trust reveal reveal-delay-2" aria-label="Why shop with Pawdigree">
+          <li><ShieldCheck size={16} aria-hidden="true" /> Verified vendors</li>
+          <li><ClipboardCheck size={16} aria-hidden="true" /> Reviewed listings</li>
+          <li><Heart className="hero-trust-heart" size={16} aria-hidden="true" /> Pet care in one place</li>
+        </ul>
+
       </div>
 
 
@@ -108,6 +117,16 @@ export default function Hero() {
   </svg>
 
   <svg className="floaty floaty-heart heart-b" viewBox="0 0 40 40" fill="none">
+    <path d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
+      stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
+  </svg>
+
+  <svg className="floaty floaty-heart heart-c" viewBox="0 0 40 40" fill="none">
+    <path d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
+      stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
+  </svg>
+
+  <svg className="floaty floaty-heart heart-d" viewBox="0 0 40 40" fill="none">
     <path d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
       stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
   </svg>

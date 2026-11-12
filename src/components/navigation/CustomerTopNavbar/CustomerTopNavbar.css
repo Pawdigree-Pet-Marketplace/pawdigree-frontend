@@ -31,6 +31,15 @@
   box-shadow: 0 2px 10px rgba(44, 48, 47, 0.08);
 }
 
+
+.top-navbar-brand {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: clamp(8px, 1vw, 14px);
+}
+
+
 /* =========================
    LOGO
 ========================= */
@@ -194,6 +203,31 @@
 .top-navbar--transparent:not(.top-navbar--scrolled) .desktop-links a.is-active,
 .top-navbar--scrolled .desktop-links a.is-active {
   color: var(--coral);
+}
+
+/* =========================
+   EXPLORE PETS (LIGHT BACKGROUND)
+========================= */
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .desktop-links a {
+  color: var(--charcoal);
+}
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .desktop-links a:hover {
+  color: var(--teal);
+}
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .desktop-links a.is-active {
+  color: var(--coral);
+}
+
+.top-navbar--transparent.top-navbar--explore:not(.top-navbar--scrolled)
+  .hamburger {
+  color: var(--charcoal);
+  background: transparent;
 }
 
 /* =========================

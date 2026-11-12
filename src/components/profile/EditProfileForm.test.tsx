@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render as rtlRender, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import EditProfileForm from './EditProfileForm'
 
 const initialValues = {
@@ -11,12 +12,14 @@ const initialValues = {
 
 function setup(values = initialValues) {
   const onSubmit = vi.fn()
-  render(
-    <EditProfileForm
-      initialValues={values}
-      onSubmit={onSubmit}
-      cancelHref="/profile"
-    />,
+  rtlRender(
+    <MemoryRouter>
+      <EditProfileForm
+        initialValues={values}
+        onSubmit={onSubmit}
+        cancelHref="/profile"
+      />
+    </MemoryRouter>,
   )
   return onSubmit
 }

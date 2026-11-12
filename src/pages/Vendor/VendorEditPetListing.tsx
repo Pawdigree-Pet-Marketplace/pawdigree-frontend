@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent, useRef } from "react";
 import {
-  ArrowLeft,
   ImagePlus,
   LoaderCircle,
   PawPrint,
@@ -8,9 +7,13 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
+import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./VendorEditPetListing.css";
 
 type Business = { id: string; name: string };
@@ -126,7 +129,11 @@ function BrandSelect({
 }
 
 export default function VendorEditPetListing() {
-  const id = window.location.pathname.split("/").filter(Boolean).pop() || "";
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
+  const { petId = "" } = useParams();
+  const navigate = useNavigate();
+  const id = petId;
   const isIdMissing = !id || id === "edit-pet";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -179,7 +186,9 @@ export default function VendorEditPetListing() {
     if (isIdMissing) return;
     async function loadBusinesses() {
       try {
-        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
+        const res = await vendorAuthenticatedFetch(
+          `${API_BASE_URL}/api/businesses/`,
+        );
         if (!res.ok) throw new Error(await readError(res));
         const data = (await res.json()) as BusinessResponse;
         const items = Array.isArray(data) ? data : data.results;
@@ -192,11 +201,11 @@ export default function VendorEditPetListing() {
       try {
         // The backend exposes listing detail through the vendor-owned list route;
         // /api/pets/{id}/edit/ accepts PATCH/PUT only.
-        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`);
+        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/${activeBusinessId ? `?business_id=${encodeURIComponent(activeBusinessId)}` : ""}`);
         if (!res.ok) throw new Error(await readError(res));
         const data = (await res.json()) as VendorPetResponse;
         const pets = Array.isArray(data) ? data : data.results;
-        const pet = pets.find((listing) => String(listing.pet_id) === id);
+        const pet = pets.find((listing) => String(listing.pet_id) === id && (!activeBusinessId || String(listing.business) === activeBusinessId));
         if (!pet) throw new Error("Pet not found.");
         setName(pet.name || "");
         setSpecies(pet.species || "Dog");
@@ -207,11 +216,9 @@ export default function VendorEditPetListing() {
         setDescription(pet.description || "");
         setPrice(pet.price != null ? String(pet.price) : "");
         setListingType(
-          pet.listing_type === "SALE"
-            ? "SALE"
-            : pet.listing_type || "ADOPTION",
+          pet.listing_type === "SALE" ? "SALE" : pet.listing_type || "ADOPTION",
         );
-        setBusinessId(pet.business != null ? String(pet.business) : "");
+        setBusinessId(activeBusinessId ?? (pet.business != null ? String(pet.business) : ""));
         setExistingPhotos(pet.images || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Pet not found.");
@@ -221,17 +228,21 @@ export default function VendorEditPetListing() {
     }
     loadBusinesses();
     loadPet();
-  }, [id, isIdMissing]);
+  }, [id, isIdMissing, activeBusinessId]);
 
   if (isIdMissing) {
     return (
-      <VendorLayout title="Edit pet listing" description="No pet selected" vendorWorkspace>
+      <VendorLayout
+        title="Edit pet listing"
+        description="No pet selected"
+        vendorWorkspace
+      >
         <div className="dashboard-content vendor-pet-page">
           <div className="pet-form-section">
             <h2>No Pet ID</h2>
             <p>
-              Go to <a href="/vendor/listings">/vendor/listings</a> and click
-              Edit.
+              Go to <Link to="/vendor/listings">/vendor/listings</Link> and
+              click Edit.
             </p>
           </div>
         </div>
@@ -265,7 +276,8 @@ export default function VendorEditPetListing() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    if (!businessId) {
+    const selectedBusinessId = activeBusiness ? String(activeBusiness.id) : businessId;
+    if (!selectedBusinessId) {
       setError("Select business");
       return;
     }
@@ -274,11 +286,8 @@ export default function VendorEditPetListing() {
       return;
     }
     const formData = new FormData();
-    formData.append("business", businessId);
-    formData.append(
-      "listing_type",
-      listingType,
-    );
+    formData.append("business", selectedBusinessId);
+    formData.append("listing_type", listingType);
     formData.append("name", name.trim());
     formData.append("species", species.trim());
     formData.append("breed", breed.trim());
@@ -295,14 +304,17 @@ export default function VendorEditPetListing() {
     });
     setSubmitting(true);
     try {
-      const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/${id}/edit/`, {
-        method: "PATCH",
-        body: formData,
-      });
+      const res = await vendorAuthenticatedFetch(
+        `${API_BASE_URL}/api/pets/${id}/edit/${activeBusiness ? `?business_id=${encodeURIComponent(String(activeBusiness.id))}` : ""}`,
+        {
+          method: "PATCH",
+          body: formData,
+        },
+      );
       if (!res.ok) throw new Error(await readError(res));
       setSuccess("Pet updated!");
       setTimeout(() => {
-        window.location.href = "/vendor/listings";
+        navigate(activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings");
       }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
@@ -330,9 +342,7 @@ export default function VendorEditPetListing() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <a className="pet-back-link" href="/vendor/listings">
-          <ArrowLeft size={17} /> Back to catalogue
-        </a>
+        <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings"} label="Back to listings" />
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
             <div className="pet-section-heading">
@@ -353,7 +363,7 @@ export default function VendorEditPetListing() {
               </div>
             </div>
 
-            <label className="pet-field">
+            {!activeBusiness && <label className="pet-field">
               <span className="pet-field-label">
                 Your business <i>*</i>
               </span>
@@ -369,7 +379,7 @@ export default function VendorEditPetListing() {
                 }))}
                 disabled={loadingBusinesses}
               />
-            </label>
+            </label>}
 
             <div className="pet-field">
               <span className="pet-field-label">
@@ -580,9 +590,9 @@ export default function VendorEditPetListing() {
           {success && <p className="pet-form-message success">{success}</p>}
 
           <div className="pet-form-actions">
-            <a href="/vendor/listings" className="pet-cancel-button">
+            <Link to="/vendor/listings" className="pet-cancel-button">
               Cancel
-            </a>
+            </Link>
             <button
               className="pet-submit-button"
               type="submit"
@@ -602,4 +612,3 @@ export default function VendorEditPetListing() {
     </VendorLayout>
   );
 }
-

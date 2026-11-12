@@ -11,7 +11,6 @@ import API_BASE_URL from "../../services/api";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 import "./CustomerDashboard.css";
 import "./AdoptionRequest.css";
-
 type HomeType = "APARTMENT" | "HOUSE" | "OTHER";
 type Experience = "NONE" | "SOME" | "EXPERIENCED";
 
@@ -46,6 +45,8 @@ function getCustomerAccessToken(): string | null {
 }
 
 export default function AdoptionRequest() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<AdoptionForm>(initialForm);
   const [errors, setErrors] = useState<ApiErrors>({});

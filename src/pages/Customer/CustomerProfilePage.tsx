@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import TopNavbar from "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar";
-import SideMenu from "../../components/navigation/CustomerSideMenu/CustomerSideMenu";
-import BottomNavbar from "../../components/navigation/CustomerBottomNavbar/CustomerBottomNavbar";
+import { Bone, PawPrint } from "lucide-react";
+import { Link } from "react-router-dom";
 import ProfileCard from "../../components/profile/ProfileCard";
 import ProfileMenu from "../../components/profile/ProfileMenu";
 import type { Profile } from "../../data/profile";
-import API_BASE_URL from "../../services/api";
+import { customerAuthenticatedFetch } from "../../services/customerAuthenticatedFetch";
+import { getSessionToken } from "../../services/auth/authStorage";
 import "./CustomerProfilePage.css";
 
 type CustomerProfileResponse = {
@@ -17,7 +17,6 @@ type CustomerProfileResponse = {
 };
 
 export default function ProfilePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,9 +25,7 @@ export default function ProfilePage() {
     let cancelled = false;
 
     async function fetchProfile() {
-      const token =
-        localStorage.getItem("token") ||
-        sessionStorage.getItem("token");
+      const token = getSessionToken();
 
       if (!token) {
         setError("Please log in to view your profile.");
@@ -37,10 +34,7 @@ export default function ProfilePage() {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/profile/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await customerAuthenticatedFetch("/api/auth/profile/", {
         });
 
         if (!response.ok) {
@@ -90,30 +84,26 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <>
-      <TopNavbar
-        isLoggedIn
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-      />
-
-      <SideMenu
-        isOpen={isMenuOpen}
-        setIsOpen={setIsMenuOpen}
-        isLoggedIn
-        onClose={() => setIsMenuOpen(false)}
-      />
-
-      <main className="container profile-page">
+    <main className="customer-dashboard profile-page">
+      <header className="profile-hero">
+        <div className="profile-hero-decor" aria-hidden="true">
+          <Bone className="profile-hero-bone" />
+          <PawPrint className="profile-hero-paw" />
+          <span className="profile-hero-dot" />
+        </div>
+        <p className="dashboard-eyebrow">YOUR PAWDIGREE ACCOUNT</p>
         <h1 className="profile-title">Profile</h1>
+        <p>View and manage your personal information and account settings.</p>
+      </header>
 
+      <section className="profile-content" aria-label="Profile information">
         {isLoading && <p role="status">Loading your profile...</p>}
 
         {!isLoading && error && (
           <p role="alert">
             {error}{" "}
             {error.includes("log in") && (
-              <a href="/customer-login">Log in</a>
+              <Link to="/customer-login">Log in</Link>
             )}
           </p>
         )}
@@ -127,9 +117,7 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-      </main>
-
-      <BottomNavbar />
-    </>
+      </section>
+    </main>
   );
 }

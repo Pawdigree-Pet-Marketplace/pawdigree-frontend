@@ -1,6 +1,8 @@
 
 import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../../services/api";
+import { clearAuthSession, getSessionToken } from "../../../services/auth/authStorage";
 import "./ConfirmLogout.css";
 
 type Props = {
@@ -9,12 +11,11 @@ type Props = {
 };
 
 export const ConfirmLogout = ({ isOpen, onClose }: Props) => {
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
   const handleLogout = async () => {
-    const accessToken =
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("token");
+    const accessToken = getSessionToken();
 
     const refreshToken =
       localStorage.getItem("refresh") ||
@@ -33,10 +34,8 @@ export const ConfirmLogout = ({ isOpen, onClose }: Props) => {
     } catch (error) {
       console.error("Server logout failed:", error);
     } finally {
-      const authKeys = [
-        "token",
-        "refresh",
-        "role",
+      clearAuthSession();
+      const userKeys = [
         "user_email",
         "user_name",
         "user_picture",
@@ -44,13 +43,13 @@ export const ConfirmLogout = ({ isOpen, onClose }: Props) => {
         "first_name",
       ];
 
-      authKeys.forEach((key) => {
+      userKeys.forEach((key) => {
         localStorage.removeItem(key);
         sessionStorage.removeItem(key);
       });
 
       onClose();
-      window.location.href = "/";
+      navigate("/", { replace: true });
     }
   };
 

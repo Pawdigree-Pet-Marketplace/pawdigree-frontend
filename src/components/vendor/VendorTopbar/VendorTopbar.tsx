@@ -1,27 +1,24 @@
-import { Bell, Search, Store, Menu } from "lucide-react";
+import { Bell, Search, Store } from "lucide-react";
+import { Link } from "react-router-dom";
 import "./VendorTopbar.css";
+import { useVendorBusiness } from "../../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
+import VendorBusinessSwitcher from "../VendorBusinessSwitcher/VendorBusinessSwitcher";
 
 type VendorTopbarProps = {
   businessName?: string;
   onSearch?: (query: string) => void;
-  onMenuToggle?: () => void;
+  showBusinessSwitcher?: boolean;
 };
 
 export default function VendorTopbar({
   businessName = "Your store",
   onSearch,
-  onMenuToggle,
+  showBusinessSwitcher = false,
 }: VendorTopbarProps) {
+  const activeBusiness = useVendorBusiness();
   return (
     <div className="dashboard-header-actions">
-      <button
-        type="button"
-        className="vendor-hamburger-btn"
-        aria-label="Open menu"
-        onClick={onMenuToggle}
-      >
-        <Menu size={20} />
-      </button>
       <label className="dashboard-search">
         <Search size={17} aria-hidden="true" />
         <input
@@ -31,6 +28,8 @@ export default function VendorTopbar({
           onChange={(event) => onSearch?.(event.target.value)}
         />
       </label>
+
+      {showBusinessSwitcher && <VendorBusinessSwitcher />}
 
       <button
         type="button"
@@ -42,15 +41,14 @@ export default function VendorTopbar({
         <Bell size={18} aria-hidden="true" />
       </button>
 
-      <button
-        type="button"
+      <Link
+        to={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "store-profile") : "/vendor/profile"}
         className="dashboard-avatar"
-        aria-label={`${businessName} profile is not available yet`}
-        title="Store profile is not available yet"
-        disabled
+        aria-label={`${businessName} business profile`}
+        title="Business profile"
       >
         <Store size={17} aria-hidden="true" />
-      </button>
+      </Link>
     </div>
   );
 }

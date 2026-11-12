@@ -9,6 +9,7 @@ import {
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { apiRequest } from "../../services/api";
 import BusinessVerificationStatus from "../../components/BusinessVerificationStatus/BusinessVerificationStatus";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import "./VendorDashboardPage.css";
 
 const metrics = [
@@ -19,6 +20,7 @@ const metrics = [
 ];
 
 function VendorDashboardPage() {
+  const activeBusiness = useVendorBusiness();
   const [firstName, setFirstName] = useState("");
   const token =
     localStorage.getItem("token") ||
@@ -27,12 +29,6 @@ function VendorDashboardPage() {
   const role =
     localStorage.getItem("role") ||
     sessionStorage.getItem("role");
-
-  useEffect(() => {
-    if (!token || role !== "VENDOR") {
-      window.location.replace("/vendor/login");
-    }
-  }, [token, role]);
 
   useEffect(() => {
     if (!token || role !== "VENDOR") return;
@@ -61,12 +57,13 @@ function VendorDashboardPage() {
     <VendorLayout
       title={`Welcome back, ${firstName || "there"}`}
       description="Here's how your store is doing today"
-      businessName="Happy Paws Kennel"
+      businessName={activeBusiness?.name ?? "Your store"}
+      showBusinessSwitcher
       vendorWorkspace
     >
       <div className="dashboard-content">
         {/* BUSINESS VERIFICATION STATUS */}
-        <BusinessVerificationStatus />
+        <BusinessVerificationStatus businessId={activeBusiness ? String(activeBusiness.id) : undefined} />
         {/* METRIC CARDS */}
         <section
           className="dashboard-metrics"
@@ -90,7 +87,8 @@ function VendorDashboardPage() {
                 <strong aria-label={`${metric.label} not available`}>—</strong>
 
                 <div className="dashboard-metric-bottom">
-                  <span>{metric.label}</span>
+                  <span>{metric.label}</span>
+
                 </div>
               </article>
             );

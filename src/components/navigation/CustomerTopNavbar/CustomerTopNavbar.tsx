@@ -1,10 +1,8 @@
 import darkLogo from "../../../assets/logos/darkmode-logo.svg";
 import lightLogo from "../../../assets/logos/lightmode-logo.svg";
-import {
-  Menu,
-  X,
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../Button/Button";
 import "./CustomerTopNavbar.css";
 
@@ -16,9 +14,9 @@ type TopNavbarProps = {
 };
 
 const navLinks = [
-  { label: "Browse Pets", href: "#pets" },
+  { label: "Browse Pets", href: "/explore-pets" },
   { label: "Services", href: "#services" },
-  { label: "Merchandise", href: "#merchandise" },
+  { label: "Merchandise", href: "/merchandise" },
   { label: "Become a Vendor", href: "/vendor" },
   { label: "Help Center", href: "#" },
 ];
@@ -29,10 +27,16 @@ const TopNavbar = ({
   isMenuOpen,
   setIsMenuOpen,
 }: TopNavbarProps) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [hash, setHash] = useState(window.location.hash);
-  const path = window.location.pathname;
+  const hash = location.hash;
+  const path = location.pathname;
   const isLandingPage = path === "/";
+  const isExplorePetsPage = path === "/explore-pets";
+  const isMerchandisePage = path === "/merchandise";
+  const isTransparentPage =
+    isLandingPage || isExplorePetsPage || isMerchandisePage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,12 +49,6 @@ const TopNavbar = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const handleHashChange = () => setHash(window.location.hash);
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
-
   const isActive = (href: string) => {
     if (href === "#") return false;
     if (href.startsWith("#")) return isLandingPage && hash === href;
@@ -58,37 +56,50 @@ const TopNavbar = ({
   };
 
   // Dark logo only while the navbar is transparent over the hero
-  const useDarkLogo = isLandingPage && !isScrolled;
+  const useDarkLogo = isTransparentPage && !isScrolled;
 
   const navbarClass = [
     "top-navbar",
-    isLandingPage ? "top-navbar--transparent" : "",
-    isLandingPage && isScrolled ? "top-navbar--scrolled" : "",
+    isTransparentPage ? "top-navbar--transparent" : "",
+    isExplorePetsPage || isMerchandisePage ? "top-navbar--explore" : "",
+    isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <header className={navbarClass}>
-      <a href="/" aria-label="Pawdigree home">
-        <img
-          src={useDarkLogo ? darkLogo : lightLogo}
-          alt="Pawdigree"
-          className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
-        />
-      </a>
+      <div className="top-navbar-brand">
+        <Link to="/" aria-label="Pawdigree home">
+          <img
+            src={useDarkLogo ? darkLogo : lightLogo}
+            alt="Pawdigree"
+            className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
+          />
+        </Link>
+      </div>
 
       <nav className="desktop-links">
-        {navLinks.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            className={isActive(link.href) ? "is-active" : undefined}
-            aria-current={isActive(link.href) ? "page" : undefined}
-          >
-            {link.label}
-          </a>
-        ))}
+        {navLinks.map((link) => {
+          const label =
+            audience === "vendor" && link.label === "Become a Vendor"
+              ? "Vendor Home"
+              : link.label;
+          const href =
+            link.href.startsWith("#") && !isLandingPage
+              ? `/${link.href}`
+              : link.href;
+          return (
+            <Link
+              key={label}
+              to={href}
+              className={isActive(link.href) ? "is-active" : undefined}
+              aria-current={isActive(link.href) ? "page" : undefined}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="desktop-actions">
@@ -98,7 +109,9 @@ const TopNavbar = ({
               className="auth-btn"
               variant="primary"
               onClick={() => {
-                window.location.href = audience === "vendor" ? "/vendor/login" : "/customer-login";
+                navigate(
+                  audience === "vendor" ? "/vendor/login" : "/customer-login",
+                );
               }}
             >
               Log In
@@ -107,7 +120,9 @@ const TopNavbar = ({
               className="auth-btn"
               variant="secondary"
               onClick={() => {
-                window.location.href = audience === "vendor" ? "/vendor/register" : "/registration";
+                navigate(
+                  audience === "vendor" ? "/vendor/register" : "/registration",
+                );
               }}
             >
               Sign Up
@@ -118,22 +133,28 @@ const TopNavbar = ({
             className="auth-btn dashboard-redirect-btn"
             variant="secondary"
             onClick={() => {
-              window.location.href =
-                audience === "vendor" ? "/vendor/dashboard" : "/customer/dashboard";
+              navigate(
+                audience === "vendor"
+                  ? "/vendor/dashboard"
+                  : "/customer/dashboard",
+              );
             }}
           >
             {audience === "vendor" ? "Vendor Dashboard" : "Go to Dashboard"}
           </Button>
         )}
 
-        <button
-          className="hamburger"
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMenuOpen}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {audience === "customer" && (
+          <button
+            type="button"
+            className="hamburger"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        )}
       </div>
     </header>
   );

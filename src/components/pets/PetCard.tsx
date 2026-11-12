@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { Heart, MapPin, PawPrint, Sparkles, Store } from "lucide-react";
+import { Link } from "react-router-dom";
 import { SPECIES, type PublicPet } from "../../data/pets";
 import {
   formatAge,
@@ -50,6 +51,7 @@ export interface PetCardProps {
   /** When set, shows the "Top pick" ribbon with this reason. */
   reason?: string;
   variant?: "grid" | "feature";
+  showAdoptionAction?: boolean;
 }
 
 /** Presentational: everything arrives via props, so it works for any list of pets. */
@@ -60,6 +62,7 @@ export default function PetCard({
   index = 0,
   reason,
   variant = "grid",
+  showAdoptionAction = false,
 }: PetCardProps) {
   const key = speciesKey(pet.species);
   const SpeciesIcon = key ? SPECIES_ICON[key] : PawPrint;
@@ -150,9 +153,15 @@ export default function PetCard({
           </p>
         )}
 
-        <a className="pet-card__btn" href={`/pets/${pet.pet_id}`}>
+        <Link className="pet-card__btn" to={`/pets/${pet.pet_id}`}>
           View details
-        </a>
+        </Link>
+        {showAdoptionAction && isAdoption &&
+          (pet.adoption_status ?? "AVAILABLE") === "AVAILABLE" && (
+            <Link className="pet-card__btn pet-card__btn--adopt" to={`/adoption-request?pet_id=${pet.pet_id}`}>
+              Apply to adopt
+            </Link>
+          )}
       </div>
     </article>
   );

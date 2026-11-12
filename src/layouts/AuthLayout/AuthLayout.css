@@ -1,0 +1,17 @@
+.auth-layout-logo {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  z-index: 20;
+  display: inline-flex;
+  padding: 8px 14px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.auth-layout-logo img {
+  height: 30px;
+  width: auto;
+  display: block;
+}

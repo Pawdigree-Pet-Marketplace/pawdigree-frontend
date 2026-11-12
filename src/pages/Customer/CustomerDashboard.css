@@ -433,6 +433,9 @@
   background: var(--dashboard-paper);
   border: 1px solid var(--dashboard-border);
   border-radius: 17px;
+  display: block;
+  color: inherit;
+  text-decoration: none;
   box-shadow: 0 4px 13px rgb(44 48 47 / 4%);
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
@@ -936,8 +939,8 @@
 
 /* Search pill inspired by the landing-page search treatment. */
 .customer-dashboard .dashboard-search {
-  width: 100%;
-  margin: 0 auto 42px;
+  width: min(100%, 860px);
+  margin: 0 auto;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -963,8 +966,8 @@
   align-items: center;
   gap: 14px;
   width: 100%;
-  min-height: 78px;
-  padding: 9px 9px 9px 22px;
+  min-height: 64px;
+  padding: 7px 7px 7px 18px;
   background: rgb(255 255 255 / 96%);
   border: 1px solid rgb(44 48 47 / 8%);
   border-radius: 999px;
@@ -987,14 +990,14 @@
   flex: 1 1 auto;
   width: auto;
   min-width: 0;
-  min-height: 56px;
+  min-height: 48px;
   padding: 0 4px;
   color: var(--dashboard-ink);
   background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  font-size: clamp(0.95rem, 1.15vw, 1.08rem);
+  font-size: clamp(0.9rem, 1vw, 1rem);
 }
 
 .customer-dashboard .dashboard-search-row input:focus-visible {
@@ -1010,11 +1013,11 @@
 
 .customer-dashboard .dashboard-search-row button {
   display: grid;
-  flex: 0 0 58px;
-  width: 58px;
-  min-width: 58px;
-  height: 58px;
-  min-height: 58px;
+  flex: 0 0 48px;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
   place-items: center;
   padding: 0;
   color: #fff;
@@ -1034,14 +1037,13 @@
 
 @media (max-width: 700px) {
   .customer-dashboard .dashboard-search {
-    margin-bottom: 34px;
     padding: 0;
   }
 
   .customer-dashboard .dashboard-search-row {
     display: flex;
     gap: 10px;
-    min-height: 66px;
+    min-height: 58px;
     padding: 7px 7px 7px 16px;
   }
 
@@ -1055,18 +1057,18 @@
   .customer-dashboard .dashboard-search-row input {
     flex: 1 1 auto;
     width: auto;
-    min-height: 50px;
+    min-height: 44px;
     padding: 0 2px;
     font-size: 0.94rem;
   }
 
   .customer-dashboard .dashboard-search-row button {
     grid-column: auto;
-    flex: 0 0 50px;
-    width: 50px;
-    min-width: 50px;
-    height: 50px;
-    min-height: 50px;
+    flex: 0 0 44px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
   }
 }
 
@@ -1429,6 +1431,36 @@
     }
   }
 }
+
+/* Explore Pawdigree image slider */
+.customer-dashboard .dashboard-explore-controls { display: flex; flex: 0 0 auto; gap: 8px; }
+.customer-dashboard .dashboard-explore-controls button { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--dashboard-border); border-radius: 50%; background: var(--dashboard-paper); color: var(--dashboard-teal-dark); cursor: pointer; transition: background-color 180ms ease, color 180ms ease, transform 180ms ease; }
+.customer-dashboard .dashboard-explore-controls button:hover { transform: translateY(-2px); background: var(--dashboard-teal); color: #fff; }
+.customer-dashboard .dashboard-explore-controls button:focus-visible { outline: 2px solid var(--dashboard-teal); outline-offset: 3px; }
+.customer-dashboard .dashboard-explore-prev { rotate: 180deg; }
+.customer-dashboard .dashboard-explore-track { display: flex; gap: 16px; overflow-x: auto; padding: 4px 2px 14px; scroll-snap-type: x mandatory; scroll-padding-inline: 2px; scrollbar-width: thin; scrollbar-color: #b9d2c8 transparent; -webkit-overflow-scrolling: touch; }
+.customer-dashboard .dashboard-explore-track:focus-visible { outline: 2px solid var(--dashboard-teal); outline-offset: 3px; border-radius: 16px; }
+.customer-dashboard .dashboard-explore-slide { position: relative; isolation: isolate; display: flex; flex: 0 0 clamp(250px, 32%, 360px); min-width: 0; min-height: 220px; overflow: hidden; align-items: flex-end; padding: 20px; border: 1px solid rgb(44 48 47 / 8%); border-radius: 19px; background: #dfe9e3; color: #fff !important; text-decoration: none; scroll-snap-align: start; box-shadow: 0 5px 18px rgb(44 48 47 / 7%); transition: transform 220ms ease, box-shadow 220ms ease; }
+.customer-dashboard .dashboard-explore-slide::before { position: absolute; z-index: -2; inset: 0; background-image: var(--explore-image); background-position: center; background-size: cover; content: ""; transition: transform 450ms ease; }
+.customer-dashboard .dashboard-explore-slide::after { position: absolute; z-index: -1; inset: 0; background: linear-gradient(180deg, rgb(21 35 31 / 8%) 10%, rgb(21 35 31 / 20%) 38%, rgb(21 35 31 / 82%) 100%); content: ""; }
+.customer-dashboard .dashboard-explore-slide:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgb(44 48 47 / 15%); }
+.customer-dashboard .dashboard-explore-slide:hover::before { transform: scale(1.045); }
+.customer-dashboard .dashboard-explore-slide--unavailable { cursor: default; }
+.customer-dashboard .dashboard-explore-slide--unavailable:hover { transform: none; box-shadow: 0 5px 18px rgb(44 48 47 / 7%); }
+.customer-dashboard .dashboard-explore-slide--unavailable:hover::before { transform: none; }
+.customer-dashboard .dashboard-explore-slide .dashboard-marketplace-icon { position: absolute; top: 15px; left: 16px; display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid rgb(255 255 255 / 38%); border-radius: 14px; background: rgb(255 255 255 / 84%); color: var(--dashboard-teal-dark); box-shadow: 0 3px 12px rgb(0 0 0 / 12%); }
+.customer-dashboard .dashboard-explore-slide:nth-child(2) .dashboard-marketplace-icon { color: #a45e3d; }
+.customer-dashboard .dashboard-explore-slide:nth-child(3) .dashboard-marketplace-icon { color: #7a6940; }
+.customer-dashboard .dashboard-explore-slide:nth-child(4) .dashboard-marketplace-icon { color: #8b5b70; }
+.customer-dashboard .dashboard-explore-slide:nth-child(5) .dashboard-marketplace-icon { color: #526b83; }
+.customer-dashboard .dashboard-explore-slide .dashboard-marketplace-card-copy { gap: 5px; padding-right: 16px; }
+.customer-dashboard .dashboard-explore-slide .dashboard-marketplace-card-copy strong { color: #fff; font-size: 1.05rem; white-space: normal; }
+.customer-dashboard .dashboard-explore-slide .dashboard-marketplace-card-copy > span { display: -webkit-box; color: rgb(255 255 255 / 88%); font-size: .82rem; line-height: 1.45; -webkit-line-clamp: 2; line-clamp: 2; }
+.customer-dashboard .dashboard-explore-slide .dashboard-marketplace-arrow { position: absolute; right: 17px; bottom: 22px; color: #fff; transition: transform 180ms ease; }
+.customer-dashboard .dashboard-explore-slide:hover .dashboard-marketplace-arrow { transform: translateX(4px); }
+@media (max-width: 800px) { .customer-dashboard .dashboard-explore-slide { flex-basis: min(72%, 340px); } }
+@media (max-width: 520px) { .customer-dashboard .dashboard-section-heading { align-items: flex-end; } .customer-dashboard .dashboard-explore-controls button { width: 34px; height: 34px; } .customer-dashboard .dashboard-explore-slide { flex-basis: 84%; min-height: 205px; } }
+@media (prefers-reduced-motion: reduce) { .customer-dashboard .dashboard-explore-controls button, .customer-dashboard .dashboard-explore-slide, .customer-dashboard .dashboard-explore-slide::before, .customer-dashboard .dashboard-explore-slide .dashboard-marketplace-arrow { transition: none !important; scroll-behavior: auto !important; } .customer-dashboard .dashboard-explore-slide:hover, .customer-dashboard .dashboard-explore-controls button:hover { transform: none; } }
 
 /* =========================================================
    Welcome card decorations (paws, heart, bowl, sparkles)

@@ -1,6 +1,7 @@
 import useScrollReveal from "../../hooks/useScrollReveal";
 import "./Footer.css";
 import darkLogo from "../../assets/logos/darkmode-logo.svg";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   const footerRef = useScrollReveal<HTMLDivElement>();
@@ -10,13 +11,13 @@ export default function Footer() {
       <div className="container footer-inner" ref={footerRef}>
         <div className="footer-main">
           <div className="footer-brand reveal">
-            <a
-              href="/"
+            <Link
+              to="/"
               className="footer-logo-link"
               aria-label="Pawdigree home"
             >
               <img src={darkLogo} alt="Pawdigree" className="footer-logo" />
-            </a>
+            </Link>
 
             <p>
               Find your perfect
@@ -28,9 +29,9 @@ export default function Footer() {
           <div className="footer-links reveal reveal-delay-1">
             <div className="footer-column">
               <h3>Marketplace</h3>
-              <a href="#pets">Browse Pets</a>
+              <Link to="/explore-pets">Browse Pets</Link>
               <a href="#categories">Categories</a>
-              <a href="#merchandise">Shop Merchandise</a>
+              <Link to="/merchandise">Shop Merchandise</Link>
               <a href="#services">Pet Services</a>
             </div>
 
@@ -44,8 +45,8 @@ export default function Footer() {
 
             <div className="footer-column">
               <h3>Legal</h3>
-              <a href="/terms">Terms of Services</a>
-              <a href="/privacy">Privacy Policy</a>
+              <Link to="/terms-and-conditions">Terms of Services</Link>
+              <Link to="/privacy">Privacy Policy</Link>
             </div>
           </div>
         </div>

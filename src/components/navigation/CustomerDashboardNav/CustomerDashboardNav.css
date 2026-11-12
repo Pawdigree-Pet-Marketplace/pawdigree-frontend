@@ -289,8 +289,7 @@
     background: rgb(251 250 247 / 96%);
     border-bottom: 1px solid rgb(44 48 47 / 7%);
     box-shadow: 0 4px 18px rgb(44 48 47 / 5%);
-    backdrop-filter: blur(12px);
-  }
+      }
 
   .customer-dash-mobile-header > a {
     display: flex;

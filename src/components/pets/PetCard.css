@@ -366,6 +366,12 @@
   }
 }
 
+.pet-card__btn--adopt {
+  border-color: var(--teal, #216c68);
+  background: var(--teal, #216c68);
+  color: #fff;
+}
+
 @media (max-width: 340px) {
   .pet-card__media {
     aspect-ratio: 5 / 4;

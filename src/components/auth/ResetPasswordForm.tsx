@@ -1,11 +1,11 @@
-
 import { useMemo, useState } from "react";
 import { Check, Eye, EyeOff, X } from "lucide-react";
 import { apiRequest } from "../../services/api";
+import { Link, useSearchParams } from "react-router-dom";
 import "./ResetPasswordForm.css";
-import pawdigreeLogo from "../../assets/logo.png";
 
 const ResetPasswordForm = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -53,12 +53,13 @@ const ResetPasswordForm = () => {
       return;
     }
 
-    const params = new URLSearchParams(window.location.search);
-    const uid = params.get("uid");
-    const token = params.get("token");
+    const uid = searchParams.get("uid");
+    const token = searchParams.get("token");
 
     if (!uid || !token) {
-      setError("This reset link is invalid or expired. Please request a new one.");
+      setError(
+        "This reset link is invalid or expired. Please request a new one.",
+      );
       return;
     }
 
@@ -94,12 +95,6 @@ const ResetPasswordForm = () => {
   return (
     <main className="reset-password-page">
       <section className="reset-password-card">
-        <img
-  src={pawdigreeLogo}
-  alt="Pawdigree logo"
-  className="reset-password-logo"
-/>
-
         {success ? (
           <>
             <h1>Password Updated!</h1>
@@ -110,16 +105,17 @@ const ResetPasswordForm = () => {
             <div className="reset-password-success" role="status">
               <Check size={32} strokeWidth={2.5} />
               <p>{success}</p>
-              <a className="reset-password-login-link" href="/login">
+              <Link className="reset-password-login-link" to="/login">
                 Go to Login
-              </a>
+              </Link>
             </div>
           </>
         ) : (
           <>
             <h1>Reset Your Password</h1>
             <p className="reset-password-description">
-              Choose a strong new password to get back to your Pawdigree account.
+              Choose a strong new password to get back to your Pawdigree
+              account.
             </p>
 
             <form
@@ -171,7 +167,9 @@ const ResetPasswordForm = () => {
                   <button
                     className="reset-password-toggle"
                     type="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     onClick={() => setShowPassword((visible) => !visible)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -187,11 +185,7 @@ const ResetPasswordForm = () => {
                         }`}
                         key={condition.text}
                       >
-                        {condition.ok ? (
-                          <Check size={14} />
-                        ) : (
-                          <X size={14} />
-                        )}
+                        {condition.ok ? <Check size={14} /> : <X size={14} />}
                         <span>{condition.text}</span>
                       </li>
                     ))}
@@ -261,7 +255,7 @@ const ResetPasswordForm = () => {
             <p className="reset-password-footer">
               Remembered your password?
               <br />
-              <a href="/login">Back to Login</a>
+              <Link to="/login">Back to Login</Link>
             </p>
           </>
         )}

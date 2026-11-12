@@ -1,0 +1,37 @@
+/* Responsive product grid. */
+.merch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 20px;
+}
+
+.merch-grid > .merch-card {
+  animation: merch-grid-rise 0.5s cubic-bezier(0.2, 0.75, 0.25, 1) backwards;
+  animation-delay: calc(var(--n, 0) * 55ms);
+}
+
+@media (max-width: 560px) {
+  .merch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 340px) {
+  .merch-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@keyframes merch-grid-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .merch-grid > .merch-card {
+    animation: none;
+  }
+}

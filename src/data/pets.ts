@@ -23,7 +23,7 @@ export type SortKey =
 /** One pet as returned by GET /api/pets/public/. Fields marked ? may be missing. */
 export interface PublicPet {
   pet_id: number;
-  business?: number; // id of the seller's business
+  business?: number | null; // id of the seller's business
   business_name?: string; // seller name, shown on the card
   listing_type: ListingType;
   name: string;
@@ -63,6 +63,8 @@ export interface PetFilters {
 
 export interface PetQuery extends PetFilters {
   search: string;
+  /** Exact breed filter supported by the public pet endpoint. */
+  breed?: string;
   sort: SortKey;
   page: number;
 }
