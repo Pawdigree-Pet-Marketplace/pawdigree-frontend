@@ -45,6 +45,8 @@ import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
+import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
+import { VendorBusinessRoute } from "./services/vendorBusinessContext";
 function App() {
   return (
     <Routes>
@@ -72,18 +74,21 @@ function App() {
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
         <Route path="/merchandise" element={<MerchandisePage />} />
-        <Route path="/merchandise/:productId" element={<ProductDetailsPage />} />
+        <Route
+          path="/merchandise/:productId"
+          element={<ProductDetailsPage />}
+        />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
         <Route
-  path="/vendor/merchandise"
-  element={
-    <ProtectedRoute role="VENDOR">
-      <VendorMerchandisePage />
-    </ProtectedRoute>
-  }
-/>
+          path="/vendor/merchandise"
+          element={
+            <ProtectedRoute role="VENDOR">
+              <VendorMerchandisePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/profile"
           element={
@@ -146,7 +151,6 @@ function App() {
         }
       />
 
-     
       <Route
         path="/customer/cart"
         element={
@@ -194,6 +198,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/vendor/profile"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorStoreProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/vendor/availability"
         element={
@@ -292,6 +305,127 @@ function App() {
             >
               <VendorCategorySelector />
             </VendorLayout>
+          </ProtectedRoute>
+        }
+      />
+      {/* Business workspaces reuse the existing vendor pages and layout. */}
+      <Route
+        path="/vendor/business/:businessId/dashboard"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorDashboardPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/businesses"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorBusinessProfilePage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/store-profile"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorStoreProfilePage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/listings"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorCataloguePage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/listings/new"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorAddPetPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/edit-pet/:petId"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorEditPetListing />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/services/new"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorAddServicePage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/services/:serviceId/edit"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorEditServicePage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/services/:serviceId/availability"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorServiceAvailabilityPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/merchandise"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorMerchandisePage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/adoption-applications"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorAdoptionApplicationsPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/documents"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <DocumentUpload />
+            </VendorBusinessRoute>
           </ProtectedRoute>
         }
       />

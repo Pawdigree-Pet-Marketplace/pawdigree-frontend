@@ -19,9 +19,12 @@ import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
 import iconLogo from "../../../assets/logos/icon-logo.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { clearAuthSession } from "../../../services/auth/authStorage";
+import { useVendorBusiness } from "../../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
 
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
+  "/vendor/profile",
   "/vendor/listings",
   "/vendor/adoption-applications",
   "/vendor/services/new",
@@ -104,6 +107,7 @@ export default function VendorSidebar({
 }: VendorSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const business = useVendorBusiness();
   const currentPath = providedPath ?? location.pathname;
   function handleLogout() {
     clearAuthSession();
@@ -132,18 +136,46 @@ export default function VendorSidebar({
       </Link>
 
       <nav className="dashboard-navigation" aria-label="Vendor navigation">
-        {navigationGroups.map((group) => (
+        {navigationGroups.map((group) => {
+          const scopedItems = group.items.filter((item) => {
+            if (!business) return true;
+            if (item.path === "/vendor/listings" || item.path === "/vendor/adoption-applications") return business.business_type === "PET_SALE_ADOPTION";
+            if (item.path === "/vendor/merchandise") return business.business_type === "PRODUCT_SELLER";
+            if (item.path === "/vendor/services/new") return business.business_type === "SERVICE_PROVIDER";
+            return true;
+          });
+          if (scopedItems.length === 0) return null;
+          return (
           <div className="dashboard-nav-group" key={group.title}>
             <p className="dashboard-nav-heading">{group.title}</p>
 
-            {group.items.map((item) => {
+            {scopedItems.map((item) => {
               const Icon = item.icon;
+              const scopedPath = business
+                ? item.path === "/vendor/dashboard"
+                  ? vendorBusinessPath(String(business.id), "dashboard")
+                  : item.path === "/vendor/profile"
+                    ? vendorBusinessPath(String(business.id), "store-profile")
+                    : item.path === "/vendor/listings"
+                      ? vendorBusinessPath(String(business.id), "listings")
+                      : item.path === "/vendor/adoption-applications"
+                        ? vendorBusinessPath(String(business.id), "adoption-applications")
+                        : item.path === "/vendor/services/new"
+                          ? vendorBusinessPath(String(business.id), "services/new")
+                          : item.path === "/vendor/merchandise"
+                            ? vendorBusinessPath(String(business.id), "merchandise")
+                            : item.path === "/vendor/business-profile"
+                              ? vendorBusinessPath(String(business.id), "businesses")
+                            : item.path
+                : item.path;
               const isActive =
-                currentPath === item.path ||
+                currentPath === scopedPath ||
+                (business && item.path === "/vendor/profile" && currentPath.endsWith("/store-profile")) ||
+                (business && item.path === "/vendor/business-profile" && currentPath.endsWith("/businesses")) ||
                 (item.path === "/vendor/listings" &&
-                  currentPath.startsWith("/vendor/listings/")) ||
+                  (business ? currentPath.includes("/listings/") : currentPath.startsWith("/vendor/listings/"))) ||
                 (item.path === "/vendor/services/new" &&
-                  currentPath.startsWith("/vendor/services/")) ||
+                  (business ? currentPath.includes("/services/") : currentPath.startsWith("/vendor/services/"))) ||
                 (item.path === "/vendor/orders" &&
                   (currentPath.startsWith("/vendor/orders/") ||
                     currentPath === "/vendor/bookings")) ||
@@ -168,7 +200,7 @@ export default function VendorSidebar({
                 </>
               );
 
-              if (!implementedVendorPages.has(item.path)) {
+              if (!implementedVendorPages.has(item.path) && !(business && ["/vendor/dashboard", "/vendor/profile", "/vendor/listings", "/vendor/adoption-applications", "/vendor/services/new", "/vendor/merchandise"].includes(item.path))) {
                 return (
                   <span
                     key={item.label}
@@ -184,7 +216,7 @@ export default function VendorSidebar({
               return (
                 <Link
                   key={item.label}
-                  to={item.path}
+                  to={scopedPath}
                   className={`dashboard-nav-item${isActive ? " active" : ""}`}
                   aria-current={isActive ? "page" : undefined}
                   title={item.label}
@@ -194,7 +226,8 @@ export default function VendorSidebar({
               );
             })}
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="dashboard-sidebar-footer">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Trash2, Clock3 } from "lucide-react";
 import API_BASE_URL from "../../../services/api";
 import { vendorAuthenticatedFetch } from "../../../services/vendorAuthenticatedFetch";
+import { useVendorBusiness } from "../../../services/vendorBusinessStore";
 import "./ServiceAvailability.css";
 
 type TimeSlot = {
@@ -54,6 +55,8 @@ type ServiceAvailabilityProps = {
 export default function ServiceAvailability({
   serviceId,
 }: ServiceAvailabilityProps) {
+const activeBusiness = useVendorBusiness();
+const businessQuery = activeBusiness ? `?business_id=${encodeURIComponent(String(activeBusiness.id))}` : "";
 const [days, setDays] = useState<DayAvailability[]>(initialDays);
 const [selectedDay, setSelectedDay] = useState(0);
 const [startTime, setStartTime] = useState("09:00");
@@ -71,7 +74,7 @@ const [serviceDuration, setServiceDuration] = useState(0);
       setError("");
 
       const response = await vendorAuthenticatedFetch(
-        `${API_BASE_URL}/api/services/${serviceId}/availability/`,
+        `${API_BASE_URL}/api/services/${serviceId}/availability/${businessQuery}`,
       );
 
       if (!response.ok) {
@@ -110,7 +113,7 @@ const [serviceDuration, setServiceDuration] = useState(0);
   if (serviceId) {
     loadAvailability();
   }
-}, [serviceId]);
+}, [serviceId, businessQuery]);
 
   async function addTimeSlot() {
   setError("");
@@ -136,7 +139,7 @@ const [serviceDuration, setServiceDuration] = useState(0);
 
   try {
     const response = await vendorAuthenticatedFetch(
-      `${API_BASE_URL}/api/services/${serviceId}/slots/`,
+      `${API_BASE_URL}/api/services/${serviceId}/slots/${businessQuery}`,
       {
         method: "POST",
         headers: {
@@ -196,7 +199,7 @@ const [serviceDuration, setServiceDuration] = useState(0);
 
   try {
     const response = await vendorAuthenticatedFetch(
-      `${API_BASE_URL}/api/services/${serviceId}/slots/${slotId}/`,
+      `${API_BASE_URL}/api/services/${serviceId}/slots/${slotId}/${businessQuery}`,
       {
         method: "DELETE",
       },

@@ -61,10 +61,14 @@ async function request<T>(
   return response.json() as Promise<T>;
 }
 
-export async function getMerchandise(): Promise<Merchandise[]> {
-  const response = await request<ProductResponse>(PRODUCTS_URL);
+export async function getMerchandise(businessId?: string): Promise<Merchandise[]> {
+  const url = businessId
+    ? `${PRODUCTS_URL}?business_id=${encodeURIComponent(businessId)}`
+    : PRODUCTS_URL;
+  const response = await request<ProductResponse>(url);
 
-  return Array.isArray(response) ? response : response.results ?? [];
+  const items = Array.isArray(response) ? response : response.results ?? [];
+  return businessId ? items.filter((product) => String(product.business) === businessId) : items;
 }
 
 export async function createMerchandise(
@@ -80,8 +84,10 @@ export async function createMerchandise(
 export async function updateMerchandise(
   id: number,
   payload: Partial<MerchandisePayload>,
+  businessId?: string,
 ): Promise<Merchandise> {
-  return request<Merchandise>(`${PRODUCTS_URL}${id}/`, {
+  const url = `${PRODUCTS_URL}${id}/${businessId ? `?business_id=${encodeURIComponent(businessId)}` : ""}`;
+  return request<Merchandise>(url, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -90,8 +96,9 @@ export async function updateMerchandise(
 
 export async function deactivateMerchandise(
   id: number,
+  businessId?: string,
 ): Promise<void> {
-  await request<void>(`${PRODUCTS_URL}${id}/`, {
+  await request<void>(`${PRODUCTS_URL}${id}/${businessId ? `?business_id=${encodeURIComponent(businessId)}` : ""}`, {
     method: "DELETE",
   });
 }

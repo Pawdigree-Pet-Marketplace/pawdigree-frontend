@@ -11,6 +11,8 @@ import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./VendorEditPetListing.css";
 
@@ -127,6 +129,8 @@ function BrandSelect({
 }
 
 export default function VendorEditPetListing() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const { petId = "" } = useParams();
   const navigate = useNavigate();
   const id = petId;
@@ -197,11 +201,11 @@ export default function VendorEditPetListing() {
       try {
         // The backend exposes listing detail through the vendor-owned list route;
         // /api/pets/{id}/edit/ accepts PATCH/PUT only.
-        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/`);
+        const res = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/${activeBusinessId ? `?business_id=${encodeURIComponent(activeBusinessId)}` : ""}`);
         if (!res.ok) throw new Error(await readError(res));
         const data = (await res.json()) as VendorPetResponse;
         const pets = Array.isArray(data) ? data : data.results;
-        const pet = pets.find((listing) => String(listing.pet_id) === id);
+        const pet = pets.find((listing) => String(listing.pet_id) === id && (!activeBusinessId || String(listing.business) === activeBusinessId));
         if (!pet) throw new Error("Pet not found.");
         setName(pet.name || "");
         setSpecies(pet.species || "Dog");
@@ -214,7 +218,7 @@ export default function VendorEditPetListing() {
         setListingType(
           pet.listing_type === "SALE" ? "SALE" : pet.listing_type || "ADOPTION",
         );
-        setBusinessId(pet.business != null ? String(pet.business) : "");
+        setBusinessId(activeBusinessId ?? (pet.business != null ? String(pet.business) : ""));
         setExistingPhotos(pet.images || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Pet not found.");
@@ -224,7 +228,7 @@ export default function VendorEditPetListing() {
     }
     loadBusinesses();
     loadPet();
-  }, [id, isIdMissing]);
+  }, [id, isIdMissing, activeBusinessId]);
 
   if (isIdMissing) {
     return (
@@ -272,7 +276,8 @@ export default function VendorEditPetListing() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    if (!businessId) {
+    const selectedBusinessId = activeBusiness ? String(activeBusiness.id) : businessId;
+    if (!selectedBusinessId) {
       setError("Select business");
       return;
     }
@@ -281,7 +286,7 @@ export default function VendorEditPetListing() {
       return;
     }
     const formData = new FormData();
-    formData.append("business", businessId);
+    formData.append("business", selectedBusinessId);
     formData.append("listing_type", listingType);
     formData.append("name", name.trim());
     formData.append("species", species.trim());
@@ -300,7 +305,7 @@ export default function VendorEditPetListing() {
     setSubmitting(true);
     try {
       const res = await vendorAuthenticatedFetch(
-        `${API_BASE_URL}/api/pets/${id}/edit/`,
+        `${API_BASE_URL}/api/pets/${id}/edit/${activeBusiness ? `?business_id=${encodeURIComponent(String(activeBusiness.id))}` : ""}`,
         {
           method: "PATCH",
           body: formData,
@@ -309,7 +314,7 @@ export default function VendorEditPetListing() {
       if (!res.ok) throw new Error(await readError(res));
       setSuccess("Pet updated!");
       setTimeout(() => {
-        navigate("/vendor/listings");
+        navigate(activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings");
       }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
@@ -337,7 +342,7 @@ export default function VendorEditPetListing() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-pet-page">
-        <BackButton fallback="/vendor/listings" label="Back to listings" />
+        <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings"} label="Back to listings" />
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
             <div className="pet-section-heading">
@@ -358,7 +363,7 @@ export default function VendorEditPetListing() {
               </div>
             </div>
 
-            <label className="pet-field">
+            {!activeBusiness && <label className="pet-field">
               <span className="pet-field-label">
                 Your business <i>*</i>
               </span>
@@ -374,7 +379,7 @@ export default function VendorEditPetListing() {
                 }))}
                 disabled={loadingBusinesses}
               />
-            </label>
+            </label>}
 
             <div className="pet-field">
               <span className="pet-field-label">

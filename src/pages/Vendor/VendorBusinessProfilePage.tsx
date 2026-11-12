@@ -12,6 +12,8 @@ import {
   Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import VendorBusinessUpdateForm, {
   type Business,
 } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
@@ -132,6 +134,7 @@ function ImageFallback({ kind }: { kind: "cover" | "logo" | "pet" }) {
 
 export default function VendorBusinessProfilePage() {
   const navigate = useNavigate();
+  const activeBusiness = useVendorBusiness();
 
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
   const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
@@ -155,7 +158,7 @@ export default function VendorBusinessProfilePage() {
         if (!cancelled) {
           setState({ status: "ready", businesses });
           setSelectedBusinessId(
-            businesses[0]?.id ? String(businesses[0].id) : null,
+            activeBusiness?.id ? String(activeBusiness.id) : businesses[0]?.id ? String(businesses[0].id) : null,
           );
         }
       } catch {
@@ -166,7 +169,7 @@ export default function VendorBusinessProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeBusiness?.id]);
 
   const selectedBusiness =
     state.businesses.find(
@@ -295,11 +298,18 @@ export default function VendorBusinessProfilePage() {
                           type="button"
                           className="bp-business-select"
                           onClick={() => {
-                            setSelectedBusinessId(id);
+                            navigate(vendorBusinessPath(id, "businesses"));
                             setEditingBusinessId(null);
                           }}
                         >
                           {isSelected ? "Viewing" : "View business"}
+                        </button>
+                        <button
+                          type="button"
+                          className="bp-business-select"
+                          onClick={() => navigate(vendorBusinessPath(id, "dashboard"))}
+                        >
+                          Work with this business
                         </button>
                       </article>
                     );

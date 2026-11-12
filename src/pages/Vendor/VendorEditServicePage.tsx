@@ -15,6 +15,8 @@ import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./VendorEditServicePage.css";
 
 /* ------------------------------------------------------------------ */
@@ -25,7 +27,8 @@ import "./VendorEditServicePage.css";
 /* ------------------------------------------------------------------ */
 const SERVICES_URL = `${API_BASE_URL}/api/services/`;
 const serviceUrl = (id: string) => `${SERVICES_URL}${id}/`;
-const AFTER_SAVE_PATH = "/vendor/dashboard";
+const scopedServiceUrl = (id: string, businessId: string | null) =>
+  `${serviceUrl(id)}${businessId ? `?business_id=${encodeURIComponent(businessId)}` : ""}`;
 
 type ServiceStatus = "DRAFT" | "PENDING";
 type ExistingPhoto = {
@@ -46,6 +49,7 @@ type VendorService = {
   duration?: number | null;
   service_area?: string;
   status?: string;
+  business?: string | number;
   images?: ExistingPhoto[];
 };
 
@@ -205,6 +209,8 @@ function ConfirmRemoveDialog({
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 export default function VendorEditServicePage() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const { serviceId = "" } = useParams();
   const navigate = useNavigate();
   const id = serviceId;
@@ -254,13 +260,14 @@ export default function VendorEditServicePage() {
 
     async function loadService() {
       try {
-        const res = await vendorAuthenticatedFetch(serviceUrl(id));
+        const res = await vendorAuthenticatedFetch(scopedServiceUrl(id, activeBusinessId));
         if (!res.ok) {
           throw new Error(
             res.status === 404 ? "Service not found." : await readError(res),
           );
         }
         const service = (await res.json()) as VendorService;
+        if (activeBusinessId && String(service.business) !== activeBusinessId) throw new Error("This service does not belong to the selected business.");
         if (cancelled) return;
         setServiceName(service.name || "");
         setCategory(service.category || "");
@@ -282,7 +289,7 @@ export default function VendorEditServicePage() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, activeBusinessId]);
 
   function addPhotos(files: FileList | null) {
     if (!files) return;
@@ -359,7 +366,7 @@ export default function VendorEditServicePage() {
 
     setSubmitting(status);
     try {
-      const res = await vendorAuthenticatedFetch(serviceUrl(id), {
+      const res = await vendorAuthenticatedFetch(scopedServiceUrl(id, activeBusinessId), {
         method: "PATCH",
         body: formData,
       });
@@ -370,7 +377,7 @@ export default function VendorEditServicePage() {
           : "Submitted. Your changes are held for review before going live.",
       );
       redirectTimer.current = window.setTimeout(
-        () => navigate(AFTER_SAVE_PATH),
+        () => navigate(activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "dashboard") : "/vendor/dashboard"),
         900,
       );
     } catch (err) {
@@ -392,11 +399,11 @@ export default function VendorEditServicePage() {
     setRemoving(true);
     setRemoveError("");
     try {
-      const res = await vendorAuthenticatedFetch(serviceUrl(id), {
+      const res = await vendorAuthenticatedFetch(scopedServiceUrl(id, activeBusinessId), {
         method: "DELETE",
       });
       if (!res.ok) throw new Error(await readError(res));
-      navigate(AFTER_SAVE_PATH, { replace: true });
+      navigate(activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "dashboard") : "/vendor/dashboard", { replace: true });
     } catch (err) {
       setRemoveError(
         err instanceof Error
@@ -434,7 +441,7 @@ export default function VendorEditServicePage() {
         vendorWorkspace
       >
         <div className="dashboard-content vendor-edit-service-page">
-          <BackButton fallback="/vendor/dashboard" label="Back to dashboard" />
+          <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "dashboard") : "/vendor/dashboard"} label="Back to dashboard" />
           <div className="edit-service-section">
             <h2 className="edit-service-empty-title">Service unavailable</h2>
             <p className="edit-service-empty-text">
@@ -457,7 +464,7 @@ export default function VendorEditServicePage() {
       vendorWorkspace
     >
       <div className="dashboard-content vendor-edit-service-page">
-        <BackButton fallback="/vendor/dashboard" label="Back to dashboard" />
+        <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "dashboard") : "/vendor/dashboard"} label="Back to dashboard" />
 
         <form className="edit-service-form" onSubmit={handleSubmit}>
           <section className="edit-service-section edit-service-details">

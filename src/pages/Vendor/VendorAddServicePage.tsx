@@ -6,6 +6,8 @@ import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import API_BASE_URL from "../../services/api";
 import { getCategories, type Category } from "../../services/categoryService";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./VendorAddServicePage.css";
 
 type Business = { id: string; name: string };
@@ -25,6 +27,8 @@ async function readError(response: Response): Promise<string> {
 }
 
 export default function VendorAddServicePage() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessId, setBusinessId] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -33,54 +37,63 @@ export default function VendorAddServicePage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loadedForBusinessId, setLoadedForBusinessId] = useState<string | null | undefined>(undefined);
+  const loading = loadedForBusinessId !== activeBusinessId;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const selectedBusinessId = activeBusinessId ?? businessId;
 
   useEffect(() => {
     document.title = "Add Service - Pawdigree";
     let cancelled = false;
+
     async function loadOptions() {
       try {
         const [businessResponse, categoryOptions] = await Promise.all([
-          vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`),
+          activeBusinessId === null
+            ? vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`)
+            : Promise.resolve(null),
           getCategories(),
         ]);
-        if (!businessResponse.ok) throw new Error(await readError(businessResponse));
-        const data = (await businessResponse.json()) as BusinessResponse;
-        const businessOptions = Array.isArray(data) ? data : data.results ?? [];
+        if (businessResponse) {
+          if (!businessResponse.ok) throw new Error(await readError(businessResponse));
+          const data = (await businessResponse.json()) as BusinessResponse;
+          const businessOptions = Array.isArray(data) ? data : data.results ?? [];
+          if (cancelled) return;
+          setBusinesses(businessOptions);
+          setBusinessId(businessOptions[0]?.id ?? "");
+        }
         if (cancelled) return;
-        setBusinesses(businessOptions);
-        setBusinessId(businessOptions[0]?.id ?? "");
         setCategories(categoryOptions);
         setCategoryId(categoryOptions[0] ? String(categoryOptions[0].id) : "");
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : "Could not load service options.");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoadedForBusinessId(activeBusinessId);
       }
     }
+
     void loadOptions();
     return () => { cancelled = true; };
-  }, []);
+  }, [activeBusinessId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSuccess("");
     const selectedCategory = categories.find((item) => String(item.id) === categoryId);
-    if (!businessId || !selectedCategory) {
+    if (!selectedBusinessId || !selectedCategory) {
       setError("Select a business and service category before saving.");
       return;
     }
     setSubmitting(true);
     try {
-      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/services/`, {
+      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/services/${activeBusinessId !== null ? `?business_id=${encodeURIComponent(selectedBusinessId)}` : ""}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          business: businessId,
+          business: selectedBusinessId,
           category: selectedCategory.id,
           name: serviceName.trim(),
           service_type: selectedCategory.name,
@@ -106,12 +119,12 @@ export default function VendorAddServicePage() {
     }
   }
 
-  const hasFormOptions = businesses.length > 0 && categories.length > 0;
+  const hasFormOptions = (activeBusinessId !== null || businesses.length > 0) && categories.length > 0;
 
   return (
     <VendorLayout title="Add a service" description="Tell customers about the care and services your business offers." vendorWorkspace>
       <div className="dashboard-content vendor-service-page">
-        <BackButton fallback="/vendor/dashboard" label="Back to dashboard" />
+        <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "dashboard") : "/vendor/dashboard"} label="Back to dashboard" />
         <form className="service-listing-form" onSubmit={handleSubmit}>
           <section className="service-form-section">
             <div className="service-section-heading">
@@ -120,14 +133,14 @@ export default function VendorAddServicePage() {
             </div>
 
             {loading && <p className="service-form-message" role="status">Loading your businesses and service categories...</p>}
-            <label className="service-field">
+            {!activeBusiness && <label className="service-field">
               Your business <span aria-hidden="true"></span>
               <select value={businessId} onChange={(event) => setBusinessId(event.target.value)} disabled={loading || businesses.length === 0} required>
                 <option value="">{loading ? "Loading businesses..." : "Select a business"}</option>
                 {businesses.map((business) => <option key={business.id} value={business.id}>{business.name}</option>)}
               </select>
-            </label>
-            {!loading && businesses.length === 0 && <p className="service-inline-note">Register a business before adding a service. <Link to="/business-registration">Register a business</Link></p>}
+            </label>}
+            {!activeBusiness && !loading && businesses.length === 0 && <p className="service-inline-note">Register a business before adding a service. <Link to="/business-registration">Register a business</Link></p>}
 
             <label className="service-field">
               Service category <span aria-hidden="true"></span>

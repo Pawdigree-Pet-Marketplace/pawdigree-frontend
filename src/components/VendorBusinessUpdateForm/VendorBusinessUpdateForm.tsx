@@ -83,15 +83,18 @@ interface Props {
   business?: Business | null;
   onSaved: (business: Business) => void;
   onCancel: () => void;
+  showCategory?: boolean;
 }
 
 export default function VendorBusinessUpdateForm({
   business,
   onSaved,
   onCancel,
+  showCategory = true,
 }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const loadingCategories = showCategory && !categoriesLoaded;
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -141,8 +144,9 @@ export default function VendorBusinessUpdateForm({
   const [hoursEdits, setHoursEdits] = useState<BusinessHours | null>(null);
   const hours = hoursEdits ?? baseHours;
 
-  // Load the category list once.
+  // Load the category list only when its field is shown.
   useEffect(() => {
+    if (!showCategory) return;
     let cancelled = false;
     fetch(`${API_BASE_URL}/api/categories/`, {
       headers: {
@@ -160,12 +164,12 @@ export default function VendorBusinessUpdateForm({
         // Leave the category list empty if the request fails
       })
       .finally(() => {
-        if (!cancelled) setLoadingCategories(false);
+        if (!cancelled) setCategoriesLoaded(true);
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [showCategory]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -202,7 +206,7 @@ export default function VendorBusinessUpdateForm({
     if (!form.description.trim()) err.description = "Description is required.";
     else if (form.description.trim().length > 500)
       err.description = "Description max 500 chars.";
-    if (!form.businessType)
+    if (showCategory && !form.businessType)
       err.businessType = "Please select a business category.";
     if (!form.address.trim()) err.address = "Address is required.";
     if (!form.cityDistrict.trim())
@@ -240,16 +244,16 @@ export default function VendorBusinessUpdateForm({
     setSaving(true);
     try {
       const phone = parsePhoneNumberFromString(form.businessPhone, "UG");
-      const payload = {
+      const payload: Record<string, unknown> = {
         name: form.businessName.trim(),
         description: form.description.trim(),
         contact: phone?.number,
         email: form.businessEmail.trim(),
         address: form.address.trim(),
         city_district: form.cityDistrict.trim(),
-        category: Number(form.businessType),
         business_hours: hours,
       };
+      if (showCategory) payload.category = Number(form.businessType);
       const url = isExistingBusiness
         ? `${API_BASE_URL}/api/businesses/${business?.id}/`
         : `${API_BASE_URL}/api/businesses/`;
@@ -341,7 +345,7 @@ export default function VendorBusinessUpdateForm({
         )}
       </div>
 
-      <div className="form-group">
+      {showCategory && <div className="form-group">
         <label htmlFor="businessType">
           Business category <span className="req-star">*</span>
         </label>
@@ -365,7 +369,7 @@ export default function VendorBusinessUpdateForm({
         {errors.businessType && (
           <p className="field-error">{errors.businessType}</p>
         )}
-      </div>
+      </div>}
 
       <div className="form-row">
         <div className="form-group">
