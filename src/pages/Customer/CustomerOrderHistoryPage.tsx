@@ -240,14 +240,23 @@ export default function CustomerOrderHistoryPage() {
                   ))}
                 </div>
 
-                {/* ORDER TOTAL */}
-                <div className="customer-order-footer">
-                  <span>Order Total</span>
+                {/* ORDER TOTAL AND DETAILS LINK */}
+<div className="customer-order-footer">
+  <div>
+    <span>Order Total</span>
 
-                  <strong>
-                    {formatPrice(order.total_amount)}
-                  </strong>
-                </div>
+    <strong>
+      {formatPrice(order.total_amount)}
+    </strong>
+  </div>
+
+  <Link
+    to={`/customer/orders/${order.id}`}
+    className="customer-order-details-link"
+  >
+    View Order Details →
+  </Link>
+</div>
               </article>
             ))}
           </section>

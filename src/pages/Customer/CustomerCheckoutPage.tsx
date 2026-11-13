@@ -560,8 +560,8 @@ export default function CustomerCheckoutPage() {
               </div>
 
               <p className="customer-checkout-delivery-note">
-                Delivery fees, if applicable, will be calculated
-                separately.
+                 Delivery fees are not included in this payment. You will pay
+                 the delivery fee separately when your order is delivered.
               </p>
 
               <Link
