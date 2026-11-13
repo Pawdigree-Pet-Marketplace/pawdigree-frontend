@@ -21,7 +21,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { clearAuthSession } from "../../../services/auth/authStorage";
 import { useVendorBusiness } from "../../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
-
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
   "/vendor/profile",
@@ -30,8 +29,8 @@ const implementedVendorPages = new Set([
   "/vendor/services/new",
   "/vendor/business-profile",
   "/vendor/availability",
+  "/vendor/orders",
 ]);
-
 const navigationGroups = [
   {
     title: "WORKSPACE",
@@ -151,23 +150,43 @@ export default function VendorSidebar({
 
             {scopedItems.map((item) => {
               const Icon = item.icon;
-              const scopedPath = business
-                ? item.path === "/vendor/dashboard"
-                  ? vendorBusinessPath(String(business.id), "dashboard")
-                  : item.path === "/vendor/profile"
-                    ? vendorBusinessPath(String(business.id), "store-profile")
-                    : item.path === "/vendor/listings"
-                      ? vendorBusinessPath(String(business.id), "listings")
-                      : item.path === "/vendor/adoption-applications"
-                        ? vendorBusinessPath(String(business.id), "adoption-applications")
-                        : item.path === "/vendor/services/new"
-                          ? vendorBusinessPath(String(business.id), "services/new")
-                          : item.path === "/vendor/merchandise"
-                            ? vendorBusinessPath(String(business.id), "merchandise")
-                            : item.path === "/vendor/business-profile"
-                              ? vendorBusinessPath(String(business.id), "businesses")
-                            : item.path
-                : item.path;
+             
+const scopedPath: string = (() => {
+  if (!business) return item.path;
+
+  switch (item.path) {
+    case "/vendor/dashboard":
+      return vendorBusinessPath(String(business.id), "dashboard");
+
+    case "/vendor/profile":
+      return vendorBusinessPath(String(business.id), "store-profile");
+
+    case "/vendor/listings":
+      return vendorBusinessPath(String(business.id), "listings");
+
+    case "/vendor/adoption-applications":
+      return vendorBusinessPath(
+        String(business.id),
+        "adoption-applications"
+      );
+
+    case "/vendor/services/new":
+      return vendorBusinessPath(String(business.id), "services/new");
+
+    case "/vendor/merchandise":
+      return vendorBusinessPath(String(business.id), "merchandise");
+
+    case "/vendor/orders":
+      return vendorBusinessPath(String(business.id), "orders");
+
+    case "/vendor/business-profile":
+      return vendorBusinessPath(String(business.id), "businesses");
+
+    default:
+      return item.path;
+  }
+})();
+
               const isActive =
                 currentPath === scopedPath ||
                 (business && item.path === "/vendor/profile" && currentPath.endsWith("/store-profile")) ||
@@ -200,17 +219,23 @@ export default function VendorSidebar({
                 </>
               );
 
-              if (!implementedVendorPages.has(item.path) && !(business && ["/vendor/dashboard", "/vendor/profile", "/vendor/listings", "/vendor/adoption-applications", "/vendor/services/new", "/vendor/merchandise"].includes(item.path))) {
-                return (
-                  <span
-                    key={item.label}
-                    className="dashboard-nav-item dashboard-nav-item-unavailable"
-                    aria-disabled="true"
-                    title={`${item.label} isn't available yet`}
-                  >
-                    {itemContent}
-                  </span>
-                );
+        
+              if (
+                !implementedVendorPages.has(item.path) &&
+                !(
+                  business &&
+                  [
+                    "/vendor/dashboard",
+                    "/vendor/profile",
+                    "/vendor/listings",
+                    "/vendor/adoption-applications",
+                    "/vendor/services/new",
+                    "/vendor/merchandise",
+                    "/vendor/orders",
+                  ].includes(item.path)
+                )
+              ) {
+                return null;
               }
 
               return (
@@ -228,6 +253,7 @@ export default function VendorSidebar({
           </div>
           );
         })}
+
       </nav>
 
       <div className="dashboard-sidebar-footer">

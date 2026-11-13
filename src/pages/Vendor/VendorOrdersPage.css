@@ -1,0 +1,348 @@
+
+.vendor-orders-page {
+  width: 100%;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+}
+
+.vendor-orders-toolbar,
+.vendor-order-card-header,
+.vendor-order-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vendor-orders-toolbar {
+  margin-bottom: 22px;
+}
+
+.vendor-orders-toolbar h2 {
+  margin: 0 0 5px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 24px;
+}
+
+.vendor-orders-toolbar p,
+.order-date {
+  margin: 0;
+  color: #737b78;
+  font-size: 14px;
+}
+
+.orders-refresh-button,
+.orders-filter-button,
+.order-primary-action,
+.order-cancel-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 9px;
+  padding: 10px 15px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.orders-refresh-button {
+  border: 1px solid #d9e4e0;
+  background: #fff;
+  color: #216c68;
+}
+
+.orders-refresh-button:disabled,
+.order-primary-action:disabled,
+.order-cancel-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.orders-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 22px;
+}
+
+.orders-filter-button {
+  border: 1px solid #dfe7e3;
+  background: #fff;
+  color: #56615d;
+  font-size: 13px;
+}
+
+.orders-filter-button.selected,
+.order-primary-action {
+  border: 1px solid #216c68;
+  background: #216c68;
+  color: #fff;
+}
+
+.orders-filter-button:hover,
+.orders-refresh-button:hover {
+  border-color: #216c68;
+}
+
+.vendor-orders-list {
+  display: grid;
+  gap: 18px;
+}
+
+.vendor-order-card {
+  overflow: hidden;
+  border: 1px solid #e5eae7;
+  border-radius: 15px;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgb(44 48 47 / 4%);
+}
+
+.order-reference {
+  color: #216c68;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.order-date {
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.order-status-badge {
+  border-radius: 30px;
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.status-paid {
+  background: #fff1df;
+  color: #9a5b0b;
+}
+
+.status-processing {
+  background: #e8f1ff;
+  color: #285b9a;
+}
+
+.status-shipped {
+  background: #eee9ff;
+  color: #6545a0;
+}
+
+.status-delivered {
+  background: #e4f4e9;
+  color: #287346;
+}
+
+.status-cancelled {
+  background: #fde9e7;
+  color: #a33d35;
+}
+
+.vendor-order-customer {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f7f3e8;
+}
+
+.vendor-order-customer > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.order-field-label {
+  color: #78817d;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.vendor-order-customer strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.vendor-order-items h4 {
+  margin: 0 0 10px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 16px;
+}
+
+.vendor-order-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0ee;
+  font-size: 13px;
+}
+
+.vendor-order-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vendor-order-item span {
+  color: #78817d;
+  font-size: 12px;
+}
+
+.vendor-order-notes {
+  margin-top: 14px;
+  border-left: 3px solid #fb8665;
+  padding: 10px 12px;
+  background: #fff7f3;
+  font-size: 13px;
+}
+
+.vendor-order-card-footer {
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0ee;
+}
+
+.vendor-order-total {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vendor-order-total span {
+  color: #78817d;
+  font-size: 12px;
+}
+
+.vendor-order-total strong {
+  color: #216c68;
+  font-size: 19px;
+}
+
+.vendor-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.order-primary-action,
+.order-cancel-action {
+  border: 1px solid transparent;
+  font-size: 12px;
+}
+
+.order-primary-action:hover {
+  background: #185652;
+}
+
+.order-cancel-action {
+  border-color: #f3c9c4;
+  background: #fff;
+  color: #b34b41;
+}
+
+.order-completed-label,
+.order-cancelled-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #287346;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.order-cancelled-label {
+  color: #a33d35;
+}
+
+.orders-notice,
+.orders-error {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  border-radius: 9px;
+  padding: 12px 14px;
+  font-size: 13px;
+}
+
+.orders-notice {
+  background: #e8f5ed;
+  color: #287346;
+}
+
+.orders-error {
+  background: #fff0ee;
+  color: #a33d35;
+}
+
+.orders-empty-state,
+.orders-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 230px;
+  border: 1px dashed #d8e2dd;
+  border-radius: 14px;
+  background: #fff;
+  color: #78817d;
+  text-align: center;
+}
+
+.orders-empty-state h3 {
+  margin: 12px 0 5px;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+}
+
+.orders-empty-state p,
+.orders-message p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.orders-spinner {
+  animation: orders-spin 1s linear infinite;
+}
+
+@keyframes orders-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .vendor-order-customer {
+    grid-template-columns: 1fr;
+  }
+
+  .vendor-order-card {
+    padding: 15px;
+  }
+
+  .vendor-orders-toolbar {
+    align-items: flex-start;
+  }
+
+  .vendor-order-card-header {
+    align-items: flex-start;
+  }
+
+  .vendor-order-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
