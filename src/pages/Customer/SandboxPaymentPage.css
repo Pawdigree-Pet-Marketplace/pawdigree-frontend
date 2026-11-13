@@ -1,0 +1,356 @@
+/* =========================================
+   SANDBOX PAYMENT PAGE
+========================================= */
+
+.sandbox-payment-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  background: #fbfaf7;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+  box-sizing: border-box;
+}
+
+.sandbox-payment-layout *,
+.sandbox-payment-layout *::before,
+.sandbox-payment-layout *::after {
+  box-sizing: border-box;
+}
+
+.sandbox-payment-main {
+  width: 100%;
+  max-width: 1100px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 36px clamp(20px, 4vw, 56px);
+}
+
+.sandbox-payment-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 30px;
+  padding: 32px;
+  border-radius: 22px;
+  background: linear-gradient(
+    120deg,
+    #f7f3e8 0%,
+    #e8f2ed 65%,
+    #fce9e1 100%
+  );
+}
+
+.sandbox-payment-eyebrow {
+  margin: 0;
+  color: #216c68;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.sandbox-payment-heading h1 {
+  margin: 8px 0;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 600;
+}
+
+.sandbox-payment-heading p:last-child {
+  margin: 0;
+  color: #656c68;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sandbox-payment-heading > svg {
+  width: 65px;
+  height: 65px;
+  color: #216c68;
+  opacity: 0.75;
+}
+
+/* =========================================
+   PAYMENT CARD
+========================================= */
+
+.sandbox-payment-card {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 34px;
+  border: 1px solid #e7e5de;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(44, 48, 47, 0.06);
+}
+
+.sandbox-payment-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  gap: 15px;
+  color: #216c68;
+}
+
+.sandbox-payment-loading p {
+  margin: 0;
+  color: #656c68;
+  font-size: 14px;
+}
+
+/* =========================================
+   PAYMENT RESULT
+========================================= */
+
+.sandbox-payment-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.sandbox-payment-result > svg {
+  margin-bottom: 12px;
+}
+
+.sandbox-payment-result h2 {
+  margin: 5px 0 8px;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+  font-size: 27px;
+}
+
+.sandbox-payment-result p {
+  margin: 0;
+  color: #656c68;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.sandbox-payment-success > svg {
+  color: #216c68;
+}
+
+.sandbox-payment-failure > svg {
+  color: #c6533d;
+}
+
+.sandbox-payment-waiting > svg {
+  color: #b77a20;
+}
+
+/* =========================================
+   PAYMENT DETAILS
+========================================= */
+
+.sandbox-payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 28px 0;
+  border-top: 1px solid #e7e5de;
+}
+
+.sandbox-payment-details > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid #efeee9;
+}
+
+.sandbox-payment-details span {
+  color: #777d79;
+  font-size: 13px;
+}
+
+.sandbox-payment-details strong {
+  color: #2c302f;
+  font-size: 13px;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.sandbox-payment-status {
+  color: #216c68 !important;
+}
+
+/* =========================================
+   SIMULATION ACTIONS
+========================================= */
+
+.sandbox-payment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sandbox-payment-actions > p {
+  margin: 0 0 5px;
+  color: #777d79;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.sandbox-payment-success-button,
+.sandbox-payment-failure-button {
+  width: 100%;
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.sandbox-payment-success-button {
+  background: #216c68;
+}
+
+.sandbox-payment-success-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #185652;
+}
+
+.sandbox-payment-failure-button {
+  background: #b84e3a;
+}
+
+.sandbox-payment-failure-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #983b2b;
+}
+
+.sandbox-payment-success-button:disabled,
+.sandbox-payment-failure-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   MESSAGES AND LINKS
+========================================= */
+
+.sandbox-payment-error {
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border: 1px solid #f3c5b8;
+  border-radius: 10px;
+  background: #fff3ef;
+  color: #a8422d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.sandbox-payment-primary-link {
+  width: 100%;
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 13px 18px;
+  border-radius: 10px;
+  background: #216c68;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.sandbox-payment-primary-link:hover {
+  background: #185652;
+}
+
+.sandbox-payment-result a {
+  margin-top: 18px;
+  color: #216c68;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sandbox-payment-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px 0 12px;
+  color: #858b87;
+  font-size: 12px;
+  text-align: center;
+}
+
+.sandbox-payment-back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #216c68;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.sandbox-payment-back-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 768px) {
+  .sandbox-payment-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sandbox-payment-main {
+    padding: 24px 18px;
+  }
+
+  .sandbox-payment-heading {
+    padding: 25px;
+  }
+
+  .sandbox-payment-card {
+    padding: 27px 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sandbox-payment-main {
+    padding: 18px 13px;
+  }
+
+  .sandbox-payment-heading {
+    padding: 22px 18px;
+  }
+
+  .sandbox-payment-heading > svg {
+    width: 42px;
+    height: 42px;
+  }
+
+  .sandbox-payment-card {
+    padding: 23px 17px;
+  }
+
+  .sandbox-payment-details > div {
+    gap: 10px;
+  }
+}

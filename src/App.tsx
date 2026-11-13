@@ -28,6 +28,7 @@ import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
 import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
+import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
 import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
 import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
@@ -175,6 +176,14 @@ function App() {
       />
 
           {/* CUSTOMER CHECKOUT */}
+      <Route
+        path="/sandbox-pay"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <SandboxPaymentPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/customer/checkout"
         element={

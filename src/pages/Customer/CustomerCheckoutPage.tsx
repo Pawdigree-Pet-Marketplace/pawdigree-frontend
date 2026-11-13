@@ -1,5 +1,4 @@
-
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   ShoppingBag,
@@ -7,15 +6,23 @@ import {
   Clock,
   CheckCircle,
   PawPrint,
+  CreditCard,
+  Smartphone,
 } from "lucide-react";
 
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 import { useCart } from "../../context/CartContext";
+
 import {
   createCheckoutOrder,
   type CheckoutPayload,
   type CustomerOrder,
 } from "../../services/orders/orderApi";
+
+import {
+  getPaymentMethods,
+  startPayment,
+} from "../../services/payments/paymentApi";
 
 import "./CustomerCheckoutPage.css";
 
@@ -36,10 +43,46 @@ export default function CustomerCheckoutPage() {
     notes: "",
   });
 
+  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
+  const [currency, setCurrency] = useState("UGX");
+  const [selectedMethod, setSelectedMethod] = useState("");
+
+  const [methodsLoading, setMethodsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [startingPayment, setStartingPayment] = useState(false);
+
   const [error, setError] = useState("");
   const [createdOrder, setCreatedOrder] =
     useState<CustomerOrder | null>(null);
+
+  // Load the payment methods supported by the backend.
+  useEffect(() => {
+    async function loadPaymentMethods() {
+      setMethodsLoading(true);
+      setError("");
+
+      try {
+        const response = await getPaymentMethods();
+
+        setPaymentMethods(response.methods);
+        setCurrency(response.currency);
+
+        if (response.methods.length > 0) {
+          setSelectedMethod(response.methods[0]);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to load payment methods.",
+        );
+      } finally {
+        setMethodsLoading(false);
+      }
+    }
+
+    loadPaymentMethods();
+  }, []);
 
   // Update a form field when the customer types.
   function handleChange(
@@ -52,16 +95,75 @@ export default function CustomerCheckoutPage() {
     }));
   }
 
-  // Submit the shipping details and create the order.
+  // Convert backend method names into readable labels.
+  function getMethodLabel(method: string) {
+    switch (method) {
+      case "card":
+        return "Card";
+
+      case "mobile_money":
+        return "Mobile Money";
+
+      default:
+        return method
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+    }
+  }
+
+  // Start payment for an order that has already been created.
+  // This function can be called again without creating another order.
+  async function handleStartPayment(orderId: number) {
+    if (!selectedMethod) {
+      setError("Please select a payment method.");
+      return;
+    }
+
+    setError("");
+    setStartingPayment(true);
+
+    try {
+      const payment = await startPayment(orderId, selectedMethod);
+
+      if (!payment.payment_url) {
+        throw new Error("The backend did not provide a payment link.");
+      }
+
+      // Redirect the customer to the sandbox payment page.
+      window.location.assign(payment.payment_url);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to start payment. Please try again.",
+      );
+    } finally {
+      setStartingPayment(false);
+    }
+  }
+
+  // Create the order once, then start its payment.
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!selectedMethod) {
+      setError("Please select a payment method.");
+      return;
+    }
 
     setError("");
     setSubmitting(true);
 
     try {
       const order = await createCheckoutOrder(formData);
+
+      // Save the order before attempting payment.
+      // A payment failure must not cause another order to be created.
       setCreatedOrder(order);
+
+      // Start payment using the newly created order.
+      await handleStartPayment(order.id);
     } catch (err) {
       setError(
         err instanceof Error
@@ -73,8 +175,9 @@ export default function CustomerCheckoutPage() {
     }
   }
 
-  // Format prices supplied by the backend or cart.
-  const formatPrice = (price: string) => `UGX ${price}`;
+  // Format prices using the currency returned by the backend.
+  const formatPrice = (price: string) =>
+    `${currency} ${Number(price).toLocaleString("en-UG")}`;
 
   // Show the order confirmation after the backend creates it.
   if (createdOrder) {
@@ -128,17 +231,42 @@ export default function CustomerCheckoutPage() {
               </strong>
             </div>
 
+            {error && (
+              <div className="customer-checkout-error" role="alert">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="customer-checkout-primary-button"
+              disabled={startingPayment}
+              onClick={() => handleStartPayment(createdOrder.id)}
+            >
+              {startingPayment
+                ? "Starting Payment..."
+                : "Continue to Payment"}
+            </button>
+
+            <p className="customer-checkout-secure-note">
+              If payment did not open, you can try again using the
+              button above. Your existing order will be used.
+            </p>
+
             <p className="customer-checkout-confirmation-note">
-              Your cart has not been cleared. It will remain available
-              until payment is confirmed.
+              This is a sandbox payment for testing. No real money
+              will be charged. Your cart is not manually cleared
+              during checkout.
             </p>
 
             <Link
               to="/customer/orders"
-              className="customer-checkout-primary-button"
+              className="customer-checkout-secondary-link"
             >
               View My Orders
             </Link>
+
+            <br />
 
             <Link
               to="/customer/cart"
@@ -193,7 +321,7 @@ export default function CustomerCheckoutPage() {
           </section>
         ) : (
           <div className="customer-checkout-content">
-            {/* SHIPPING DETAILS FORM */}
+            {/* SHIPPING DETAILS AND PAYMENT FORM */}
             <section className="customer-checkout-form-section">
               <div className="customer-checkout-section-heading">
                 <MapPin size={22} />
@@ -325,17 +453,76 @@ export default function CustomerCheckoutPage() {
                   />
                 </div>
 
+                {/* PAYMENT METHOD SELECTION */}
+                <div className="customer-checkout-payment-section">
+                  <div className="customer-checkout-section-heading">
+                    <CreditCard size={22} />
+
+                    <div>
+                      <h2>Payment Method</h2>
+                      <p>Choose how you would like to pay.</p>
+                    </div>
+                  </div>
+
+                  {methodsLoading ? (
+                    <p className="customer-checkout-payment-message">
+                      Loading available payment methods...
+                    </p>
+                  ) : paymentMethods.length === 0 ? (
+                    <p className="customer-checkout-payment-message">
+                      No payment methods are currently available.
+                      Please try again later.
+                    </p>
+                  ) : (
+                    <div className="customer-checkout-payment-options">
+                      {paymentMethods.map((method) => (
+                        <label
+                          key={method}
+                          className={`customer-checkout-payment-option ${
+                            selectedMethod === method ? "selected" : ""
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="payment_method"
+                            value={method}
+                            checked={selectedMethod === method}
+                            onChange={() => setSelectedMethod(method)}
+                          />
+
+                          {method === "mobile_money" ? (
+                            <Smartphone size={22} />
+                          ) : (
+                            <CreditCard size={22} />
+                          )}
+
+                          <span>{getMethodLabel(method)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   className="customer-checkout-primary-button"
-                  disabled={submitting || hasUnavailableItems}
+                  disabled={
+                    submitting ||
+                    methodsLoading ||
+                    paymentMethods.length === 0 ||
+                    !selectedMethod ||
+                    hasUnavailableItems
+                  }
                 >
-                  {submitting ? "Placing Order..." : "Place Order"}
+                  {submitting
+                    ? "Creating Order..."
+                    : "Place Order & Continue to Payment"}
                 </button>
 
                 <p className="customer-checkout-secure-note">
-                  Your order will be created with a pending payment
-                  status. Payment is not processed by this form.
+                  You will be redirected to a sandbox payment page.
+                  This is a test integration and does not charge real
+                  money.
                 </p>
               </form>
             </section>
