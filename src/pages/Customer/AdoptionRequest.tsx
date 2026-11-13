@@ -45,8 +45,6 @@ function getCustomerAccessToken(): string | null {
 }
 
 export default function AdoptionRequest() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<AdoptionForm>(initialForm);
   const [errors, setErrors] = useState<ApiErrors>({});

@@ -590,6 +590,23 @@
 
 .customer-cart-summary .customer-cart-button {
   width: 100%;
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #216c68;
+  color: #ffffff;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.customer-cart-summary .customer-cart-button:hover:not(:disabled) {
+  background: #185652;
+  transform: translateY(-1px);
 }
 
 .customer-cart-summary .customer-cart-button:disabled {
