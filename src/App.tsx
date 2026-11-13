@@ -1,16 +1,12 @@
-
-
 import { Navigate, Route, Routes } from "react-router-dom";
-
 import CustomerShell from "./layouts/CustomerShell/CustomerShell";
 import AuthLayout from "./layouts/AuthLayout/AuthLayout";
 import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayout";
 import VendorLayout from "./layouts/VendorLayout/VendorLayout";
-
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
+import PublicLayout from "./layouts/PublicLayout/PublicLayout";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
@@ -30,12 +26,12 @@ import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
 import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
 import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
+import CustomerOrderDetailsPage from "./pages/Customer/CustomerOrderDetailsPage";
 import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
@@ -61,13 +57,15 @@ function App() {
   return (
     <Routes>
       {/* Public pages */}
+      {/* Landing page uses the public navigation and footer */}
+      <Route element={<PublicLayout />}>
       <Route path="/" element={<LandingPage />} />
+      </Route>
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsAndConditionsPage />} />
       <Route path="/vendor" element={<VendorLandingPage />} />
       <Route path="/pets" element={<CustomerPetCataloguePage />} />
       <Route path="/pets/:petId" element={<PetsDetailPage />} />
-      <Route path="/vendors" element={<CustomerVendorsPage />} />
       <Route path="/adoption-request" element={<AdoptionRequest />} />
       <Route
   path="/vendor/orders"
@@ -199,6 +197,15 @@ function App() {
         element={
           <ProtectedRoute role="CUSTOMER">
             <CustomerOrderHistoryPage />
+          </ProtectedRoute>
+        }
+      />
+            {/* INDIVIDUAL CUSTOMER ORDER DETAILS */}
+      <Route
+        path="/customer/orders/:orderId"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerOrderDetailsPage />
           </ProtectedRoute>
         }
       />
