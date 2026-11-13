@@ -1,12 +1,15 @@
 
+
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import CustomerShell from "./layouts/CustomerShell/CustomerShell";
+import AuthLayout from "./layouts/AuthLayout/AuthLayout";
+import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayout";
+import VendorLayout from "./layouts/VendorLayout/VendorLayout";
+
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AuthLayout from "./layouts/AuthLayout/AuthLayout";
-import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayout";
 
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
@@ -26,27 +29,27 @@ import RegistrationPage from "./pages/Customer/RegistrationPage";
 import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
 import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
+import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
+import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 
-import DocumentUpload from "./pages/Vendor/DocumentUpload";
+import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
+import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
+import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
+import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
+import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
+import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
+import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorAddServicePage from "./pages/Vendor/VendorAddServicePage";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
-import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorCategorySelector from "./pages/Vendor/VendorCategorySelector";
-import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
-import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import VendorAvailabilityPage from "./pages/Vendor/VendorAvailabilityPage";
-import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import VendorEditServicePage from "./pages/Vendor/VendorEditServicePage";
 import VendorServiceAvailabilityPage from "./pages/Vendor/VendorServiceAvailabilityPage";
-import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
-import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
-import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
@@ -65,6 +68,14 @@ function App() {
       <Route path="/pets/:petId" element={<PetsDetailPage />} />
       <Route path="/vendors" element={<CustomerVendorsPage />} />
       <Route path="/adoption-request" element={<AdoptionRequest />} />
+      <Route
+  path="/vendor/orders"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorOrdersPage />
+    </ProtectedRoute>
+  }
+/>
       <Route
         path="/customer/my-requests"
         element={
@@ -402,6 +413,16 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/vendor/business/:businessId/orders"
+  element={
+    <ProtectedRoute role="VENDOR">
+      <VendorBusinessRoute>
+        <VendorOrdersPage />
+      </VendorBusinessRoute>
+    </ProtectedRoute>
+  }
+/>
       <Route
         path="/vendor/business/:businessId/services/:serviceId/availability"
         element={
