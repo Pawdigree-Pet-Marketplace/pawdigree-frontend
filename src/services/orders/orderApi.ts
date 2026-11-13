@@ -37,6 +37,14 @@ export interface CustomerOrder {
   vendor_orders: VendorOrder[];
 }
 
+export interface CheckoutPayload {
+  shipping_name: string;
+  shipping_phone: string;
+  shipping_address: string;
+  shipping_city_district: string;
+  notes?: string;
+}
+
 // Build the customer order history URL.
 function getOrdersUrl(): string {
   if (!API_BASE_URL) {
@@ -88,4 +96,79 @@ export async function getCustomerOrders(): Promise<CustomerOrder[]> {
   }
 
   return data as CustomerOrder[];
+}
+
+
+// GET /api/orders/my-orders/<id>/
+export async function getCustomerOrderById(
+  orderId: number,
+): Promise<CustomerOrder> {
+  const orderUrl = new URL(
+    `${orderId}/`,
+    getOrdersUrl(),
+  ).toString();
+
+  const response = await customerAuthenticatedFetch(orderUrl);
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+
+  const data: unknown = await response.json();
+
+  if (
+    !data ||
+    typeof data !== "object" ||
+    !("id" in data)
+  ) {
+    throw new Error(
+      "The backend returned an invalid order details response.",
+    );
+  }
+
+  return data as CustomerOrder;
+}
+
+
+// Build the customer checkout URL.
+function getCheckoutUrl(): string {
+  if (!API_BASE_URL) {
+    throw new Error("The backend API URL is not configured.");
+  }
+
+  return new URL("/api/orders/checkout/", API_BASE_URL).toString();
+}
+
+// POST /api/orders/checkout/
+export async function createCheckoutOrder(
+  payload: CheckoutPayload,
+): Promise<CustomerOrder> {
+  const response = await customerAuthenticatedFetch(
+    getCheckoutUrl(),
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+
+  const data: unknown = await response.json();
+
+  if (
+    !data ||
+    typeof data !== "object" ||
+    !("id" in data)
+  ) {
+    throw new Error(
+      "The backend returned an invalid checkout response.",
+    );
+  }
+
+  return data as CustomerOrder;
 }

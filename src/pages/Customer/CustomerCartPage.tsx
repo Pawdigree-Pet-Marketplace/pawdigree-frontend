@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag, PawPrint, Sparkles } from "lucide-react";
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
 import { useCart } from "../../context/CartContext";
 import "./CustomerCartPage.css";
 
 export default function CustomerCartPage() {
+  const navigate = useNavigate();
+
   const {
     cartItems,
     updateQuantity,
@@ -220,6 +222,15 @@ export default function CustomerCartPage() {
                 Delivery fees, if applicable, will be calculated
                 separately.
               </p>
+
+              <button
+                type="button"
+                className="customer-cart-button"
+                disabled={loading || hasUnavailableItems}
+                onClick={() => navigate("/customer/checkout")}
+      >
+         Proceed to Checkout
+         </button>
             </aside>
           </div>
         )}
