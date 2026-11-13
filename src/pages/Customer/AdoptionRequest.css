@@ -270,13 +270,12 @@
 }
 /* Pawdigree adoption layout — final targeted correction */
 
-/* Preserve the dashboard sidebar and let the content use remaining space */
-.customer-dashboard-layout {
+/* Keep this layout correction exclusive to the adoption request page */
+.customer-dashboard-layout:has(.adoption-page) {
   display: flex;
   align-items: stretch;
   min-height: 100vh;
 }
-
 .customer-dashboard-main.adoption-page {
   flex: 1 1 0;
   min-width: 0;
