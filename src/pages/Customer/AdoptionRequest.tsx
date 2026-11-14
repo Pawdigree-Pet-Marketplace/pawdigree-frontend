@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   Check,
@@ -45,7 +46,6 @@ function getCustomerAccessToken(): string | null {
 }
 
 export default function AdoptionRequest() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<AdoptionForm>(initialForm);
@@ -57,9 +57,7 @@ export default function AdoptionRequest() {
   } | null>(null);
 
   // Open this page with /adoption-request?pet_id=123.
-  const petId = Number(
-    new URLSearchParams(window.location.search).get("pet_id"),
-  );
+  const petId = Number(searchParams.get("pet_id"));
   const petName = "your selected pet";
 
   function update<K extends keyof AdoptionForm>(

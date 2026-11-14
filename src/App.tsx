@@ -8,6 +8,9 @@ import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayo
 import PublicLayout from "./layouts/PublicLayout/PublicLayout";
 import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
+import CustomerCartPage from "./pages/Customer/CustomerCartPage";
+import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
+import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
 import AdoptionRequest from "./pages/Customer/AdoptionRequest";
@@ -18,8 +21,12 @@ import ExplorePets from "./pages/Customer/ExplorePets";
 import MerchandisePage from "./pages/Customer/MerchandisePage";
 import ProductDetailsPage from "./pages/Customer/ProductDetailsPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
-import PetsDetailPage from "./pages/Customer/PetsDetailPage"; 
-import AdoptionRequest from "./pages/Customer/AdoptionRequest";
+import PetsDetailPage from "./pages/Customer/PetsDetailPage";
+import ProfilePage from "./pages/Customer/CustomerProfilePage";
+import RegistrationPage from "./pages/Customer/RegistrationPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
@@ -28,20 +35,13 @@ import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
-import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorAddServicePage from "./pages/Vendor/VendorAddServicePage";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
-import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorCategorySelector from "./pages/Vendor/VendorCategorySelector";
-import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
 import VendorAvailabilityPage from "./pages/Vendor/VendorAvailabilityPage";
-import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
 import VendorEditServicePage from "./pages/Vendor/VendorEditServicePage";
 import VendorServiceAvailabilityPage from "./pages/Vendor/VendorServiceAvailabilityPage";
-import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
-import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
-import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
@@ -50,12 +50,17 @@ import { VendorBusinessRoute } from "./services/vendorBusinessContext";
 function App() {
   return (
     <Routes>
-      {/* Public pages */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/pets" element={<CustomerPetCataloguePage />} />
-      <Route path="/pets/:petId" element={<PetsDetailPage />} />
-      <Route path="/vendors" element={<CustomerVendorsPage />} />
-      <Route path="/adoption-request" element={<AdoptionRequest />} />
+      {/* Public frame: customer or vendor navigation, footer, and legal pages. */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/vendor" element={<VendorLandingPage />} />
+        <Route
+          path="/terms-and-conditions"
+          element={<TermsAndConditionsPage />}
+        />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="*" element={<LandingPage />} />
+      </Route>
       <Route
         path="/customer/my-requests"
         element={
@@ -64,7 +69,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-      {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
+      {/* Public pages use customer navigation when a customer is signed in. */}
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
         <Route path="/merchandise" element={<MerchandisePage />} />
@@ -72,17 +77,10 @@ function App() {
           path="/merchandise/:productId"
           element={<ProductDetailsPage />}
         />
+        <Route path="/pets" element={<CustomerPetCataloguePage />} />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
-        <Route
-          path="/vendor/merchandise"
-          element={
-            <ProtectedRoute role="VENDOR">
-              <VendorMerchandisePage />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/profile"
           element={
@@ -137,15 +135,6 @@ function App() {
         }
       />
       <Route
-        path="/pets"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <CustomerPetCataloguePage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
         path="/customer/cart"
         element={
           <ProtectedRoute role="CUSTOMER">
@@ -154,12 +143,16 @@ function App() {
         }
       />
 
-      {/* Adoption application */}
       <Route
-       path="/adoption-request"
-        element={<AdoptionRequest />}
-      /> 
+        path="/customer/orders"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerOrderHistoryPage />
+          </ProtectedRoute>
+        }
+      />
 
+      {/* Adoption applications require a customer session and dashboard shell. */}
       <Route
         path="/adoption-request"
         element={
@@ -172,7 +165,14 @@ function App() {
       </Route>
 
       {/* VENDOR AREA */}
-      {/* VENDOR AREA */}
+      <Route
+        path="/vendor/merchandise"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorMerchandisePage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/vendor/business-registration"
         element={
