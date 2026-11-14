@@ -10,6 +10,9 @@ import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
 import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
+import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
+import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
+import CustomerOrderDetailsPage from "./pages/Customer/CustomerOrderDetailsPage";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
@@ -29,6 +32,7 @@ import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
+import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
@@ -58,6 +62,7 @@ function App() {
           path="/terms-and-conditions"
           element={<TermsAndConditionsPage />}
         />
+        <Route path="/terms" element={<TermsAndConditionsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<LandingPage />} />
       </Route>
@@ -144,10 +149,36 @@ function App() {
       />
 
       <Route
+        path="/customer/checkout"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerCheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/sandbox-pay"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <SandboxPaymentPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/customer/orders"
         element={
           <ProtectedRoute role="CUSTOMER">
             <CustomerOrderHistoryPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/orders/:orderId"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerOrderDetailsPage />
           </ProtectedRoute>
         }
       />
@@ -163,6 +194,15 @@ function App() {
       >
         <Route index element={<AdoptionRequest />} />
       </Route>
+
+      <Route
+        path="/vendor/orders"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorOrdersPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* VENDOR AREA */}
       <Route
@@ -386,6 +426,16 @@ function App() {
           <ProtectedRoute role="VENDOR">
             <VendorBusinessRoute>
               <VendorServiceAvailabilityPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/orders"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorOrdersPage />
             </VendorBusinessRoute>
           </ProtectedRoute>
         }

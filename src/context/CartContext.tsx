@@ -41,6 +41,7 @@ type CartContextType = {
   updateQuantity: (id: number | string, quantity: number) => Promise<void>;
   removeFromCart: (id: number | string) => Promise<void>;
   clearCart: () => Promise<void>;
+  refreshCart: () => Promise<void>;
   cartCount: number;
   cartTotal: string;
   hasUnavailableItems: boolean;
@@ -212,6 +213,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         removeFromCart,
         clearCart,
+        refreshCart: syncCart,
         cartCount,
         cartTotal,
         hasUnavailableItems,
