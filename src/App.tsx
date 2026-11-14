@@ -1,13 +1,19 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import CustomerShell from "./layouts/CustomerShell/CustomerShell";
-import AuthLayout from "./layouts/AuthLayout/AuthLayout";
-import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayout";
-import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import BusinessRegistrationForm from "./components/BusinessRegistrationForm/BusinessRegistrationForm";
-import PublicLayout from "./layouts/PublicLayout/PublicLayout";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthLayout from "./layouts/AuthLayout/AuthLayout";
+import CustomerAwareLayout from "./layouts/CustomerAwareLayout/CustomerAwareLayout";
+import PublicLayout from "./layouts/PublicLayout/PublicLayout";
+import VendorLayout from "./layouts/VendorLayout/VendorLayout";
 import CustomerDashboardLayout from "./pages/Customer/CustomerDashboard";
+import CustomerCartPage from "./pages/Customer/CustomerCartPage";
+import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
+import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
+import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
+import CustomerOrderDetailsPage from "./pages/Customer/CustomerOrderDetailsPage";
+import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
 import AdoptionRequest from "./pages/Customer/AdoptionRequest";
@@ -18,22 +24,15 @@ import ExplorePets from "./pages/Customer/ExplorePets";
 import MerchandisePage from "./pages/Customer/MerchandisePage";
 import ProductDetailsPage from "./pages/Customer/ProductDetailsPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
-import LandingPage from "./pages/Customer/CustomerLandingPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
 import ProfilePage from "./pages/Customer/CustomerProfilePage";
 import RegistrationPage from "./pages/Customer/RegistrationPage";
-import CustomerCartPage from "./pages/Customer/CustomerCartPage";
-import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
-import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
-import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
-import CustomerOrderDetailsPage from "./pages/Customer/CustomerOrderDetailsPage";
-import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
-import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
+import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
+import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
@@ -47,34 +46,26 @@ import VendorAvailabilityPage from "./pages/Vendor/VendorAvailabilityPage";
 import VendorEditServicePage from "./pages/Vendor/VendorEditServicePage";
 import VendorServiceAvailabilityPage from "./pages/Vendor/VendorServiceAvailabilityPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
+import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
-
 import { VendorBusinessRoute } from "./services/vendorBusinessContext";
-
 function App() {
   return (
     <Routes>
-      {/* Public pages */}
-      {/* Landing page uses the public navigation and footer */}
+      {/* Public frame: customer or vendor navigation, footer, and legal pages. */}
       <Route element={<PublicLayout />}>
-      <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/vendor" element={<VendorLandingPage />} />
+        <Route
+          path="/terms-and-conditions"
+          element={<TermsAndConditionsPage />}
+        />
+        <Route path="/terms" element={<TermsAndConditionsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="*" element={<LandingPage />} />
       </Route>
-      <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/terms" element={<TermsAndConditionsPage />} />
-      <Route path="/vendor" element={<VendorLandingPage />} />
-      <Route path="/pets" element={<CustomerPetCataloguePage />} />
-      <Route path="/pets/:petId" element={<PetsDetailPage />} />
-      <Route path="/adoption-request" element={<AdoptionRequest />} />
-      <Route
-  path="/vendor/orders"
-  element={
-    <ProtectedRoute role="VENDOR">
-      <VendorOrdersPage />
-    </ProtectedRoute>
-  }
-/>
       <Route
         path="/customer/my-requests"
         element={
@@ -83,7 +74,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-      {/* PUBLIC PAGES: signed-in customers get the sidebar, visitors get the public frame */}
+      {/* Public pages use customer navigation when a customer is signed in. */}
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
         <Route path="/merchandise" element={<MerchandisePage />} />
@@ -91,17 +82,10 @@ function App() {
           path="/merchandise/:productId"
           element={<ProductDetailsPage />}
         />
+        <Route path="/pets" element={<CustomerPetCataloguePage />} />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
         <Route path="/vendors/:id" element={<CustomerVendorProfilePage />} />
-        <Route
-          path="/vendor/merchandise"
-          element={
-            <ProtectedRoute role="VENDOR">
-              <VendorMerchandisePage />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/profile"
           element={
@@ -156,15 +140,6 @@ function App() {
         }
       />
       <Route
-        path="/pets"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <CustomerPetCataloguePage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
         path="/customer/cart"
         element={
           <ProtectedRoute role="CUSTOMER">
@@ -173,15 +148,6 @@ function App() {
         }
       />
 
-          {/* CUSTOMER CHECKOUT */}
-      <Route
-        path="/sandbox-pay"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <SandboxPaymentPage />
-          </ProtectedRoute>
-        }
-      />
       <Route
         path="/customer/checkout"
         element={
@@ -190,8 +156,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/sandbox-pay"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <SandboxPaymentPage />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* CUSTOMER ORDER HISTORY */}
       <Route
         path="/customer/orders"
         element={
@@ -200,7 +173,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-            {/* INDIVIDUAL CUSTOMER ORDER DETAILS */}
+
       <Route
         path="/customer/orders/:orderId"
         element={
@@ -209,6 +182,8 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      {/* Adoption applications require a customer session and dashboard shell. */}
       <Route
         path="/adoption-request"
         element={
@@ -220,8 +195,24 @@ function App() {
         <Route index element={<AdoptionRequest />} />
       </Route>
 
+      <Route
+        path="/vendor/orders"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorOrdersPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* VENDOR AREA */}
-      {/* VENDOR AREA */}
+      <Route
+        path="/vendor/merchandise"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorMerchandisePage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/vendor/business-registration"
         element={
@@ -430,21 +421,21 @@ function App() {
         }
       />
       <Route
-  path="/vendor/business/:businessId/orders"
-  element={
-    <ProtectedRoute role="VENDOR">
-      <VendorBusinessRoute>
-        <VendorOrdersPage />
-      </VendorBusinessRoute>
-    </ProtectedRoute>
-  }
-/>
-      <Route
         path="/vendor/business/:businessId/services/:serviceId/availability"
         element={
           <ProtectedRoute role="VENDOR">
             <VendorBusinessRoute>
               <VendorServiceAvailabilityPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/orders"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorOrdersPage />
             </VendorBusinessRoute>
           </ProtectedRoute>
         }
