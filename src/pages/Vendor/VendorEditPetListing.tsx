@@ -6,6 +6,8 @@ import {
   Trash2,
   ChevronDown,
   Check,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
@@ -13,6 +15,7 @@ import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetc
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { countWords } from "../../utils/petUtils";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./VendorEditPetListing.css";
 
@@ -42,6 +45,7 @@ type VendorPet = {
   images?: ExistingPhoto[];
 };
 type VendorPetResponse = VendorPet[] | { results: VendorPet[] };
+const MAX_DESCRIPTION_WORDS = 300;
 
 async function readError(response: Response): Promise<string> {
   if (response.status === 401) {
@@ -158,6 +162,7 @@ export default function VendorEditPetListing() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [viewingPhotoIndex, setViewingPhotoIndex] = useState<number | null>(null);
 
   const primaryPhoto =
     existingPhotos[0]?.image ||
@@ -168,8 +173,8 @@ export default function VendorEditPetListing() {
   const speciesOptions: Option[] = [
     { value: "Dog", label: "Dog" },
     { value: "Cat", label: "Cat" },
+    { value: "Fish", label: "Fish" },
     { value: "Bird", label: "Bird" },
-    { value: "Other", label: "Other" },
   ];
   const genderOptions: Option[] = [
     { value: "UNKNOWN", label: "Not specified" },
@@ -285,6 +290,10 @@ export default function VendorEditPetListing() {
       setError("Keep at least 1 photo");
       return;
     }
+    if (countWords(description) > MAX_DESCRIPTION_WORDS) {
+      setError("Description must be 300 words or fewer.");
+      return;
+    }
     const formData = new FormData();
     formData.append("business", selectedBusinessId);
     formData.append("listing_type", listingType);
@@ -323,6 +332,11 @@ export default function VendorEditPetListing() {
     }
   }
 
+  const galleryPhotos = [
+    ...existingPhotos.map((photo) => new URL(photo.image || photo.image_url || photo.url || "", API_BASE_URL).href),
+    ...newPhotos.map((photo) => photo.preview),
+  ];
+
   if (loadingPet) {
     return (
       <VendorLayout
@@ -343,6 +357,7 @@ export default function VendorEditPetListing() {
     >
       <div className="dashboard-content vendor-pet-page">
         <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings"} label="Back to listings" />
+        {success && <p className="pet-form-message success pet-form-success-top" role="status">{success}</p>}
         <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
             <div className="pet-section-heading">
@@ -497,8 +512,10 @@ export default function VendorEditPetListing() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
+                aria-describedby="edit-pet-description-count"
                 placeholder="Tell customers about this pet..."
               />
+              <span id="edit-pet-description-count" className="pet-description-count">{countWords(description)} / {MAX_DESCRIPTION_WORDS} words</span>
             </label>
           </section>
 
@@ -542,7 +559,7 @@ export default function VendorEditPetListing() {
               <div className="pet-photo-grid">
                 {existingPhotos.map((ph, idx) => (
                   <div className="pet-photo-card" key={"ex-" + idx}>
-                    <img src={ph.image || ph.image_url || ph.url} alt="" />
+                    <img src={new URL(ph.image || ph.image_url || ph.url || "", API_BASE_URL).href} alt={`Existing pet photo ${idx + 1}`} role="button" tabIndex={0} onClick={() => setViewingPhotoIndex(idx)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setViewingPhotoIndex(idx); }} />
                     <button
                       type="button"
                       onClick={() => {
@@ -567,7 +584,7 @@ export default function VendorEditPetListing() {
                 ))}
                 {newPhotos.map((ph, idx) => (
                   <div className="pet-photo-card" key={ph.preview}>
-                    <img src={ph.preview} alt="" />
+                    <img src={ph.preview} alt={`New pet photo ${idx + 1}`} role="button" tabIndex={0} onClick={() => setViewingPhotoIndex(existingPhotos.length + idx)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setViewingPhotoIndex(existingPhotos.length + idx); }} />
                     <button
                       type="button"
                       onClick={() =>
@@ -587,7 +604,6 @@ export default function VendorEditPetListing() {
           </section>
 
           {error && <p className="pet-form-message error">{error}</p>}
-          {success && <p className="pet-form-message success">{success}</p>}
 
           <div className="pet-form-actions">
             <Link to="/vendor/listings" className="pet-cancel-button">
@@ -608,6 +624,15 @@ export default function VendorEditPetListing() {
             </button>
           </div>
         </form>
+        {viewingPhotoIndex !== null && galleryPhotos.length > 0 && (
+          <div className="pet-gallery-backdrop" role="dialog" aria-modal="true" aria-label="Pet photo carousel" onClick={() => setViewingPhotoIndex(null)}>
+            <button type="button" className="pet-gallery-close" onClick={() => setViewingPhotoIndex(null)} aria-label="Close photo viewer">×</button>
+            <button type="button" className="pet-gallery-arrow" aria-label="Previous photo" onClick={(event) => { event.stopPropagation(); setViewingPhotoIndex((viewingPhotoIndex - 1 + galleryPhotos.length) % galleryPhotos.length); }}><ChevronLeft /></button>
+            <img className="pet-gallery-image" src={galleryPhotos[viewingPhotoIndex]} alt={`Pet photo ${viewingPhotoIndex + 1} of ${galleryPhotos.length}`} onClick={(event) => event.stopPropagation()} />
+            <button type="button" className="pet-gallery-arrow" aria-label="Next photo" onClick={(event) => { event.stopPropagation(); setViewingPhotoIndex((viewingPhotoIndex + 1) % galleryPhotos.length); }}><ChevronRight /></button>
+            <span className="pet-gallery-count">{viewingPhotoIndex + 1} / {galleryPhotos.length}</span>
+          </div>
+        )}
       </div>
     </VendorLayout>
   );

@@ -21,11 +21,15 @@ export function speciesKey(species: string): SpeciesKey | null {
 }
 
 export function formatAge(months: number): string {
-  if (months < 12) return `${months} month${months === 1 ? "" : "s"}`;
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"} old`;
   const years = Math.floor(months / 12);
   const rest = months % 12;
   const y = `${years} year${years === 1 ? "" : "s"}`;
-  return rest ? `${y} ${rest} mo` : y;
+  return rest ? `${y} ${rest} month${rest === 1 ? "" : "s"} old` : `${y} old`;
+}
+
+export function countWords(value: string): number {
+  return value.trim() ? value.trim().split(/\s+/).length : 0;
 }
 
 export function formatPrice(price: string | number | null | undefined): string | null {

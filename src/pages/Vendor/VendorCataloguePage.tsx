@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Plus,
   PawPrint,
@@ -8,13 +8,16 @@ import {
   Image as ImageIcon,
   Power,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { formatAge } from "../../utils/petUtils";
 import "./VendorCataloguePage.css";
 
 type PetImage = {
@@ -30,6 +33,7 @@ type Pet = {
   name: string;
   species: string;
   breed?: string;
+  description?: string;
   age: number;
   listing_type: "ADOPTION" | "SALE";
   price?: string | number | null;
@@ -90,6 +94,7 @@ function listingStatus(pet: Pet) {
 
 export default function VendorCataloguePage() {
   const activeBusiness = useVendorBusiness();
+  const navigate = useNavigate();
   const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +105,9 @@ export default function VendorCataloguePage() {
     useState<ListingAction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [cardPhotoIndexes, setCardPhotoIndexes] = useState<Record<number, number>>({});
+  const cardTouchStartX = useRef<number | null>(null);
+  const ignoreNextCardClick = useRef(false);
 
   const loadPets = useCallback(async () => {
     const token = getToken();
@@ -304,20 +312,46 @@ export default function VendorCataloguePage() {
         {!loading && !error && pets.length > 0 && (
           <div className="catalogue-grid">
             {pets.map((pet) => {
-              const firstImage =
-                pet.images?.find(
-                  (image) =>
-                    typeof image !== "string" && image.is_primary,
-                ) || pet.images?.[0];
-
-              const photo = imageUrl(firstImage);
+              const sortedImages = [...(pet.images ?? [])].sort((a, b) => Number(typeof b !== "string" && b.is_primary) - Number(typeof a !== "string" && a.is_primary));
+              const cardImages = sortedImages.slice(0, 2);
+              const photoIndex = Math.min(cardPhotoIndexes[pet.pet_id] ?? 0, Math.max(0, cardImages.length - 1));
               const status = listingStatus(pet);
+              const detailPath = activeBusiness
+                ? vendorBusinessPath(String(activeBusiness.id), `listings/${pet.pet_id}`)
+                : `/vendor/listings/${pet.pet_id}`;
 
               return (
-                <article className="catalogue-card" key={pet.pet_id}>
-                  <div className="catalogue-photo">
-                    {photo ? (
-                      <img src={photo} alt={pet.name} />
+                <article
+                  className="catalogue-card"
+                  key={pet.pet_id}
+                  role="link"
+                  tabIndex={0}
+                  onClick={(event) => {
+                    if (ignoreNextCardClick.current) { ignoreNextCardClick.current = false; return; }
+                    if ((event.target as HTMLElement).closest("button, a")) return;
+                    navigate(detailPath);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.target !== event.currentTarget) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      navigate(detailPath);
+                    }
+                  }}
+                  aria-label={`View ${pet.name} listing details`}
+                >
+                  <div className="catalogue-photo"
+                    onTouchStart={(event) => { cardTouchStartX.current = event.touches[0]?.clientX ?? null; }}
+                    onTouchEnd={(event) => {
+                      const startX = cardTouchStartX.current;
+                      const endX = event.changedTouches[0]?.clientX;
+                      if (startX === null || endX === undefined || Math.abs(endX - startX) < 35 || cardImages.length < 2) return;
+                      ignoreNextCardClick.current = true;
+                      setCardPhotoIndexes((current) => ({ ...current, [pet.pet_id]: (photoIndex + (endX < startX ? 1 : cardImages.length - 1)) % cardImages.length }));
+                      cardTouchStartX.current = null;
+                    }}>
+                    {cardImages.length ? (
+                      <img className="catalogue-card-carousel-image" src={imageUrl(cardImages[photoIndex])} alt={`${pet.name} photo ${photoIndex + 1}`} />
                     ) : (
                       <div className="catalogue-no-photo">
                         <ImageIcon size={30} />
@@ -338,6 +372,14 @@ export default function VendorCataloguePage() {
                     >
                       {status}
                     </span>
+                    {cardImages.length > 1 && <>
+                      <button type="button" className="catalogue-photo-arrow catalogue-photo-prev" aria-label={`Previous ${pet.name} photo`} onClick={(event) => { event.stopPropagation(); setCardPhotoIndexes((current) => ({ ...current, [pet.pet_id]: (photoIndex + cardImages.length - 1) % cardImages.length })); }}><ChevronLeft size={19} /></button>
+                      <button type="button" className="catalogue-photo-arrow catalogue-photo-next" aria-label={`Next ${pet.name} photo`} onClick={(event) => { event.stopPropagation(); setCardPhotoIndexes((current) => ({ ...current, [pet.pet_id]: (photoIndex + 1) % cardImages.length })); }}><ChevronRight size={19} /></button>
+                      <div className="catalogue-photo-indicators" aria-label={`Photo ${photoIndex + 1} of ${cardImages.length}`}>
+                        {cardImages.map((_, index) => <span key={index} className={index === photoIndex ? "active" : ""} />)}
+                      </div>
+                    </>}
+                    {sortedImages.length > 2 && <Link className="catalogue-see-more" to={detailPath} onClick={(event) => event.stopPropagation()}>See More</Link>}
                   </div>
 
                   <div className="catalogue-card-content">
@@ -349,10 +391,11 @@ export default function VendorCataloguePage() {
                     </div>
 
                     <p className="catalogue-pet-details">
-                      {[pet.breed, pet.species, `${pet.age} months`]
+                      {[pet.breed, pet.species, formatAge(pet.age)]
                         .filter(Boolean)
                         .join(" · ")}
                     </p>
+                    <p className="catalogue-description-preview">{pet.description?.trim() || "No description provided."}</p>
 
                     <div className="catalogue-card-footer">
                       <span className="catalogue-type">

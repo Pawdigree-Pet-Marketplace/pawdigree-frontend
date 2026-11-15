@@ -1,5 +1,11 @@
 
 import { vendorAuthenticatedFetch } from "./vendorAuthenticatedFetch";
+import API_BASE_URL from "./api";
+
+function vendorOrdersUrl(suffix = "") {
+  const baseUrl = API_BASE_URL || window.location.origin;
+  return new URL(`/api/orders/vendor/${suffix}`, baseUrl).toString();
+}
 
 export type VendorOrderStatus =
   | "PAID"
@@ -52,7 +58,7 @@ export async function fetchVendorOrders(
       : "";
 
   const response = await vendorAuthenticatedFetch(
-    `/api/orders/vendor/${query}`,
+    `${vendorOrdersUrl()}${query}`,
   );
 
   if (!response.ok) {
@@ -73,7 +79,7 @@ export async function updateVendorOrderStatus(
   status: VendorOrderStatus,
 ): Promise<VendorOrder> {
   const response = await vendorAuthenticatedFetch(
-    `/api/orders/vendor/${vendorOrderId}/status/`,
+    vendorOrdersUrl(`${vendorOrderId}/status/`),
     {
       method: "PATCH",
       headers: {

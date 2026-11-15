@@ -404,6 +404,22 @@
 .vendor-workspace .pet-form-message.error { background: rgb(251 134 101 / 12%); color: #2C302F; }
 .vendor-workspace .pet-form-message.success { background: rgb(33 108 104 / 10%); color: #216C68; }
 .vendor-workspace .pet-form-actions { grid-column: 1 / -1; }
+.vendor-workspace .pet-listing-mode { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 18px; padding: 5px; border: 1px solid rgb(44 48 47 / 12%); border-radius: 999px; background: #F3F0EA; width: fit-content; }
+.vendor-workspace .pet-listing-mode button { min-height: 40px; border: 0; border-radius: 999px; background: transparent; padding: 0 16px; color: #2C302F; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.vendor-workspace .pet-listing-mode button.active { background: #216C68; color: #fff; }
+.vendor-workspace .pet-bulk-upload { max-width: 920px; }
+.vendor-workspace .pet-bulk-guidance { border-radius: 14px; background: #F3F0EA; padding: 16px 18px; color: rgb(44 48 47 / 78%); font-size: 13px; line-height: 1.65; }
+.vendor-workspace .pet-bulk-guidance p { margin: 0 0 8px; }
+.vendor-workspace .pet-bulk-guidance p:last-child { margin-bottom: 0; }
+.vendor-workspace .pet-bulk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.vendor-workspace .pet-bulk-actions input[type="file"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; clip-path: inset(50%); }
+.vendor-workspace .pet-bulk-file-label { display: inline-flex; align-items: center; min-height: 42px; min-width: 180px; max-width: 300px; overflow: hidden; border: 1px solid rgb(44 48 47 / 16%); border-radius: 999px; background: #FBFAF7; padding: 0 15px; color: #2C302F; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.vendor-workspace .pet-bulk-result { margin-top: 16px; border-radius: 13px; background: rgb(33 108 104 / 9%); padding: 16px; color: #216C68; overflow-wrap: anywhere; }
+.vendor-workspace .pet-bulk-result p { margin: 7px 0; font-size: 13px; }
+.vendor-workspace .pet-bulk-result ul { display: grid; gap: 7px; margin: 10px 0; padding-left: 20px; color: #8a4935; font-size: 12px; }
+.vendor-workspace .pet-bulk-result a { display: inline-block; margin-top: 8px; color: #216C68; font-weight: 800; text-decoration: underline; }
+.vendor-workspace .pet-description-count { display: block; margin-top: 6px; color: rgb(44 48 47 / 66%); font-size: 12px; text-align: right; }
+.vendor-workspace .pet-form-success-top { margin: 14px 0 18px; }
 .vendor-workspace .pet-cancel-button,
 .vendor-workspace .pet-submit-button { min-height: 44px; border-radius: 999px; font-family: "Inter", "Nunito", sans-serif; }
 .vendor-workspace .pet-cancel-button { border-color: rgb(44 48 47 / 16%); background: #FBFAF7; color: #2C302F; }
@@ -414,3 +430,4 @@
 @media (max-width: 950px) { .vendor-workspace .vendor-pet-page { padding-top: 18px; } .vendor-workspace .pet-listing-form { grid-template-columns: minmax(0, 1.2fr) minmax(230px, .8fr); } }
 @media (max-width: 700px) { .vendor-workspace .vendor-pet-page { padding: 14px 0 22px; } .vendor-workspace .pet-listing-form { grid-template-columns: 1fr; gap: 12px; } .vendor-workspace .pet-form-section { padding: 20px 16px; } .vendor-workspace .pet-form-grid { grid-template-columns: 1fr; } .vendor-workspace .pet-choice-group { gap: 8px; } .vendor-workspace .pet-form-actions { flex-direction: column-reverse; align-items: stretch; } .vendor-workspace .pet-cancel-button, .vendor-workspace .pet-submit-button { width: 100%; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .vendor-workspace .pet-form-section, .vendor-workspace .pet-section-icon, .vendor-workspace .pet-back-link, .vendor-workspace .pet-field input, .vendor-workspace .pet-field select, .vendor-workspace .pet-field textarea { animation: none !important; transition: none !important; } .vendor-workspace .pet-form-section:hover, .vendor-workspace .pet-back-link:hover { transform: none; } }
+@media (max-width: 700px) { .vendor-workspace .pet-listing-mode { width: 100%; border-radius: 14px; } .vendor-workspace .pet-listing-mode button { flex: 1; min-width: 0; padding: 0 8px; } .vendor-workspace .pet-bulk-actions { align-items: stretch; flex-direction: column; } .vendor-workspace .pet-bulk-actions > button, .vendor-workspace .pet-bulk-file-label { width: 100%; max-width: none; justify-content: center; box-sizing: border-box; } }
