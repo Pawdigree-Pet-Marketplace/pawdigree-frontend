@@ -38,6 +38,7 @@ import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
 import VendorEditPetListing from "./pages/Vendor/VendorEditPetListing";
+import VendorPetListingDetailsPage from "./pages/Vendor/VendorPetListingDetailsPage";
 import DocumentUpload from "./pages/Vendor/DocumentUpload";
 import VendorAddServicePage from "./pages/Vendor/VendorAddServicePage";
 import VendorBusinessProfilePage from "./pages/Vendor/VendorBusinessProfilePage";
@@ -50,6 +51,7 @@ import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
+import VendorProfilePage from "./pages/Vendor/VendorProfilePage";
 import { VendorBusinessRoute } from "./services/vendorBusinessContext";
 function App() {
   return (
@@ -233,10 +235,11 @@ function App() {
         path="/vendor/profile"
         element={
           <ProtectedRoute role="VENDOR">
-            <VendorStoreProfilePage />
+            <VendorProfilePage />
           </ProtectedRoute>
         }
       />
+      <Route path="/vendor/store-profile" element={<ProtectedRoute role="VENDOR"><VendorStoreProfilePage /></ProtectedRoute>} />
 
       <Route
         path="/vendor/availability"
@@ -275,6 +278,14 @@ function App() {
         element={
           <ProtectedRoute role="VENDOR">
             <VendorAddPetPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/listings/:petId"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorPetListingDetailsPage />
           </ProtectedRoute>
         }
       />
@@ -386,6 +397,16 @@ function App() {
           <ProtectedRoute role="VENDOR">
             <VendorBusinessRoute>
               <VendorAddPetPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/listings/:petId"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorPetListingDetailsPage />
             </VendorBusinessRoute>
           </ProtectedRoute>
         }

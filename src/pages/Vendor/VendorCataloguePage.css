@@ -62,6 +62,7 @@
   position: relative;
   height: 205px;
   background: #f3f0ea;
+  touch-action: pan-y;
 }
 
 .catalogue-photo > img {
@@ -70,6 +71,17 @@
   display: block;
   object-fit: cover;
 }
+
+.catalogue-card { cursor: pointer; }
+.catalogue-card:focus-visible { outline: 3px solid rgb(33 108 104 / 45%); outline-offset: 3px; }
+.catalogue-photo-arrow { position: absolute; top: 50%; display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 92%); color: #216c68; transform: translateY(-50%); cursor: pointer; }
+.catalogue-photo-prev { left: 10px; }
+.catalogue-photo-next { right: 10px; }
+.catalogue-photo-indicators { position: absolute; bottom: 12px; left: 50%; display: flex; gap: 5px; transform: translateX(-50%); }
+.catalogue-photo-indicators span { width: 7px; height: 7px; border-radius: 50%; background: rgb(255 255 255 / 65%); box-shadow: 0 1px 3px rgb(0 0 0 / 35%); }
+.catalogue-photo-indicators span.active { background: #216c68; }
+.catalogue-see-more { position: absolute; right: 10px; bottom: 10px; border: 0; border-radius: 999px; background: #216c68; padding: 7px 11px; color: #fff; font-size: 11px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.catalogue-description-preview { display: -webkit-box; overflow: hidden; min-height: 2.8em; margin: -7px 0 14px; color: #59635f; font-size: 12px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 
 .catalogue-no-photo {
   display: flex;

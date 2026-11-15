@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import API_BASE_URL, { apiRequest } from "../../services/api";
 import { Link, useSearchParams } from "react-router-dom";
-import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
+import { formatAge } from "../../utils/petUtils";
 import "./CustomerPetCataloguePage.css";
 
 type Pet = {
@@ -254,10 +254,7 @@ export default function CustomerPetCataloguePage() {
   const pages = Math.ceil(count / 20);
 
   return (
-    <div className="customer-dashboard-layout">
-      <CustomerDashboardNav />
-
-      <main className="customer-dashboard-main customer-dashboard pet-catalogue">
+    <div className="customer-dashboard pet-catalogue">
         <header className="catalogue-heading">
           <div
             className="catalogue-heading-decor"
@@ -493,10 +490,7 @@ export default function CustomerPetCataloguePage() {
                   pet.images?.find((item) => item.is_primary)
                     ?.image || pet.images?.[0]?.image;
 
-                const age =
-                  pet.age < 12
-                    ? `${pet.age} months old`
-                    : `${Math.floor(pet.age / 12)} years old`;
+                const age = formatAge(pet.age);
 
                 return (
                   <Link
@@ -582,7 +576,6 @@ export default function CustomerPetCataloguePage() {
             </nav>
           )}
         </section>
-      </main>
     </div>
   );
 }

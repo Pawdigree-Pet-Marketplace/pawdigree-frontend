@@ -120,8 +120,9 @@ useEffect(() => {
     <VendorLayout
       title="Orders & Bookings"
       description="View customer orders, prepare purchases and manage deliveries."
+      vendorWorkspace
     >
-      <section className="vendor-orders-page">
+      <section className="dashboard-content vendor-orders-page">
         <div className="vendor-orders-toolbar">
           <div>
             <h2>Your orders</h2>

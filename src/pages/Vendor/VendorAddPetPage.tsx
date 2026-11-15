@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { countWords } from "../../utils/petUtils";
+import VendorPetBulkUpload from "../../components/vendor/VendorPetBulkUpload";
 import "./VendorAddPetPage.css";
 
 type Business = {
@@ -26,6 +28,8 @@ type PetPhoto = {
 };
 
 type ListingType = "ADOPTION" | "SALE";
+const MAX_DESCRIPTION_WORDS = 300;
+
 
 async function readError(response: Response): Promise<string> {
   if (response.status === 401) {
@@ -51,6 +55,7 @@ async function readError(response: Response): Promise<string> {
 
 export default function VendorAddPetPage() {
   const activeBusiness = useVendorBusiness();
+  const [listingMode, setListingMode] = useState<"individual" | "bulk">("individual");
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessId, setBusinessId] = useState("");
   const [listingType, setListingType] = useState<ListingType>("ADOPTION");
@@ -175,6 +180,11 @@ export default function VendorAddPetPage() {
       return;
     }
 
+    if (countWords(description) > MAX_DESCRIPTION_WORDS) {
+      setError("Description must be 300 words or fewer.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("business", selectedBusinessId);
     formData.append("listing_type", listingType);
@@ -243,8 +253,18 @@ export default function VendorAddPetPage() {
     >
       <div className="dashboard-content vendor-pet-page">
         <BackButton fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings"} label="Back to listings" />
+        {success && (
+          <p className="pet-form-message success pet-form-success-top" role="status">
+            {success}
+          </p>
+        )}
 
-        <form className="pet-listing-form" onSubmit={handleSubmit}>
+        <div className="pet-listing-mode" role="group" aria-label="Choose how to add pet listings">
+          <button type="button" className={listingMode === "individual" ? "active" : ""} aria-pressed={listingMode === "individual"} onClick={() => setListingMode("individual")}>Individual listing</button>
+          <button type="button" className={listingMode === "bulk" ? "active" : ""} aria-pressed={listingMode === "bulk"} onClick={() => setListingMode("bulk")}>Bulk upload (CSV)</button>
+        </div>
+
+        {listingMode === "individual" ? <form className="pet-listing-form" onSubmit={handleSubmit}>
           <section className="pet-form-section">
             <div className="pet-section-heading">
               <span className="pet-section-icon">
@@ -327,13 +347,12 @@ export default function VendorAddPetPage() {
 
               <label className="pet-field">
                 Species <span></span>
-                <input
-                  value={species}
-                  onChange={(event) => setSpecies(event.target.value)}
-                  maxLength={100}
-                  placeholder="e.g. Dog, Cat, Rabbit"
-                  required
-                />
+                <select value={species} onChange={(event) => setSpecies(event.target.value)} required>
+                  <option value="Dog">Dogs</option>
+                  <option value="Cat">Cats</option>
+                  <option value="Fish">Fish</option>
+                  <option value="Bird">Birds</option>
+                </select>
               </label>
 
               <label className="pet-field">
@@ -407,8 +426,12 @@ export default function VendorAddPetPage() {
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 rows={5}
+                aria-describedby="pet-description-count"
                 placeholder="Tell customers about this pet, its personality and care needs..."
               />
+              <span id="pet-description-count" className="pet-description-count">
+                {countWords(description)} / {MAX_DESCRIPTION_WORDS} words
+              </span>
             </label>
           </section>
 
@@ -474,12 +497,6 @@ export default function VendorAddPetPage() {
             </p>
           )}
 
-          {success && (
-            <p className="pet-form-message success" role="status">
-              {success}
-            </p>
-          )}
-
           <div className="pet-form-actions">
             <Link to="/vendor/listings" className="pet-cancel-button">
               Cancel
@@ -501,7 +518,7 @@ export default function VendorAddPetPage() {
               )}
             </button>
           </div>
-        </form>
+        </form> : <VendorPetBulkUpload />}
       </div>
     </VendorLayout>
   );

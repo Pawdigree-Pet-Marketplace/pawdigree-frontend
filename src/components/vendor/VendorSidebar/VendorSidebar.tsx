@@ -13,6 +13,7 @@ import {
   Headset,
   FileText,
   BriefcaseBusiness,
+  UserRound,
 } from "lucide-react";
 import "./VendorSidebar.css";
 import lightModeLogo from "../../../assets/logos/lightmode-logo.svg";
@@ -24,6 +25,7 @@ import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
   "/vendor/profile",
+  "/vendor/store-profile",
   "/vendor/listings",
   "/vendor/adoption-applications",
   "/vendor/services/new",
@@ -84,9 +86,10 @@ const navigationGroups = [
   
   title: "BUSINESS",
   items: [
-    { label: "Store Profile", path: "/vendor/profile", icon: Store },
+    { label: "My Profile", path: "/vendor/profile", icon: UserRound },
+    { label: "Store Profile", path: "/vendor/store-profile", icon: Store },
     {
-      label: "Businesses",
+      label: "My Businesses",
       path: "/vendor/business-profile",
       icon: BriefcaseBusiness,
     },
@@ -158,7 +161,7 @@ const scopedPath: string = (() => {
     case "/vendor/dashboard":
       return vendorBusinessPath(String(business.id), "dashboard");
 
-    case "/vendor/profile":
+            case "/vendor/store-profile":
       return vendorBusinessPath(String(business.id), "store-profile");
 
     case "/vendor/listings":
@@ -189,7 +192,7 @@ const scopedPath: string = (() => {
 
               const isActive =
                 currentPath === scopedPath ||
-                (business && item.path === "/vendor/profile" && currentPath.endsWith("/store-profile")) ||
+            (item.path === "/vendor/store-profile" && (business ? currentPath.endsWith("/store-profile") : currentPath === "/vendor/store-profile")) ||
                 (business && item.path === "/vendor/business-profile" && currentPath.endsWith("/businesses")) ||
                 (item.path === "/vendor/listings" &&
                   (business ? currentPath.includes("/listings/") : currentPath.startsWith("/vendor/listings/"))) ||
@@ -227,6 +230,7 @@ const scopedPath: string = (() => {
                   [
                     "/vendor/dashboard",
                     "/vendor/profile",
+                    "/vendor/store-profile",
                     "/vendor/listings",
                     "/vendor/adoption-applications",
                     "/vendor/services/new",

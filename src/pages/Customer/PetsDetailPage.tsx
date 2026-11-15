@@ -32,9 +32,9 @@ function photosOf(pet: PublicPet): string[] {
 }
 
 function formatAge(months: number) {
-  if (months < 12) return `${months} month${months === 1 ? "" : "s"}`;
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"} old`;
   const years = Math.floor(months / 12);
-  return `${years} year${years === 1 ? "" : "s"}`;
+  return `${years} year${years === 1 ? "" : "s"} old`;
 }
 
 const titleCase = (s?: string) =>
@@ -186,47 +186,13 @@ export default function PetDetailsPage() {
       </div>
 
       <main className="pd-main">
+        <div className="pd-detail-card">
         <section className="pd-gallery" aria-label={`${pet.name} photos`}>
           <Gallery
             key={pet.pet_id}
             photos={photos}
             alt={`${pet.name}${pet.breed ? `, ${pet.breed}` : ""}`}
           />
-
-          {current.similar.length > 0 && (
-            <section className="pd-recommendations">
-              <h2>More pets you may like</h2>
-              <div className="pd-suggested-grid">
-                {current.similar.map((s) => {
-                  const img = photosOf(s)[0];
-                  return (
-                    <Link
-                      className="pd-suggested-card"
-                      to={`/pets/${s.pet_id}`}
-                      key={s.pet_id}
-                    >
-                      <div className="pd-suggested-image">
-                        {img ? (
-                          <img src={img} alt={s.name} />
-                        ) : (
-                          <PawPrint size={36} aria-hidden="true" />
-                        )}
-                        <span>{titleCase(s.species)}</span>
-                      </div>
-                      <div className="pd-suggested-info">
-                        <strong>{s.name}</strong>
-                        {s.location && (
-                          <small>
-                            <MapPin size={12} /> {s.location}
-                          </small>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          )}
         </section>
 
         <section className="pd-information" aria-labelledby="pd-pet-name">
@@ -302,6 +268,45 @@ export default function PetDetailsPage() {
             vendor before arranging a visit.
           </p>
         </section>
+        </div>
+
+        {current.similar.length > 0 && (
+          <section className="pd-recommendations">
+            <div className="pd-recommendations-heading">
+              <p className="pd-section-eyebrow">KEEP EXPLORING</p>
+              <h2>More pets you may like</h2>
+            </div>
+            <div className="pd-suggested-grid">
+              {current.similar.map((s) => {
+                const img = photosOf(s)[0];
+                return (
+                  <Link
+                    className="pd-suggested-card"
+                    to={`/pets/${s.pet_id}`}
+                    key={s.pet_id}
+                  >
+                    <div className="pd-suggested-image">
+                      {img ? (
+                        <img src={img} alt={s.name} />
+                      ) : (
+                        <PawPrint size={36} aria-hidden="true" />
+                      )}
+                      <span>{titleCase(s.species)}</span>
+                    </div>
+                    <div className="pd-suggested-info">
+                      <strong>{s.name}</strong>
+                      {s.location && (
+                        <small>
+                          <MapPin size={12} /> {s.location}
+                        </small>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
