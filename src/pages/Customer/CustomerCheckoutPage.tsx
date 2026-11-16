@@ -186,9 +186,25 @@ export default function CustomerCheckoutPage() {
         <CustomerDashboardNav />
 
         <main className="customer-checkout-main">
-          <section className="customer-checkout-confirmation">
-            <CheckCircle size={58} />
+  {/* PAGE HEADING */}
+       <header className="customer-checkout-heading">
+        <div>
+         <p className="customer-checkout-eyebrow">
+           PAWDIGREE PET STORE
+         </p>
 
+         <h1>Checkout</h1>
+
+         <p>
+          Review your order and complete payment to finish your purchase.
+         </p>
+       </div>
+
+       <PawPrint aria-hidden="true" />
+      </header>
+
+      <section className="customer-checkout-confirmation">
+       <CheckCircle size={58} />
             <p className="customer-checkout-eyebrow">
               PAWDIGREE PET STORE
             </p>
