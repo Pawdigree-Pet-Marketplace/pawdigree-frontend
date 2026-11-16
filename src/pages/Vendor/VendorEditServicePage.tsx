@@ -14,8 +14,13 @@ import {
 import BackButton from "../../components/BackButton/BackButton";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
+import {
+  categoryKindForBusinessType,
+  getCategories,
+  type Category,
+} from "../../services/categoryService";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
-import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { useVendorBusiness, useVendorBusinesses } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./VendorEditServicePage.css";
 
@@ -43,7 +48,7 @@ type VendorService = {
   id?: number | string;
   name?: string;
   description?: string;
-  category?: string;
+  category?: string | number;
   price_type?: string;
   price?: string | number | null;
   duration?: number | null;
@@ -53,13 +58,6 @@ type VendorService = {
   images?: ExistingPhoto[];
 };
 
-const CATEGORIES = [
-  { value: "GROOMING", label: "Grooming" },
-  { value: "VET", label: "Vet" },
-  { value: "BOARDING", label: "Boarding" },
-  { value: "TRAINING", label: "Training" },
-  { value: "OTHER", label: "Other" },
-];
 const PRICE_TYPES = [
   { value: "FIXED", label: "Fixed price" },
   { value: "HOURLY", label: "Per hour" },
@@ -210,6 +208,7 @@ function ConfirmRemoveDialog({
 /* ------------------------------------------------------------------ */
 export default function VendorEditServicePage() {
   const activeBusiness = useVendorBusiness();
+  const { businesses } = useVendorBusinesses();
   const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const { serviceId = "" } = useParams();
   const navigate = useNavigate();
@@ -221,6 +220,9 @@ export default function VendorEditServicePage() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [serviceName, setServiceName] = useState("");
   const [category, setCategory] = useState("");
+  const [serviceBusinessId, setServiceBusinessId] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [priceType, setPriceType] = useState("FIXED");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
@@ -237,6 +239,14 @@ export default function VendorEditServicePage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [removeError, setRemoveError] = useState("");
+
+  const selectedBusiness = activeBusiness ?? businesses.find(
+    (business) => String(business.id) === serviceBusinessId,
+  );
+  const categoryKind = categoryKindForBusinessType(selectedBusiness?.business_type);
+  const visibleCategories = categories.filter(
+    (item) => item.is_active && item.kind === categoryKind,
+  );
 
   const newPhotosRef = useRef(newPhotos);
   useEffect(() => {
@@ -270,7 +280,8 @@ export default function VendorEditServicePage() {
         if (activeBusinessId && String(service.business) !== activeBusinessId) throw new Error("This service does not belong to the selected business.");
         if (cancelled) return;
         setServiceName(service.name || "");
-        setCategory(service.category || "");
+        setServiceBusinessId(service.business == null ? "" : String(service.business));
+        setCategory(service.category == null ? "" : String(service.category));
         setPriceType(service.price_type || "FIXED");
         setPrice(service.price != null ? String(service.price) : "");
         setDuration(service.duration != null ? String(service.duration) : "");
@@ -290,6 +301,30 @@ export default function VendorEditServicePage() {
       cancelled = true;
     };
   }, [id, activeBusinessId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!categoryKind) {
+      void Promise.resolve().then(() => {
+        if (cancelled) return;
+        setCategories([]);
+        setCategoriesLoading(false);
+      });
+      return;
+    }
+
+    void Promise.resolve().then(() => {
+      if (!cancelled) setCategoriesLoading(true);
+    });
+    getCategories(categoryKind)
+      .then((options) => { if (!cancelled) setCategories(options); })
+      .catch((reason: unknown) => {
+        if (!cancelled) setError(reason instanceof Error ? reason.message : "Could not load service categories.");
+      })
+      .finally(() => { if (!cancelled) setCategoriesLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [selectedBusiness?.id, categoryKind]);
 
   function addPhotos(files: FileList | null) {
     if (!files) return;
@@ -335,6 +370,13 @@ export default function VendorEditServicePage() {
       setError("Add a service name before saving.");
       return;
     }
+    const selectedCategory = visibleCategories.find(
+      (item) => String(item.id) === category,
+    );
+    if (!selectedCategory) {
+      setError("Select a valid category for this business before saving.");
+      return;
+    }
     if (status === "PENDING") {
       if (!description.trim()) {
         setError("Add a description before submitting for review.");
@@ -352,7 +394,8 @@ export default function VendorEditServicePage() {
 
     const formData = new FormData();
     formData.append("name", serviceName.trim());
-    formData.append("category", category);
+    formData.append("category", String(selectedCategory.id));
+    formData.append("service_type", selectedCategory.name);
     formData.append("price_type", priceType);
     formData.append("price", price);
     formData.append("duration", duration);
@@ -498,11 +541,15 @@ export default function VendorEditServicePage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
+                  disabled={categoriesLoading || visibleCategories.length === 0}
+                  required
                 >
-                  <option value="">Select a category</option>
-                  {CATEGORIES.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
+                  <option value="">
+                    {categoriesLoading ? "Loading categories..." : "Select a category"}
+                  </option>
+                  {visibleCategories.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
                     </option>
                   ))}
                 </select>

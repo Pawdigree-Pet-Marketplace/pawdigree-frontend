@@ -92,6 +92,9 @@ vi.mock("./pages/Vendor/VendorDashboardPage", () => ({
 vi.mock("./pages/Vendor/VendorBusinessProfilePage", () => ({
   default: () => <main><h1>Vendor business profile route</h1></main>,
 }));
+vi.mock("./pages/Vendor/VendorProfilePage", () => ({
+  default: () => <main><h1>Vendor personal profile route</h1></main>,
+}));
 vi.mock("./pages/Vendor/VendorCategorySelector", () => ({
   default: () => <main><h1>Vendor categories route</h1></main>,
 }));
@@ -248,6 +251,22 @@ describe("App route configuration", () => {
     renderApp("/vendor/business/business-7/dashboard", "VENDOR");
 
     expect(await screen.findByRole("heading", { name: "Vendor dashboard route" })).toBeInTheDocument();
+    expect(vendorFetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/businesses/business-7/"));
+  });
+
+  it("loads the vendor personal profile under a business-scoped route", async () => {
+    vendorFetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        id: "business-7",
+        name: "Paws & Co",
+        business_type: "SERVICE_PROVIDER",
+      }),
+    });
+    renderApp("/vendor/business/business-7/profile", "VENDOR");
+
+    expect(await screen.findByRole("heading", { name: "Vendor personal profile route" })).toBeInTheDocument();
     expect(vendorFetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/businesses/business-7/"));
   });
 

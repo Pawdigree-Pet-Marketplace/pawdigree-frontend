@@ -4,13 +4,17 @@ import { Link } from "react-router-dom";
 import BackButton from "../../components/BackButton/BackButton";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import API_BASE_URL from "../../services/api";
-import { getCategories, type Category } from "../../services/categoryService";
+import {
+  categoryKindForBusinessType,
+  getCategories,
+  type Category,
+} from "../../services/categoryService";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./VendorAddServicePage.css";
 
-type Business = { id: string; name: string };
+type Business = { id: string; name: string; business_type?: string | null };
 type BusinessResponse = Business[] | { results?: Business[] };
 type ServiceResponse = { category_status?: string };
 
@@ -31,58 +35,90 @@ export default function VendorAddServicePage() {
   const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [businessId, setBusinessId] = useState("");
+  const [businessesLoading, setBusinessesLoading] = useState(activeBusinessId === null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [categoryId, setCategoryId] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
-  const [loadedForBusinessId, setLoadedForBusinessId] = useState<string | null | undefined>(undefined);
-  const loading = loadedForBusinessId !== activeBusinessId;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const selectedBusinessId = activeBusinessId ?? businessId;
+  const selectedBusiness = activeBusiness ?? businesses.find(
+    (business) => String(business.id) === selectedBusinessId,
+  );
+  const categoryKind = categoryKindForBusinessType(selectedBusiness?.business_type);
+  const visibleCategories = categories.filter(
+    (category) => category.is_active && category.kind === categoryKind,
+  );
+  const loading = businessesLoading || categoriesLoading;
 
   useEffect(() => {
     document.title = "Add Service - Pawdigree";
     let cancelled = false;
 
-    async function loadOptions() {
+    async function loadBusinesses() {
+      if (activeBusinessId !== null) {
+        setBusinessesLoading(false);
+        return;
+      }
+      setBusinessesLoading(true);
       try {
-        const [businessResponse, categoryOptions] = await Promise.all([
-          activeBusinessId === null
-            ? vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`)
-            : Promise.resolve(null),
-          getCategories(),
-        ]);
-        if (businessResponse) {
-          if (!businessResponse.ok) throw new Error(await readError(businessResponse));
-          const data = (await businessResponse.json()) as BusinessResponse;
-          const businessOptions = Array.isArray(data) ? data : data.results ?? [];
-          if (cancelled) return;
-          setBusinesses(businessOptions);
-          setBusinessId(businessOptions[0]?.id ?? "");
-        }
+        const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
+        if (!response.ok) throw new Error(await readError(response));
+        const data = (await response.json()) as BusinessResponse;
+        const businessOptions = Array.isArray(data) ? data : data.results ?? [];
         if (cancelled) return;
-        setCategories(categoryOptions);
-        setCategoryId(categoryOptions[0] ? String(categoryOptions[0].id) : "");
+        setBusinesses(businessOptions);
+        setBusinessId((current) => current || businessOptions[0]?.id || "");
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : "Could not load service options.");
       } finally {
-        if (!cancelled) setLoadedForBusinessId(activeBusinessId);
+        if (!cancelled) setBusinessesLoading(false);
       }
     }
 
-    void loadOptions();
+    void loadBusinesses();
     return () => { cancelled = true; };
   }, [activeBusinessId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!categoryKind) {
+      void Promise.resolve().then(() => {
+        if (cancelled) return;
+        setCategories([]);
+        setCategoryId("");
+        setCategoriesLoading(false);
+      });
+      return;
+    }
+
+    void Promise.resolve().then(() => {
+      if (!cancelled) setCategoriesLoading(true);
+    });
+    getCategories(categoryKind)
+      .then((options) => {
+        if (cancelled) return;
+        setCategories(options);
+        setCategoryId(options[0] ? String(options[0].id) : "");
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Could not load service categories.");
+      })
+      .finally(() => { if (!cancelled) setCategoriesLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [selectedBusinessId, categoryKind]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSuccess("");
-    const selectedCategory = categories.find((item) => String(item.id) === categoryId);
+    const selectedCategory = visibleCategories.find((item) => String(item.id) === categoryId);
     if (!selectedBusinessId || !selectedCategory) {
       setError("Select a business and service category before saving.");
       return;
@@ -119,7 +155,7 @@ export default function VendorAddServicePage() {
     }
   }
 
-  const hasFormOptions = (activeBusinessId !== null || businesses.length > 0) && categories.length > 0;
+  const hasFormOptions = Boolean(selectedBusinessId && visibleCategories.length > 0);
 
   return (
     <VendorLayout title="Add a service" description="Tell customers about the care and services your business offers." vendorWorkspace>
@@ -144,12 +180,12 @@ export default function VendorAddServicePage() {
 
             <label className="service-field">
               Service category <span aria-hidden="true"></span>
-              <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)} disabled={loading || categories.length === 0} required>
+              <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)} disabled={loading || visibleCategories.length === 0} required>
                 <option value="">{loading ? "Loading categories..." : "Select a category"}</option>
-                {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                {visibleCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
               </select>
             </label>
-            {!loading && categories.length === 0 && !error && <p className="service-inline-note">No service categories are available yet. Please try again later.</p>}
+            {!loading && visibleCategories.length === 0 && !error && <p className="service-inline-note">No service categories are available yet. Please try again later.</p>}
 
             <label className="service-field">
               Service name <span aria-hidden="true"></span>

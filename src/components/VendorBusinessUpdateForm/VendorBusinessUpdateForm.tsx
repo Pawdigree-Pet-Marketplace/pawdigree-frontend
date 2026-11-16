@@ -16,6 +16,7 @@ export interface BusinessStats {
 
 export interface Business {
   id?: number | string;
+  business_type?: string | null;
   business_name?: string;
   name?: string;
   description?: string;

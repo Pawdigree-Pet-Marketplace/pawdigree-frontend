@@ -2,6 +2,8 @@ import { Bell, Search, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./VendorTopbar.css";
 import VendorBusinessSwitcher from "../VendorBusinessSwitcher/VendorBusinessSwitcher";
+import { useVendorBusiness } from "../../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
 
 type VendorTopbarProps = {
   businessName?: string;
@@ -13,6 +15,11 @@ export default function VendorTopbar({
   onSearch,
   showBusinessSwitcher = false,
 }: VendorTopbarProps) {
+  const activeBusiness = useVendorBusiness();
+  const profilePath = activeBusiness
+    ? vendorBusinessPath(String(activeBusiness.id), "profile")
+    : "/vendor/profile";
+
   return (
     <div className="dashboard-header-actions">
       <label className="dashboard-search">
@@ -38,7 +45,7 @@ export default function VendorTopbar({
       </button>
 
       <Link
-        to="/vendor/profile"
+        to={profilePath}
         className="dashboard-avatar"
         aria-label="My vendor profile"
         title="My profile"

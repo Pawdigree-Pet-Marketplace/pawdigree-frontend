@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import VendorAddServicePage from "../pages/Vendor/VendorAddServicePage";
-import { getCategories } from "../services/categoryService";
+import { getCategories, type Category } from "../services/categoryService";
 import { vendorAuthenticatedFetch } from "../services/vendorAuthenticatedFetch";
 
 vi.mock("../layouts/VendorLayout/VendorLayout", () => ({
@@ -13,13 +13,26 @@ vi.mock("../layouts/VendorLayout/VendorLayout", () => ({
   ),
 }));
 vi.mock("../services/api", () => ({ default: "https://api.test" }));
-vi.mock("../services/categoryService", () => ({ getCategories: vi.fn() }));
+vi.mock("../services/categoryService", () => ({
+  getCategories: vi.fn(),
+  categoryKindForBusinessType: (type?: string | null) => ({
+    PET_SALE_ADOPTION: "pets",
+    PRODUCT_SELLER: "merchandise",
+    SERVICE_PROVIDER: "services",
+  }[type ?? ""] ?? null),
+}));
 vi.mock("../services/vendorAuthenticatedFetch", () => ({ vendorAuthenticatedFetch: vi.fn() }));
 
-const businesses = [{ id: "business-123", name: "Happy Paws" }];
-const categories = [
-  { id: 4, name: "Grooming", slug: "grooming", is_active: true },
-  { id: 7, name: "Boarding", slug: "boarding", is_active: true },
+const businesses = [
+  { id: "business-123", name: "Happy Paws", business_type: "SERVICE_PROVIDER" },
+  { id: "business-456", name: "Paw Supplies", business_type: "PRODUCT_SELLER" },
+];
+const categories: Category[] = [
+  { id: 4, name: "Grooming", slug: "grooming", kind: "services", is_active: true },
+  { id: 7, name: "Boarding", slug: "boarding", kind: "services", is_active: true },
+];
+const merchandiseCategories: Category[] = [
+  { id: 9, name: "Leashes", slug: "leashes", kind: "merchandise", is_active: true },
 ];
 const response = (data: unknown, status = 200) => ({
   ok: status >= 200 && status < 300,
@@ -55,6 +68,22 @@ describe("VendorAddServicePage", () => {
     expect(screen.getByRole("spinbutton", { name: /price \(ugx\)/i })).toBeRequired();
     expect(screen.getByRole("spinbutton", { name: /duration \(minutes\)/i })).toBeRequired();
     expect(screen.getByRole("button", { name: /save service/i })).toBeEnabled();
+  });
+
+  it("reloads available categories when the selected business changes type", async () => {
+    vi.mocked(getCategories).mockImplementation(async (kind) =>
+      kind === "merchandise" ? merchandiseCategories : categories,
+    );
+    const user = userEvent.setup();
+    render(<VendorAddServicePage />);
+
+    await screen.findByRole("option", { name: "Grooming" });
+    await user.selectOptions(screen.getByLabelText(/your business/i), "business-456");
+
+    expect(await screen.findByRole("option", { name: "Leashes" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Grooming" })).not.toBeInTheDocument();
+    expect(getCategories).toHaveBeenCalledWith("services");
+    expect(getCategories).toHaveBeenCalledWith("merchandise");
   });
 
   it("validates required fields and duration before sending", async () => {
