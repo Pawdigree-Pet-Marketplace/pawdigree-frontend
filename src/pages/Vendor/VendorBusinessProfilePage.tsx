@@ -294,23 +294,25 @@ export default function VendorBusinessProfilePage() {
                             {cap(business.verification_status || "draft")}
                           </span>
                         </div>
-                        <button
-                          type="button"
-                          className="bp-business-select"
-                          onClick={() => {
-                            navigate(vendorBusinessPath(id, "businesses"));
-                            setEditingBusinessId(null);
-                          }}
-                        >
-                          {isSelected ? "Viewing" : "View business"}
-                        </button>
-                        <button
-                          type="button"
-                          className="bp-business-select"
-                          onClick={() => navigate(vendorBusinessPath(id, "dashboard"))}
-                        >
-                          Work with this business
-                        </button>
+                        <div className="bp-business-actions">
+                          <button
+                            type="button"
+                            className="bp-business-select"
+                            onClick={() => {
+                              navigate(vendorBusinessPath(id, "businesses"));
+                              setEditingBusinessId(null);
+                            }}
+                          >
+                            {isSelected ? "Viewing" : "View business"}
+                          </button>
+                          <button
+                            type="button"
+                            className="bp-business-select"
+                            onClick={() => navigate(vendorBusinessPath(id, "dashboard"))}
+                          >
+                            Work with this business
+                          </button>
+                        </div>
                       </article>
                     );
                   })}

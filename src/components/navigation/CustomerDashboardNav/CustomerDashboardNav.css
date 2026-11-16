@@ -210,6 +210,11 @@
 }
 
 .customer-dash-side-drawer {
+  --dashboard-paper: #fff0eb;
+  --dashboard-border: rgb(171 100 79 / 19%);
+  --dashboard-teal: #216c68;
+  --dashboard-ink: #2c302f;
+  --dashboard-muted: #68716d;
   display: flex;
   flex-direction: column;
   width: min(86vw, 340px);

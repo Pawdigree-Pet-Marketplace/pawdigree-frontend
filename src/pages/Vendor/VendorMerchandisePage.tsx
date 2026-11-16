@@ -23,7 +23,11 @@ import type {
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
-import { getCategories, type Category } from "../../services/categoryService";
+import {
+  categoryKindForBusinessType,
+  getCategories,
+  type Category,
+} from "../../services/categoryService";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 
 import type { Business } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
@@ -65,6 +69,7 @@ export default function VendorMerchandisePage() {
   const [businessId, setBusinessId] = useState("");
   const [products, setProducts] = useState<Merchandise[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -83,6 +88,10 @@ export default function VendorMerchandisePage() {
     (business) => String(business.id) === businessId,
   );
   const selectedBusinessId = activeBusinessId ?? businessId;
+  const categoryKind = categoryKindForBusinessType(selectedBusiness?.business_type);
+  const visibleCategories = categories.filter(
+    (category) => category.is_active && category.kind === categoryKind,
+  );
 
   const businessProducts = useMemo(
     () => products.filter((product) => String(product.business) === selectedBusinessId),
@@ -102,10 +111,9 @@ export default function VendorMerchandisePage() {
       setError("");
 
       try {
-        const [businessResponse, categoryResponse, productResponse] =
+        const [businessResponse, productResponse] =
           await Promise.all([
             vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`),
-            getCategories(),
             getMerchandise(activeBusinessId ?? undefined),
           ]);
 
@@ -123,7 +131,6 @@ export default function VendorMerchandisePage() {
         if (cancelled) return;
 
         setBusinesses(businessList);
-        setCategories(categoryResponse);
         setProducts(productResponse);
 
         setBusinessId(
@@ -149,9 +156,43 @@ export default function VendorMerchandisePage() {
     };
   }, [activeBusinessId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    if (!categoryKind) {
+      void Promise.resolve().then(() => {
+        if (cancelled) return;
+        setCategories([]);
+        setValues((current) => ({ ...current, category: "" }));
+        setCategoriesLoading(false);
+      });
+      return;
+    }
+
+    void Promise.resolve().then(() => {
+      if (!cancelled) setCategoriesLoading(true);
+    });
+    getCategories(categoryKind)
+      .then((options) => {
+        if (cancelled) return;
+        setCategories(options);
+        setValues((current) => ({
+          ...current,
+          category: options[0] ? String(options[0].id) : "",
+        }));
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Could not load categories.");
+        }
+      })
+      .finally(() => { if (!cancelled) setCategoriesLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [selectedBusinessId, categoryKind]);
+
   function openCreateForm() {
     setEditingProduct(null);
-    setValues(emptyForm);
+    setValues({ ...emptyForm, category: visibleCategories[0] ? String(visibleCategories[0].id) : "" });
     setPhoto(null);
     setPhotoPreview("");
     setShowForm(true);
@@ -216,7 +257,7 @@ async function handleSubmit() {
       return;
     }
 
-    if (!values.category) {
+    if (!visibleCategories.some((category) => String(category.id) === values.category)) {
       setError("Please select a product category.");
       return;
     }
@@ -449,10 +490,13 @@ async function handleSubmit() {
                     onChange={(event) =>
                       updateField("category", event.target.value)
                     }
+                    disabled={categoriesLoading || visibleCategories.length === 0}
                     required
                   >
-                    <option value="">Choose a category</option>
-                    {categories.map((category) => (
+                    <option value="">
+                      {categoriesLoading ? "Loading categories..." : "Choose a category"}
+                    </option>
+                    {visibleCategories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>

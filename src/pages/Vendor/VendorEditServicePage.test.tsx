@@ -11,10 +11,27 @@ import {
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import VendorEditServicePage from "./VendorEditServicePage";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
+import { getCategories, type Category } from "../../services/categoryService";
 
 vi.mock("../../services/api", () => ({ default: "http://api.test" }));
 vi.mock("../../services/vendorAuthenticatedFetch", () => ({
   vendorAuthenticatedFetch: vi.fn(),
+}));
+vi.mock("../../services/categoryService", () => ({
+  getCategories: vi.fn(),
+  categoryKindForBusinessType: (type?: string | null) => ({
+    PET_SALE_ADOPTION: "pets",
+    PRODUCT_SELLER: "merchandise",
+    SERVICE_PROVIDER: "services",
+  }[type ?? ""] ?? null),
+}));
+vi.mock("../../services/vendorBusinessStore", () => ({
+  useVendorBusiness: () => null,
+  useVendorBusinesses: () => ({
+    businesses: [{ id: "business-123", name: "Happy Paws", business_type: "SERVICE_PROVIDER" }],
+    loading: false,
+    error: "",
+  }),
 }));
 vi.mock("../../layouts/VendorLayout/VendorLayout", () => ({
   default: ({ title, children }: { title: string; children: ReactNode }) => (
@@ -34,7 +51,8 @@ const service = {
   id: 7,
   name: "Full grooming",
   description: "Bath, trim and nail clip.",
-  category: "GROOMING",
+  category: 4,
+  business: "business-123",
   price_type: "FIXED",
   price: "35000",
   duration: 60,
@@ -91,11 +109,17 @@ function renderPage(path = "/vendor/services/7/edit") {
 async function renderLoaded() {
   renderPage();
   await screen.findByDisplayValue("Full grooming");
+  await waitFor(() => expect(screen.getByLabelText("Category")).toHaveValue("4"));
 }
 
 describe("Vendor edit service page", () => {
   beforeEach(() => {
     mockApi();
+    vi.mocked(getCategories).mockResolvedValue([
+      { id: 4, name: "Grooming", slug: "grooming", kind: "services", is_active: true },
+      { id: 5, name: "Leashes", slug: "leashes", kind: "merchandise", is_active: true },
+      { id: 6, name: "Retired grooming", slug: "retired-grooming", kind: "services", is_active: false },
+    ] as Category[]);
   });
 
   afterEach(() => {
@@ -112,7 +136,11 @@ describe("Vendor edit service page", () => {
       expect(screen.getByLabelText(/service name/i)).toHaveValue(
         "Full grooming",
       );
-      expect(screen.getByLabelText("Category")).toHaveValue("GROOMING");
+      expect(screen.getByLabelText("Category")).toHaveValue("4");
+      expect(screen.getByRole("option", { name: "Grooming" })).toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Leashes" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Retired grooming" })).not.toBeInTheDocument();
+      expect(getCategories).toHaveBeenCalledWith("services");
       expect(screen.getByLabelText(/price \(ugx\)/i)).toHaveValue(35000);
       expect(screen.getByLabelText(/duration/i)).toHaveValue(60);
       expect(screen.getByLabelText(/service area/i)).toHaveValue(
@@ -181,7 +209,8 @@ describe("Vendor edit service page", () => {
       expect(body.get("name")).toBe("Deluxe grooming");
       expect(body.get("price")).toBe("45000");
       expect(body.get("duration")).toBe("60");
-      expect(body.get("category")).toBe("GROOMING");
+        expect(body.get("category")).toBe("4");
+        expect(body.get("service_type")).toBe("Grooming");
       expect(body.get("price_type")).toBe("FIXED");
       expect(body.get("service_area")).toBe("Within 10 km");
       expect(body.get("status")).toBe("PENDING");

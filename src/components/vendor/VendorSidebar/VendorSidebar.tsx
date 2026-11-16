@@ -161,6 +161,9 @@ const scopedPath: string = (() => {
     case "/vendor/dashboard":
       return vendorBusinessPath(String(business.id), "dashboard");
 
+    case "/vendor/profile":
+      return vendorBusinessPath(String(business.id), "profile");
+
             case "/vendor/store-profile":
       return vendorBusinessPath(String(business.id), "store-profile");
 
