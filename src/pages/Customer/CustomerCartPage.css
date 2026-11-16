@@ -738,3 +738,27 @@
     transition: none;
   }
 }
+
+/* Clear Cart button */
+.customer-cart-clear-button {
+  background: transparent;
+  border: 1px solid #fb8665;
+  color: #d9684b;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.customer-cart-clear-button:hover {
+  background: #fb8665;
+  color: #ffffff;
+}
+
+.customer-cart-clear-button:focus-visible {
+  outline: 2px solid #216c68;
+  outline-offset: 3px;
+}

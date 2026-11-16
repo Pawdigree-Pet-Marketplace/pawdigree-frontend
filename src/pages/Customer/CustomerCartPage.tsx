@@ -85,6 +85,7 @@ export default function CustomerCartPage() {
 
                 <button
                   type="button"
+                  className="customer-cart-clear-button"
                   onClick={() => void clearCart().catch(() => {})}
                 >
                   Clear Cart
