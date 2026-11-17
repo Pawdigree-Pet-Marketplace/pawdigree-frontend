@@ -4,15 +4,20 @@
 ========================================= */
 
 .customer-checkout-layout {
-  min-height: 100vh;
   display: grid;
   grid-template-columns: 236px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 2vw, 36px);
+  width: 100%;
+  max-width: 1920px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px;
   background: #fbfaf7;
   color: #2c302f;
   font-family: "Nunito", sans-serif;
   box-sizing: border-box;
 }
-
 .customer-checkout-layout *,
 .customer-checkout-layout *::before,
 .customer-checkout-layout *::after {
@@ -511,9 +516,10 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .customer-checkout-layout {
     grid-template-columns: 1fr;
+    padding: 20px;
   }
 
   .customer-checkout-main {

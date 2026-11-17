@@ -1,12 +1,28 @@
+
 /* =========================================
    SANDBOX PAYMENT PAGE
 ========================================= */
 
 .sandbox-payment-layout {
-  min-height: 100vh;
   display: grid;
   grid-template-columns: 236px minmax(0, 1fr);
-  background: #fbfaf7;
+  align-items: start;
+  gap: clamp(24px, 2vw, 36px);
+  width: 100%;
+  max-width: 1920px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px;
+
+  /* Same paw-print background as Orders */
+  background-color: #fbfaf7;
+  background-image:
+    radial-gradient(circle at 20px 10px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
+    radial-gradient(circle at 10px 20px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
+    radial-gradient(circle at 30px 20px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
+    radial-gradient(ellipse at 20px 27px, rgb(33 108 104 / 9%) 0 7px, transparent 7.5px);
+  background-size: 140px 140px;
+
   color: #2c302f;
   font-family: "Nunito", sans-serif;
   box-sizing: border-box;
@@ -19,57 +35,78 @@
 }
 
 .sandbox-payment-main {
-  width: 100%;
-  max-width: 1100px;
   min-width: 0;
-  margin: 0 auto;
-  padding: 36px clamp(20px, 4vw, 56px);
+  width: 100%;
+  font-family: "Nunito", sans-serif;
 }
 
+/* =========================================
+   PAGE HEADING / HERO BANNER
+========================================= */
+
 .sandbox-payment-heading {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 30px;
-  padding: 32px;
+  min-height: 212px;
+  width: 100%;
+  margin: 8px 0 24px;
+  padding: 38px 40px;
+  border: 1px solid #e7e5de;
   border-radius: 22px;
   background: linear-gradient(
-    120deg,
-    #f7f3e8 0%,
-    #e8f2ed 65%,
-    #fce9e1 100%
+    110deg,
+    #f5f3e9 0%,
+    #eef5ef 52%,
+    #fff0e8 100%
   );
+  box-shadow: 0 5px 18px rgba(44, 48, 47, 0.035);
+}
+
+/* Banner text */
+.sandbox-payment-heading > div {
+  position: relative;
+  z-index: 2;
+  max-width: 70%;
 }
 
 .sandbox-payment-eyebrow {
-  margin: 0;
+  margin: 0 0 15px;
   color: #216c68;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 
 .sandbox-payment-heading h1 {
-  margin: 8px 0;
+  margin: 0 0 10px;
   color: #2c302f;
   font-family: "Fredoka", sans-serif;
-  font-size: clamp(30px, 4vw, 42px);
+  font-size: clamp(32px, 4vw, 46px);
   font-weight: 600;
 }
 
 .sandbox-payment-heading p:last-child {
   margin: 0;
-  color: #656c68;
-  font-size: 14px;
+  color: #747c78;
+  font-size: 15px;
   line-height: 1.6;
 }
 
+/* Decorative paw positioned independently */
 .sandbox-payment-heading > svg {
-  width: 65px;
-  height: 65px;
-  color: #216c68;
-  opacity: 0.75;
+  position: absolute;
+  top: 50%;
+  right: 10%;
+  width: 85px;
+  height: 85px;
+  color: #b9d0c9;
+  opacity: 0.8;
+  stroke-width: 1.5;
+  transform: translateY(-50%) rotate(-15deg);
 }
 
 /* =========================================
@@ -271,6 +308,7 @@
   font-size: 14px;
   font-weight: 800;
   text-decoration: none;
+  transition: background 160ms ease;
 }
 
 .sandbox-payment-primary-link:hover {
@@ -314,36 +352,40 @@
    RESPONSIVE DESIGN
 ========================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .sandbox-payment-layout {
     grid-template-columns: 1fr;
-  }
-
-  .sandbox-payment-main {
-    padding: 24px 18px;
-  }
-
-  .sandbox-payment-heading {
-    padding: 25px;
-  }
-
-  .sandbox-payment-card {
-    padding: 27px 22px;
-  }
-}
-
-@media (max-width: 480px) {
-  .sandbox-payment-main {
-    padding: 18px 13px;
-  }
-
-  .sandbox-payment-heading {
-    padding: 22px 18px;
+    padding: 20px;
   }
 
   .sandbox-payment-heading > svg {
-    width: 42px;
-    height: 42px;
+    right: 4%;
+  }
+}
+
+@media (max-width: 600px) {
+  .sandbox-payment-layout {
+    padding: 14px;
+  }
+
+  .sandbox-payment-heading {
+    min-height: 180px;
+    padding: 25px 22px;
+  }
+
+  .sandbox-payment-heading h1 {
+    font-size: 32px;
+  }
+
+  .sandbox-payment-heading > div {
+    max-width: 75%;
+  }
+
+  .sandbox-payment-heading > svg {
+    right: -25px;
+    width: 75px;
+    height: 75px;
+    opacity: 0.45;
   }
 
   .sandbox-payment-card {
@@ -352,5 +394,10 @@
 
   .sandbox-payment-details > div {
     gap: 10px;
+  }
+
+  .sandbox-payment-disclaimer {
+    align-items: flex-start;
+    line-height: 1.6;
   }
 }

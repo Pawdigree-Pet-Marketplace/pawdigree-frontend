@@ -1,16 +1,21 @@
-/* Merchandise page layout. Page-level classes are prefixed mp-.
-   Reuses the global tokens from index.css (--teal, --coral, --ink, --sand ...). */
+/* =========================================
+   MERCHANDISE PAGE
+========================================= */
 
 .mp-page {
   width: 100%;
   min-height: 100vh;
-  /* clears the fixed navbar (72px desktop, 56px mobile) */
-  padding: 72px 0 72px;
+  padding: 20px 0 64px;
   overflow-x: clip;
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 14px;
-  background: linear-gradient(180deg, rgb(254 235 227 / 60%) 0, rgb(254 235 227 / 0%) 560px);
+
+  /* Paw-print background across the whole page */
+  background-color: #fbfaf7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='%23dce8df' opacity='.65'%3E%3Cellipse cx='75' cy='91' rx='17' ry='14'/%3E%3Cellipse cx='54' cy='69' rx='7' ry='10' transform='rotate(-25 54 69)'/%3E%3Cellipse cx='70' cy='59' rx='7' ry='10' transform='rotate(-8 70 59)'/%3E%3Cellipse cx='88' cy='59' rx='7' ry='10' transform='rotate(8 88 59)'/%3E%3Cellipse cx='104' cy='70' rx='7' ry='10' transform='rotate(25 104 70)'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 150px 150px;
 }
 
 .mp-page *,
@@ -36,27 +41,41 @@
   outline-offset: 3px;
 }
 
+/* =========================================
+   MAIN CONTAINER
+========================================= */
+
 .mp-container {
-  width: min(1316px, 100% - 48px);
+  width: min(1316px, calc(100% - 48px));
   margin-inline: auto;
 }
 
-.mp-section {
-  margin-top: clamp(40px, 6vw, 72px);
-}
+/* =========================================
+   TOP BANNER
+========================================= */
 
 .mp-hero {
   position: relative;
-  margin-top: 24px;
-  padding: clamp(24px, 4vw, 52px);
+  isolation: isolate;
+  width: 100%;
+  min-height: 212px;
+  margin: 0;
+  padding: 34px 40px;
+  overflow: hidden;
   border: 1px solid rgb(33 108 104 / 13%);
-  border-radius: 28px;
-  background: linear-gradient(115deg, #e7f3ec, #fbf5e9 68%, #ffeae1);
-  box-shadow: 0 16px 42px rgb(44 48 47 / 6%);
+  border-radius: 22px;
+  background: linear-gradient(
+    110deg,
+    #f5f3e9 0%,
+    #eef5ef 52%,
+    #fff0e8 100%
+  );
+  box-shadow: 0 5px 18px rgb(44 48 47 / 3.5%);
 }
 
 .mp-hero-decor {
   position: absolute;
+  z-index: 0;
   inset: 0;
   overflow: hidden;
   border-radius: inherit;
@@ -68,28 +87,31 @@
 }
 
 .mp-decor-paw {
-  top: 12%;
+  top: 14%;
   right: 9%;
   color: rgb(33 108 104 / 20%);
   rotate: -16deg;
 }
 
 .mp-decor-sparkle {
-  top: 40%;
-  right: 14%;
+  top: 43%;
+  right: 15%;
   color: rgb(251 134 101 / 60%);
 }
 
 .mp-hero > :not(.mp-hero-decor) {
   position: relative;
+  z-index: 1;
 }
+
+/* Breadcrumb */
 
 .mp-breadcrumb {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-bottom: 18px;
+  margin-bottom: 15px;
   color: #68716d;
   font-size: 0.82rem;
   font-weight: 700;
@@ -103,6 +125,8 @@
 .mp-breadcrumb [aria-current] {
   color: var(--ink);
 }
+
+/* Banner heading */
 
 .mp-eyebrow {
   display: inline-flex;
@@ -133,80 +157,44 @@
 
 .mp-hero-sub {
   max-width: 560px;
-  margin-top: 10px;
+  margin-top: 10px !important;
   color: #68716d;
   font-size: clamp(0.95rem, 1.2vw, 1.08rem);
   line-height: 1.6;
 }
 
-.mp-results {
-  margin-top: clamp(32px, 5vw, 56px);
-  scroll-margin-top: 92px;
-}
+/* =========================================
+   SEARCH BAR
+========================================= */
 
-.mp-results-head {
-  margin-bottom: 16px;
-}
-
-.mp-results-head h2 {
-  font-family: var(--font-heading);
-  font-size: clamp(1.45rem, 2.2vw, 2rem);
-  line-height: 1.25;
-}
-
-.mp-results-count {
-  margin-top: 4px;
-  color: #68716d;
-  font-size: 0.9rem;
-}
-
-@media (max-width: 768px) {
-  .mp-page {
-    padding-top: 56px;
-  }
-}
-
-@media (max-width: 720px) {
-  .mp-container {
-    width: calc(100% - 32px);
-  }
-
-  .mp-hero {
-    margin-top: 16px;
-    border-radius: 24px;
-  }
-
-  .mp-decor-sparkle {
-    display: none;
-  }
-}
-
-/* hero search */
 .mp-search {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   max-width: 840px;
-  min-height: 70px;
-  margin-top: 24px;
-  padding: 8px 8px 8px 22px;
+  min-height: 64px;
+  margin-top: 22px;
+  padding: 6px 7px 6px 20px;
   color: #737c77;
-  background: rgb(255 255 255 / 96%);
+  background: #fff;
   border: 1px solid rgb(44 48 47 / 8%);
   border-radius: 999px;
-  box-shadow: 0 10px 28px rgb(44 48 47 / 9%);
+  box-shadow: 0 8px 22px rgb(44 48 47 / 7%);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .mp-search:focus-within {
   border-color: rgb(33 108 104 / 42%);
-  box-shadow: 0 0 0 4px rgb(33 108 104 / 10%), 0 10px 28px rgb(44 48 47 / 8%);
+  box-shadow:
+    0 0 0 4px rgb(33 108 104 / 10%),
+    0 8px 22px rgb(44 48 47 / 7%);
 }
 
 .mp-search input {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 52px;
+  min-height: 48px;
   padding: 0 4px;
   color: var(--ink);
   background: transparent;
@@ -218,9 +206,9 @@
 
 .mp-search button {
   display: grid;
-  flex: 0 0 54px;
-  width: 54px;
-  height: 54px;
+  flex: 0 0 50px;
+  width: 50px;
+  height: 50px;
   place-items: center;
   padding: 0;
   color: #fff;
@@ -229,38 +217,98 @@
   border-radius: 50%;
   box-shadow: 0 3px 9px rgb(251 134 101 / 28%);
   cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 
 .mp-search button:hover {
   background: #e87354;
+  transform: translateX(2px);
 }
 
-/* results layout: filter sidebar + product grid */
+/* =========================================
+   FILTERS + PRODUCTS LAYOUT
+========================================= */
+
+.mp-results {
+  margin-top: 36px;
+  scroll-margin-top: 110px;
+}
+
 .mp-results-layout {
   display: grid;
-  grid-template-columns: 290px minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 0.68fr);
   align-items: start;
+  gap: 28px;
+  width: 100%;
 }
 
+/* =========================================
+   FILTER CARD POSITIONING
+   Internal filter controls are unchanged.
+========================================= */
+
 .mp-sidebar {
-  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  align-self: start;
+}
+
+.mp-sidebar > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .mp-backdrop {
   display: none;
 }
 
+/* =========================================
+   PRODUCTS SECTION
+========================================= */
+
+.mp-results-main {
+  width: 100%;
+  min-width: 0;
+  align-self: start;
+}
+
 .mp-results-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 18px;
 }
+
+.mp-results-head h2 {
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.25;
+}
+
+.mp-results-count {
+  margin-top: 5px !important;
+  color: #68716d;
+  font-size: 0.9rem;
+}
+
+.mp-results-main > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mp-results-main img {
+  max-width: 100%;
+}
+
+/* Filter toggle */
 
 .mp-filter-toggle {
   display: none;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   min-height: 44px;
   padding: 0 16px;
@@ -272,6 +320,11 @@
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.mp-filter-toggle:hover {
+  background: #edf5f1;
 }
 
 .mp-badge {
@@ -286,16 +339,29 @@
   font-size: 0.72rem;
 }
 
+/* =========================================
+   TABLET
+========================================= */
+
 @media (max-width: 1180px) {
+  .mp-container {
+    width: calc(100% - 40px);
+  }
+
   .mp-results-layout {
-    grid-template-columns: 262px minmax(0, 1fr);
+    grid-template-columns: minmax(210px, 0.34fr) minmax(0, 0.66fr);
     gap: 22px;
   }
 }
 
+/* =========================================
+   MOBILE FILTER LAYOUT
+========================================= */
+
 @media (max-width: 1023px) {
   .mp-results-layout {
     grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
   }
 
   .mp-sidebar {
@@ -314,26 +380,63 @@
     background: rgb(44 48 47 / 48%);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s linear 0.3s;
   }
 
   .mp-backdrop.is-open {
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.3s ease, visibility 0s;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s;
   }
 }
 
+@media (max-width: 768px) {
+  .mp-page {
+    padding-top: 72px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
 @media (max-width: 720px) {
+  .mp-container {
+    width: calc(100% - 32px);
+  }
+
+  .mp-hero {
+    min-height: auto;
+    padding: 27px 24px;
+    border-radius: 22px;
+  }
+
+  .mp-decor-sparkle {
+    display: none;
+  }
+
   .mp-search {
-    min-height: 62px;
-    padding: 6px 6px 6px 16px;
+    min-height: 58px;
+    margin-top: 20px;
+    padding: 5px 6px 5px 15px;
+  }
+
+  .mp-search input {
+    min-height: 44px;
   }
 
   .mp-search button {
-    flex-basis: 48px;
-    width: 48px;
-    height: 48px;
+    flex-basis: 46px;
+    width: 46px;
+    height: 46px;
+  }
+
+  .mp-results {
+    margin-top: 28px;
   }
 }
 
@@ -341,10 +444,26 @@
   .mp-results-head {
     align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
   }
 
   .mp-filter-toggle {
     width: 100%;
-    justify-content: center;
+  }
+
+  .mp-hero {
+    padding: 24px 20px;
+  }
+
+  .mp-hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .mp-search {
+    gap: 8px;
+  }
+
+  .mp-hero-sub {
+    max-width: 100%;
   }
 }

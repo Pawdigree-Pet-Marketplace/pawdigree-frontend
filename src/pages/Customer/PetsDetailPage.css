@@ -412,3 +412,58 @@
     height: 300px;
   }
 }
+
+/* ADOPT THIS PET BUTTON — teal background, white text */
+.pet-details-page .pd-button-primary {
+  color: #ffffff !important;
+  background-color: #216c68 !important;
+  border: 1.5px solid #216c68;
+  text-decoration: none;
+}
+
+.pet-details-page .pd-button-primary:hover {
+  color: #ffffff !important;
+  background-color: #185b57 !important;
+  border-color: #185b57;
+}
+
+.pet-details-page .pd-button-primary:focus,
+.pet-details-page .pd-button-primary:focus-visible {
+  color: #ffffff !important;
+  outline: 3px solid #fb8665;
+  outline-offset: 3px;
+}
+
+.pet-details-page .pd-button-primary:active {
+  color: #ffffff !important;
+  background-color: #144743 !important;
+}
+
+/* VIEW PROFILE BUTTON — teal background, white text */
+.pet-details-page .pd-button-outline,
+.pet-details-page .pd-vendor-button {
+  color: #ffffff !important;
+  background-color: #216c68 !important;
+  border: 1.5px solid #216c68;
+  text-decoration: none;
+}
+
+.pet-details-page .pd-button-outline:hover,
+.pet-details-page .pd-vendor-button:hover {
+  color: #ffffff !important;
+  background-color: #185b57 !important;
+  border-color: #185b57;
+}
+
+.pet-details-page .pd-button-outline:focus-visible,
+.pet-details-page .pd-vendor-button:focus-visible {
+  color: #ffffff !important;
+  outline: 3px solid #fb8665;
+  outline-offset: 3px;
+}
+
+.pet-details-page .pd-button-outline:active,
+.pet-details-page .pd-vendor-button:active {
+  color: #ffffff !important;
+  background-color: #144743 !important;
+}

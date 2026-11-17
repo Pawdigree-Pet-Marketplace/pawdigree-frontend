@@ -84,6 +84,7 @@ function App() {
           path="/merchandise/:productId"
           element={<ProductDetailsPage />}
         />
+        <Route path="/customer/cart" element={<CustomerCartPage />} />
         <Route path="/pets" element={<CustomerPetCataloguePage />} />
         <Route path="/pets/:petId" element={<PetsDetailPage />} />
         <Route path="/vendors" element={<CustomerVendorsPage />} />
@@ -138,14 +139,6 @@ function App() {
         element={
           <ProtectedRoute role="CUSTOMER">
             <CustomerAdoptionPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/customer/cart"
-        element={
-          <ProtectedRoute role="CUSTOMER">
-            <CustomerCartPage />
           </ProtectedRoute>
         }
       />
