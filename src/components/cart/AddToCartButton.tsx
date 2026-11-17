@@ -1,6 +1,7 @@
 
 import { ShoppingCart, Check } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart, type CartProduct } from "../../context/CartContext";
 import "./AddToCartButton.css";
 
@@ -14,6 +15,7 @@ export default function AddToCartButton({
   disabled = false,
 }: AddToCartButtonProps) {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const [added, setAdded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,6 +31,9 @@ export default function AddToCartButton({
     try {
       await addToCart(product);
       setAdded(true);
+
+      // Navigate to the cart only after the product is added successfully.
+      navigate("/customer/cart");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Could not add this product.",

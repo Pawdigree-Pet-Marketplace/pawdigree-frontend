@@ -359,3 +359,121 @@
   }
 }
 
+
+/* =========================================
+   WHAT HAPPENS NEXT — VERTICAL TIMELINE
+========================================= */
+
+.adoption-page .next-steps {
+  width: 100%;
+  padding: 24px;
+  background: #f2efe8;
+  border-radius: 20px;
+}
+
+.adoption-page .next-steps h2 {
+  margin: 0 0 22px;
+  color: #2c302f;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.adoption-page .timeline-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 76px;
+  padding: 12px 0;
+  color: #777b78;
+}
+
+.adoption-page .timeline-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 52px;
+  height: 36px;
+  border-left: 2px dashed #c9cfc8;
+}
+
+.adoption-page .timeline-item span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #d6dcd6;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #216c68;
+}
+
+.adoption-page .timeline-item.current {
+  color: #2c302f;
+}
+
+.adoption-page .timeline-item.current span,
+.adoption-page .timeline-item.done span {
+  border-color: #216c68;
+  background: #216c68;
+  color: #ffffff;
+}
+
+.adoption-page .timeline-item b {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* Mobile spacing */
+@media (max-width: 620px) {
+  .adoption-page .next-steps {
+    padding: 20px;
+  }
+
+  .adoption-page .timeline-item {
+    min-height: 70px;
+    gap: 13px;
+  }
+
+  .adoption-page .timeline-item b {
+    font-size: 14px;
+  }
+}
+
+/* FIX: Stack the What Happens Next section vertically */
+
+.adoption-page .next-steps {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100%;
+}
+
+.adoption-page .next-steps h2 {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.adoption-page .next-steps .timeline-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 14px;
+}
+
+.adoption-page .next-steps .timeline-item b {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+}

@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag, PawPrint, Sparkles } from "lucide-react";
-import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
+import useSession from "../../hooks/useSession";
 import { useCart } from "../../context/CartContext";
 import "./CustomerCartPage.css";
 
 export default function CustomerCartPage() {
   const navigate = useNavigate();
+  const isCustomer = useSession("CUSTOMER");
 
   const {
     cartItems,
@@ -25,9 +26,7 @@ export default function CustomerCartPage() {
 
   return (
     <div className="customer-cart-layout">
-      <CustomerDashboardNav />
-
-      <main className="customer-cart-main">
+     <main className="customer-cart-main">
         {/* PAGE HEADING */}
         <header className="customer-cart-heading">
   <div className="customer-cart-heading-content">
@@ -224,15 +223,34 @@ export default function CustomerCartPage() {
                 separately.
               </p>
 
-              <button
-                type="button"
-                className="customer-cart-button"
-                disabled={loading || hasUnavailableItems}
-                onClick={() => navigate("/customer/checkout")}
+              {isCustomer ? (
+           <button
+             type="button"
+             className="customer-cart-button"
+             disabled={loading || hasUnavailableItems}
+             onClick={() => navigate("/customer/checkout")}
+           >
+           Proceed to Checkout
+        </button>
+     ) : (
+     <div className="customer-cart-guest-checkout">
+     <p>
+      Please log in or create an account to proceed to checkout.
+     </p>
+
+      <Link to="/login" className="customer-cart-button">
+       Log In to Checkout
+      </Link>
+
+      <Link
+       to="/registration"
+       className="customer-cart-register-link"
       >
-         Proceed to Checkout
-         </button>
-            </aside>
+       Create an Account
+      </Link>
+     </div>
+       )}
+        </aside>
           </div>
         )}
       </main>

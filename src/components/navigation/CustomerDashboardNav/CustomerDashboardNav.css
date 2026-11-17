@@ -439,3 +439,12 @@
 .customer-dash-link.is-unavailable:hover svg {
   color: #805b50;
 }
+
+/* Keep the customer profile avatar green on every page */
+.customer-dash-account .customer-dash-avatar,
+.customer-dash-account:hover .customer-dash-avatar,
+.customer-dash-account:focus-visible .customer-dash-avatar {
+  color: #ffffff !important;
+  background-color: #216c68 !important;
+  border-radius: 50%;
+}

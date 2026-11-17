@@ -12,10 +12,7 @@
 ========================================= */
 
 .customer-cart-layout {
-  display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
-  align-items: start;
-  gap: clamp(24px, 2vw, 36px);
+  display: block;
   width: 100%;
   max-width: 1920px;
   min-height: 100vh;
@@ -63,7 +60,6 @@
 
 /* =========================================
    HERO SECTION
-   Original approved design
 ========================================= */
 
 .customer-cart-heading {
@@ -184,7 +180,6 @@
   font-weight: 600;
 }
 
-
 /* =========================================
    EMPTY CART CARD
 ========================================= */
@@ -216,7 +211,7 @@
   stroke-width: 2;
 }
 
-/* Icon background, if using an icon wrapper */
+/* Icon background */
 
 .customer-cart-empty-icon {
   display: flex;
@@ -283,7 +278,6 @@
   outline: 3px solid rgb(33 108 104 / 25%);
   outline-offset: 3px;
 }
-
 
 /* =========================================
    CART CONTENT LAYOUT
@@ -588,7 +582,12 @@
   font-weight: 800;
 }
 
+/* Checkout button */
+
 .customer-cart-summary .customer-cart-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 48px;
   margin-top: 18px;
@@ -601,6 +600,7 @@
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
+  text-decoration: none;
   transition: background 160ms ease, transform 160ms ease;
 }
 
@@ -624,6 +624,44 @@
 }
 
 /* =========================================
+   GUEST CHECKOUT OPTIONS
+========================================= */
+
+.customer-cart-guest-checkout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.customer-cart-guest-checkout p {
+  margin: 0;
+  color: #68716d;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.customer-cart-summary .customer-cart-guest-checkout .customer-cart-button {
+  margin-top: 0;
+}
+
+.customer-cart-register-link {
+  display: block;
+  color: #216c68;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.customer-cart-register-link:hover {
+  color: #185652;
+  text-decoration: underline;
+}
+
+/* =========================================
    LOADING STATE
 ========================================= */
 
@@ -643,8 +681,6 @@
 
 @media (max-width: 1100px) {
   .customer-cart-layout {
-    grid-template-columns: 210px minmax(0, 1fr);
-    gap: 20px;
     padding: 22px;
   }
 
@@ -664,8 +700,6 @@
 
 @media (max-width: 768px) {
   .customer-cart-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
     padding: 16px;
   }
 
@@ -739,7 +773,10 @@
   }
 }
 
-/* Clear Cart button */
+/* =========================================
+   CLEAR CART BUTTON
+========================================= */
+
 .customer-cart-clear-button {
   background: transparent;
   border: 1px solid #fb8665;

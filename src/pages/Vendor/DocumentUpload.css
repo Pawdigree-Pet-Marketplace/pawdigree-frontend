@@ -591,19 +591,29 @@
 }
 
 .save-exit-button {
-  padding: 0 10px;
-  border: none;
-  background: transparent;
-  color: var(--document-dark-green);
+  min-width: 230px;
+  padding: 15px 26px;
+  border: 1.5px solid var(--document-teal);
+  border-radius: 30px;
+  background: var(--document-white);
+  color: var(--document-teal);
   font-family: inherit;
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.save-exit-button:hover {
-  color: var(--document-teal);
-  text-decoration: underline;
+.save-exit-button:hover:not(:disabled) {
+  background: var(--document-teal);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.save-exit-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 /* TABLET */
