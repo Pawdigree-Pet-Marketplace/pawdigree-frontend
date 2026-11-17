@@ -1,4 +1,4 @@
-import { cleanup, render as rtlRender, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render as rtlRender, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
@@ -71,10 +71,10 @@ describe("VendorAddServicePage", () => {
   });
 
   it("reloads available categories when the selected business changes type", async () => {
+    const user = userEvent.setup();
     vi.mocked(getCategories).mockImplementation(async (kind) =>
       kind === "merchandise" ? merchandiseCategories : categories,
     );
-    const user = userEvent.setup();
     render(<VendorAddServicePage />);
 
     await screen.findByRole("option", { name: "Grooming" });
@@ -140,5 +140,36 @@ describe("VendorAddServicePage", () => {
     await user.type(screen.getByRole("spinbutton", { name: /duration \(minutes\)/i }), "60");
     await user.click(screen.getByRole("button", { name: /save service/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent("detail: Service could not be saved.");
+  });
+
+  it("caps service creation input at 300 words", async () => {
+    render(<VendorAddServicePage />);
+    await screen.findByRole("option", { name: "Happy Paws" });
+    const description = screen.getByRole("textbox", { name: /description/i });
+    fireEvent.change(description, { target: { value: Array(301).fill("word").join(" ") } });
+    expect(screen.getByText(/300 \/ 300 words/)).toBeInTheDocument();
+    expect(description).toHaveValue(Array(300).fill("word").join(" "));
+    expect(screen.getByText("Description is limited to 300 words.")).toBeInTheDocument();
+    fireEvent.change(screen.getByRole("textbox", { name: /service name/i }), { target: { value: "Full dog grooming" } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: /price \(ugx\)/i }), { target: { value: "50000" } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: /duration \(minutes\)/i }), { target: { value: "60" } });
+    fireEvent.click(screen.getByRole("button", { name: /save service/i }));
+    await waitFor(() => expect(vendorAuthenticatedFetch).toHaveBeenCalledWith(expect.stringContaining("/api/services/"), expect.objectContaining({ method: "POST" })));
+  });
+
+  it("shows backend description errors beneath the service description field", async () => {
+    vi.mocked(vendorAuthenticatedFetch).mockImplementation(async (input) => {
+      if (String(input).endsWith("/api/businesses/")) return response(businesses);
+      return response({ description: ["Description must be 300 words or fewer (you wrote 312)."] }, 400);
+    });
+    render(<VendorAddServicePage />);
+    await screen.findByRole("option", { name: "Happy Paws" });
+    fireEvent.change(screen.getByRole("textbox", { name: /service name/i }), { target: { value: "Full dog grooming" } });
+    fireEvent.change(screen.getByRole("textbox", { name: /description/i }), { target: { value: "Bathing and grooming for dogs." } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: /price \(ugx\)/i }), { target: { value: "50000" } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: /duration \(minutes\)/i }), { target: { value: "60" } });
+    fireEvent.click(screen.getByRole("button", { name: /save service/i }));
+    expect(await screen.findByText("Description must be 300 words or fewer (you wrote 312).", { selector: '[role="alert"]' })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /description/i })).toHaveAttribute("aria-invalid", "true");
   });
 });

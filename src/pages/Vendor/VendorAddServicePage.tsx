@@ -12,6 +12,8 @@ import {
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { countWords } from "../../utils/petUtils";
+import { getDescriptionErrorFromMessage, getListingDescriptionError, limitListingDescriptionWords, MAX_LISTING_DESCRIPTION_CHARACTERS, MAX_LISTING_DESCRIPTION_WORDS } from "../../utils/descriptionValidation";
 import "./VendorAddServicePage.css";
 
 type Business = { id: string; name: string; business_type?: string | null };
@@ -41,6 +43,7 @@ export default function VendorAddServicePage() {
   const [categoryId, setCategoryId] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -118,6 +121,12 @@ export default function VendorAddServicePage() {
     event.preventDefault();
     setError("");
     setSuccess("");
+    setDescriptionError("");
+    const validationError = getListingDescriptionError(description);
+    if (validationError) {
+      setDescriptionError(validationError);
+      return;
+    }
     const selectedCategory = visibleCategories.find((item) => String(item.id) === categoryId);
     if (!selectedBusinessId || !selectedCategory) {
       setError("Select a business and service category before saving.");
@@ -149,6 +158,8 @@ export default function VendorAddServicePage() {
       setPrice("");
       setDuration("");
     } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
       setError(err instanceof Error ? err.message : "Could not save your service. Please try again.");
     } finally {
       setSubmitting(false);
@@ -193,8 +204,9 @@ export default function VendorAddServicePage() {
             </label>
             <label className="service-field">
               Description <span aria-hidden="true"></span>
-              <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={5} maxLength={2000} placeholder="Describe what the service includes and who it is for..." required />
-              <small>{description.length}/2000 characters</small>
+              <textarea value={description} onChange={(event) => { const limited = limitListingDescriptionWords(event.target.value); setDescription(limited); setDescriptionError(limited === event.target.value ? "" : "Description is limited to 300 words."); }} rows={5} maxLength={MAX_LISTING_DESCRIPTION_CHARACTERS} aria-describedby="service-description-count service-description-error" aria-invalid={Boolean(descriptionError)} placeholder="Describe what the service includes and who it is for..." required />
+              <small id="service-description-count">{countWords(description)} / {MAX_LISTING_DESCRIPTION_WORDS} words</small>
+              {descriptionError && <small id="service-description-error" className="field-error" role="alert">{descriptionError}</small>}
             </label>
             <div className="service-form-grid">
               <label className="service-field">

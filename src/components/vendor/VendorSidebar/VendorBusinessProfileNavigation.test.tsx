@@ -107,4 +107,27 @@ describe("business-scoped vendor profile navigation", () => {
       "/vendor/business/business-42/profile",
     );
   });
+
+  it.each(["PET_SALE_ADOPTION", "PRODUCT_SELLER", "SERVICE_PROVIDER"])(
+    "keeps Dashboard and Availability inside the selected %s business workspace",
+    async (type) => {
+      const user = userEvent.setup();
+      renderWorkspace("/vendor/business/business-42/profile", type);
+
+      expect(await screen.findByText("Personal vendor account")).toBeInTheDocument();
+      const dashboard = screen.getByRole("link", { name: "Dashboard" });
+      const availability = screen.getByRole("link", { name: "Availability" });
+      expect(dashboard).toHaveAttribute("href", "/vendor/business/business-42/dashboard");
+      expect(availability).toHaveAttribute("href", "/vendor/business/business-42/availability");
+
+      await user.click(availability);
+      expect(await screen.findByText("Business section")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("aria-current", "page");
+      expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute("href", "/vendor/business/business-42/dashboard");
+
+      await user.click(screen.getByRole("link", { name: "Dashboard" }));
+      expect(await screen.findByText("Business section")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
+    },
+  );
 });

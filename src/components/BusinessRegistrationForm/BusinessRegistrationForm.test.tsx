@@ -2,6 +2,7 @@
 import { type ReactNode } from "react";
 import {
   render,
+  fireEvent,
   screen,
   waitFor,
 } from "@testing-library/react";
@@ -408,6 +409,18 @@ describe("Business Registration Form", () => {
         /business description is required/i,
       ),
     ).toBeInTheDocument();
+  });
+
+  it("retains the 500-character business description limit", async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await fillField(user, /^business name$/i, "Happy Paws");
+    await user.selectOptions(screen.getByLabelText(/^business type$/i), "PRODUCT_SELLER");
+    const description = screen.getByLabelText(/^business description$/i);
+    expect(description).toHaveAttribute("maxLength", "500");
+    fireEvent.change(description, { target: { value: "x".repeat(501) } });
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+    expect(await screen.findByText(/description cannot exceed 500 characters/i)).toBeInTheDocument();
   });
 
   it("does not advance when required first-step fields are missing", async () => {

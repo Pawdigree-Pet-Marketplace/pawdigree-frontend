@@ -8,6 +8,7 @@ import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import { countWords } from "../../utils/petUtils";
+import { getDescriptionErrorFromMessage, getListingDescriptionError, limitListingDescriptionWords, MAX_LISTING_DESCRIPTION_CHARACTERS, MAX_LISTING_DESCRIPTION_WORDS } from "../../utils/descriptionValidation";
 import VendorPetBulkUpload from "../../components/vendor/VendorPetBulkUpload";
 import "./VendorAddPetPage.css";
 
@@ -28,7 +29,6 @@ type PetPhoto = {
 };
 
 type ListingType = "ADOPTION" | "SALE";
-const MAX_DESCRIPTION_WORDS = 300;
 
 
 async function readError(response: Response): Promise<string> {
@@ -66,6 +66,7 @@ export default function VendorAddPetPage() {
   const [gender, setGender] = useState("UNKNOWN");
   const [size, setSize] = useState("MEDIUM");
   const [description, setDescription] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const [price, setPrice] = useState("");
   const [photos, setPhotos] = useState<PetPhoto[]>([]);
   const [loadingBusinesses, setLoadingBusinesses] = useState(true);
@@ -164,6 +165,7 @@ export default function VendorAddPetPage() {
     event.preventDefault();
     setError("");
     setSuccess("");
+    setDescriptionError("");
 
     if (!selectedBusinessId) {
       setError("You need a registered business before adding a pet listing.");
@@ -180,8 +182,9 @@ export default function VendorAddPetPage() {
       return;
     }
 
-    if (countWords(description) > MAX_DESCRIPTION_WORDS) {
-      setError("Description must be 300 words or fewer.");
+    const validationError = getListingDescriptionError(description);
+    if (validationError) {
+      setDescriptionError(validationError);
       return;
     }
 
@@ -229,12 +232,15 @@ export default function VendorAddPetPage() {
       setBreed("");
       setAge("");
       setDescription("");
+      setDescriptionError("");
       setPrice("");
       setListingType("ADOPTION");
       setSpecies("Dog");
       setGender("UNKNOWN");
       setSize("MEDIUM");
     } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
       setError(
         err instanceof Error
           ? err.message
@@ -424,14 +430,17 @@ export default function VendorAddPetPage() {
               Description
               <textarea
                 value={description}
-                onChange={(event) => setDescription(event.target.value)}
+                onChange={(event) => { const limited = limitListingDescriptionWords(event.target.value); setDescription(limited); setDescriptionError(limited === event.target.value ? "" : "Description is limited to 300 words."); }}
                 rows={5}
-                aria-describedby="pet-description-count"
+                maxLength={MAX_LISTING_DESCRIPTION_CHARACTERS}
+                aria-describedby="pet-description-count pet-description-error"
+                aria-invalid={Boolean(descriptionError)}
                 placeholder="Tell customers about this pet, its personality and care needs..."
               />
               <span id="pet-description-count" className="pet-description-count">
-                {countWords(description)} / {MAX_DESCRIPTION_WORDS} words
+                {countWords(description)} / {MAX_LISTING_DESCRIPTION_WORDS} words
               </span>
+              {descriptionError && <span id="pet-description-error" className="field-error" role="alert">{descriptionError}</span>}
             </label>
           </section>
 
