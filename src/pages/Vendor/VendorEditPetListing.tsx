@@ -16,6 +16,7 @@ import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import { countWords } from "../../utils/petUtils";
+import { getDescriptionErrorFromMessage, getListingDescriptionError, limitListingDescriptionWords, MAX_LISTING_DESCRIPTION_CHARACTERS, MAX_LISTING_DESCRIPTION_WORDS } from "../../utils/descriptionValidation";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./VendorEditPetListing.css";
 
@@ -45,7 +46,6 @@ type VendorPet = {
   images?: ExistingPhoto[];
 };
 type VendorPetResponse = VendorPet[] | { results: VendorPet[] };
-const MAX_DESCRIPTION_WORDS = 300;
 
 async function readError(response: Response): Promise<string> {
   if (response.status === 401) {
@@ -152,6 +152,7 @@ export default function VendorEditPetListing() {
   const [gender, setGender] = useState("UNKNOWN");
   const [size, setSize] = useState("MEDIUM");
   const [description, setDescription] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const [price, setPrice] = useState("");
   const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([]);
   const [removedPhotoIds, setRemovedPhotoIds] = useState<number[]>([]);
@@ -281,6 +282,7 @@ export default function VendorEditPetListing() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setDescriptionError("");
     const selectedBusinessId = activeBusiness ? String(activeBusiness.id) : businessId;
     if (!selectedBusinessId) {
       setError("Select business");
@@ -290,8 +292,9 @@ export default function VendorEditPetListing() {
       setError("Keep at least 1 photo");
       return;
     }
-    if (countWords(description) > MAX_DESCRIPTION_WORDS) {
-      setError("Description must be 300 words or fewer.");
+    const validationError = getListingDescriptionError(description);
+    if (validationError) {
+      setDescriptionError(validationError);
       return;
     }
     const formData = new FormData();
@@ -326,6 +329,8 @@ export default function VendorEditPetListing() {
         navigate(activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings") : "/vendor/listings");
       }, 800);
     } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
       setError(err instanceof Error ? err.message : "Update failed");
     } finally {
       setSubmitting(false);
@@ -510,12 +515,15 @@ export default function VendorEditPetListing() {
               <textarea
                 className="brand-input"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => { const limited = limitListingDescriptionWords(e.target.value); setDescription(limited); setDescriptionError(limited === e.target.value ? "" : "Description is limited to 300 words."); }}
                 rows={5}
-                aria-describedby="edit-pet-description-count"
+                maxLength={MAX_LISTING_DESCRIPTION_CHARACTERS}
+                aria-describedby="edit-pet-description-count edit-pet-description-error"
+                aria-invalid={Boolean(descriptionError)}
                 placeholder="Tell customers about this pet..."
               />
-              <span id="edit-pet-description-count" className="pet-description-count">{countWords(description)} / {MAX_DESCRIPTION_WORDS} words</span>
+              <span id="edit-pet-description-count" className="pet-description-count">{countWords(description)} / {MAX_LISTING_DESCRIPTION_WORDS} words</span>
+              {descriptionError && <span id="edit-pet-description-error" className="field-error" role="alert">{descriptionError}</span>}
             </label>
           </section>
 

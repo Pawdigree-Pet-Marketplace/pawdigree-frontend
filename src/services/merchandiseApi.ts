@@ -43,6 +43,11 @@ async function request<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
+    if (body && typeof body === "object" && "description" in body) {
+      const value = (body as Record<string, unknown>).description;
+      const detail = Array.isArray(value) ? value.join(" ") : String(value);
+      throw new Error(`description: ${detail}`);
+    }
     const message =
       body && typeof body === "object"
         ? Object.values(body as Record<string, unknown>)

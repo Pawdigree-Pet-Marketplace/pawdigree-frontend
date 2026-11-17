@@ -3,6 +3,8 @@ import { BriefcaseBusiness, CalendarDays, Clock3, LoaderCircle, Wallet } from "l
 import { Link } from "react-router-dom";
 import BackButton from "../../components/BackButton/BackButton";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import "./VendorAvailabilityPage.css";
@@ -16,6 +18,7 @@ type VendorService = {
   duration?: number | null;
   availability_status?: string;
   category_status?: string | null;
+  business?: string | number;
 };
 
 type ServicesResponse = VendorService[] | { results?: VendorService[] };
@@ -41,6 +44,8 @@ async function readError(response: Response): Promise<string> {
 }
 
 export default function VendorAvailabilityPage() {
+  const activeBusiness = useVendorBusiness();
+  const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [services, setServices] = useState<VendorService[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -53,7 +58,7 @@ export default function VendorAvailabilityPage() {
     async function loadServices() {
       try {
         const response = await vendorAuthenticatedFetch(
-          `${API_BASE_URL}/api/services/`
+          `${API_BASE_URL}/api/services/${activeBusinessId ? `?business_id=${encodeURIComponent(activeBusinessId)}` : ""}`
         );
 
         if (!response.ok) {
@@ -61,9 +66,12 @@ export default function VendorAvailabilityPage() {
         }
 
         const data = (await response.json()) as ServicesResponse;
-        const serviceOptions = Array.isArray(data)
+        const fetchedServices = Array.isArray(data)
           ? data
           : data.results ?? [];
+        const serviceOptions = activeBusinessId
+          ? fetchedServices.filter((service) => String(service.business) === activeBusinessId)
+          : fetchedServices;
 
         if (!cancelled) {
           setServices(serviceOptions);
@@ -88,7 +96,7 @@ export default function VendorAvailabilityPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeBusinessId]);
 
   function formatPrice(price: string | number | null | undefined) {
     if (price === null || price === undefined || price === "") {
@@ -106,7 +114,7 @@ export default function VendorAvailabilityPage() {
     >
       <div className="dashboard-content vendor-availability-page">
         <BackButton
-          fallback="/vendor/dashboard"
+          fallback={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "dashboard") : "/vendor/dashboard"}
           label="Back to dashboard"
         />
 
@@ -144,9 +152,11 @@ export default function VendorAvailabilityPage() {
               Add a service to your business first. You can then manage
               its booking days and time slots here.
             </p>
-            <Link to="/vendor/services/new" className="availability-add-link">
-              Add a service
-            </Link>
+            {(!activeBusiness || activeBusiness.business_type === "SERVICE_PROVIDER") && (
+              <Link to={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "services/new") : "/vendor/services/new"} className="availability-add-link">
+                Add a service
+              </Link>
+            )}
           </section>
         )}
 
@@ -199,7 +209,9 @@ export default function VendorAvailabilityPage() {
                   </div>
 
                   <Link
-                    to={`/vendor/services/${service.service_id}/availability`}
+                    to={activeBusiness
+                      ? vendorBusinessPath(String(activeBusiness.id), `services/${service.service_id}/availability`)
+                      : `/vendor/services/${service.service_id}/availability`}
                     className="availability-manage-link"
                   >
                     Manage Availability

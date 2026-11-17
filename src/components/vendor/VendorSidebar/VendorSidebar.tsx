@@ -185,6 +185,9 @@ const scopedPath: string = (() => {
     case "/vendor/orders":
       return vendorBusinessPath(String(business.id), "orders");
 
+    case "/vendor/availability":
+      return vendorBusinessPath(String(business.id), "availability");
+
     case "/vendor/business-profile":
       return vendorBusinessPath(String(business.id), "businesses");
 
@@ -239,6 +242,7 @@ const scopedPath: string = (() => {
                     "/vendor/services/new",
                     "/vendor/merchandise",
                     "/vendor/orders",
+                    "/vendor/availability",
                   ].includes(item.path)
                 )
               ) {

@@ -282,6 +282,26 @@ describe("Vendor edit service page", () => {
       ).toBeEnabled();
     });
 
+    it("shows backend description validation beneath the field", async () => {
+      mockApi({ patch: () => json({ description: ["Description must be 300 words or fewer (you wrote 312)."] }, 400) });
+      await renderLoaded();
+      fireEvent.click(screen.getByRole("button", { name: "Submit for review" }));
+      expect(await screen.findByText("Description must be 300 words or fewer (you wrote 312).", { selector: "small[role=alert]" })).toBeInTheDocument();
+      expect(screen.getByLabelText(/description/i)).toHaveAttribute("aria-invalid", "true");
+    });
+
+    it("lets vendors shorten an existing service description above the new limit", async () => {
+      mockApi({ get: () => json({ ...service, description: Array(301).fill("word").join(" ") }) });
+      await renderLoaded();
+      const description = screen.getByLabelText(/description/i);
+      expect(description).toHaveValue(Array(301).fill("word").join(" "));
+      expect(screen.getByText(/301 \/ 300 words/)).toBeInTheDocument();
+      fireEvent.change(description, { target: { value: "Shortened service description." } });
+      fireEvent.click(screen.getByRole("button", { name: "Save as draft" }));
+      await waitFor(() => expect(callsWithMethod("PATCH")).toHaveLength(1));
+      expect((callsWithMethod("PATCH")[0][1]?.body as FormData).get("description")).toBe("Shortened service description.");
+    });
+
     it("sends the ids of removed photos", async () => {
       await renderLoaded();
       fireEvent.click(screen.getByRole("button", { name: "Remove photo 1" }));

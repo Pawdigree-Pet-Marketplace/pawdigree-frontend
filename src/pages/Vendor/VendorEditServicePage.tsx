@@ -22,6 +22,8 @@ import {
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness, useVendorBusinesses } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
+import { countWords } from "../../utils/petUtils";
+import { getDescriptionErrorFromMessage, getListingDescriptionError, limitListingDescriptionWords, MAX_LISTING_DESCRIPTION_CHARACTERS, MAX_LISTING_DESCRIPTION_WORDS } from "../../utils/descriptionValidation";
 import "./VendorEditServicePage.css";
 
 /* ------------------------------------------------------------------ */
@@ -228,6 +230,7 @@ export default function VendorEditServicePage() {
   const [duration, setDuration] = useState("");
   const [serviceArea, setServiceArea] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const [existingPhotos, setExistingPhotos] = useState<ExistingPhoto[]>([]);
   const [removedPhotoIds, setRemovedPhotoIds] = useState<number[]>([]);
   const [newPhotos, setNewPhotos] = useState<{ file: File; preview: string }[]>(
@@ -365,6 +368,12 @@ export default function VendorEditServicePage() {
   async function save(status: ServiceStatus) {
     setError("");
     setSuccess("");
+    setDescriptionError("");
+    const descriptionValidationError = getListingDescriptionError(description);
+    if (descriptionValidationError) {
+      setDescriptionError(descriptionValidationError);
+      return;
+    }
 
     if (!serviceName.trim()) {
       setError("Add a service name before saving.");
@@ -424,6 +433,8 @@ export default function VendorEditServicePage() {
         900,
       );
     } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
       setError(
         err instanceof Error
           ? err.message
@@ -627,13 +638,16 @@ export default function VendorEditServicePage() {
                 </span>
                 <textarea
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => { const limited = limitListingDescriptionWords(e.target.value); setDescription(limited); setDescriptionError(limited === e.target.value ? "" : "Description is limited to 300 words."); }}
                   rows={5}
-                  maxLength={2000}
+                  maxLength={MAX_LISTING_DESCRIPTION_CHARACTERS}
+                  aria-describedby="edit-service-description-count edit-service-description-error"
+                  aria-invalid={Boolean(descriptionError)}
                   placeholder="Describe what the service includes and who it is for..."
                   required
                 />
-                <small>{description.length}/2000 characters</small>
+                <small id="edit-service-description-count">{countWords(description)} / {MAX_LISTING_DESCRIPTION_WORDS} words</small>
+                {descriptionError && <small id="edit-service-description-error" className="field-error" role="alert">{descriptionError}</small>}
               </label>
             </div>
           </section>

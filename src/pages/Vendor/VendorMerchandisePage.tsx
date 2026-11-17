@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import {
   Plus,
@@ -29,6 +29,8 @@ import {
   type Category,
 } from "../../services/categoryService";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { getDescriptionErrorFromMessage, getListingDescriptionError, limitListingDescriptionWords, MAX_LISTING_DESCRIPTION_CHARACTERS, MAX_LISTING_DESCRIPTION_WORDS } from "../../utils/descriptionValidation";
+import { countWords } from "../../utils/petUtils";
 
 import type { Business } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
 
@@ -80,6 +82,7 @@ export default function VendorMerchandisePage() {
   const [editingProduct, setEditingProduct] =
     useState<Merchandise | null>(null);
   const [values, setValues] = useState<FormValues>(emptyForm);
+  const [descriptionError, setDescriptionError] = useState("");
 
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
@@ -198,6 +201,7 @@ export default function VendorMerchandisePage() {
     setShowForm(true);
     setError("");
     setSuccess("");
+    setDescriptionError("");
   }
 
   function openEditForm(product: Merchandise) {
@@ -216,6 +220,7 @@ export default function VendorMerchandisePage() {
     setShowForm(true);
     setError("");
     setSuccess("");
+    setDescriptionError("");
   }
 
   function closeForm() {
@@ -224,6 +229,7 @@ export default function VendorMerchandisePage() {
     setValues(emptyForm);
     setPhoto(null);
     setPhotoPreview("");
+    setDescriptionError("");
   }
 
   function updateField(
@@ -251,7 +257,15 @@ export default function VendorMerchandisePage() {
     setError("");
   }
 
-async function handleSubmit() {
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setDescriptionError("");
+    const descriptionValidationError = getListingDescriptionError(values.description);
+    if (descriptionValidationError) {
+      setDescriptionError(descriptionValidationError);
+      return;
+    }
     if (!selectedBusinessId) {
       setError("Register a business before adding merchandise.");
       return;
@@ -307,6 +321,8 @@ async function handleSubmit() {
       await loadProducts();
       closeForm();
     } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
       setError(
         err instanceof Error
           ? err.message
@@ -445,11 +461,16 @@ async function handleSubmit() {
                     id="vm-description"
                     value={values.description}
                     onChange={(event) =>
-                      updateField("description", event.target.value)
+                      { const limited = limitListingDescriptionWords(event.target.value); updateField("description", limited); setDescriptionError(limited === event.target.value ? "" : "Description is limited to 300 words."); }
                     }
+                    maxLength={MAX_LISTING_DESCRIPTION_CHARACTERS}
+                    aria-describedby="vm-description-count vm-description-error"
+                    aria-invalid={Boolean(descriptionError)}
                     rows={3}
                     placeholder="Describe your product..."
                   />
+                  <small id="vm-description-count">{countWords(values.description)} / {MAX_LISTING_DESCRIPTION_WORDS} words</small>
+                  {descriptionError && <p id="vm-description-error" className="field-error" role="alert">{descriptionError}</p>}
                 </div>
 
                 <div className="vm-field">
