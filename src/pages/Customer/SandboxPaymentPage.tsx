@@ -1,10 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   CheckCircle,
   XCircle,
   Clock,
-  CreditCard,
   Smartphone,
   PawPrint,
 } from "lucide-react";
@@ -89,7 +89,7 @@ export default function SandboxPaymentPage() {
     };
   }, [reference, validOrderId, orderId, refreshCart]);
 
-  // Simulate the result returned by the sandbox gateway.
+  // Process the payment confirmation.
   async function handleSimulation(result: SandboxPaymentResult) {
     if (!reference) {
       setError("The payment reference is missing.");
@@ -121,7 +121,7 @@ export default function SandboxPaymentPage() {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to process the sandbox payment.",
+          : "Unable to process your payment.",
       );
     } finally {
       setProcessing(false);
@@ -165,10 +165,9 @@ export default function SandboxPaymentPage() {
             <p className="sandbox-payment-eyebrow">
               PAWDIGREE PET STORE
             </p>
-            <h1>Sandbox Payment</h1>
+            <h1>Confirm Payment</h1>
             <p>
-              Test the payment process before connecting a live payment
-              provider.
+              Review your order details and confirm your payment.
             </p>
           </div>
 
@@ -200,8 +199,8 @@ export default function SandboxPaymentPage() {
                 <XCircle size={58} />
                 <h2>Payment failed</h2>
                 <p>
-                  The sandbox has simulated an unsuccessful payment.
-                  Your order was not paid.
+                  Your payment could not be completed.
+                  Your order has not been paid.
                 </p>
               </div>
             ) : (
@@ -209,8 +208,7 @@ export default function SandboxPaymentPage() {
                 <Clock size={58} />
                 <h2>Payment awaiting confirmation</h2>
                 <p>
-                  Choose a test result below to complete the sandbox
-                  payment.
+                  Confirm your payment to complete your order.
                 </p>
               </div>
             )}
@@ -261,8 +259,7 @@ export default function SandboxPaymentPage() {
             {isPending && (
               <div className="sandbox-payment-actions">
                 <p>
-                  Select one of the options below to simulate the gateway
-                  response.
+                  Confirm your payment to proceed with your order.
                 </p>
 
                 <button
@@ -272,8 +269,10 @@ export default function SandboxPaymentPage() {
                   onClick={() => handleSimulation("success")}
                 >
                   <CheckCircle size={19} />
-                  {processing ? "Processing..." : "Simulate Successful Payment"}
+                  {processing ? "Confirming..." : "Confirm Payment"}
                 </button>
+
+                {/* Retained for future payment failure testing.
 
                 <button
                   type="button"
@@ -284,6 +283,8 @@ export default function SandboxPaymentPage() {
                   <XCircle size={19} />
                   {processing ? "Processing..." : "Simulate Failed Payment"}
                 </button>
+
+                */}
               </div>
             )}
 
@@ -313,11 +314,6 @@ export default function SandboxPaymentPage() {
             <Link to="/customer/orders">View My Orders</Link>
           </section>
         )}
-
-        <p className="sandbox-payment-disclaimer">
-          <CreditCard size={16} />
-          This is a development sandbox. No real money is charged.
-        </p>
 
         <Link to="/customer/cart" className="sandbox-payment-back-link">
           <Smartphone size={16} />
