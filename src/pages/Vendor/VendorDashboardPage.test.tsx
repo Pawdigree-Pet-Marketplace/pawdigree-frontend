@@ -9,7 +9,7 @@ vi.mock('../../services/api', async (importOriginal) => {
   return { ...actual, apiRequest: vi.fn() }
 })
 
-vi.mock('../layouts/VendorLayout/VendorLayout', () => ({
+vi.mock('../../layouts/VendorLayout/VendorLayout', () => ({
   default: ({
     title,
     description,
