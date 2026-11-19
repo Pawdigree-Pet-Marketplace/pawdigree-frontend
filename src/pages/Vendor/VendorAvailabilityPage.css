@@ -132,7 +132,7 @@
   border: 1px solid #216C68;
   border-radius: 999px;
   background: #216C68;
-  color: #FFFFFF;
+  color: #FFFFFF !important;
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
@@ -143,6 +143,19 @@
 .vendor-workspace .availability-add-link:hover {
   transform: translateY(-1px);
   background: #195652;
+}
+
+.vendor-workspace .availability-service-actions {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.vendor-workspace .availability-service-actions .availability-manage-link {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 /* LOADING, ERROR AND EMPTY STATES */
@@ -226,6 +239,22 @@
     width: 100%;
     box-sizing: border-box;
   }
+
+  .vendor-workspace .availability-service-actions {
+    flex-direction: column;
+  }
+
+  .vendor-workspace .availability-service-actions .availability-manage-link {
+    flex: none;
+  }
+
+  .vendor-workspace .vendor-availability-page .availability-intro {
+    flex-wrap: wrap;
+  }
+
+  .vendor-workspace .vendor-availability-page .availability-intro > .availability-add-link {
+    margin-left: 0;
+  }
 }
 
 @keyframes availability-spin {
@@ -259,10 +288,16 @@
   gap: 15px;
 }
 
-.vendor-workspace .vendor-availability-page .availability-intro > div:last-child {
+.vendor-workspace .vendor-availability-page .availability-intro > .availability-intro-copy {
   flex: 1;
   min-width: 0;
   text-align: left;
+}
+
+.vendor-workspace .vendor-availability-page .availability-intro > .availability-add-link {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 /* Make the Add a service button text white */

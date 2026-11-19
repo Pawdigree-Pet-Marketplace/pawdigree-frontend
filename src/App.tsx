@@ -34,6 +34,7 @@ import VendorRegistrationPage from "./pages/Vendor/VendorRegistrationPage";
 import VendorLandingPage from "./pages/Vendor/VendorLandingPage";
 import VendorOrdersPage from "./pages/Vendor/VendorOrdersPage";
 import VendorDashboardPage from "./pages/Vendor/VendorDashboardPage";
+import VendorBusinessDashboardPage from "./pages/Vendor/VendorBusinessDashboardPage";
 import VendorLoginPage from "./pages/Vendor/VendorLoginPage";
 import VendorAddPetPage from "./pages/Vendor/VendorAddPetPage";
 import VendorCataloguePage from "./pages/Vendor/VendorCataloguePage";
@@ -349,7 +350,7 @@ function App() {
         element={
           <ProtectedRoute role="VENDOR">
             <VendorBusinessRoute>
-              <VendorDashboardPage />
+              <VendorBusinessDashboardPage />
             </VendorBusinessRoute>
           </ProtectedRoute>
         }
@@ -360,6 +361,16 @@ function App() {
           <ProtectedRoute role="VENDOR">
             <VendorBusinessRoute>
               <VendorAvailabilityPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/business/:businessId/services"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorAvailabilityPage view="catalog" />
             </VendorBusinessRoute>
           </ProtectedRoute>
         }

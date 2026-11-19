@@ -49,4 +49,35 @@ describe("VendorAvailabilityPage business context", () => {
       "/vendor/business/business-42/services/11/availability",
     );
   });
+
+  it("uses the existing service data for Catalog and links to the current edit route", async () => {
+    vi.mocked(vendorAuthenticatedFetch).mockResolvedValue(new Response(JSON.stringify([
+      { service_id: 11, name: "Current business grooming", business: "business-42", price: "30000", duration: 60 },
+    ]), { status: 200, headers: { "Content-Type": "application/json" } }));
+    const business = {
+      id: "business-42",
+      name: "Pawdigree Services",
+      business_type: "SERVICE_PROVIDER",
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/vendor/business/business-42/services"]}>
+        <VendorBusinessContext.Provider value={{ business }}>
+          <VendorAvailabilityPage view="catalog" />
+        </VendorBusinessContext.Provider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Current business grooming")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Service Catalog" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /edit service/i })).toHaveAttribute(
+      "href",
+      "/vendor/business/business-42/services/11/edit",
+    );
+    expect(screen.getByRole("link", { name: /manage availability/i })).toHaveAttribute(
+      "href",
+      "/vendor/business/business-42/services/11/availability",
+    );
+    expect(vendorAuthenticatedFetch).toHaveBeenCalledWith("http://api.test/api/services/?business_id=business-42");
+  });
 });

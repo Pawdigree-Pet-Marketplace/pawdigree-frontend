@@ -14,6 +14,7 @@ import {
   type VendorOrderFilter,
   type VendorOrderStatus,
 } from "../../services/vendorOrdersApi";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import "./VendorOrdersPage.css";
 
 const filters: VendorOrderFilter[] = [
@@ -56,6 +57,7 @@ function nextAction(status: VendorOrderStatus) {
 }
 
 export default function VendorOrdersPage() {
+  const activeBusiness = useVendorBusiness();
   const [orders, setOrders] = useState<VendorOrder[]>([]);
   const [filter, setFilter] = useState<VendorOrderFilter>("ALL");
   const [loading, setLoading] = useState(true);
@@ -118,7 +120,7 @@ useEffect(() => {
 
   return (
     <VendorLayout
-      title="Orders & Bookings"
+      title={activeBusiness?.business_type === "PRODUCT_SELLER" ? "Orders" : "Orders & Bookings"}
       description="View customer orders, prepare purchases and manage deliveries."
       vendorWorkspace
     >

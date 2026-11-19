@@ -29,6 +29,7 @@ const implementedVendorPages = new Set([
   "/vendor/listings",
   "/vendor/adoption-applications",
   "/vendor/services/new",
+  "/vendor/services/catalog",
   "/vendor/business-profile",
   "/vendor/availability",
   "/vendor/orders",
@@ -48,7 +49,7 @@ const navigationGroups = [
   {
     title: "YOUR STORE",
     items: [
-      { label: "Catalogue", path: "/vendor/listings", icon: Package },
+      { label: "Catalog", path: "/vendor/listings", icon: Package },
       {
         label: "Adoption applications",
         path: "/vendor/adoption-applications",
@@ -58,6 +59,11 @@ const navigationGroups = [
         label: "Add Service",
         path: "/vendor/services/new",
         icon: BriefcaseBusiness,
+      },
+      {
+        label: "Catalog",
+        path: "/vendor/services/catalog",
+        icon: Package,
       },
       {
   label: "Merchandise",
@@ -140,10 +146,11 @@ export default function VendorSidebar({
       <nav className="dashboard-navigation" aria-label="Vendor navigation">
         {navigationGroups.map((group) => {
           const scopedItems = group.items.filter((item) => {
-            if (!business) return true;
+            if (!business) return item.path !== "/vendor/services/catalog";
             if (item.path === "/vendor/listings" || item.path === "/vendor/adoption-applications") return business.business_type === "PET_SALE_ADOPTION";
             if (item.path === "/vendor/merchandise") return business.business_type === "PRODUCT_SELLER";
-            if (item.path === "/vendor/services/new") return business.business_type === "SERVICE_PROVIDER";
+            if (item.path === "/vendor/services/new" || item.path === "/vendor/services/catalog") return business.business_type === "SERVICE_PROVIDER";
+            if (item.path === "/vendor/orders") return ["PRODUCT_SELLER", "SERVICE_PROVIDER"].includes(business.business_type ?? "");
             return true;
           });
           if (scopedItems.length === 0) return null;
@@ -153,6 +160,15 @@ export default function VendorSidebar({
 
             {scopedItems.map((item) => {
               const Icon = item.icon;
+              const itemLabel = business?.business_type === "PRODUCT_SELLER" && item.path === "/vendor/merchandise"
+                ? "Merchandise"
+                : business?.business_type === "PET_SALE_ADOPTION" && item.path === "/vendor/listings"
+                  ? "Catalog"
+                  : business?.business_type === "PRODUCT_SELLER" && item.path === "/vendor/orders"
+                    ? "Orders"
+                    : business?.business_type === "SERVICE_PROVIDER" && item.path === "/vendor/orders"
+                      ? "Bookings"
+                      : item.label;
              
 const scopedPath: string = (() => {
   if (!business) return item.path;
@@ -179,6 +195,9 @@ const scopedPath: string = (() => {
     case "/vendor/services/new":
       return vendorBusinessPath(String(business.id), "services/new");
 
+    case "/vendor/services/catalog":
+      return vendorBusinessPath(String(business.id), "services");
+
     case "/vendor/merchandise":
       return vendorBusinessPath(String(business.id), "merchandise");
 
@@ -197,7 +216,7 @@ const scopedPath: string = (() => {
 })();
 
               const isActive =
-                currentPath === scopedPath ||
+                (currentPath === scopedPath && !(business?.business_type === "PET_SALE_ADOPTION" && item.path === "/vendor/listings" && location.search.includes("type=SALE"))) ||
             (item.path === "/vendor/store-profile" && (business ? currentPath.endsWith("/store-profile") : currentPath === "/vendor/store-profile")) ||
                 (business && item.path === "/vendor/business-profile" && currentPath.endsWith("/businesses")) ||
                 (item.path === "/vendor/listings" &&
@@ -217,7 +236,7 @@ const scopedPath: string = (() => {
                     size={18}
                     strokeWidth={1.9}
                   />
-                  <span>{item.label}</span>
+                  <span>{itemLabel}</span>
                   {isActive && (
                     <ChevronRight
                       className="dashboard-nav-chevron"
@@ -230,7 +249,7 @@ const scopedPath: string = (() => {
 
         
               if (
-                !implementedVendorPages.has(item.path) &&
+                  !implementedVendorPages.has(item.path) &&
                 !(
                   business &&
                   [
@@ -240,6 +259,7 @@ const scopedPath: string = (() => {
                     "/vendor/listings",
                     "/vendor/adoption-applications",
                     "/vendor/services/new",
+                    "/vendor/services/catalog",
                     "/vendor/merchandise",
                     "/vendor/orders",
                     "/vendor/availability",
@@ -261,6 +281,17 @@ const scopedPath: string = (() => {
                 </Link>
               );
             })}
+            {business?.business_type === "PET_SALE_ADOPTION" && group.title === "YOUR STORE" && (
+              <Link
+                to={`${vendorBusinessPath(String(business.id), "listings")}?type=SALE`}
+                className={`dashboard-nav-item${currentPath.endsWith("/listings") && location.search.includes("type=SALE") ? " active" : ""}`}
+                aria-current={currentPath.endsWith("/listings") && location.search.includes("type=SALE") ? "page" : undefined}
+                title="Pet Sales"
+              >
+                <ShoppingBag className="dashboard-nav-icon" size={18} strokeWidth={1.9} />
+                <span>Pet Sales</span>
+              </Link>
+            )}
           </div>
           );
         })}

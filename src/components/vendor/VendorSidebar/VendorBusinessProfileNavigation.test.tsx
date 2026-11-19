@@ -131,4 +131,31 @@ describe("business-scoped vendor profile navigation", () => {
     },
   );
 
+  it("shows merchandise business navigation without Bookings", async () => {
+    renderWorkspace("/vendor/business/business-42/dashboard", "PRODUCT_SELLER");
+    expect(await screen.findByText("Business section")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Merchandise" })).toHaveAttribute("href", "/vendor/business/business-42/merchandise");
+    expect(screen.getByRole("link", { name: "Orders" })).toHaveAttribute("href", "/vendor/business/business-42/orders");
+    expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
+    expect(screen.queryByRole("link", { name: "Bookings" })).not.toBeInTheDocument();
+  });
+
+  it("keeps pet sales within the unified Catalog and hides Orders and Bookings", async () => {
+    renderWorkspace("/vendor/business/business-42/dashboard", "PET_SALE_ADOPTION");
+    expect(await screen.findByText("Business section")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Catalog" })).toHaveAttribute("href", "/vendor/business/business-42/listings");
+    expect(screen.getByRole("link", { name: "Pet Sales" })).toHaveAttribute("href", "/vendor/business/business-42/listings?type=SALE");
+    expect(screen.getByRole("link", { name: "Adoption applications" })).toHaveAttribute("href", "/vendor/business/business-42/adoption-applications");
+    expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
+    expect(screen.queryByRole("link", { name: /orders|bookings/i })).not.toBeInTheDocument();
+  });
+
+  it("shows service Catalog, Bookings and Availability for service businesses", async () => {
+    renderWorkspace("/vendor/business/business-42/dashboard", "SERVICE_PROVIDER");
+    expect(await screen.findByText("Business section")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Catalog" })).toHaveAttribute("href", "/vendor/business/business-42/services");
+    expect(screen.getByRole("link", { name: "Bookings" })).toHaveAttribute("href", "/vendor/business/business-42/orders");
+    expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
+  });
+
 });

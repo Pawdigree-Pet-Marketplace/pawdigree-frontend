@@ -115,6 +115,10 @@ vi.mock("./pages/Vendor/VendorDashboardPage", () => ({
   default: () => <main><h1>Vendor dashboard route</h1></main>,
 }));
 
+vi.mock("./pages/Vendor/VendorBusinessDashboardPage", () => ({
+  default: () => <main><h1>Vendor dashboard route</h1></main>,
+}));
+
 vi.mock("./pages/Vendor/VendorBusinessProfilePage", () => ({
   default: () => <main><h1>Vendor business profile route</h1></main>,
 }));

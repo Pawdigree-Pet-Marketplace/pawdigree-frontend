@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BriefcaseBusiness, CalendarDays, Clock3, LoaderCircle, Wallet } from "lucide-react";
+import { BriefcaseBusiness, CalendarDays, Clock3, LoaderCircle, Pencil, Plus, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackButton from "../../components/BackButton/BackButton";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
@@ -43,7 +43,8 @@ async function readError(response: Response): Promise<string> {
   return `Request failed (${response.status}). Please try again.`;
 }
 
-export default function VendorAvailabilityPage() {
+export default function VendorAvailabilityPage({ view = "availability" }: { view?: "availability" | "catalog" }) {
+  const isCatalog = view === "catalog";
   const activeBusiness = useVendorBusiness();
   const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [services, setServices] = useState<VendorService[]>([]);
@@ -108,8 +109,8 @@ export default function VendorAvailabilityPage() {
 
   return (
     <VendorLayout
-      title="Availability"
-      description="Choose a service to manage the days and times customers can book."
+      title={isCatalog ? "Service Catalog" : "Availability"}
+      description={isCatalog ? "View and manage the services offered by this business." : "Choose a service to manage the days and times customers can book."}
       vendorWorkspace
     >
       <div className="dashboard-content vendor-availability-page">
@@ -122,13 +123,17 @@ export default function VendorAvailabilityPage() {
           <div className="availability-intro-icon">
             <CalendarDays size={23} />
           </div>
-          <div>
-            <h2>Manage your service availability</h2>
-            <p>
-              Select one of your services to set the days and time slots
-              when customers can book appointments.
-            </p>
+          <div className="availability-intro-copy">
+            <h2>{isCatalog ? "Your services" : "Manage your service availability"}</h2>
+            <p>{isCatalog
+              ? "Review your registered services, edit their details, or update when customers can book."
+              : "Select one of your services to set the days and time slots when customers can book appointments."}</p>
           </div>
+          {isCatalog && activeBusiness && (
+            <Link to={vendorBusinessPath(String(activeBusiness.id), "services/new")} className="availability-add-link">
+              <Plus size={16} /> Add service
+            </Link>
+          )}
         </section>
 
         {loading && (
@@ -208,15 +213,26 @@ export default function VendorAvailabilityPage() {
                     )}
                   </div>
 
-                  <Link
-                    to={activeBusiness
-                      ? vendorBusinessPath(String(activeBusiness.id), `services/${service.service_id}/availability`)
-                      : `/vendor/services/${service.service_id}/availability`}
-                    className="availability-manage-link"
-                  >
-                    Manage Availability
-                    <CalendarDays size={17} />
-                  </Link>
+                  <div className="availability-service-actions">
+                    {isCatalog && activeBusiness && (
+                      <Link
+                        to={vendorBusinessPath(String(activeBusiness.id), `services/${service.service_id}/edit`)}
+                        className="availability-manage-link"
+                      >
+                        Edit service
+                        <Pencil size={17} />
+                      </Link>
+                    )}
+                    <Link
+                      to={activeBusiness
+                        ? vendorBusinessPath(String(activeBusiness.id), `services/${service.service_id}/availability`)
+                        : `/vendor/services/${service.service_id}/availability`}
+                      className="availability-manage-link"
+                    >
+                      {isCatalog ? "Manage availability" : "Manage Availability"}
+                      <CalendarDays size={17} />
+                    </Link>
+                  </div>
                 </article>
               ))}
             </div>
