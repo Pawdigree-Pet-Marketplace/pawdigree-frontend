@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -8,6 +7,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ShoppingCart,
+  CheckCircle,
+  X,
 } from "lucide-react";
 
 import BackButton from "../../components/BackButton/BackButton";
@@ -115,7 +116,6 @@ function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
 
 export default function PetDetailsPage() {
   const { petId } = useParams<{ petId: string }>();
-
   const { addPetToCart } = useCart();
 
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -130,6 +130,8 @@ export default function PetDetailsPage() {
     added: false,
     error: null,
   });
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   const addedToCart = cartFeedback.petId === petId && cartFeedback.added;
 
@@ -172,9 +174,10 @@ export default function PetDetailsPage() {
   const pet = current?.pet;
 
   async function handleAddToCart() {
-    if (!pet) return;
+    if (!pet || addingToCart) return;
 
     setAddingToCart(true);
+    setSuccessMessage("");
 
     setCartFeedback({
       petId: petId ?? "",
@@ -195,6 +198,8 @@ export default function PetDetailsPage() {
         added: true,
         error: null,
       });
+
+      setSuccessMessage(`${pet.name} added to cart successfully!`);
     } catch (err) {
       setCartFeedback({
         petId: petId ?? "",
@@ -265,6 +270,24 @@ export default function PetDetailsPage() {
 
   return (
     <div className="pet-details-page">
+      {successMessage && (
+        <div
+          className="pd-cart-success-toast"
+          role="status"
+          aria-live="polite"
+        >
+          <CheckCircle size={21} aria-hidden="true" />
+          <span>{successMessage}</span>
+          <button
+            type="button"
+            onClick={() => setSuccessMessage("")}
+            aria-label="Dismiss notification"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="pd-back">
         <BackButton fallback="/explore-pets" label="Back to pets" />
       </div>
@@ -333,7 +356,7 @@ export default function PetDetailsPage() {
               </Link>
             )}
 
-            {/* Only available pets for sale can be added to the cart. */}
+            {/* Available pets for sale can be added without leaving this page. */}
             {!isAdoption && isAvailable && (
               <div className="pd-cart-action">
                 <button

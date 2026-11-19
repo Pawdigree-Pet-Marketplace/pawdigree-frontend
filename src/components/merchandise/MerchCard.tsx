@@ -1,8 +1,7 @@
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Store } from "lucide-react";
-import type { CSSProperties } from "react";
+import { ShoppingBag, Store, Eye } from "lucide-react";
 import type { Product } from "../../data/merchandise";
 import AddToCartButton from "../cart/AddToCartButton";
 import "./MerchCard.css";
@@ -10,7 +9,6 @@ import "./MerchCard.css";
 function ProductImage({ product }: { product: Product }) {
   const src = product.main_image;
 
-  // Remember which URL failed, so a new photo can be tried again.
   const [failedSrc, setFailedSrc] = useState<string | undefined>(undefined);
 
   if (!src || failedSrc === src) {
@@ -37,7 +35,6 @@ function ProductImage({ product }: { product: Product }) {
 
 interface MerchCardProps {
   product: Product;
-  /** Position in a list; drives the staggered entrance. */
   index?: number;
 }
 
@@ -92,14 +89,22 @@ export default function MerchCard({ product, index = 0 }: MerchCardProps) {
           </p>
         )}
 
-        <AddToCartButton
-          product={cartProduct}
-          disabled={!inStock || !hasPrice}
-        />
+        <div className="merch-card__actions">
+          <Link
+            className="merch-card__btn merch-card__btn--view"
+            to={`/merchandise/${product.id}`}
+          >
+            <Eye size={15} aria-hidden="true" />
+            View
+          </Link>
 
-        <Link className="merch-card__btn" to={`/merchandise/${product.id}`}>
-          View details
-        </Link>
+          <div className="merch-card__cart-action">
+            <AddToCartButton
+              product={cartProduct}
+              disabled={!inStock || !hasPrice}
+            />
+          </div>
+        </div>
       </div>
     </article>
   );

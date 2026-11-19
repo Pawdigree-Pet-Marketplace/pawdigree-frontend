@@ -7,6 +7,7 @@ import {
   Sparkles,
   Store,
   ShoppingCart,
+  Eye,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SPECIES, type PublicPet } from "../../data/pets";
@@ -30,10 +31,9 @@ const GENDER_LABEL: Record<string, string> = {
 
 function PetImage({ pet }: { pet: PublicPet }) {
   const src = primaryImage(pet);
-  // Remember which URL failed, so a new photo is tried again without needing an effect.
   const [failedSrc, setFailedSrc] = useState<string | undefined>(undefined);
 
-  if (!src || failedSrc === src)
+  if (!src || failedSrc === src) {
     return (
       <div
         className="pet-card__placeholder"
@@ -41,6 +41,7 @@ function PetImage({ pet }: { pet: PublicPet }) {
         aria-label="No photo yet"
       />
     );
+  }
 
   return (
     <img
@@ -56,15 +57,12 @@ export interface PetCardProps {
   pet: PublicPet;
   isFav: boolean;
   onToggleFav: (id: number) => void;
-  /** Position in a list; drives the staggered entrance. */
   index?: number;
-  /** When set, shows the "Top pick" ribbon with this reason. */
   reason?: string;
   variant?: "grid" | "feature";
   showAdoptionAction?: boolean;
 }
 
-/** Presentational: everything arrives via props, so it works for any list of pets. */
 export default function PetCard({
   pet,
   isFav,
@@ -88,6 +86,8 @@ export default function PetCard({
   const fresh = isNewListing(pet);
 
   async function handleAddToCart() {
+    if (addingToCart) return;
+
     setAddingToCart(true);
     setAddError(null);
     setAddedToCart(false);
@@ -103,7 +103,9 @@ export default function PetCard({
       setAddedToCart(true);
     } catch (err) {
       setAddError(
-        err instanceof Error ? err.message : "Could not add this pet to your cart."
+        err instanceof Error
+          ? err.message
+          : "Could not add this pet to your cart.",
       );
     } finally {
       setAddingToCart(false);
@@ -200,44 +202,48 @@ export default function PetCard({
           </p>
         )}
 
-        <Link className="pet-card__btn" to={`/pets/${pet.pet_id}`}>
-          View details
-        </Link>
+        <div className="pet-card__actions">
+          <Link
+            className="pet-card__btn pet-card__btn--view"
+            to={`/pets/${pet.pet_id}`}
+          >
+            <Eye size={15} aria-hidden="true" />
+            View
+          </Link>
 
-        {!isAdoption && (
-          <>
+          {!isAdoption && (
             <button
               type="button"
-              className="pet-card__btn"
+              className="pet-card__btn pet-card__btn--cart"
               onClick={() => void handleAddToCart()}
               disabled={addingToCart}
             >
-              <ShoppingCart size={16} aria-hidden="true" />
+              <ShoppingCart size={15} aria-hidden="true" />
               {addingToCart
                 ? "Adding..."
                 : addedToCart
-                  ? "Added to cart"
+                  ? "Added"
                   : "Add to Cart"}
             </button>
-
-            {addError && (
-              <p className="pet-card__cart-error" role="alert">
-                {addError}
-              </p>
-            )}
-          </>
-        )}
-
-        {showAdoptionAction &&
-          isAdoption &&
-          (pet.adoption_status ?? "AVAILABLE") === "AVAILABLE" && (
-            <Link
-              className="pet-card__btn pet-card__btn--adopt"
-              to={`/adoption-request?pet_id=${pet.pet_id}`}
-            >
-              Apply to adopt
-            </Link>
           )}
+
+          {showAdoptionAction &&
+            isAdoption &&
+            (pet.adoption_status ?? "AVAILABLE") === "AVAILABLE" && (
+              <Link
+                className="pet-card__btn pet-card__btn--adopt"
+                to={`/adoption-request?pet_id=${pet.pet_id}`}
+              >
+                Apply to adopt
+              </Link>
+            )}
+        </div>
+
+        {addError && (
+          <p className="pet-card__cart-error" role="alert">
+            {addError}
+          </p>
+        )}
       </div>
     </article>
   );

@@ -246,7 +246,7 @@ describe("ExplorePets page", () => {
     render(<ExplorePets />);
     await screen.findByRole("heading", { name: "Rex" });
 
-    const links = screen.getAllByRole("link", { name: "View details" });
+    const links = screen.getAllByRole("link", { name: "View" });
     expect(links[0].getAttribute("href")).toBe("/pets/1");
   });
 });

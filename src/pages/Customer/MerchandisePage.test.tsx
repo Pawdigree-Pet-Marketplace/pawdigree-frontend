@@ -147,7 +147,7 @@ describe("MerchandisePage", () => {
 
     await screen.findByRole("heading", { name: "Chew Bone" });
 
-    const links = screen.getAllByRole("link", { name: "View details" });
+    const links = screen.getAllByRole("link", { name: "View" });
 
     expect(links[0].getAttribute("href")).toBe("/merchandise/1");
   });
