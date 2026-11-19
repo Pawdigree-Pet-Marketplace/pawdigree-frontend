@@ -16,10 +16,17 @@ export type VendorOrderStatus =
 
 export interface VendorOrderItem {
   id?: number;
-  product?: number | string;
+
+  item_type: "product" | "pet";
+
+  product?: number | string | null;
+  pet?: number | string | null;
+
   product_name?: string;
+  pet_name?: string;
   name?: string;
-  quantity: number;
+
+  quantity: number | null;
   price?: string | number;
   unit_price?: string | number;
   subtotal?: string | number;

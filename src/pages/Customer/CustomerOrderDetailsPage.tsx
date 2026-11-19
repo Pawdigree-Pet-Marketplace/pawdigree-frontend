@@ -248,7 +248,9 @@ export default function CustomerOrderDetailsPage() {
                           <strong>{item.name}</strong>
 
                           <span>
-                            Quantity: {item.quantity}
+                            {item.item_type === "pet"
+                              ? "Pet for Sale · One pet"
+                              : `Quantity: ${item.quantity ?? 1}`}
                           </span>
 
                           <span>

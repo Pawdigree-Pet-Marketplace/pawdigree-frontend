@@ -2,12 +2,17 @@
 import API_BASE_URL from "../api";
 import { customerAuthenticatedFetch } from "../customerAuthenticatedFetch";
 
-// A product purchased within a vendor order.
+// An item purchased within a vendor order.
+// A vendor order item can be merchandise or a pet.
 export interface OrderItem {
   id: number;
-  product_id: number;
+  item_type: "product" | "pet";
+
+  product_id: number | null;
+  pet_id: number | null;
+
   name: string;
-  quantity: number;
+  quantity: number | null;
   unit_price: string;
   subtotal: string;
 }

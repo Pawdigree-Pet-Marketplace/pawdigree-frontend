@@ -6,10 +6,12 @@ import {
   getSessionToken,
 } from "../auth/authStorage";
 
-// The backend cart line.
+// A cart line can represent merchandise or a pet for sale.
 export type CartItem = {
   id: number | string;
-  product_id: number | string;
+  item_type: "product" | "pet";
+  product_id: number | string | null;
+  pet_id: number | string | null;
   name: string;
   business_name: string;
   image: string | null;
@@ -30,11 +32,19 @@ export type CartResponse = {
   cart_token: string | null;
 };
 
-// Data required when adding a product.
-export type AddCartItemData = {
-  product: number | string;
-  quantity: number;
-};
+// Merchandise requires a product ID and quantity.
+// Pets require only a pet ID. Never send both.
+export type AddCartItemData =
+  | {
+      product: number | string;
+      quantity: number;
+      pet?: never;
+    }
+  | {
+      pet: number | string;
+      product?: never;
+      quantity?: never;
+    };
 
 export const CART_TOKEN_KEY = "pawdigree:cart_token";
 
@@ -174,17 +184,36 @@ export function getCart(): Promise<CartResponse> {
 export function addCartItem(
   data: AddCartItemData,
 ): Promise<CartResponse> {
+  if ("pet" in data) {
+    if (data.pet === "" || data.pet === null || data.pet === undefined) {
+      throw new Error("A valid pet ID is required.");
+    }
+
+    // Pets are always quantity 1.
+    // Do not send a quantity or product field.
+    return cartRequest("/items/", {
+      method: "POST",
+      body: JSON.stringify({ pet: data.pet }),
+    });
+  }
+
   if (!Number.isInteger(data.quantity) || data.quantity < 1) {
     throw new Error("Quantity must be at least 1.");
   }
 
+  // Merchandise keeps the existing payload.
   return cartRequest("/items/", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      product: data.product,
+      quantity: data.quantity,
+    }),
   });
 }
 
 // PATCH /api/cart/items/{item_id}/
+// This endpoint is for merchandise quantity changes.
+// Pet quantity changes are rejected by the backend.
 export function updateCartItemQuantity(
   itemId: number | string,
   quantity: number,

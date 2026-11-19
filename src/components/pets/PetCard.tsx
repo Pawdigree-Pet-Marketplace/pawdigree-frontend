@@ -1,7 +1,16 @@
+
 import { useState, type CSSProperties } from "react";
-import { Heart, MapPin, PawPrint, Sparkles, Store } from "lucide-react";
+import {
+  Heart,
+  MapPin,
+  PawPrint,
+  Sparkles,
+  Store,
+  ShoppingCart,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { SPECIES, type PublicPet } from "../../data/pets";
+import { useCart } from "../../context/CartContext";
 import {
   formatAge,
   formatPrice,
@@ -21,7 +30,7 @@ const GENDER_LABEL: Record<string, string> = {
 
 function PetImage({ pet }: { pet: PublicPet }) {
   const src = primaryImage(pet);
-  // remember WHICH url failed, so a new photo is tried again without needing an effect
+  // Remember which URL failed, so a new photo is tried again without needing an effect.
   const [failedSrc, setFailedSrc] = useState<string | undefined>(undefined);
 
   if (!src || failedSrc === src)
@@ -32,6 +41,7 @@ function PetImage({ pet }: { pet: PublicPet }) {
         aria-label="No photo yet"
       />
     );
+
   return (
     <img
       src={src}
@@ -64,12 +74,41 @@ export default function PetCard({
   variant = "grid",
   showAdoptionAction = false,
 }: PetCardProps) {
+  const { addPetToCart } = useCart();
+
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+
   const key = speciesKey(pet.species);
   const SpeciesIcon = key ? SPECIES_ICON[key] : PawPrint;
   const speciesLabel = SPECIES.find((s) => s.key === key)?.label ?? pet.species;
   const price = formatPrice(pet.price);
   const isAdoption = pet.listing_type === "ADOPTION";
   const fresh = isNewListing(pet);
+
+  async function handleAddToCart() {
+    setAddingToCart(true);
+    setAddError(null);
+    setAddedToCart(false);
+
+    try {
+      await addPetToCart({
+        id: pet.pet_id,
+        name: pet.name,
+        price: pet.price,
+        image: primaryImage(pet) ?? undefined,
+      });
+
+      setAddedToCart(true);
+    } catch (err) {
+      setAddError(
+        err instanceof Error ? err.message : "Could not add this pet to your cart."
+      );
+    } finally {
+      setAddingToCart(false);
+    }
+  }
 
   return (
     <article
@@ -79,10 +118,12 @@ export default function PetCard({
     >
       <div className="pet-card__media">
         <PetImage pet={pet} />
+
         <span className="pet-card__chip pet-card__chip--species">
           <SpeciesIcon size={13} aria-hidden="true" />
           {speciesLabel}
         </span>
+
         <button
           type="button"
           className={`pet-card__fav${isFav ? " is-fav" : ""}`}
@@ -100,6 +141,7 @@ export default function PetCard({
             aria-hidden="true"
           />
         </button>
+
         {reason ? (
           <span className="pet-card__ribbon">
             <Sparkles size={13} aria-hidden="true" />
@@ -115,8 +157,13 @@ export default function PetCard({
       <div className="pet-card__body">
         <div className="pet-card__top">
           <h3 className="pet-card__title">{pet.name}</h3>
+
           <span
-            className={`pet-card__tag ${isAdoption ? "pet-card__tag--adopt" : "pet-card__tag--sale"}`}
+            className={`pet-card__tag ${
+              isAdoption
+                ? "pet-card__tag--adopt"
+                : "pet-card__tag--sale"
+            }`}
           >
             {isAdoption ? "Adoption" : "For sale"}
           </span>
@@ -156,9 +203,38 @@ export default function PetCard({
         <Link className="pet-card__btn" to={`/pets/${pet.pet_id}`}>
           View details
         </Link>
-        {showAdoptionAction && isAdoption &&
+
+        {!isAdoption && (
+          <>
+            <button
+              type="button"
+              className="pet-card__btn"
+              onClick={() => void handleAddToCart()}
+              disabled={addingToCart}
+            >
+              <ShoppingCart size={16} aria-hidden="true" />
+              {addingToCart
+                ? "Adding..."
+                : addedToCart
+                  ? "Added to cart"
+                  : "Add to Cart"}
+            </button>
+
+            {addError && (
+              <p className="pet-card__cart-error" role="alert">
+                {addError}
+              </p>
+            )}
+          </>
+        )}
+
+        {showAdoptionAction &&
+          isAdoption &&
           (pet.adoption_status ?? "AVAILABLE") === "AVAILABLE" && (
-            <Link className="pet-card__btn pet-card__btn--adopt" to={`/adoption-request?pet_id=${pet.pet_id}`}>
+            <Link
+              className="pet-card__btn pet-card__btn--adopt"
+              to={`/adoption-request?pet_id=${pet.pet_id}`}
+            >
               Apply to adopt
             </Link>
           )}

@@ -1,3 +1,4 @@
+
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -35,6 +36,10 @@ export default function CustomerCheckoutPage() {
     loading,
   } = useCart();
 
+  const hasPetItems = cartItems.some(
+    (item) => item.item_type === "pet"
+  );
+
   const [formData, setFormData] = useState<CheckoutPayload>({
     shipping_name: "",
     shipping_phone: "",
@@ -55,7 +60,7 @@ export default function CustomerCheckoutPage() {
   const [createdOrder, setCreatedOrder] =
     useState<CustomerOrder | null>(null);
 
-  // Load the payment methods supported by the backend.
+  // Load payment methods supported by the backend.
   useEffect(() => {
     async function loadPaymentMethods() {
       setMethodsLoading(true);
@@ -74,7 +79,7 @@ export default function CustomerCheckoutPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "Unable to load payment methods.",
+            : "Unable to load payment methods."
         );
       } finally {
         setMethodsLoading(false);
@@ -84,10 +89,10 @@ export default function CustomerCheckoutPage() {
     loadPaymentMethods();
   }, []);
 
-  // Update a form field when the customer types.
+  // Update a form field.
   function handleChange(
     field: keyof CheckoutPayload,
-    value: string,
+    value: string
   ) {
     setFormData((previous) => ({
       ...previous,
@@ -95,7 +100,7 @@ export default function CustomerCheckoutPage() {
     }));
   }
 
-  // Convert backend method names into readable labels.
+  // Convert backend payment method names into readable labels.
   function getMethodLabel(method: string) {
     switch (method) {
       case "card":
@@ -107,13 +112,15 @@ export default function CustomerCheckoutPage() {
       default:
         return method
           .split("_")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1)
+          )
           .join(" ");
     }
   }
 
-  // Start payment for an order that has already been created.
-  // This function can be called again without creating another order.
+  // Start payment for an already-created order.
   async function handleStartPayment(orderId: number) {
     if (!selectedMethod) {
       setError("Please select a payment method.");
@@ -127,28 +134,38 @@ export default function CustomerCheckoutPage() {
       const payment = await startPayment(orderId, selectedMethod);
 
       if (!payment.payment_url) {
-        throw new Error("The backend did not provide a payment link.");
+        throw new Error(
+          "The backend did not provide a payment link."
+        );
       }
 
-      // Redirect the customer to the sandbox payment page.
       window.location.assign(payment.payment_url);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to start payment. Please try again.",
+          : "Unable to start payment. Please try again."
       );
     } finally {
       setStartingPayment(false);
     }
   }
 
-  // Create the order once, then start its payment.
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  // Create the order once, then start payment.
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     if (!selectedMethod) {
       setError("Please select a payment method.");
+      return;
+    }
+
+    if (hasUnavailableItems) {
+      setError(
+        "Your cart contains unavailable items. Please review your cart."
+      );
       return;
     }
 
@@ -159,16 +176,15 @@ export default function CustomerCheckoutPage() {
       const order = await createCheckoutOrder(formData);
 
       // Save the order before attempting payment.
-      // A payment failure must not cause another order to be created.
+      // Retrying payment must not create another order.
       setCreatedOrder(order);
 
-      // Start payment using the newly created order.
       await handleStartPayment(order.id);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to place your order. Please try again.",
+          : "Unable to place your order. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -179,32 +195,33 @@ export default function CustomerCheckoutPage() {
   const formatPrice = (price: string) =>
     `${currency} ${Number(price).toLocaleString("en-UG")}`;
 
-  // Show the order confirmation after the backend creates it.
+  // Order confirmation after the backend creates the order.
   if (createdOrder) {
     return (
       <div className="customer-checkout-layout">
         <CustomerDashboardNav />
 
         <main className="customer-checkout-main">
-  {/* PAGE HEADING */}
-       <header className="customer-checkout-heading">
-        <div>
-         <p className="customer-checkout-eyebrow">
-           PAWDIGREE PET STORE
-         </p>
+          <header className="customer-checkout-heading">
+            <div>
+              <p className="customer-checkout-eyebrow">
+                PAWDIGREE PET STORE
+              </p>
 
-         <h1>Checkout</h1>
+              <h1>Checkout</h1>
 
-         <p>
-          Review your order and complete payment to finish your purchase.
-         </p>
-       </div>
+              <p>
+                Review your order and complete payment to finish
+                your purchase.
+              </p>
+            </div>
 
-       <PawPrint aria-hidden="true" />
-      </header>
+            <PawPrint aria-hidden="true" />
+          </header>
 
-      <section className="customer-checkout-confirmation">
-       <CheckCircle size={58} />
+          <section className="customer-checkout-confirmation">
+            <CheckCircle size={58} />
+
             <p className="customer-checkout-eyebrow">
               PAWDIGREE PET STORE
             </p>
@@ -230,13 +247,12 @@ export default function CustomerCheckoutPage() {
             {createdOrder.expires_at && (
               <p className="customer-checkout-expiry">
                 Payment deadline:{" "}
-                {new Date(createdOrder.expires_at).toLocaleString(
-                  "en-UG",
-                  {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  },
-                )}
+                {new Date(
+                  createdOrder.expires_at
+                ).toLocaleString("en-UG", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </p>
             )}
 
@@ -248,7 +264,10 @@ export default function CustomerCheckoutPage() {
             </div>
 
             {error && (
-              <div className="customer-checkout-error" role="alert">
+              <div
+                className="customer-checkout-error"
+                role="alert"
+              >
                 {error}
               </div>
             )}
@@ -265,8 +284,8 @@ export default function CustomerCheckoutPage() {
             </button>
 
             <p className="customer-checkout-secure-note">
-              If payment did not open, you can try again using the
-              button above. Your existing order will be used.
+              If payment did not open, you can try again using
+              the button above. Your existing order will be used.
             </p>
 
             <p className="customer-checkout-confirmation-note">
@@ -311,8 +330,10 @@ export default function CustomerCheckoutPage() {
             <h1>Checkout</h1>
 
             <p>
-              Provide your delivery details to place your merchandise
-              order.
+              Provide your delivery details to complete your
+              {hasPetItems
+                ? " pet and merchandise purchase."
+                : " merchandise purchase."}
             </p>
           </div>
 
@@ -329,7 +350,7 @@ export default function CustomerCheckoutPage() {
 
             <h2>Your cart is empty</h2>
 
-            <p>Add merchandise to your cart before checking out.</p>
+            <p>Add items to your cart before checking out.</p>
 
             <Link to="/customer/cart">
               Return to Cart
@@ -349,15 +370,22 @@ export default function CustomerCheckoutPage() {
               </div>
 
               {error && (
-                <div className="customer-checkout-error" role="alert">
+                <div
+                  className="customer-checkout-error"
+                  role="alert"
+                >
                   {error}
                 </div>
               )}
 
               {hasUnavailableItems && (
-                <div className="customer-checkout-error" role="alert">
-                  Your cart contains unavailable items. Return to your
-                  cart and resolve these items before checking out.
+                <div
+                  className="customer-checkout-error"
+                  role="alert"
+                >
+                  Your cart contains unavailable items. Return to
+                  your cart and resolve these items before checking
+                  out.
                   <Link to="/customer/cart">Review Cart</Link>
                 </div>
               )}
@@ -378,7 +406,10 @@ export default function CustomerCheckoutPage() {
                     required
                     value={formData.shipping_name}
                     onChange={(event) =>
-                      handleChange("shipping_name", event.target.value)
+                      handleChange(
+                        "shipping_name",
+                        event.target.value
+                      )
                     }
                   />
                 </div>
@@ -398,13 +429,16 @@ export default function CustomerCheckoutPage() {
                     required
                     value={formData.shipping_phone}
                     onChange={(event) =>
-                      handleChange("shipping_phone", event.target.value)
+                      handleChange(
+                        "shipping_phone",
+                        event.target.value
+                      )
                     }
                   />
 
                   <small>
-                    Enter a phone number where the delivery team can
-                    reach you.
+                    Enter a phone number where the delivery team
+                    can reach you.
                   </small>
                 </div>
 
@@ -425,7 +459,7 @@ export default function CustomerCheckoutPage() {
                     onChange={(event) =>
                       handleChange(
                         "shipping_city_district",
-                        event.target.value,
+                        event.target.value
                       )
                     }
                   />
@@ -446,7 +480,10 @@ export default function CustomerCheckoutPage() {
                     required
                     value={formData.shipping_address}
                     onChange={(event) =>
-                      handleChange("shipping_address", event.target.value)
+                      handleChange(
+                        "shipping_address",
+                        event.target.value
+                      )
                     }
                   />
                 </div>
@@ -454,7 +491,9 @@ export default function CustomerCheckoutPage() {
                 <div className="customer-checkout-field">
                   <label htmlFor="notes">
                     Additional Delivery Notes
-                    <span className="optional-label"> (Optional)</span>
+                    <span className="optional-label">
+                      {" "}(Optional)
+                    </span>
                   </label>
 
                   <textarea
@@ -495,7 +534,9 @@ export default function CustomerCheckoutPage() {
                         <label
                           key={method}
                           className={`customer-checkout-payment-option ${
-                            selectedMethod === method ? "selected" : ""
+                            selectedMethod === method
+                              ? "selected"
+                              : ""
                           }`}
                         >
                           <input
@@ -503,7 +544,9 @@ export default function CustomerCheckoutPage() {
                             name="payment_method"
                             value={method}
                             checked={selectedMethod === method}
-                            onChange={() => setSelectedMethod(method)}
+                            onChange={() =>
+                              setSelectedMethod(method)
+                            }
                           />
 
                           {method === "mobile_money" ? (
@@ -537,8 +580,8 @@ export default function CustomerCheckoutPage() {
 
                 <p className="customer-checkout-secure-note">
                   You will be redirected to a sandbox payment page.
-                  This is a test integration and does not charge real
-                  money.
+                  This is a test integration and does not charge
+                  real money.
                 </p>
               </form>
             </section>
@@ -552,22 +595,28 @@ export default function CustomerCheckoutPage() {
               </p>
 
               <div className="customer-checkout-products">
-                {cartItems.map((item) => (
-                  <div
-                    className="customer-checkout-product"
-                    key={item.id}
-                  >
-                    <div>
-                      <strong>{item.name}</strong>
+                {cartItems.map((item) => {
+                  const isPet = item.item_type === "pet";
 
-                      <span>
-                        {item.business_name} · Qty: {item.quantity}
-                      </span>
+                  return (
+                    <div
+                      className="customer-checkout-product"
+                      key={item.id}
+                    >
+                      <div>
+                        <strong>{item.name}</strong>
+
+                        <span>
+                          {isPet
+                            ? "Pet for Sale · One pet"
+                            : `${item.business_name} · Qty: ${item.quantity}`}
+                        </span>
+                      </div>
+
+                      <strong>{formatPrice(item.line_total)}</strong>
                     </div>
-
-                    <strong>{formatPrice(item.line_total)}</strong>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="customer-checkout-total">
@@ -576,8 +625,9 @@ export default function CustomerCheckoutPage() {
               </div>
 
               <p className="customer-checkout-delivery-note">
-                 Delivery fees are not included in this payment. You will pay
-                 the delivery fee separately when your order is delivered.
+                Delivery fees are not included in this payment.
+                You will pay the delivery fee separately when your
+                order is delivered.
               </p>
 
               <Link

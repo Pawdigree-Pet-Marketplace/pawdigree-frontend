@@ -23,11 +23,19 @@ import {
   getSessionRole,
 } from "../services/auth/authStorage";
 
-// Keep this type for components that pass product information to the cart.
+// Information needed when adding merchandise to the cart.
 export type CartProduct = {
   id: number | string;
   name: string;
   price?: number;
+  image?: string;
+};
+
+// Information needed when adding a pet for sale to the cart.
+export type CartPet = {
+  id: number | string;
+  name: string;
+  price?: string | number | null;
   image?: string;
 };
 
@@ -38,6 +46,7 @@ export type { CartItem };
 type CartContextType = {
   cartItems: CartItem[];
   addToCart: (product: CartProduct) => Promise<void>;
+  addPetToCart: (pet: CartPet) => Promise<void>;
   updateQuantity: (id: number | string, quantity: number) => Promise<void>;
   removeFromCart: (id: number | string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -111,7 +120,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Load the cart when the application starts.
   // Also respond when a user logs in or their session changes.
   useEffect(() => {
-    // Schedule the initial load outside the synchronous effect execution.
     const initialLoad = window.setTimeout(() => {
       void syncCart();
     }, 0);
@@ -135,7 +143,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
   }, [syncCart]);
 
-  // Add a product using its backend product ID.
+  // Add merchandise using its backend product ID.
   async function addToCart(product: CartProduct) {
     setError(null);
 
@@ -155,7 +163,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Add an individual pet for sale using its backend pet ID.
+  // The backend automatically treats each pet as quantity 1.
+  async function addPetToCart(pet: CartPet) {
+    setError(null);
+
+    try {
+      const cart = await addCartItem({
+        pet: pet.id,
+      });
+
+      updateCartState(cart);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Could not add this pet.";
+
+      setError(message);
+      throw err;
+    }
+  }
+
   // Update the quantity using the backend cart-line ID.
+  // The backend does not allow quantity changes for pet cart lines.
   async function updateQuantity(id: number | string, quantity: number) {
     if (!Number.isInteger(quantity) || quantity < 1) return;
 
@@ -210,6 +239,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         cartItems,
         addToCart,
+        addPetToCart,
         updateQuantity,
         removeFromCart,
         clearCart,
@@ -228,7 +258,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 }
 
 // Custom hook for accessing cart functionality.
- // eslint-disable-next-line react-refresh/only-export-components
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCart() {
   const context = useContext(CartContext);
 
