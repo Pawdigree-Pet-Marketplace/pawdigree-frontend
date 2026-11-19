@@ -799,3 +799,131 @@
   outline: 2px solid #216c68;
   outline-offset: 3px;
 }
+
+
+/* =========================================
+   CART PAGE - MERCHANDISE AND PET ITEMS
+========================================= */
+
+/* Match the current JSX class names */
+.customer-cart-items-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.customer-cart-items-heading h2 {
+  margin: 0;
+  color: #2c302f;
+  font-family: "Fredoka", sans-serif;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.customer-cart-items-heading p {
+  margin: 5px 0 0;
+  color: #68716d;
+  font-size: 13px;
+}
+
+/* Item images */
+.customer-cart-item-image {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.customer-cart-item-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 190px;
+  background: #f3f0ea;
+  color: #216c68;
+}
+
+/* Item type label */
+.customer-cart-item-type {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-bottom: 9px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #eaf3ee;
+  color: #216c68;
+  font-family: "Nunito", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+/* Pet quantity display */
+.customer-cart-pet-quantity {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #dce9df;
+  border-radius: 9px;
+  background: #f2f7f2;
+  color: #216c68;
+  font-family: "Nunito", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* Item subtotal */
+.customer-cart-item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  color: #216c68;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.customer-cart-item-price span {
+  color: #7b8580;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.customer-cart-item-price strong {
+  color: #216c68;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* Unavailable item warning */
+.customer-cart-item-issue {
+  margin: 12px 0 0;
+  padding: 9px 11px;
+  border: 1px solid #f1d8b6;
+  border-radius: 8px;
+  background: #fff8ed;
+  color: #98642a;
+  font-family: "Nunito", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Responsive cart heading */
+@media (max-width: 600px) {
+  .customer-cart-items-heading {
+    align-items: flex-start;
+  }
+
+  .customer-cart-items-heading h2 {
+    font-size: 20px;
+  }
+
+  .customer-cart-item-bottom {
+    flex-wrap: wrap;
+  }
+}

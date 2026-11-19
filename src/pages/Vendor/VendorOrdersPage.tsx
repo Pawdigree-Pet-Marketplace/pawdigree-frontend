@@ -240,9 +240,16 @@ useEffect(() => {
                       >
                         <div>
                           <strong>
-                            {item.product_name || item.name || "Product"}
+                            {item.item_type === "pet"
+                             ? item.pet_name || item.name || "Pet"
+                            : item.product_name || item.name || "Product"}
                           </strong>
-                          <span>Quantity: {item.quantity}</span>
+                          <span>
+                             {item.item_type === "pet"
+                              ? "Pet for Sale · One pet"
+                              : `Quantity: ${item.quantity ?? 1}`}
+
+                          </span>
                         </div>
                         <strong>
                           {formatMoney(item.subtotal ?? item.price)}

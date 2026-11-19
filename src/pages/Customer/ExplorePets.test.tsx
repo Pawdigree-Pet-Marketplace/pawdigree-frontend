@@ -36,6 +36,12 @@ vi.mock("../../services/petsApi", () => ({
   fetchSuggestions: vi.fn(),
 }));
 
+vi.mock("../../context/CartContext", () => ({
+  useCart: () => ({
+    addPetToCart: vi.fn(),
+  }),
+}));
+
 vi.mock(
   "../../components/navigation/CustomerTopNavbar/CustomerTopNavbar",
   () => ({
