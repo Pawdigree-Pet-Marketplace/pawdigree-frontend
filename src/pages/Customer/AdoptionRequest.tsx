@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+
+import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -8,9 +9,15 @@ import {
   ShoppingCart,
   UserRound,
 } from "lucide-react";
+
+import type { PublicPet } from "../../data/pets";
+import { fetchPet } from "../../services/petsApi";
+import { primaryImage } from "../../utils/petUtils";
 import API_BASE_URL from "../../services/api";
+
 import "./CustomerDashboard.css";
 import "./AdoptionRequest.css";
+
 type HomeType = "APARTMENT" | "HOUSE" | "OTHER";
 type Experience = "NONE" | "SOME" | "EXPERIENCED";
 
@@ -26,6 +33,8 @@ type AdoptionForm = {
 type ApiErrors = Partial<
   Record<keyof AdoptionForm | "pet" | "detail", string>
 >;
+
+const MAX_MESSAGE_WORDS = 300;
 
 const initialForm: AdoptionForm = {
   home_type: "",
@@ -44,20 +53,79 @@ function getCustomerAccessToken(): string | null {
   );
 }
 
+function countWords(value: string): number {
+  const trimmed = value.trim();
+
+  return trimmed ? trimmed.split(/\s+/).filter(Boolean).length : 0;
+}
+
+function limitWords(value: string, maxWords: number): string {
+  const words = value.trim().split(/\s+/).filter(Boolean);
+
+  if (words.length <= maxWords) {
+    return value;
+  }
+
+  return words.slice(0, maxWords).join(" ");
+}
+
 export default function AdoptionRequest() {
   const [searchParams] = useSearchParams();
+
+  const petId = Number(searchParams.get("pet_id"));
+
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<AdoptionForm>(initialForm);
   const [errors, setErrors] = useState<ApiErrors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  const [selectedPetState, setSelectedPetState] = useState<{
+    petId: number;
+    pet: PublicPet;
+  } | null>(null);
+
+  // Only show the pet that matches the current URL pet_id.
+  const selectedPet =
+    selectedPetState?.petId === petId
+      ? selectedPetState.pet
+      : null;
+
   const [success, setSuccess] = useState<{
     applicationId: number | string;
     status: string;
   } | null>(null);
 
-  // Open this page with /adoption-request?pet_id=123.
-  const petId = Number(searchParams.get("pet_id"));
-  const petName = "your selected pet";
+  // Fetch the selected pet so its name and photo appear in the sidebar.
+  useEffect(() => {
+    if (!Number.isInteger(petId) || petId < 1) {
+      return;
+    }
+
+    let cancelled = false;
+
+    fetchPet(String(petId))
+      .then((pet) => {
+        if (!cancelled) {
+          setSelectedPetState({
+            petId,
+            pet,
+          });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSelectedPetState(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [petId]);
+
+  const petName = selectedPet?.name || "your selected pet";
+  const petPhoto = selectedPet ? primaryImage(selectedPet) : undefined;
+  const wordCount = countWords(form.message);
 
   function update<K extends keyof AdoptionForm>(
     key: K,
@@ -85,12 +153,15 @@ export default function AdoptionRequest() {
       if (!form.home_type) {
         nextErrors.home_type = "Choose your home type.";
       }
+
       if (form.has_outdoor_space === null) {
         nextErrors.has_outdoor_space = "Please choose yes or no.";
       }
+
       if (form.has_other_pets === null) {
         nextErrors.has_other_pets = "Please choose yes or no.";
       }
+
       if (form.has_other_pets && form.other_pets_details.length > 200) {
         nextErrors.other_pets_details =
           "Keep this answer to 200 characters or fewer.";
@@ -102,18 +173,14 @@ export default function AdoptionRequest() {
         nextErrors.previous_pet_experience =
           "Choose your previous pet experience.";
       }
-      if (!form.message.trim()) {
-        nextErrors.message = "Tell us why you want to adopt this pet.";
-      } else if (form.message.length > 2000) {
+
+      if (wordCount > MAX_MESSAGE_WORDS) {
         nextErrors.message =
-          "Keep your message to 2,000 characters or fewer.";
+          `Your message must not exceed ${MAX_MESSAGE_WORDS} words. You currently have ${wordCount} words.`;
       }
     }
 
-    if (
-      currentStep === 3 &&
-      (!Number.isInteger(petId) || petId < 1)
-    ) {
+    if (currentStep === 3 && (!Number.isInteger(petId) || petId < 1)) {
       nextErrors.pet =
         "We couldn't identify this pet. Return to the pet details page and select Apply to Adopt again.";
     }
@@ -278,14 +345,18 @@ export default function AdoptionRequest() {
           <span className="success-mark">
             <Check size={30} />
           </span>
+
           <h2>Application submitted!</h2>
+
           <p>
             Your adoption request has been sent successfully. The application
             status is <strong>{success.status}</strong>.
           </p>
+
           <p>
             Application reference: <strong>{success.applicationId}</strong>
           </p>
+
           <button
             className="primary-button"
             type="button"
@@ -346,18 +417,29 @@ export default function AdoptionRequest() {
           <aside className="adoption-sidebar">
             <section className="pet-summary">
               <div className="pet-placeholder">
-                <PawPrint size={34} />
-                <small>PET PHOTO</small>
+                {petPhoto ? (
+                  <img
+                    src={petPhoto}
+                    alt={selectedPet?.name || "Selected pet"}
+                  />
+                ) : (
+                  <>
+                    <PawPrint size={34} />
+                    <small>PET PHOTO</small>
+                  </>
+                )}
               </div>
 
               <div className="pet-summary-text">
                 <h2>Adopt {petName}</h2>
+
                 <p>
                   Pet ID:{" "}
                   {Number.isInteger(petId) && petId > 0
                     ? petId
                     : "Not selected"}
                 </p>
+
                 <span className="verified">
                   <Check size={16} /> Adoption request
                 </span>
@@ -367,16 +449,12 @@ export default function AdoptionRequest() {
             <section className="next-steps">
               <h2>What happens next</h2>
 
-              <div
-                className={`timeline-item ${step >= 1 ? "current" : ""}`}
-              >
+              <div className={`timeline-item ${step >= 1 ? "current" : ""}`}>
                 <span>{step > 1 ? <Check size={17} /> : null}</span>
                 <b>Application details</b>
               </div>
 
-              <div
-                className={`timeline-item ${step >= 2 ? "current" : ""}`}
-              >
+              <div className={`timeline-item ${step >= 2 ? "current" : ""}`}>
                 <span>{step > 2 ? <Check size={17} /> : null}</span>
                 <b>Review application</b>
               </div>
@@ -424,10 +502,7 @@ export default function AdoptionRequest() {
                       id="home_type"
                       value={form.home_type}
                       onChange={(event) =>
-                        update(
-                          "home_type",
-                          event.target.value as HomeType | "",
-                        )
+                        update("home_type", event.target.value as HomeType | "")
                       }
                       aria-invalid={!!errors.home_type}
                     >
@@ -436,22 +511,19 @@ export default function AdoptionRequest() {
                       <option value="HOUSE">House</option>
                       <option value="OTHER">Other</option>
                     </select>
+
                     <ChevronDown size={19} />
                   </div>
 
                   {errors.home_type && (
-                    <small className="field-error">
-                      {errors.home_type}
-                    </small>
+                    <small className="field-error">{errors.home_type}</small>
                   )}
                 </div>
 
                 <BooleanField
                   label="Do you have outdoor space?"
                   value={form.has_outdoor_space}
-                  onChange={(value) =>
-                    update("has_outdoor_space", value)
-                  }
+                  onChange={(value) => update("has_outdoor_space", value)}
                   error={errors.has_outdoor_space}
                 />
 
@@ -537,6 +609,7 @@ export default function AdoptionRequest() {
                       <option value="SOME">Some experience</option>
                       <option value="EXPERIENCED">Experienced</option>
                     </select>
+
                     <ChevronDown size={19} />
                   </div>
 
@@ -549,27 +622,30 @@ export default function AdoptionRequest() {
 
                 <div className="field">
                   <label htmlFor="message">
-                    Why do you want to adopt this pet? <span>*</span>
+                    Why do you want to adopt this pet?{" "}
+                    <span className="optional-label">(optional)</span>
                   </label>
 
                   <textarea
                     id="message"
                     className="reason-textarea"
-                    maxLength={2000}
                     value={form.message}
                     onChange={(event) =>
-                      update("message", event.target.value)
+                      update(
+                        "message",
+                        limitWords(event.target.value, MAX_MESSAGE_WORDS),
+                      )
                     }
-                    placeholder="Tell us why you would be a good match..."
+                    placeholder="Tell us why you would be a good match (maximum 300 words)."
                     aria-invalid={!!errors.message}
                   />
 
                   <small className="character-count">
-                    {form.message.length}/2000 characters
+                    {wordCount}/{MAX_MESSAGE_WORDS} words
                   </small>
 
                   {errors.message && (
-                    <small className="field-error">
+                    <small className="field-error" role="alert">
                       {errors.message}
                     </small>
                   )}
@@ -623,10 +699,12 @@ export default function AdoptionRequest() {
                           : "Other"
                     }
                   />
+
                   <ReviewRow
                     label="Outdoor space"
                     value={form.has_outdoor_space ? "Yes" : "No"}
                   />
+
                   <ReviewRow
                     label="Other pets"
                     value={form.has_other_pets ? "Yes" : "No"}
@@ -658,9 +736,10 @@ export default function AdoptionRequest() {
                           : "Experienced"
                     }
                   />
+
                   <ReviewRow
                     label="Your message"
-                    value={form.message}
+                    value={form.message || "Not provided"}
                   />
                 </section>
 
