@@ -219,7 +219,7 @@ function App() {
       <Route
         path="/vendor/dashboard"
         element={
-          <ProtectedRoute role="VENDOR">
+          <ProtectedRoute role="VENDOR" requireVendorBusiness>
             <VendorDashboardPage />
           </ProtectedRoute>
         }

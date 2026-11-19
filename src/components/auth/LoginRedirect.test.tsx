@@ -4,9 +4,13 @@ import { MemoryRouter, Route, Routes, type InitialEntry } from "react-router-dom
 import CustomerLoginForm from "./CustomerLoginForm";
 import VendorLoginPage from "../../pages/Vendor/VendorLoginPage";
 
-const { apiRequestMock } = vi.hoisted(() => ({ apiRequestMock: vi.fn() }));
+const { apiRequestMock, vendorFetchMock } = vi.hoisted(() => ({ apiRequestMock: vi.fn(), vendorFetchMock: vi.fn() }));
 
-vi.mock("../../services/api", () => ({ apiRequest: apiRequestMock }));
+vi.mock("../../services/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../services/api")>()),
+  apiRequest: apiRequestMock,
+}));
+vi.mock("../../services/vendorAuthenticatedFetch", () => ({ vendorAuthenticatedFetch: vendorFetchMock }));
 vi.mock("@react-oauth/google", () => ({
   GoogleLogin: ({ onSuccess }: { onSuccess: (result: { credential: string }) => void }) => (
     <button type="button" onClick={() => onSuccess({ credential: "google-credential" })}>
@@ -46,6 +50,7 @@ async function submitVendorLogin() {
 afterEach(() => {
   cleanup();
   apiRequestMock.mockReset();
+  vendorFetchMock.mockReset().mockResolvedValue({ ok: true, json: async () => [{ id: "business-1" }] });
   localStorage.clear();
   sessionStorage.clear();
 });

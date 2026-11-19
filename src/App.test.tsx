@@ -204,7 +204,7 @@ describe("App route configuration", () => {
     vendorFetchMock.mockReset().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => [],
+      json: async () => [{ id: "business-1", name: "Paws & Co" }],
     });
   });
 
@@ -326,7 +326,7 @@ describe("App route configuration", () => {
     ).toBeInTheDocument();
   });
 
-  it("allows each role into its own dashboard and denies the other role", () => {
+  it("allows each role into its own dashboard and denies the other role", async () => {
     const customer = renderApp("/customer/dashboard", "CUSTOMER");
 
     expect(
@@ -338,7 +338,7 @@ describe("App route configuration", () => {
     const vendor = renderApp("/vendor/dashboard", "VENDOR");
 
     expect(
-      screen.getByRole("heading", { name: "Vendor dashboard route" }),
+      await screen.findByRole("heading", { name: "Vendor dashboard route" }),
     ).toBeInTheDocument();
 
     vendor.unmount();
@@ -348,6 +348,24 @@ describe("App route configuration", () => {
     expect(
       screen.getByRole("heading", { name: /you can’t access this page/i }),
     ).toBeInTheDocument();
+  });
+
+  it("redirects a vendor without a business from a direct dashboard URL", async () => {
+    vendorFetchMock.mockResolvedValue({ ok: true, status: 200, json: async () => [] });
+    renderApp("/vendor/dashboard", "VENDOR");
+
+    expect(screen.getByText(/checking your business registration/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/business name/i)).toBeInTheDocument();
+    expect(currentPath()).toBe("/vendor/business-registration");
+  });
+
+  it("keeps the dashboard blocked and reports an ownership check failure", async () => {
+    vendorFetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
+    renderApp("/vendor/dashboard", "VENDOR");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/couldn't verify your business registration/i);
+    expect(currentPath()).toBe("/vendor/dashboard");
+    expect(screen.queryByRole("heading", { name: "Vendor dashboard route" })).not.toBeInTheDocument();
   });
 
   it("keeps registration and verification pages in the auth layout", () => {

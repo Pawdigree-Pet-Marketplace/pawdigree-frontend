@@ -1,5 +1,7 @@
-import { describe, expect, it } from "vitest";
-import { getPostLoginPath } from "./authRedirect";
+import { describe, expect, it, vi } from "vitest";
+const { vendorFetchMock } = vi.hoisted(() => ({ vendorFetchMock: vi.fn() }));
+vi.mock("../vendorAuthenticatedFetch", () => ({ vendorAuthenticatedFetch: vendorFetchMock }));
+import { getPostLoginPath, getVendorPostLoginPath } from "./authRedirect";
 
 describe("getPostLoginPath", () => {
   it("preserves safe internal destinations and their query and hash", () => {
@@ -49,5 +51,22 @@ describe("getPostLoginPath", () => {
     expect(getPostLoginPath({ from: { pathname } }, "VENDOR")).toBe(
       "/vendor/dashboard",
     );
+  });
+});
+
+describe("getVendorPostLoginPath", () => {
+  it("sends vendors without businesses to business registration", async () => {
+    vendorFetchMock.mockResolvedValue({ ok: true, json: async () => [] });
+    await expect(getVendorPostLoginPath(null)).resolves.toBe("/vendor/business-registration");
+  });
+
+  it("preserves the normal destination for vendors with businesses", async () => {
+    vendorFetchMock.mockResolvedValue({ ok: true, json: async () => [{ id: "business-1" }] });
+    await expect(getVendorPostLoginPath({ from: { pathname: "/vendor/orders" } })).resolves.toBe("/vendor/orders");
+  });
+
+  it("fails closed when the backend business check fails", async () => {
+    vendorFetchMock.mockResolvedValue({ ok: false });
+    await expect(getVendorPostLoginPath(null)).rejects.toThrow(/check your businesses/i);
   });
 });

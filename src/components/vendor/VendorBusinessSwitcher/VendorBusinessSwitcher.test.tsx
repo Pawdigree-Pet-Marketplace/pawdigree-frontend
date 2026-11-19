@@ -27,6 +27,26 @@ afterEach(() => {
 });
 
 describe("VendorBusinessSwitcher", () => {
+  it("switches from a business workspace to the main vendor dashboard", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/vendor/business/42/dashboard"]}>
+        <VendorBusinessSwitcher />
+        <Routes>
+          <Route path="/vendor/business/:businessId/*" element={<CurrentPath />} />
+          <Route path="/vendor/dashboard" element={<CurrentPath />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByLabelText(/switch business/i));
+    await user.click(screen.getByRole("menuitemradio", { name: /main vendor dashboard/i }));
+
+    expect(screen.getByText("/vendor/dashboard")).toBeInTheDocument();
+    await user.click(screen.getByLabelText(/choose a business/i));
+    expect(screen.getByRole("menuitemradio", { name: /main vendor dashboard.*current/i })).toHaveAttribute("aria-checked", "true");
+  });
+
   it.each([
     ["99", "Merchandise Store"],
     ["77", "Services Store"],

@@ -6,7 +6,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import "@testing-library/jest-dom/vitest";
 
 import VendorRegistrationForm from "./VendorRegistrationForm";
@@ -14,18 +14,26 @@ import VendorRegistrationForm from "./VendorRegistrationForm";
 const render = (ui: React.ReactNode) =>
   rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
-const { apiRequestMock } = vi.hoisted(() => ({
+const { apiRequestMock, vendorPostLoginPathMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),
+  vendorPostLoginPathMock: vi.fn(),
 }));
 
 vi.mock("../../services/api", () => ({
   apiRequest: apiRequestMock,
 }));
+vi.mock("../../services/auth/authRedirect", () => ({
+  getVendorPostLoginPath: vendorPostLoginPathMock,
+}));
 
 // GoogleLogin throws unless it is inside <GoogleOAuthProvider>, and we don't
 // want tests loading Google's script anyway, so replace the library.
 vi.mock("@react-oauth/google", () => ({
-  GoogleLogin: () => <button type="button">Sign in with Google</button>,
+  GoogleLogin: ({ onSuccess }: { onSuccess: (response: { credential?: string }) => void }) => (
+    <button type="button" onClick={() => onSuccess({ credential: "google-credential" })}>
+      Sign in with Google
+    </button>
+  ),
   GoogleOAuthProvider: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>
   ),
@@ -51,6 +59,11 @@ const CONFIRM_PASSWORD = /^Confirm password\s*\*?$/i;
 
 const REGISTER_URL = "/auth/register/vendor/";
 const USERNAME_CHECK_URL = "/auth/username-available/";
+
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="location">{location.pathname}</output>;
+}
 
 function defaultApi(url: string) {
   if (url === "/country-codes/") {
@@ -139,7 +152,11 @@ function registerCalls() {
 describe("Vendor Registration Form", () => {
   beforeEach(() => {
     apiRequestMock.mockReset();
-    apiRequestMock.mockImplementation(async (url: string) => defaultApi(url));
+    apiRequestMock.mockImplementation(async (url: string) => {
+      if (url === "/auth/google/vendor/") return { access: "google-access", refresh: "google-refresh" };
+      return defaultApi(url);
+    });
+    vendorPostLoginPathMock.mockReset().mockResolvedValue("/vendor/business-registration");
   });
 
   afterEach(() => {
@@ -345,6 +362,25 @@ describe("Vendor Registration Form", () => {
 
     // Step 1 fields are no longer rendered.
     expect(screen.queryByLabelText(FIRST_NAME)).not.toBeInTheDocument();
+  });
+
+  test("sends a Google-registered vendor without businesses to business registration", async () => {
+    rtlRender(
+      <MemoryRouter>
+        <VendorRegistrationForm />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+    await waitForCountries();
+    fillStepOne();
+    await goToStepTwo();
+    fireEvent.click(screen.getByRole("button", { name: /sign in with google/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("location")).toHaveTextContent("/vendor/business-registration");
+    });
+    expect(apiRequestMock).toHaveBeenCalledWith("/auth/google/vendor/", expect.any(Object));
+    expect(vendorPostLoginPathMock).toHaveBeenCalledWith(null);
   });
 
   test("allows the vendor to fill in step 2", async () => {
