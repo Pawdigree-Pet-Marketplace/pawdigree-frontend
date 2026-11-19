@@ -1,6 +1,7 @@
 export type VendorBusinessPage =
   | "dashboard"
   | "availability"
+  | "services"
   | "profile"
   | "store-profile"
   | "listings"

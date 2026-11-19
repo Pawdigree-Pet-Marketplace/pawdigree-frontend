@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
@@ -95,6 +95,8 @@ function listingStatus(pet: Pet) {
 export default function VendorCataloguePage() {
   const activeBusiness = useVendorBusiness();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const salesOnly = searchParams.get("type") === "SALE";
   const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,6 +110,7 @@ export default function VendorCataloguePage() {
   const [cardPhotoIndexes, setCardPhotoIndexes] = useState<Record<number, number>>({});
   const cardTouchStartX = useRef<number | null>(null);
   const ignoreNextCardClick = useRef(false);
+  const visiblePets = salesOnly ? pets.filter((pet) => pet.listing_type === "SALE") : pets;
 
   const loadPets = useCallback(async () => {
     const token = getToken();
@@ -243,8 +246,9 @@ export default function VendorCataloguePage() {
             <p>
               {loading
                 ? "Loading your listings..."
-                : `${pets.length} ${pets.length === 1 ? "listing" : "listings"}`}
+                : `${visiblePets.length} ${visiblePets.length === 1 ? "listing" : "listings"}`}
             </p>
+            {salesOnly && <p>Showing pets listed for sale.</p>}
           </div>
 
           <Link className="catalogue-add-button" to={activeBusiness ? vendorBusinessPath(String(activeBusiness.id), "listings/new") : "/vendor/listings/new"}>
@@ -283,17 +287,15 @@ export default function VendorCataloguePage() {
           </div>
         )}
 
-        {!loading && !error && pets.length === 0 && (
+        {!loading && !error && visiblePets.length === 0 && (
           <div className="catalogue-empty">
             <span className="catalogue-empty-icon" aria-hidden="true">
               <PawPrint size={30} />
             </span>
 
-            <p className="catalogue-welcome">
-              A little space for new beginnings
-            </p>
+            <p className="catalogue-welcome">{salesOnly ? "Pet sales" : "A little space for new beginnings"}</p>
 
-            <h3>Your catalogue is waiting for its first pet!</h3>
+            <h3>{salesOnly ? "No pets for sale yet" : "Your catalogue is waiting for its first pet!"}</h3>
 
             <p>
               Every great pet story starts somewhere. Once your business is
@@ -309,9 +311,9 @@ export default function VendorCataloguePage() {
           </div>
         )}
 
-        {!loading && !error && pets.length > 0 && (
+        {!loading && !error && visiblePets.length > 0 && (
           <div className="catalogue-grid">
-            {pets.map((pet) => {
+            {visiblePets.map((pet) => {
               const sortedImages = [...(pet.images ?? [])].sort((a, b) => Number(typeof b !== "string" && b.is_primary) - Number(typeof a !== "string" && a.is_primary));
               const cardImages = sortedImages.slice(0, 2);
               const photoIndex = Math.min(cardPhotoIndexes[pet.pet_id] ?? 0, Math.max(0, cardImages.length - 1));
