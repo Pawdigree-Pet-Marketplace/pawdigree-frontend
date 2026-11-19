@@ -3,8 +3,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import VerifyEmailPage from "./VerifyEmailPage";
 
-const { apiRequestMock } = vi.hoisted(() => ({ apiRequestMock: vi.fn() }));
-vi.mock("../services/api", () => ({ apiRequest: apiRequestMock }));
+const { apiRequestMock, vendorFetchMock } = vi.hoisted(() => ({ apiRequestMock: vi.fn(), vendorFetchMock: vi.fn() }));
+vi.mock("../services/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../services/api")>()),
+  apiRequest: apiRequestMock,
+}));
+vi.mock("../services/vendorAuthenticatedFetch", () => ({ vendorAuthenticatedFetch: vendorFetchMock }));
 
 function renderVerification(role: "CUSTOMER" | "VENDOR", redirectTo: string) {
   sessionStorage.setItem(
@@ -28,6 +32,7 @@ function renderVerification(role: "CUSTOMER" | "VENDOR", redirectTo: string) {
         <Route path="/vendor/documents" element={<p>Vendor documents destination</p>} />
         <Route path="/customer/dashboard" element={<p>Customer dashboard destination</p>} />
         <Route path="/vendor/dashboard" element={<p>Vendor dashboard destination</p>} />
+        <Route path="/vendor/business-registration" element={<p>Business registration destination</p>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -41,6 +46,7 @@ async function verify() {
 afterEach(() => {
   cleanup();
   apiRequestMock.mockReset();
+  vendorFetchMock.mockReset().mockResolvedValue({ ok: true, json: async () => [{ id: "business-1" }] });
   localStorage.clear();
   sessionStorage.clear();
 });
@@ -60,6 +66,15 @@ describe("email verification destination", () => {
     await verify();
 
     expect(await screen.findByText("Vendor documents destination")).toBeInTheDocument();
+  });
+
+  it("sends a newly verified vendor without businesses to registration", async () => {
+    apiRequestMock.mockResolvedValue({ access: "vendor-token", refresh: "vendor-refresh" });
+    vendorFetchMock.mockResolvedValue({ ok: true, json: async () => [] });
+    renderVerification("VENDOR", "/vendor/dashboard");
+    await verify();
+
+    expect(await screen.findByText("Business registration destination")).toBeInTheDocument();
   });
 
   it("uses the role dashboard when a stored destination crosses role boundaries", async () => {

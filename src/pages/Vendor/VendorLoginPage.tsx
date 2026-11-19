@@ -15,7 +15,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./VendorLoginPage.css";
 import BackButton from "../../components/BackButton/BackButton";
-import { getPostLoginPath } from "../../services/auth/authRedirect";
+import { getPostLoginPath, getVendorPostLoginPath } from "../../services/auth/authRedirect";
 
 type LoginResponse = {
   access?: string;
@@ -134,7 +134,7 @@ export default function VendorLoginPage() {
         role: "VENDOR",
       });
 
-      navigate(postLoginPath, { replace: true });
+      navigate(await getVendorPostLoginPath(location.state), { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       const normalizedMessage = message.toLowerCase();

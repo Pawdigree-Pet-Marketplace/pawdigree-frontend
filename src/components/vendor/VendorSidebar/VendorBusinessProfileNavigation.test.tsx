@@ -130,4 +130,5 @@ describe("business-scoped vendor profile navigation", () => {
       expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
     },
   );
+
 });

@@ -1,4 +1,6 @@
 import type { UserRole } from "./authStorage";
+import API_BASE_URL from "../api";
+import { vendorAuthenticatedFetch } from "../vendorAuthenticatedFetch";
 
 type RouteDestination = {
   pathname?: unknown;
@@ -94,4 +96,23 @@ export function getPostLoginPath(state: unknown, role: UserRole): string {
   }
 
   return path;
+}
+
+type VendorBusinessList = unknown[] | { results?: unknown[] };
+
+/** Resolve the vendor destination from their current backend business data. */
+export async function getVendorPostLoginPath(state: unknown): Promise<string> {
+  const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`);
+  if (!response.ok) {
+    throw new Error("We couldn't check your businesses. Please try again.");
+  }
+
+  const data = (await response.json()) as VendorBusinessList;
+  const businesses = Array.isArray(data) ? data : data.results;
+  if (!businesses) {
+    throw new Error("We couldn't check your businesses. Please try again.");
+  }
+
+  if (businesses.length === 0) return "/vendor/business-registration";
+  return getPostLoginPath(state, "VENDOR");
 }

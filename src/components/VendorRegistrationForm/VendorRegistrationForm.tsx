@@ -12,6 +12,7 @@ import "../../App.css";
 import "./VendorRegistrationForm.css";
 import { apiRequest } from "../../services/api";
 import { saveAuthSession } from "../../services/auth/authStorage";
+import { getVendorPostLoginPath } from "../../services/auth/authRedirect";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import GoogleSignInButton from "../GoogleSignInButton/GoogleSignInButton";
 
@@ -475,7 +476,7 @@ export default function VendorRegistrationForm() {
         role: "VENDOR",
       });
 
-      navigate("/vendor/dashboard", { replace: true });
+      navigate(await getVendorPostLoginPath(null), { replace: true });
     } catch (error) {
       setApiError(
         error instanceof Error

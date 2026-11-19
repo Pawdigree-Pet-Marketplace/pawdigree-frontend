@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { MailCheck, PawPrint } from "lucide-react";
 import { apiRequest } from "../services/api";
 import { saveAuthSession } from "../services/auth/authStorage";
-import { getPostLoginPath } from "../services/auth/authRedirect";
+import { getPostLoginPath, getVendorPostLoginPath } from "../services/auth/authRedirect";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton/BackButton";
 import "./Customer/CustomerLoginPage.css";
@@ -100,10 +100,10 @@ export default function VerifyEmailPage() {
         role: verification.role,
       });
       sessionStorage.removeItem("pawdigree_email_verification");
-      navigate(
-        getPostLoginPath({ from: verification.redirectTo }, verification.role),
-        { replace: true },
-      );
+      const destination = verification.role === "VENDOR"
+        ? await getVendorPostLoginPath({ from: verification.redirectTo })
+        : getPostLoginPath({ from: verification.redirectTo }, verification.role);
+      navigate(destination, { replace: true });
     } catch (err) {
       const message =
         err instanceof Error

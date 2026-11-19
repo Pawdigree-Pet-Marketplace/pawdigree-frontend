@@ -9,6 +9,7 @@
 .vendor-business-switcher-note{margin:8px;padding:8px;color:var(--dashboard-muted);font-size:12px}
 .vendor-business-switcher-option,.vendor-business-switcher-manage{display:flex;width:100%;align-items:center;gap:10px;border:0;border-radius:9px;background:transparent;padding:10px;color:var(--dashboard-ink);font:inherit;font-size:13px;text-align:left;cursor:pointer}
 .vendor-business-switcher-option:hover,.vendor-business-switcher-option.is-selected{background:var(--dashboard-sand)}
+.vendor-business-switcher-option--main{margin-bottom:6px;border-bottom:1px solid var(--dashboard-border);border-radius:9px 9px 0 0;padding-bottom:12px}
 .vendor-business-switcher-option>span:first-of-type{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vendor-business-switcher-current{color:var(--dashboard-teal);font-size:10px;font-weight:800}
 .vendor-business-switcher-manage{margin-top:6px;border-top:1px solid var(--dashboard-border);border-radius:0 0 8px 8px;padding-top:12px;color:var(--dashboard-teal);font-weight:800}

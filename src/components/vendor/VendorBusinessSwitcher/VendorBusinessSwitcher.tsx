@@ -26,6 +26,11 @@ export default function VendorBusinessSwitcher() {
     if (detailsRef.current) detailsRef.current.open = false;
   }
 
+  function switchToMainDashboard() {
+    navigate("/vendor/dashboard");
+    if (detailsRef.current) detailsRef.current.open = false;
+  }
+
   return (
     <details className="vendor-business-switcher" ref={detailsRef}>
       <summary aria-label={activeBusiness ? `Switch business. Current business: ${activeBusiness.name}` : "Choose a business"} title={activeBusiness?.name || "Choose a business"}>
@@ -34,6 +39,17 @@ export default function VendorBusinessSwitcher() {
       </summary>
       <div className="vendor-business-switcher-menu" role="menu" aria-label="Your businesses">
         <p className="vendor-business-switcher-heading">Switch business</p>
+        <button
+          className={`vendor-business-switcher-option vendor-business-switcher-option--main${!activeId ? " is-selected" : ""}`}
+          type="button"
+          role="menuitemradio"
+          aria-checked={!activeId}
+          onClick={switchToMainDashboard}
+        >
+          <House size={16} aria-hidden="true" />
+          <span>Main Vendor Dashboard</span>
+          {!activeId && <span className="vendor-business-switcher-current">Current</span>}
+        </button>
         {loading ? <p className="vendor-business-switcher-note">Loading businesses…</p> : businesses.length ? businesses.map((business) => {
           const id = String(business.id);
           const selected = id === activeId;
