@@ -22,6 +22,7 @@ import CustomerVendorsPage from "./pages/Customer/CustomerVendorsPage";
 import EditProfilePage from "./pages/Customer/EditProfilePage";
 import ExplorePets from "./pages/Customer/ExplorePets";
 import MerchandisePage from "./pages/Customer/MerchandisePage";
+import ServicesPage from "./pages/Customer/ServicesPage";
 import ProductDetailsPage from "./pages/Customer/ProductDetailsPage";
 import ForgotPasswordPage from "./pages/Customer/ForgotPasswordPage";
 import PetsDetailPage from "./pages/Customer/PetsDetailPage";
@@ -81,6 +82,7 @@ function App() {
       <Route element={<CustomerAwareLayout />}>
         <Route path="/explore-pets" element={<ExplorePets />} />
         <Route path="/merchandise" element={<MerchandisePage />} />
+        <Route path="/services" element={<ServicesPage />} />
         <Route
           path="/merchandise/:productId"
           element={<ProductDetailsPage />}

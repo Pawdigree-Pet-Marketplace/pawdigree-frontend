@@ -29,7 +29,7 @@ const navigationItems = [
   { label: "Pet Store", href: "/merchandise", Icon: ShoppingBag },
   { label: "Cart", href: "/customer/cart", Icon: ShoppingCart },
   { label: "Orders", href: "/customer/orders", Icon: ClipboardList },
-  { label: "Pet Services", href: "/vendors", Icon: Stethoscope },
+  { label: "Pet Services", href: "/services", Icon: Stethoscope },
   { label: "Adoption", href: "/customer/adoption", Icon: HeartHandshake },
 ];
 
@@ -60,7 +60,7 @@ export default function CustomerDashboardNav() {
       case "Orders":
         return pathname === "/customer/orders";
       case "Pet Services":
-        return pathname.startsWith("/vendors");
+        return pathname.startsWith("/services");
       case "Adoption":
         return pathname === "/pets" && isAdoption;
       default:
