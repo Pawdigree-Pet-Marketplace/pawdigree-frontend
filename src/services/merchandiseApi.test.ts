@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { apiRequest } from "./api";
-import { fetchProducts } from "./publicMerchandiseApi";
+import { fetchMerchCategories, fetchProducts } from "./publicMerchandiseApi";
 import { readMerchQuery } from "../data/merchandise";
 
 vi.mock("./api", () => ({ apiRequest: vi.fn() }));
@@ -42,5 +42,17 @@ describe("fetchProducts", () => {
     const res = await fetchProducts(readMerchQuery(new URLSearchParams()));
 
     expect(res).toEqual({ count: 0, results: [] });
+  });
+});
+
+describe("fetchMerchCategories", () => {
+  it("requests only active merchandise categories from the public endpoint", async () => {
+    vi.mocked(apiRequest).mockResolvedValue([]);
+
+    await fetchMerchCategories();
+
+    expect(apiRequest).toHaveBeenCalledWith(
+      "/categories/public/?kind=merchandise",
+    );
   });
 });

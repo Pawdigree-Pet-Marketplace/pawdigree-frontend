@@ -17,6 +17,8 @@ export interface Merchandise {
   price: string;
   stock_quantity: number;
   is_active: boolean;
+  approved: boolean;
+  rejection_reason: string;
   images: ProductImage[];
 }
 
@@ -96,6 +98,32 @@ export async function updateMerchandise(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
+  });
+}
+
+export async function uploadMerchandiseImage(
+  productId: number,
+  file: File,
+  altText: string,
+  displayOrder: number,
+): Promise<ProductImage> {
+  const body = new FormData();
+  body.append("image", file);
+  body.append("alt_text", altText);
+  body.append("display_order", String(displayOrder));
+
+  return request<ProductImage>(`${PRODUCTS_URL}${productId}/images/`, {
+    method: "POST",
+    body,
+  });
+}
+
+export async function deleteMerchandiseImage(
+  productId: number,
+  imageId: number,
+): Promise<void> {
+  await request<void>(`${PRODUCTS_URL}${productId}/images/${imageId}/`, {
+    method: "DELETE",
   });
 }
 

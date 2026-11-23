@@ -35,7 +35,7 @@ export async function fetchProduct(id: string | number): Promise<Product> {
 /** Category list for the filter. Callers should treat a failure as "no categories". */
 export async function fetchMerchCategories(): Promise<MerchCategory[]> {
   const res = await apiRequest<MerchCategory[] | { results?: MerchCategory[] }>(
-    "/categories/",
+    "/categories/public/?kind=merchandise",
   );
   return Array.isArray(res) ? res : (res.results ?? []);
 }

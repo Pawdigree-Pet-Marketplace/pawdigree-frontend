@@ -199,6 +199,27 @@
 .vendor-workspace .dashboard-header .vendor-page-heading,
 .vendor-workspace .dashboard-header-actions { position: relative; z-index: 1; }
 
+.vendor-workspace .dashboard-merchandise-panel { padding: 20px 22px; }
+.vendor-workspace .dashboard-merchandise-heading,
+.vendor-workspace .dashboard-merchandise-heading > div { display: flex; align-items: center; gap: 12px; }
+.vendor-workspace .dashboard-merchandise-heading { justify-content: space-between; gap: 16px; }
+.vendor-workspace .dashboard-merchandise-heading .dashboard-metric-icon { flex: 0 0 38px; margin: 0; }
+.vendor-workspace .dashboard-merchandise-heading h2 { margin: 0; }
+.vendor-workspace .dashboard-merchandise-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 9px 14px; border: 1px solid rgb(33 108 104 / 20%); border-radius: 12px; background: rgb(33 108 104 / 8%); color: #216c68; font-weight: 700; }
+.vendor-workspace .dashboard-merchandise-link:hover { background: rgb(33 108 104 / 14%); }
+.vendor-workspace .dashboard-merchandise-link:focus-visible { outline: 3px solid rgb(33 108 104 / 35%); outline-offset: 2px; }
+.vendor-workspace .dashboard-merchandise-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.vendor-workspace .dashboard-merchandise-stats > div { display: flex; min-width: 0; flex-direction: column; gap: 5px; padding: 12px 14px; border-radius: 13px; background: #f3f0ea; }
+.vendor-workspace .dashboard-merchandise-stats strong { color: #2c302f; font-family: "Poppins", "Fredoka", sans-serif; font-size: 22px; }
+.vendor-workspace .dashboard-merchandise-stats span,
+.vendor-workspace .dashboard-merchandise-message { color: rgb(44 48 47 / 66%); font-size: 12px; }
+.vendor-workspace .dashboard-merchandise-message { margin: 18px 0 0; }
+@media (max-width: 680px) {
+  .vendor-workspace .dashboard-merchandise-panel { padding: 17px 15px; }
+  .vendor-workspace .dashboard-merchandise-heading { align-items: flex-start; flex-direction: column; }
+  .vendor-workspace .dashboard-merchandise-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* Soft brand tints add warmth while keeping the workspace light and readable. */
 .vendor-workspace .dashboard-sidebar {
   border-color: var(--coral-border);

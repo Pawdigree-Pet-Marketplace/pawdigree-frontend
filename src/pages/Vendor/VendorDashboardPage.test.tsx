@@ -3,11 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { apiRequest } from '../../services/api'
 import VendorDashboardPage from './VendorDashboardPage'
+import { getMerchandise } from '../../services/merchandiseApi'
 
 vi.mock('../../services/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../services/api')>()
   return { ...actual, apiRequest: vi.fn() }
 })
+
+vi.mock('../../services/merchandiseApi', () => ({ getMerchandise: vi.fn() }))
 
 vi.mock('../../layouts/VendorLayout/VendorLayout', () => ({
   default: ({
@@ -36,6 +39,7 @@ describe('VendorDashboardPage', () => {
     localStorage.setItem('token', 'test-vendor-token')
     localStorage.setItem('role', 'VENDOR')
     vi.mocked(apiRequest).mockResolvedValue({ first_name: 'Faith' })
+    vi.mocked(getMerchandise).mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -81,6 +85,24 @@ describe('VendorDashboardPage', () => {
     expect(screen.getByText('Pending Bookings')).toBeInTheDocument()
     expect(screen.getAllByText('—')).toHaveLength(4)
     expect(screen.queryByText(',480')).not.toBeInTheDocument()
+  })
+
+  it('shows vendor merchandise totals and the existing management link', async () => {
+    vi.mocked(getMerchandise).mockResolvedValue([
+      { id: 1, is_active: true, approved: true, rejection_reason: '' },
+      { id: 2, is_active: false, approved: false, rejection_reason: '' },
+      { id: 3, is_active: true, approved: false, rejection_reason: 'Needs changes' },
+    ] as never)
+
+    render(<VendorDashboardPage />)
+
+    expect(await screen.findByText('Awaiting approval')).toBeInTheDocument()
+    expect(screen.getByText('Total products').previousElementSibling).toHaveTextContent('3')
+    expect(screen.getByText('Active').previousElementSibling).toHaveTextContent('2')
+    expect(screen.getByText('Inactive').previousElementSibling).toHaveTextContent('1')
+    expect(screen.getByText('Awaiting approval').previousElementSibling).toHaveTextContent('1')
+    expect(screen.getByRole('link', { name: /manage merchandise/i })).toHaveAttribute('href', '/vendor/merchandise')
+    expect(getMerchandise).toHaveBeenCalledWith()
   })
 
   it('shows an honest empty state for sales history', () => {
