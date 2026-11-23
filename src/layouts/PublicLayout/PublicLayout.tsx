@@ -55,7 +55,7 @@ export default function PublicLayout() {
       <Outlet />
 
       <Footer />
-      {audience === "customer" && <BottomNavbar />}
+      {audience === "customer" && !isLoggedIn && <BottomNavbar />}
     </>
   );
 }

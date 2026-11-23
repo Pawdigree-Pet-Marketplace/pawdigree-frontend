@@ -7,7 +7,7 @@ const navItems = [
   { label: "Home", icon: Home },
   { label: "Cart", icon: ShoppingBag },
   { label: "Chat", icon: MessageSquare },
-  { label: "Profile", icon: User },
+  { label: "Sign in", icon: User },
 ];
 
 const BottomNavbar = () => {
@@ -20,7 +20,7 @@ const BottomNavbar = () => {
         navigate(isLoggedIn ? "/customer/dashboard" : "/");
         break;
 
-      case "Profile":
+      case "Sign in":
         navigate(isLoggedIn ? "/profile" : "/customer-login");
         break;
 
@@ -39,7 +39,7 @@ const BottomNavbar = () => {
                 location.pathname === "/customer/dashboard")) ||
             (label === "Cart" && location.pathname === "/cart") ||
             (label === "Chat" && location.pathname === "/chat") ||
-            (label === "Profile" &&
+            (label === "Sign in" &&
               (location.pathname === "/profile" ||
                 location.pathname.startsWith("/profile/")));
           return (
