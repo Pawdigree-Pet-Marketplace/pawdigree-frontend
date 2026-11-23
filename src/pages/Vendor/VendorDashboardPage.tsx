@@ -3,13 +3,17 @@ import { useEffect, useState } from "react";
 import {
   CalendarCheck,
   DollarSign,
+  ExternalLink,
+  Package,
   ShoppingCart,
   Wallet,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { apiRequest } from "../../services/api";
 import BusinessVerificationStatus from "../../components/BusinessVerificationStatus/BusinessVerificationStatus";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { getMerchandise, type Merchandise } from "../../services/merchandiseApi";
 import "./VendorDashboardPage.css";
 
 const metrics = [
@@ -22,6 +26,9 @@ const metrics = [
 function VendorDashboardPage() {
   const activeBusiness = useVendorBusiness();
   const [firstName, setFirstName] = useState("");
+  const [merchandise, setMerchandise] = useState<Merchandise[]>([]);
+  const [merchandiseLoading, setMerchandiseLoading] = useState(true);
+  const [merchandiseLoadError, setMerchandiseLoadError] = useState(false);
   const token =
     localStorage.getItem("token") ||
     sessionStorage.getItem("token");
@@ -48,6 +55,26 @@ function VendorDashboardPage() {
     return () => {
       cancelled = true;
     };
+  }, [token, role]);
+
+  useEffect(() => {
+    if (!token || role !== "VENDOR") return;
+    let cancelled = false;
+    void getMerchandise()
+      .then((products) => {
+        if (!cancelled) {
+          setMerchandise(products);
+          setMerchandiseLoadError(false);
+          setMerchandiseLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMerchandiseLoadError(true);
+          setMerchandiseLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
   }, [token, role]);
   if (!token || role !== "VENDOR") {
     return null;
@@ -93,6 +120,30 @@ function VendorDashboardPage() {
               </article>
             );
           })}
+        </section>
+
+        <section className="dashboard-panel dashboard-merchandise-panel" aria-labelledby="dashboard-merchandise-title">
+          <div className="dashboard-merchandise-heading">
+            <div>
+              <span className="dashboard-metric-icon" aria-hidden="true"><Package size={18} strokeWidth={1.9} /></span>
+              <h2 id="dashboard-merchandise-title">MERCHANDISE</h2>
+            </div>
+            <Link className="dashboard-merchandise-link" to="/vendor/merchandise">
+              Manage Merchandise <ExternalLink size={15} aria-hidden="true" />
+            </Link>
+          </div>
+          {merchandiseLoading ? (
+            <p className="dashboard-merchandise-message" role="status">Loading merchandise totals…</p>
+          ) : merchandiseLoadError ? (
+            <p className="dashboard-merchandise-message" role="status">Merchandise totals could not be loaded.</p>
+          ) : (
+            <div className="dashboard-merchandise-stats" aria-label="Merchandise totals">
+              <div><strong>{merchandise.length}</strong><span>Total products</span></div>
+              <div><strong>{merchandise.filter((product) => product.is_active).length}</strong><span>Active</span></div>
+              <div><strong>{merchandise.filter((product) => !product.is_active).length}</strong><span>Inactive</span></div>
+              <div><strong>{merchandise.filter((product) => !product.approved && !product.rejection_reason).length}</strong><span>Awaiting approval</span></div>
+            </div>
+          )}
         </section>
 
         {/* SALES CHART AND STOCK ALERTS */}

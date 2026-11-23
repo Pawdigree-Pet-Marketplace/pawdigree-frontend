@@ -27,6 +27,7 @@ const implementedVendorPages = new Set([
   "/vendor/profile",
   "/vendor/store-profile",
   "/vendor/listings",
+  "/vendor/merchandise",
   "/vendor/adoption-applications",
   "/vendor/services/new",
   "/vendor/services/catalog",

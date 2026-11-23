@@ -3,6 +3,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import VendorLayout from "../../../layouts/VendorLayout/VendorLayout";
+import VendorSidebar from "./VendorSidebar";
 import VendorProfilePage from "../../../pages/Vendor/VendorProfilePage";
 import { VendorBusinessRoute } from "../../../services/vendorBusinessContext";
 import { vendorAuthenticatedFetch } from "../../../services/vendorAuthenticatedFetch";
@@ -158,4 +159,25 @@ describe("business-scoped vendor profile navigation", () => {
     expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
   });
 
+});
+
+describe("main vendor sidebar navigation", () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it("shows Merchandise under Your Store on the unscoped vendor dashboard", () => {
+    render(
+      <MemoryRouter initialEntries={["/vendor/dashboard"]}>
+        <VendorSidebar />
+      </MemoryRouter>,
+    );
+
+    const storeNavigation = screen.getByRole("navigation", { name: "Vendor navigation" });
+    const merchandiseLink = screen.getByRole("link", { name: "Merchandise" });
+    expect(storeNavigation).toContainElement(merchandiseLink);
+    expect(screen.getByText("YOUR STORE").parentElement).toContainElement(merchandiseLink);
+    expect(merchandiseLink).toHaveAttribute("href", "/vendor/merchandise");
+  });
 });
