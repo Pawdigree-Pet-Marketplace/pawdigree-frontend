@@ -35,8 +35,14 @@ const TopNavbar = ({
   const isLandingPage = path === "/";
   const isExplorePetsPage = path === "/explore-pets";
   const isMerchandisePage = path === "/merchandise";
+  const isVendorLandingPage = path === "/vendor";
   const isTransparentPage =
-    isLandingPage || isExplorePetsPage || isMerchandisePage;
+    isLandingPage ||
+    isExplorePetsPage ||
+    isMerchandisePage ||
+    isVendorLandingPage;
+
+  const useDarkLogo = isLandingPage && !isScrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,13 +61,12 @@ const TopNavbar = ({
     return path === href || path.startsWith(`${href}/`);
   };
 
-  // Dark logo only while the navbar is transparent over the hero
-  const useDarkLogo = isTransparentPage && !isScrolled;
-
   const navbarClass = [
     "top-navbar",
     isTransparentPage ? "top-navbar--transparent" : "",
-    isExplorePetsPage || isMerchandisePage ? "top-navbar--explore" : "",
+    isExplorePetsPage || isMerchandisePage || isVendorLandingPage
+      ? "top-navbar--explore"
+      : "",
     isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
   ]
     .filter(Boolean)
@@ -74,7 +79,7 @@ const TopNavbar = ({
           <img
             src={useDarkLogo ? darkLogo : lightLogo}
             alt="Pawdigree"
-            className={`logo-img ${useDarkLogo ? "logo-img--dark" : ""}`}
+            className="logo-img"
           />
         </Link>
       </div>
