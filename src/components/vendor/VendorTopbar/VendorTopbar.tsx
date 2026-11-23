@@ -1,9 +1,10 @@
-import { Bell, Search, UserRound } from "lucide-react";
+import { CircleHelp, Search, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./VendorTopbar.css";
 import VendorBusinessSwitcher from "../VendorBusinessSwitcher/VendorBusinessSwitcher";
 import { useVendorBusiness } from "../../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
+import VendorNotifications from "../VendorNotifications/VendorNotifications";
 
 type VendorTopbarProps = {
   businessName?: string;
@@ -34,15 +35,8 @@ export default function VendorTopbar({
 
       {showBusinessSwitcher && <VendorBusinessSwitcher />}
 
-      <button
-        type="button"
-        className="dashboard-notification-button"
-        aria-label="Notifications are not available yet"
-        title="Notifications are not available yet"
-        disabled
-      >
-        <Bell size={18} aria-hidden="true" />
-      </button>
+      <Link to="/vendor/dashboard?tour=replay" className="dashboard-notification-button vendor-tour-replay" aria-label="Replay dashboard tour" title="Replay dashboard tour"><CircleHelp size={18} aria-hidden="true" /></Link>
+      <VendorNotifications />
 
       <Link
         to={profilePath}

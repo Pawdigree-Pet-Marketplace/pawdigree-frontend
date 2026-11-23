@@ -277,6 +277,7 @@ const scopedPath: string = (() => {
                   className={`dashboard-nav-item${isActive ? " active" : ""}`}
                   aria-current={isActive ? "page" : undefined}
                   title={item.label}
+                  data-vendor-tour={item.path === "/vendor/listings" ? "pets" : item.path === "/vendor/services/catalog" ? "services" : item.path === "/vendor/orders" ? "orders-navigation" : undefined}
                 >
                   {itemContent}
                 </Link>

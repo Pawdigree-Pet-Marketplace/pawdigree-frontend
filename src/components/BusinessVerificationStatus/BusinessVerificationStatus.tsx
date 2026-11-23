@@ -16,6 +16,7 @@ interface BusinessVerification {
   reviewed_at: string | null;
   is_active: boolean;
   can_sell: boolean;
+  categories?: Array<{ category_id: number; name: string; approval_status: string; can_sell: boolean }>;
 }
 
 interface ApiResponse {
@@ -259,10 +260,13 @@ export default function BusinessVerificationStatus({ businessId }: { businessId?
 
             {status === "approved" && (
               <p className="verification-card__message">
-                Your business has been approved.
-                {business.can_sell
-                  ? " You can sell on Pawdigree."
-                  : " Your selling access is not currently active."}
+                {!business.is_active
+                  ? "Your business is approved, but currently inactive. Contact Pawdigree support if you need it reactivated."
+                  : business.can_sell
+                    ? "Your business is approved and active for selling."
+                    : business.categories?.some((category) => normalizeStatus(category.approval_status) === "pending")
+                      ? "Your business is approved and active. Selling is waiting for admin approval of your requested categories."
+                      : "Your business is approved and active, but no selling category is currently approved. Review your category requests or contact support."}
               </p>
             )}
 
