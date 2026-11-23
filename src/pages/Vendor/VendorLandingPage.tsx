@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import "./VendorLandingPage.css";
 import vendorHero from "../../assets/images/vendor-hero.jpg";
+import vendorHero2 from "../../assets/images/vendor-hero2.jpg";
+import vendorHero3 from "../../assets/images/vendor-hero3.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import useSession from "../../hooks/useSession";
 
 import {
   ArrowUpRight,
+  Bell,
   CalendarCheck,
   ChartNoAxesCombined,
   CheckCircle2,
@@ -17,6 +20,24 @@ import {
   Stethoscope,
   UsersRound,
 } from "lucide-react";
+
+function useIsSmallScreen(query = "(max-width: 900px)") {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const update = () => setMatches(mq.matches);
+
+    update();
+    mq.addEventListener("change", update);
+
+    return () => mq.removeEventListener("change", update);
+  }, [query]);
+
+  return matches;
+}
 
 const benefits = [
   {
@@ -192,10 +213,57 @@ function VendorSteps({
   );
 }
 
+const heroSlides = [
+  { src: vendorHero, position: "70% 30%" },
+  { src: vendorHero2, position: "50% 40%" },
+  { src: vendorHero3, position: "50% 40%" },
+];
+const SLIDE_MS = 6000;
+
+const highlights = [
+  { icon: UsersRound, title: "More customers", text: "Expand your reach" },
+  {
+    icon: ShoppingBag,
+    title: "More visibility",
+    text: "Showcase your offerings",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Easy management",
+    text: "Keep bookings organized",
+  },
+  {
+    icon: ChartNoAxesCombined,
+    title: "One dashboard",
+    text: "Manage your business",
+  },
+  { icon: ShieldCheck, title: "Build trust", text: "Get a verified badge" },
+  { icon: Bell, title: "Never miss out", text: "Instant order alerts" },
+];
+
 function VendorLandingPage() {
   const [hideFloaties, setHideFloaties] = useState(false);
   const navigate = useNavigate();
   const isVendorSignedIn = useSession("VENDOR");
+  const [slide, setSlide] = useState(0);
+  const isSmall = useIsSmallScreen();
+
+  // Automatically change hero images on desktop only
+  useEffect(() => {
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reduce || isSmall) return;
+
+    const id = window.setInterval(() => {
+      if (!document.hidden) {
+        setSlide((i) => (i + 1) % heroSlides.length);
+      }
+    }, SLIDE_MS);
+
+    return () => window.clearInterval(id);
+  }, [slide, isSmall]);
 
   useEffect(() => {
     if (isVendorSignedIn) {
@@ -265,15 +333,26 @@ function VendorLandingPage() {
     <main className="vendor-page" id="home">
       {/* HERO */}
       <section className="vendor-hero">
-        <div className="vendor-cta-decoration" aria-hidden="true">
-          <PawPrint className="vendor-cta-paw vendor-hero-paw-one" />
-          <PawPrint className="vendor-cta-paw vendor-hero-paw-two" />
+        {!isSmall && (
+          <div className="vendor-cta-decoration" aria-hidden="true">
+            <PawPrint className="vendor-cta-paw vendor-hero-paw-one" />
+            <PawPrint className="vendor-cta-paw vendor-hero-paw-two" />
+          </div>
+        )}
+        <div className="vendor-hero-slides" aria-hidden="true">
+          {heroSlides.map((s, i) => (
+            <img
+              key={s.src}
+              src={s.src}
+              alt=""
+              style={{ "--pos": s.position } as CSSProperties}
+              className={`vendor-hero-bg${
+                (isSmall ? i === 0 : i === slide) ? " is-active" : ""
+              }`}
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          ))}
         </div>
-        <img
-          className="vendor-hero-bg"
-          src={vendorHero}
-          alt="A pet owner spending time with a dog"
-        />
 
         <div className="vendor-hero-inner">
           <div className="vendor-hero-copy">
@@ -315,169 +394,172 @@ function VendorLandingPage() {
             </p>
           </div>
         </div>
-        <div
-          className={`vl-hero-floaties ${hideFloaties ? "v1-hidden" : ""}`}
-          aria-hidden="true"
-        >
-          {/* Paw prints */}
-          <svg
-            className="vl-floaty vl-floaty-paw vl-paw-a"
-            viewBox="0 0 100 100"
-            fill="none"
-          >
-            <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
-              <ellipse
-                cx="30"
-                cy="29"
-                rx="9"
-                ry="15"
-                transform="rotate(-25 30 29)"
-              />
-              <ellipse
-                cx="43"
-                cy="18"
-                rx="9"
-                ry="15"
-                transform="rotate(-8 43 18)"
-              />
-              <ellipse
-                cx="60"
-                cy="18"
-                rx="9"
-                ry="15"
-                transform="rotate(8 60 18)"
-              />
-              <ellipse
-                cx="73"
-                cy="29"
-                rx="9"
-                ry="15"
-                transform="rotate(25 73 29)"
-              />
-              <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
-            </g>
-          </svg>
 
-          <svg
-            className="vl-floaty vl-floaty-bone vl-bone-a"
-            viewBox="0 0 100 60"
-            fill="none"
+        {!isSmall && (
+          <div
+            className={`v1-hero-floaties ${hideFloaties ? "v1-hidden" : ""}`}
+            aria-hidden="true"
           >
-            <path
-              d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
-              stroke="currentColor"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              transform="rotate(-25 50 30)"
-            />
-          </svg>
+            {/* Paw prints */}
+            <svg
+              className="vl-floaty vl-floaty-paw vl-paw-a"
+              viewBox="0 0 100 100"
+              fill="none"
+            >
+              <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
+                <ellipse
+                  cx="30"
+                  cy="29"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(-25 30 29)"
+                />
+                <ellipse
+                  cx="43"
+                  cy="18"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(-8 43 18)"
+                />
+                <ellipse
+                  cx="60"
+                  cy="18"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(8 60 18)"
+                />
+                <ellipse
+                  cx="73"
+                  cy="29"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(25 73 29)"
+                />
+                <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
+              </g>
+            </svg>
 
-          <svg
-            className="vl-floaty vl-floaty-heart vl-heart-a"
-            viewBox="0 0 40 40"
-            fill="none"
-          >
-            <path
-              d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          <svg
-            className="vl-floaty vl-floaty-sparkle vl-sparkle-a"
-            viewBox="0 0 40 40"
-            fill="none"
-          >
-            <path
-              d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          <svg
-            className="vl-floaty vl-floaty-paw vl-paw-b"
-            viewBox="0 0 100 100"
-            fill="none"
-          >
-            <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
-              <ellipse
-                cx="30"
-                cy="29"
-                rx="9"
-                ry="15"
-                transform="rotate(-25 30 29)"
+            <svg
+              className="vl-floaty vl-floaty-bone vl-bone-a"
+              viewBox="0 0 100 60"
+              fill="none"
+            >
+              <path
+                d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                transform="rotate(-25 50 30)"
               />
-              <ellipse
-                cx="43"
-                cy="18"
-                rx="9"
-                ry="15"
-                transform="rotate(-8 43 18)"
-              />
-              <ellipse
-                cx="60"
-                cy="18"
-                rx="9"
-                ry="15"
-                transform="rotate(8 60 18)"
-              />
-              <ellipse
-                cx="73"
-                cy="29"
-                rx="9"
-                ry="15"
-                transform="rotate(25 73 29)"
-              />
-              <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
-            </g>
-          </svg>
+            </svg>
 
-          <svg
-            className="vl-floaty vl-floaty-sparkle vl-sparkle-b"
-            viewBox="0 0 40 40"
-            fill="none"
-          >
-            <path
-              d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-          </svg>
+            <svg
+              className="vl-floaty vl-floaty-heart vl-heart-a"
+              viewBox="0 0 40 40"
+              fill="none"
+            >
+              <path
+                d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            </svg>
 
-          <svg
-            className="vl-floaty vl-floaty-bone vl-bone-b"
-            viewBox="0 0 100 60"
-            fill="none"
-          >
-            <path
-              d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
-              stroke="currentColor"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              transform="rotate(-25 50 30)"
-            />
-          </svg>
+            <svg
+              className="vl-floaty vl-floaty-sparkle vl-sparkle-a"
+              viewBox="0 0 40 40"
+              fill="none"
+            >
+              <path
+                d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
 
-          <svg
-            className="vl-floaty vl-floaty-heart vl-heart-b"
-            viewBox="0 0 40 40"
-            fill="none"
-          >
-            <path
-              d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
+            <svg
+              className="vl-floaty vl-floaty-paw vl-paw-b"
+              viewBox="0 0 100 100"
+              fill="none"
+            >
+              <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
+                <ellipse
+                  cx="30"
+                  cy="29"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(-25 30 29)"
+                />
+                <ellipse
+                  cx="43"
+                  cy="18"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(-8 43 18)"
+                />
+                <ellipse
+                  cx="60"
+                  cy="18"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(8 60 18)"
+                />
+                <ellipse
+                  cx="73"
+                  cy="29"
+                  rx="9"
+                  ry="15"
+                  transform="rotate(25 73 29)"
+                />
+                <path d="M23 62 C27 51 36 45 42 36 C46 30 54 30 58 36 C64 45 73 51 77 62 C82 75 72 82 61 78 C54 75 46 75 39 78 C32 82 22 75 23 62Z" />
+              </g>
+            </svg>
+
+            <svg
+              className="vl-floaty vl-floaty-sparkle vl-sparkle-b"
+              viewBox="0 0 40 40"
+              fill="none"
+            >
+              <path
+                d="M20 0 L22 14 L36 16 L22 18 L20 32 L18 18 L4 16 L18 14Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
+
+            <svg
+              className="vl-floaty vl-floaty-bone vl-bone-b"
+              viewBox="0 0 100 60"
+              fill="none"
+            >
+              <path
+                d="M29 19 C23 10 12 12 12 22 C12 27 16 30 20 30 L72 30 C76 30 80 27 80 22 C80 12 69 10 63 19 C59 25 53 26 50 22 C47 26 41 25 37 19Z"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                transform="rotate(-25 50 30)"
+              />
+            </svg>
+
+            <svg
+              className="vl-floaty vl-floaty-heart vl-heart-b"
+              viewBox="0 0 40 40"
+              fill="none"
+            >
+              <path
+                d="M20 34 C16 29 5 22 5 13 C5 4 16 2 20 11 C24 2 35 4 35 13 C35 22 24 29 20 34Z"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        )}
       </section>
 
       {/* MARKETPLACE STATISTICS */}
@@ -485,29 +567,26 @@ function VendorLandingPage() {
         className="vendor-stats vendor-reveal"
         aria-label="Marketplace highlights"
       >
-        <article className="vendor-stat-card">
-          <UsersRound size={23} aria-hidden="true" />
-          <strong>More customers</strong>
-          <span>Expand your reach</span>
-        </article>
-
-        <article className="vendor-stat-card">
-          <ShoppingBag size={23} aria-hidden="true" />
-          <strong>More visibility</strong>
-          <span>Showcase your offerings</span>
-        </article>
-
-        <article className="vendor-stat-card">
-          <CalendarCheck size={23} aria-hidden="true" />
-          <strong>Easy management</strong>
-          <span>Keep bookings organized</span>
-        </article>
-
-        <article className="vendor-stat-card">
-          <ChartNoAxesCombined size={23} aria-hidden="true" />
-          <strong>One dashboard</strong>
-          <span>Manage your business</span>
-        </article>
+        <div className="vendor-marquee-track">
+          {[...highlights, ...highlights].map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <article
+                className="vendor-stat-card"
+                key={i}
+                aria-hidden={i >= highlights.length}
+              >
+                <span className="vendor-stat-icon">
+                  <Icon size={20} aria-hidden="true" />
+                </span>
+                <span className="vendor-stat-text">
+                  <strong>{item.title}</strong>
+                  <small>{item.text}</small>
+                </span>
+              </article>
+            );
+          })}
+        </div>
       </section>
 
       {/* BENEFITS */}
