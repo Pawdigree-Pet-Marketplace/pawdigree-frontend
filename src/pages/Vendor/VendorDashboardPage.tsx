@@ -11,8 +11,9 @@ import {
 import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { apiRequest } from "../../services/api";
-import BusinessVerificationStatus from "../../components/BusinessVerificationStatus/BusinessVerificationStatus";
-import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { useVendorBusinesses, useVendorBusiness } from "../../services/vendorBusinessStore";
+import VendorDashboardTour from "../../components/vendor/VendorDashboardTour/VendorDashboardTour";
+import { VendorBusinessList } from "../../components/vendor/VendorBusinessSwitcher/VendorBusinessSwitcher";
 import { getMerchandise, type Merchandise } from "../../services/merchandiseApi";
 import "./VendorDashboardPage.css";
 
@@ -25,7 +26,9 @@ const metrics = [
 
 function VendorDashboardPage() {
   const activeBusiness = useVendorBusiness();
+  const { businesses, loading: businessesLoading, error: businessesError } = useVendorBusinesses();
   const [firstName, setFirstName] = useState("");
+  const [vendorId, setVendorId] = useState("");
   const [merchandise, setMerchandise] = useState<Merchandise[]>([]);
   const [merchandiseLoading, setMerchandiseLoading] = useState(true);
   const [merchandiseLoadError, setMerchandiseLoadError] = useState(false);
@@ -36,17 +39,22 @@ function VendorDashboardPage() {
   const role =
     localStorage.getItem("role") ||
     sessionStorage.getItem("role");
+  const eligibleBusinessIds = new Set(businesses.filter((business) => business.business_type === "PRODUCT_SELLER").map((business) => String(business.id)));
+  const eligibleMerchandise = merchandise.filter((product) => eligibleBusinessIds.has(String(product.business)));
 
   useEffect(() => {
     if (!token || role !== "VENDOR") return;
 
     let cancelled = false;
 
-    void apiRequest<{ first_name?: string }>("/auth/current-user/", {
+    void apiRequest<{ first_name?: string; id?: string | number }>("/auth/current-user/", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((user) => {
-        if (!cancelled) setFirstName(user.first_name?.trim() ?? "");
+        if (!cancelled) {
+          setFirstName(user.first_name?.trim() ?? "");
+          setVendorId(user.id === undefined ? "" : String(user.id));
+        }
       })
       .catch(() => {
         if (!cancelled) setFirstName("");
@@ -85,16 +93,15 @@ function VendorDashboardPage() {
       title={`Welcome back, ${firstName || "there"}`}
       description="Here's how your store is doing today"
       businessName={activeBusiness?.name ?? "Your store"}
-      showBusinessSwitcher
       vendorWorkspace
     >
       <div className="dashboard-content">
-        {/* BUSINESS VERIFICATION STATUS */}
-        <BusinessVerificationStatus businessId={activeBusiness ? String(activeBusiness.id) : undefined} />
+        <VendorBusinessList businesses={businesses} loading={businessesLoading} error={businessesError} />
         {/* METRIC CARDS */}
         <section
           className="dashboard-metrics"
           aria-label="Store metrics"
+          data-vendor-tour="overview"
         >
           {metrics.map((metric) => {
             const MetricIcon = metric.icon;
@@ -122,33 +129,33 @@ function VendorDashboardPage() {
           })}
         </section>
 
-        <section className="dashboard-panel dashboard-merchandise-panel" aria-labelledby="dashboard-merchandise-title">
+        <section className="dashboard-panel dashboard-merchandise-panel" aria-labelledby="dashboard-merchandise-title" data-vendor-tour="merchandise">
           <div className="dashboard-merchandise-heading">
             <div>
               <span className="dashboard-metric-icon" aria-hidden="true"><Package size={18} strokeWidth={1.9} /></span>
-              <h2 id="dashboard-merchandise-title">MERCHANDISE</h2>
+              <h2 id="dashboard-merchandise-title">MERCHANDISE · VENDOR-WIDE</h2>
             </div>
             <Link className="dashboard-merchandise-link" to="/vendor/merchandise">
               Manage Merchandise <ExternalLink size={15} aria-hidden="true" />
             </Link>
           </div>
-          {merchandiseLoading ? (
+          {merchandiseLoading || businessesLoading ? (
             <p className="dashboard-merchandise-message" role="status">Loading merchandise totals…</p>
-          ) : merchandiseLoadError ? (
+          ) : merchandiseLoadError || businessesError ? (
             <p className="dashboard-merchandise-message" role="status">Merchandise totals could not be loaded.</p>
           ) : (
             <div className="dashboard-merchandise-stats" aria-label="Merchandise totals">
-              <div><strong>{merchandise.length}</strong><span>Total products</span></div>
-              <div><strong>{merchandise.filter((product) => product.is_active).length}</strong><span>Active</span></div>
-              <div><strong>{merchandise.filter((product) => !product.is_active).length}</strong><span>Inactive</span></div>
-              <div><strong>{merchandise.filter((product) => !product.approved && !product.rejection_reason).length}</strong><span>Awaiting approval</span></div>
+              <div><strong>{eligibleMerchandise.length}</strong><span>Total products</span></div>
+              <div><strong>{eligibleMerchandise.filter((product) => product.is_active).length}</strong><span>Active</span></div>
+              <div><strong>{eligibleMerchandise.filter((product) => !product.is_active).length}</strong><span>Inactive</span></div>
+              <div><strong>{eligibleMerchandise.filter((product) => !product.approved && !product.rejection_reason).length}</strong><span>Awaiting approval</span></div>
             </div>
           )}
         </section>
 
         {/* SALES CHART AND STOCK ALERTS */}
         <section className="dashboard-analytics">
-          <article className="dashboard-panel dashboard-sales-panel">
+          <article className="dashboard-panel dashboard-sales-panel" data-vendor-tour="sales">
             <h2>SALES — LAST 7 DAYS</h2>
 
             <div className="dashboard-chart dashboard-empty-chart">
@@ -190,6 +197,7 @@ function VendorDashboardPage() {
           </div>
         </section>
       </div>
+      <VendorDashboardTour vendorId={vendorId} businessTypes={businesses.map((business) => business.business_type ?? "")} />
     </VendorLayout>
   );
 }

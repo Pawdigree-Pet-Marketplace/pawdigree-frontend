@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { fetchFeatured } from '../../services/petsApi'
+import { DEFAULT_QUERY } from '../../data/pets'
+import { fetchPets } from '../../services/petsApi'
 import { customerAuthenticatedFetch } from '../../services/customerAuthenticatedFetch'
 import useSession from '../../hooks/useSession'
 import useScrollReveal from '../../hooks/useScrollReveal'
@@ -8,25 +9,53 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { PublicPet } from '../../data/pets'
 import './Listings.css'
 
+function PetListingImage({ pet }: { pet: PublicPet }) {
+  const [failed, setFailed] = useState(false)
+  const image = pet.images?.find((item) => item.is_primary)?.image || pet.images?.[0]?.image
+
+  if (!image || failed) {
+    return (
+      <div className="listing-image" role="img" aria-label={`${pet.name}, no photo available`}>
+        🐾
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={image}
+      alt={pet.name}
+      className="listing-image"
+      onError={() => setFailed(true)}
+    />
+  )
+}
+
 export default function Listings() {
-  const listingsRef = useScrollReveal<HTMLDivElement>()
   const isCustomerSignedIn = useSession('CUSTOMER')
   const location = useLocation()
   const navigate = useNavigate()
   const [pets, setPets] = useState<PublicPet[]>([])
+  const listingsRef = useScrollReveal<HTMLDivElement>(pets)
   const [favourites, setFavourites] = useState<number[]>([])
   const customerFavourites = isCustomerSignedIn ? favourites : []
-  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [retryCount, setRetryCount] = useState(0)
   const [pendingPet, setPendingPet] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    fetchFeatured()
-      .then((featured) => { if (!cancelled) setPets(featured.slice(0, 4)) })
-      .catch(() => { if (!cancelled) setPets([]) })
-      .finally(() => { if (!cancelled) setLoading(false) })
+    fetchPets(DEFAULT_QUERY)
+      .then((response) => {
+        if (cancelled) return
+        setPets(response.results.slice(0, 4))
+        setStatus('ready')
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('error')
+      })
     return () => { cancelled = true }
-  }, [])
+  }, [retryCount])
 
   useEffect(() => {
     let cancelled = false
@@ -67,7 +96,7 @@ export default function Listings() {
   return (
     <section className="container section popular-listings-section" id="pets">
       <div className="section-header">
-        <h2 className="section-title">Popular pet listings</h2>
+        <h2 className="section-title">Available Pets</h2>
 
         <Link to="/explore-pets" className="section-link">
           See All
@@ -75,8 +104,24 @@ export default function Listings() {
       </div>
 
       <div className="listings-grid" ref={listingsRef}>
-        {loading ? <p role="status">Loading popular pets…</p> : pets.length === 0 ? <p>No pet listings are available right now.</p> : pets.map((pet, index) => {
-          const image = pet.images?.find((item) => item.is_primary)?.image || pet.images?.[0]?.image
+        {status === 'loading' ? (
+          <p role="status">Loading pets…</p>
+        ) : status === 'error' ? (
+          <div role="alert">
+            <p>We couldn’t load pet listings right now.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setStatus('loading')
+                setRetryCount((count) => count + 1)
+              }}
+            >
+              Try again
+            </button>
+          </div>
+        ) : pets.length === 0 ? (
+          <p>No pet listings are available right now.</p>
+        ) : pets.map((pet, index) => {
           const age = pet.age < 12 ? `${pet.age} months` : `${Math.floor(pet.age / 12)} ${Math.floor(pet.age / 12) === 1 ? 'year' : 'years'}`
           const isFavourite = customerFavourites.includes(pet.pet_id)
           return (
@@ -88,7 +133,7 @@ export default function Listings() {
             )}`}
           >
             <div className="listing-media">
-              {image ? <img src={image} alt={pet.name} className="listing-image" /> : <div className="listing-image" role="img" aria-label={`${pet.name}, no photo available`}>🐾</div>}
+              <PetListingImage pet={pet} />
 
               {pet.listing_type === 'SALE' && (
                 <span className="listing-badge">For Sale</span>
