@@ -33,6 +33,7 @@
 }
 
 .cta-banner .btn {
+  text-decoration: none;
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease;

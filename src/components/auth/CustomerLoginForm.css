@@ -2,30 +2,13 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 0;
+  padding-bottom: 3vh;
   box-sizing: border-box;
   border: none;
   border-radius: 0;
   box-shadow: none;
   color: var(--cream);
   font-family: "Inter", sans-serif;
-}
-
-/* Logo */
-
-.customer-login-form .login-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.customer-login-form .login-logo img {
-  display: block;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 10px;
-  object-fit: contain;
 }
 
 /* Heading and introduction */
@@ -398,11 +381,6 @@
 /* Responsive layout */
 
 @media (max-width: 480px) {
-  .customer-login-form .login-logo img {
-    width: 42px;
-    height: 42px;
-  }
-
   .customer-login-form h1 {
     font-size: 1.45rem;
   }
