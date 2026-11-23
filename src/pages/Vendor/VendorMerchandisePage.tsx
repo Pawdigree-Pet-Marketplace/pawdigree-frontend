@@ -31,7 +31,13 @@ import {
   type Category,
 } from "../../services/categoryService";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
-import { getDescriptionErrorFromMessage, getListingDescriptionError, limitListingDescriptionWords, MAX_LISTING_DESCRIPTION_CHARACTERS, MAX_LISTING_DESCRIPTION_WORDS } from "../../utils/descriptionValidation";
+import {
+  getDescriptionErrorFromMessage,
+  getListingDescriptionError,
+  limitListingDescriptionWords,
+  MAX_LISTING_DESCRIPTION_CHARACTERS,
+  MAX_LISTING_DESCRIPTION_WORDS,
+} from "../../utils/descriptionValidation";
 import { countWords } from "../../utils/petUtils";
 
 import type { Business } from "../../components/VendorBusinessUpdateForm/VendorBusinessUpdateForm";
@@ -63,13 +69,19 @@ function ProductImageGallery({ product }: { product: Merchandise }) {
     <div className="vm-product-image" aria-label={`${product.name} photos`}>
       <div className="vm-product-image-stage">
         {activeImage?.image ? (
-          <img src={imageUrl(activeImage.image)} alt={activeImage.alt_text || product.name} />
+          <img
+            src={imageUrl(activeImage.image)}
+            alt={activeImage.alt_text || product.name}
+          />
         ) : (
           <ImagePlus size={34} aria-hidden="true" />
         )}
       </div>
       {images.length > 1 && (
-        <div className="vm-product-image-thumbnails" aria-label="Choose product photo">
+        <div
+          className="vm-product-image-thumbnails"
+          aria-label="Choose product photo"
+        >
           {images.map((image, index) => (
             <button
               type="button"
@@ -97,7 +109,12 @@ const emptyForm: FormValues = {
 };
 
 function businessName(business: { name?: string; business_name?: unknown }) {
-  return business.name || (typeof business.business_name === "string" ? business.business_name : "My business");
+  return (
+    business.name ||
+    (typeof business.business_name === "string"
+      ? business.business_name
+      : "My business")
+  );
 }
 
 function imageUrl(path?: string) {
@@ -136,8 +153,9 @@ export default function VendorMerchandisePage() {
   const [success, setSuccess] = useState("");
 
   const [showForm, setShowForm] = useState(false);
-  const [editingProduct, setEditingProduct] =
-    useState<Merchandise | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Merchandise | null>(
+    null,
+  );
   const [values, setValues] = useState<FormValues>(emptyForm);
   const [descriptionError, setDescriptionError] = useState("");
 
@@ -150,22 +168,32 @@ export default function VendorMerchandisePage() {
     value: number;
     total: number;
   } | null>(null);
-  const [previewImage, setPreviewImage] = useState<{ src: string; alt: string } | null>(null);
+  const [previewImage, setPreviewImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
   const nextImageId = useRef(0);
   const previewUrls = useRef(new Set<string>());
 
-  const selectedBusiness = activeBusiness ?? businesses.find(
-    (business) => String(business.id) === businessId,
+  const selectedBusiness =
+    activeBusiness ??
+    businesses.find((business) => String(business.id) === businessId);
+  const merchandiseBusinesses = businesses.filter(
+    (business) => business.business_type === "PRODUCT_SELLER",
   );
-  const merchandiseBusinesses = businesses.filter((business) => business.business_type === "PRODUCT_SELLER");
   const selectedBusinessId = activeBusinessId ?? businessId;
-  const categoryKind = categoryKindForBusinessType(selectedBusiness?.business_type);
+  const categoryKind = categoryKindForBusinessType(
+    selectedBusiness?.business_type,
+  );
   const visibleCategories = categories.filter(
     (category) => category.is_active && category.kind === categoryKind,
   );
 
   const businessProducts = useMemo(
-    () => products.filter((product) => String(product.business) === selectedBusinessId),
+    () =>
+      products.filter(
+        (product) => String(product.business) === selectedBusinessId,
+      ),
     [products, selectedBusinessId],
   );
 
@@ -209,11 +237,10 @@ export default function VendorMerchandisePage() {
       setError("");
 
       try {
-        const [businessResponse, productResponse] =
-          await Promise.all([
-            vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`),
-            getMerchandise(activeBusinessId ?? undefined),
-          ]);
+        const [businessResponse, productResponse] = await Promise.all([
+          vendorAuthenticatedFetch(`${API_BASE_URL}/api/businesses/`),
+          getMerchandise(activeBusinessId ?? undefined),
+        ]);
 
         if (!businessResponse.ok) {
           throw new Error("Could not load your businesses.");
@@ -224,7 +251,7 @@ export default function VendorMerchandisePage() {
 
         const businessList = Array.isArray(businessData)
           ? businessData
-          : businessData.results ?? [];
+          : (businessData.results ?? []);
         const firstMerchandiseBusiness = businessList.find(
           (business) => business.business_type === "PRODUCT_SELLER",
         );
@@ -235,14 +262,15 @@ export default function VendorMerchandisePage() {
         setProducts(productResponse);
 
         setBusinessId(
-          activeBusinessId ?? (firstMerchandiseBusiness?.id ? String(firstMerchandiseBusiness.id) : ""),
+          activeBusinessId ??
+            (firstMerchandiseBusiness?.id
+              ? String(firstMerchandiseBusiness.id)
+              : ""),
         );
       } catch (err) {
         if (!cancelled) {
           setError(
-            err instanceof Error
-              ? err.message
-              : "Could not load merchandise.",
+            err instanceof Error ? err.message : "Could not load merchandise.",
           );
         }
       } finally {
@@ -283,17 +311,26 @@ export default function VendorMerchandisePage() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Could not load categories.");
+          setError(
+            err instanceof Error ? err.message : "Could not load categories.",
+          );
         }
       })
-      .finally(() => { if (!cancelled) setCategoriesLoading(false); });
+      .finally(() => {
+        if (!cancelled) setCategoriesLoading(false);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [selectedBusinessId, categoryKind]);
 
   function openCreateForm() {
     setEditingProduct(null);
-    setValues({ ...emptyForm, category: visibleCategories[0] ? String(visibleCategories[0].id) : "" });
+    setValues({
+      ...emptyForm,
+      category: visibleCategories[0] ? String(visibleCategories[0].id) : "",
+    });
     clearSelectedImages();
     setRemovedImageIds(new Set());
     setShowForm(true);
@@ -328,10 +365,7 @@ export default function VendorMerchandisePage() {
     setDescriptionError("");
   }
 
-  function updateField(
-    field: keyof FormValues,
-    value: string,
-  ) {
+  function updateField(field: keyof FormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
   }
 
@@ -340,7 +374,9 @@ export default function VendorMerchandisePage() {
     if (!chosen.length) return;
 
     if (visibleSavedImages.length + selectedImages.length + chosen.length > 5) {
-      setError("A product can have at most five photos. Remove a saved photo to add another.");
+      setError(
+        "A product can have at most five photos. Remove a saved photo to add another.",
+      );
       return;
     }
 
@@ -367,11 +403,13 @@ export default function VendorMerchandisePage() {
     setError("");
   }
 
-async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setDescriptionError("");
-    const descriptionValidationError = getListingDescriptionError(values.description);
+    const descriptionValidationError = getListingDescriptionError(
+      values.description,
+    );
     if (descriptionValidationError) {
       setDescriptionError(descriptionValidationError);
       return;
@@ -381,21 +419,28 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
       return;
     }
 
-    if (!visibleCategories.some((category) => String(category.id) === values.category)) {
-      setError("Please select a product category.");
-      return;
-    }
-
     const price = Number(values.price);
     const stock = Number(values.stock_quantity);
 
+    // Validate price first
     if (!Number.isFinite(price) || price <= 0) {
       setError("Product price must be greater than zero.");
       return;
     }
 
+    // Then validate stock quantity
     if (!Number.isInteger(stock) || stock < 0) {
       setError("Stock quantity must be a whole number.");
+      return;
+    }
+
+    // Finally, validate category
+    if (
+      !visibleCategories.some(
+        (category) => String(category.id) === values.category,
+      )
+    ) {
+      setError("Please select a product category.");
       return;
     }
 
@@ -421,7 +466,11 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     setSuccess("");
     setUploadProgress(
       totalImageOperations
-        ? { message: "Saving product details…", value: 0, total: totalImageOperations }
+        ? {
+            message: "Saving product details…",
+            value: 0,
+            total: totalImageOperations,
+          }
         : null,
     );
 
@@ -471,10 +520,11 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
           value: completedImageOperations,
           total: totalImageOperations,
         });
-        const displayOrder = savedProduct.images.reduce(
-          (highest, image) => Math.max(highest, image.display_order),
-          -1,
-        ) + 1;
+        const displayOrder =
+          savedProduct.images.reduce(
+            (highest, image) => Math.max(highest, image.display_order),
+            -1,
+          ) + 1;
         const uploaded = await uploadMerchandiseImage(
           savedProduct.id,
           selected.file,
@@ -506,7 +556,9 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
       setSuccess(
         saveMessage(
           savedProduct,
-          editingProduct ? "Product updated successfully" : "Product added successfully",
+          editingProduct
+            ? "Product updated successfully"
+            : "Product added successfully",
         ),
       );
       closeForm();
@@ -514,12 +566,12 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
       const message = err instanceof Error ? err.message : "";
       setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
       if (productSaved) {
-        setSuccess("Product details were saved. Resolve the photo issue and submit again to finish.");
+        setSuccess(
+          "Product details were saved. Resolve the photo issue and submit again to finish.",
+        );
       }
       setError(
-        err instanceof Error
-          ? err.message
-          : "Could not save this product.",
+        err instanceof Error ? err.message : "Could not save this product.",
       );
     } finally {
       setSaving(false);
@@ -541,9 +593,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
       await deactivateMerchandise(product.id, selectedBusinessId);
       setProducts((current) =>
         current.map((item) =>
-          item.id === product.id
-            ? { ...item, is_active: false }
-            : item,
+          item.id === product.id ? { ...item, is_active: false } : item,
         ),
       );
       setSuccess("Product deactivated successfully.");
@@ -601,9 +651,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
           <div className="vm-notice">
             <h3>You need a registered business first</h3>
             <p>Register your business before adding merchandise.</p>
-            <a href="/vendor/business-registration">
-              Register a business
-            </a>
+            <a href="/vendor/business-registration">Register a business</a>
           </div>
         )}
 
@@ -655,17 +703,36 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   <textarea
                     id="vm-description"
                     value={values.description}
-                    onChange={(event) =>
-                      { const limited = limitListingDescriptionWords(event.target.value); updateField("description", limited); setDescriptionError(limited === event.target.value ? "" : "Description is limited to 300 words."); }
-                    }
+                    onChange={(event) => {
+                      const limited = limitListingDescriptionWords(
+                        event.target.value,
+                      );
+                      updateField("description", limited);
+                      setDescriptionError(
+                        limited === event.target.value
+                          ? ""
+                          : "Description is limited to 300 words.",
+                      );
+                    }}
                     maxLength={MAX_LISTING_DESCRIPTION_CHARACTERS}
                     aria-describedby="vm-description-count vm-description-error"
                     aria-invalid={Boolean(descriptionError)}
                     rows={3}
                     placeholder="Describe your product..."
                   />
-                  <small id="vm-description-count">{countWords(values.description)} / {MAX_LISTING_DESCRIPTION_WORDS} words</small>
-                  {descriptionError && <p id="vm-description-error" className="field-error" role="alert">{descriptionError}</p>}
+                  <small id="vm-description-count">
+                    {countWords(values.description)} /{" "}
+                    {MAX_LISTING_DESCRIPTION_WORDS} words
+                  </small>
+                  {descriptionError && (
+                    <p
+                      id="vm-description-error"
+                      className="field-error"
+                      role="alert"
+                    >
+                      {descriptionError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="vm-field">
@@ -706,11 +773,15 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                     onChange={(event) =>
                       updateField("category", event.target.value)
                     }
-                    disabled={categoriesLoading || visibleCategories.length === 0}
+                    disabled={
+                      categoriesLoading || visibleCategories.length === 0
+                    }
                     required
                   >
                     <option value="">
-                      {categoriesLoading ? "Loading categories..." : "Choose a category"}
+                      {categoriesLoading
+                        ? "Loading categories..."
+                        : "Choose a category"}
                     </option>
                     {visibleCategories.map((category) => (
                       <option key={category.id} value={category.id}>
@@ -727,7 +798,10 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                     multiple
-                    disabled={saving || visibleSavedImages.length + selectedImages.length >= 5}
+                    disabled={
+                      saving ||
+                      visibleSavedImages.length + selectedImages.length >= 5
+                    }
                     onChange={(event) => {
                       handleImageSelection(event.currentTarget.files);
                       event.currentTarget.value = "";
@@ -735,7 +809,8 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   />
 
                   <small>
-                    JPEG, PNG, or WebP; 5 MB maximum per photo and five photos per product.
+                    JPEG, PNG, or WebP; 5 MB maximum per photo and five photos
+                    per product.
                   </small>
 
                   {(savedImages.length > 0 || selectedImages.length > 0) && (
@@ -751,42 +826,76 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                               type="button"
                               className="vm-photo-preview-button"
                               aria-label={`Preview saved photo: ${image.alt_text || values.name || "Product photo"}`}
-                              onClick={() => setPreviewImage({ src: imageUrl(image.image), alt: image.alt_text || values.name || "Saved product photo" })}
+                              onClick={() =>
+                                setPreviewImage({
+                                  src: imageUrl(image.image),
+                                  alt:
+                                    image.alt_text ||
+                                    values.name ||
+                                    "Saved product photo",
+                                })
+                              }
                             >
-                              <img src={imageUrl(image.image)} alt={image.alt_text || values.name || "Saved product photo"} />
+                              <img
+                                src={imageUrl(image.image)}
+                                alt={
+                                  image.alt_text ||
+                                  values.name ||
+                                  "Saved product photo"
+                                }
+                              />
                             </button>
                             <button
                               type="button"
                               disabled={saving}
-                              onClick={() => setRemovedImageIds((current) => {
-                                const next = new Set(current);
-                                if (markedForRemoval) next.delete(image.id);
-                                else next.add(image.id);
-                                return next;
-                              })}
+                              onClick={() =>
+                                setRemovedImageIds((current) => {
+                                  const next = new Set(current);
+                                  if (markedForRemoval) next.delete(image.id);
+                                  else next.add(image.id);
+                                  return next;
+                                })
+                              }
                             >
-                              {markedForRemoval ? "Undo removal" : "Remove saved photo"}
+                              {markedForRemoval
+                                ? "Undo removal"
+                                : "Remove saved photo"}
                             </button>
-                            {markedForRemoval && <span>Will be removed when saved</span>}
+                            {markedForRemoval && (
+                              <span>Will be removed when saved</span>
+                            )}
                           </div>
                         );
                       })}
                       {selectedImages.map((image, index) => (
-                        <div className="vm-photo-item" key={`selected-${image.id}`}>
+                        <div
+                          className="vm-photo-item"
+                          key={`selected-${image.id}`}
+                        >
                           <button
                             type="button"
                             className="vm-photo-preview-button"
                             aria-label={`Preview selected photo ${index + 1}`}
-                            onClick={() => setPreviewImage({ src: image.preview, alt: `Selected photo ${index + 1}` })}
+                            onClick={() =>
+                              setPreviewImage({
+                                src: image.preview,
+                                alt: `Selected photo ${index + 1}`,
+                              })
+                            }
                           >
-                            <img src={image.preview} alt={`Selected photo ${index + 1}`} />
+                            <img
+                              src={image.preview}
+                              alt={`Selected photo ${index + 1}`}
+                            />
                           </button>
                           <button
                             type="button"
                             disabled={saving}
                             onClick={() => {
                               releasePreview(image.preview);
-                              setSelectedImages((current) => current.filter((item) => item.id !== image.id));
+                              setSelectedImages((current) =>
+                                current.filter((item) => item.id !== image.id),
+                              );
                             }}
                           >
                             Remove selected photo
@@ -884,7 +993,11 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   <div className="vm-product-details">
                     <h4>{product.name}</h4>
 
-                    <div className="vm-product-badges" role="group" aria-label="Product status">
+                    <div
+                      className="vm-product-badges"
+                      role="group"
+                      aria-label="Product status"
+                    >
                       <span
                         className={`vm-product-status${product.is_active ? " is-active" : ""}`}
                       >
@@ -897,7 +1010,10 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       </span>
                     </div>
                     {product.rejection_reason && (
-                      <p className="vm-product-review-reason" title={product.rejection_reason}>
+                      <p
+                        className="vm-product-review-reason"
+                        title={product.rejection_reason}
+                      >
                         {product.rejection_reason}
                       </p>
                     )}
@@ -938,7 +1054,10 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
           )}
         </section>
         {previewImage && (
-          <div className="vm-image-preview-backdrop" onClick={() => setPreviewImage(null)}>
+          <div
+            className="vm-image-preview-backdrop"
+            onClick={() => setPreviewImage(null)}
+          >
             <section
               className="vm-image-preview-dialog"
               role="dialog"
@@ -946,7 +1065,12 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
               aria-label="Product photo preview"
               onClick={(event) => event.stopPropagation()}
             >
-              <button type="button" className="vm-image-preview-close" aria-label="Close photo preview" onClick={() => setPreviewImage(null)}>
+              <button
+                type="button"
+                className="vm-image-preview-close"
+                aria-label="Close photo preview"
+                onClick={() => setPreviewImage(null)}
+              >
                 <X size={20} />
               </button>
               <img src={previewImage.src} alt={previewImage.alt} />
@@ -958,4 +1082,3 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     </VendorLayout>
   );
 }
-

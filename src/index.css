@@ -234,3 +234,16 @@ h6 {
 }
 
  
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input::-ms-clear {
+  display: none;
+}
+
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}

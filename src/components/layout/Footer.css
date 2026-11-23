@@ -89,7 +89,7 @@
 
 /*  Divider + bottom bar*/
 .footer-divider {
-  width: 100%;
+  width: 100% !important;
   height: 1px;
   background: rgba(255, 255, 255, 0.14);
 }

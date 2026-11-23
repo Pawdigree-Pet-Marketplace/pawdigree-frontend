@@ -64,6 +64,31 @@
   opacity: 1;
 }
 
+/* Soft dark band across the top of the vendor hero */
+.top-navbar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: linear-gradient(
+    180deg,
+    rgb(20 24 23 / 62%) 0%,
+    rgb(20 24 23 / 38%) 40%,
+    rgb(20 24 23 / 12%) 75%,
+    rgb(20 24 23 / 0%) 100%
+  );
+}
+
+.top-navbar--band::after {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .top-navbar::before {
     width: 300px;
@@ -75,6 +100,10 @@
       rgb(20 24 23 / 14%) 60%,
       rgb(20 24 23 / 0%) 100%
     );
+  }
+
+  .top-navbar::after {
+    height: 150px;
   }
 }
 

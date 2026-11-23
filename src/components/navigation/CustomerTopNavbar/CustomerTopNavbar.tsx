@@ -43,6 +43,7 @@ const TopNavbar = ({
     isVendorLandingPage;
 
   const useDarkLogo = isLandingPage && !isScrolled;
+  const useMobileLightLogo = isVendorLandingPage && !isScrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,11 +65,10 @@ const TopNavbar = ({
   const navbarClass = [
     "top-navbar",
     isTransparentPage ? "top-navbar--transparent" : "",
-    isExplorePetsPage || isMerchandisePage || isVendorLandingPage
-      ? "top-navbar--explore"
-      : "",
+    isExplorePetsPage || isMerchandisePage ? "top-navbar--explore" : "",
     isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
-    useDarkLogo ? "top-navbar--glow" : "",
+    isLandingPage && !isScrolled ? "top-navbar--glow" : "",
+    isVendorLandingPage && !isScrolled ? "top-navbar--band" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -77,11 +77,16 @@ const TopNavbar = ({
     <header className={navbarClass}>
       <div className="top-navbar-brand">
         <Link to="/" aria-label="Pawdigree home">
-          <img
-            src={useDarkLogo ? darkLogo : lightLogo}
-            alt="Pawdigree"
-            className="logo-img"
-          />
+          <picture>
+            {useMobileLightLogo && (
+              <source media="(max-width: 900px)" srcSet={darkLogo} />
+            )}
+            <img
+              src={useDarkLogo ? darkLogo : lightLogo}
+              alt="Pawdigree"
+              className="logo-img"
+            />
+          </picture>
         </Link>
       </div>
 
