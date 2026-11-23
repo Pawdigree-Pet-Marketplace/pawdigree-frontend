@@ -51,6 +51,7 @@ interface BusinessRegistrationResponse {
   address: string;
   city_district: string;
   business_hours: BusinessHours;
+  verification_status?: string;
 }
 
 const weekdays = [
@@ -412,6 +413,10 @@ function BusinessRegistrationForm() {
 
       sessionStorage.setItem("onboardingBusinessId", businessId);
       sessionStorage.setItem("onboardingBusinessType", formData.businessType);
+      sessionStorage.setItem("onboardingRegistrationResult", JSON.stringify({
+        businessId,
+        verification_status: responseData.verification_status ?? "draft",
+      }));
 
       navigate(`/vendor/documents/${businessId}`);
     } catch (error) {

@@ -5,6 +5,13 @@ import { apiRequest } from '../../services/api'
 import VendorDashboardPage from './VendorDashboardPage'
 import { getMerchandise } from '../../services/merchandiseApi'
 
+const vendorBusinessState = vi.hoisted(() => ({ businesses: [] as Array<{ id: string; name: string; business_type: string; verification_status: string }>, loading: false, error: '' }))
+
+vi.mock('../../services/vendorBusinessStore', () => ({
+  useVendorBusiness: () => null,
+  useVendorBusinesses: () => vendorBusinessState,
+}))
+
 vi.mock('../../services/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../services/api')>()
   return { ...actual, apiRequest: vi.fn() }
@@ -34,6 +41,7 @@ const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRout
 
 describe('VendorDashboardPage', () => {
   beforeEach(() => {
+    vendorBusinessState.businesses = []
     localStorage.clear()
     sessionStorage.clear()
     localStorage.setItem('token', 'test-vendor-token')
@@ -88,10 +96,11 @@ describe('VendorDashboardPage', () => {
   })
 
   it('shows vendor merchandise totals and the existing management link', async () => {
+    vendorBusinessState.businesses = [{ id: 'seller-1', name: 'Seller', business_type: 'PRODUCT_SELLER', verification_status: 'approved' }]
     vi.mocked(getMerchandise).mockResolvedValue([
-      { id: 1, is_active: true, approved: true, rejection_reason: '' },
-      { id: 2, is_active: false, approved: false, rejection_reason: '' },
-      { id: 3, is_active: true, approved: false, rejection_reason: 'Needs changes' },
+      { id: 1, business: 'seller-1', is_active: true, approved: true, rejection_reason: '' },
+      { id: 2, business: 'seller-1', is_active: false, approved: false, rejection_reason: '' },
+      { id: 3, business: 'seller-1', is_active: true, approved: false, rejection_reason: 'Needs changes' },
     ] as never)
 
     render(<VendorDashboardPage />)

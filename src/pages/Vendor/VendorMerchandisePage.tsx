@@ -157,6 +157,7 @@ export default function VendorMerchandisePage() {
   const selectedBusiness = activeBusiness ?? businesses.find(
     (business) => String(business.id) === businessId,
   );
+  const merchandiseBusinesses = businesses.filter((business) => business.business_type === "PRODUCT_SELLER");
   const selectedBusinessId = activeBusinessId ?? businessId;
   const categoryKind = categoryKindForBusinessType(selectedBusiness?.business_type);
   const visibleCategories = categories.filter(
@@ -224,6 +225,9 @@ export default function VendorMerchandisePage() {
         const businessList = Array.isArray(businessData)
           ? businessData
           : businessData.results ?? [];
+        const firstMerchandiseBusiness = businessList.find(
+          (business) => business.business_type === "PRODUCT_SELLER",
+        );
 
         if (cancelled) return;
 
@@ -231,7 +235,7 @@ export default function VendorMerchandisePage() {
         setProducts(productResponse);
 
         setBusinessId(
-          activeBusinessId ?? (businessList[0]?.id ? String(businessList[0].id) : ""),
+          activeBusinessId ?? (firstMerchandiseBusiness?.id ? String(firstMerchandiseBusiness.id) : ""),
         );
       } catch (err) {
         if (!cancelled) {
@@ -584,7 +588,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
               value={businessId}
               onChange={(event) => setBusinessId(event.target.value)}
             >
-              {businesses.map((business) => (
+              {merchandiseBusinesses.map((business) => (
                 <option key={String(business.id)} value={String(business.id)}>
                   {businessName(business)}
                 </option>

@@ -1,9 +1,27 @@
 import { useMemo, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BriefcaseBusiness, ChevronDown, House } from "lucide-react";
 import { activeBusinessIdFromPath, vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
-import { useVendorBusinesses } from "../../../services/vendorBusinessStore";
+import { useVendorBusinesses, type VendorBusiness } from "../../../services/vendorBusinessStore";
 import "./VendorBusinessSwitcher.css";
+
+export function VendorBusinessList({ businesses, loading, error }: { businesses: VendorBusiness[]; loading: boolean; error: string }) {
+  const navigate = useNavigate();
+  return <section className="dashboard-panel dashboard-businesses-panel" aria-labelledby="dashboard-businesses-title" data-vendor-tour="businesses">
+    <div className="dashboard-businesses-heading">
+      <div><BriefcaseBusiness size={18} aria-hidden="true" /><h2 id="dashboard-businesses-title">MY BUSINESSES</h2></div>
+      <Link to="/vendor/business-profile">Manage businesses <span aria-hidden="true">↗</span></Link>
+    </div>
+    {loading ? <p className="dashboard-merchandise-message" role="status">Loading your businesses…</p> : error ? <p className="dashboard-merchandise-message" role="status">Your businesses could not be loaded.</p> : businesses.length === 0 ? <p className="dashboard-merchandise-message">No businesses registered yet.</p> : <ul className="dashboard-business-list">
+      {businesses.map((business) => <li key={business.id}><button type="button" onClick={() => navigate(vendorBusinessPath(String(business.id), "dashboard"))}>
+        <span className="dashboard-business-name">{business.name}</span>
+        <span className={`dashboard-business-status is-${String(business.verification_status ?? "unknown").toLowerCase().replace(/[^a-z]+/g, "-")}`}>{String(business.verification_status ?? "Status unavailable").replaceAll("_", " ")}</span>
+        {business.is_active === false && <span className="dashboard-business-status is-inactive">Inactive</span>}
+        <span className="dashboard-business-selection">Open dashboard</span>
+      </button></li>)}
+    </ul>}
+  </section>;
+}
 
 export default function VendorBusinessSwitcher() {
   const { businesses, loading, error } = useVendorBusinesses();

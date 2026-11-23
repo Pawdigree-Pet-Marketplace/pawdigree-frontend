@@ -183,6 +183,26 @@ export default function DocumentUpload() {
       ? documentsData
       : documentsData?.results ?? [];
 
+    const registrationResult = sessionStorage.getItem("onboardingRegistrationResult");
+    if (registrationResult) {
+      try {
+        const result = JSON.parse(registrationResult) as { businessId?: string; verification_status?: string };
+        if (String(result.businessId) === String(businessId)) {
+          const status = (result.verification_status ?? businessData.verification_status ?? "draft").toLowerCase();
+          const confirmation = status === "pending"
+            ? "Your business was registered and submitted for admin review."
+            : status === "approved" || status === "verified"
+              ? "Your business was registered and is approved."
+              : `Your business was registered and saved as ${status.replaceAll("_", " ")}. Upload the required documents below to submit it for review.`;
+          setNotice(confirmation);
+          setNoticeType("success");
+          sessionStorage.removeItem("onboardingRegistrationResult");
+        }
+      } catch {
+        sessionStorage.removeItem("onboardingRegistrationResult");
+      }
+    }
+
     setBusiness(businessData as Business);
     setUploadedDocuments(documentList);
   }, [businessId, token, authHeaders]);
