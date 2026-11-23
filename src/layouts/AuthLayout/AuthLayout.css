@@ -1,17 +1,54 @@
 .auth-layout-logo {
   position: absolute;
-  top: 16px;
-  left: 24px;
+  top: 14px;
+  left: clamp(16px, 2.5vw, 32px);
   z-index: 20;
   display: inline-flex;
-  padding: 8px 14px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .auth-layout-logo img {
-  height: 30px;
+  height: 44px;
   width: auto;
   display: block;
+  object-fit: contain;
+}
+
+.auth-layout-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 520px;
+  height: 260px;
+  z-index: 10;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 520px 260px at 0 0,
+    rgb(20 24 23 / 60%) 0%,
+    rgb(20 24 23 / 38%) 30%,
+    rgb(20 24 23 / 14%) 60%,
+    rgb(20 24 23 / 0%) 100%
+  );
+}
+
+@media (max-width: 768px) {
+  .auth-layout-logo {
+    top: 13px;
+    left: 16px;
+  }
+
+  .auth-layout-logo img {
+    height: 30px;
+  }
+
+  .auth-layout-glow {
+    width: 300px;
+    height: 160px;
+    background: radial-gradient(
+      ellipse 300px 160px at 0 0,
+      rgb(20 24 23 / 60%) 0%,
+      rgb(20 24 23 / 38%) 30%,
+      rgb(20 24 23 / 14%) 60%,
+      rgb(20 24 23 / 0%) 100%
+    );
+  }
 }

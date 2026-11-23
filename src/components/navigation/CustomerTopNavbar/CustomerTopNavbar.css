@@ -39,6 +39,45 @@
   gap: clamp(8px, 1vw, 14px);
 }
 
+/* Soft dark glow behind the logo, only over the landing hero before scrolling */
+.top-navbar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 520px;
+  height: 260px;
+  z-index: -1;               /* behind the logo and links, above the hero */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    ellipse 520px 260px at 0 0,
+    rgb(20 24 23 / 60%) 0%,
+    rgb(20 24 23 / 38%) 30%,
+    rgb(20 24 23 / 14%) 60%,
+    rgb(20 24 23 / 0%) 100%
+  );
+}
+
+.top-navbar--glow::before {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .top-navbar::before {
+    width: 300px;
+    height: 160px;
+    background: radial-gradient(
+      ellipse 300px 160px at 0 0,
+      rgb(20 24 23 / 60%) 0%,
+      rgb(20 24 23 / 38%) 30%,
+      rgb(20 24 23 / 14%) 60%,
+      rgb(20 24 23 / 0%) 100%
+    );
+  }
+}
+
 
 /* =========================
    LOGO
@@ -147,7 +186,10 @@
 }
 
 .desktop-actions .auth-btn {
-  width: clamp(88px, 9vw, 120px);
+  width: auto;
+  min-width: 88px;
+  padding-inline: 16px;
+  white-space: nowrap;
 }
 
 .desktop-actions .dashboard-redirect-btn {
@@ -249,6 +291,20 @@
 /* =========================
    MOBILE
 ========================= */
+@media (max-width: 1100px) {
+  .top-navbar {
+    gap: 8px;
+  }
+
+  .desktop-links {
+    gap: 12px;
+  }
+
+  .desktop-links a {
+    font-size: 12px;
+  }
+}
+
 
 @media (max-width: 768px) {
   .top-navbar {

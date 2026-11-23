@@ -68,6 +68,7 @@ const TopNavbar = ({
       ? "top-navbar--explore"
       : "",
     isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
+    useDarkLogo ? "top-navbar--glow" : "",
   ]
     .filter(Boolean)
     .join(" ");

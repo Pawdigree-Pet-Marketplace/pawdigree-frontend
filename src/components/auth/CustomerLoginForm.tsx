@@ -9,7 +9,6 @@ import {
   saveAuthSession,
 } from "../../services/auth/authStorage";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../assets/logos/icon-logo.svg";
 import { getPostLoginPath } from "../../services/auth/authRedirect";
 
 export default function CustomerLoginForm() {
@@ -154,10 +153,6 @@ export default function CustomerLoginForm() {
 
   return (
     <div className="customer-login-form">
-      <div className="login-logo">
-        <img src={logo} alt="Pawdigree logo" />
-      </div>
-
       <h1>Welcome back!</h1>
       <p className="login-subtitle">
         Login to continue your Pawdigree journey.
