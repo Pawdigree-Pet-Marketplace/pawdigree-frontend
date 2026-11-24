@@ -1,3 +1,4 @@
+
 import { apiRequest } from "./api";
 import { getCategories } from "./categoryService";
 import {
@@ -34,6 +35,12 @@ export async function fetchServices(
   return apiRequest<PagedServices>(
     `/services/public/?${params.toString()}`,
   );
+}
+
+export async function fetchServiceById(
+  id: number | string,
+): Promise<Service> {
+  return apiRequest<Service>(`/services/public/${id}/`);
 }
 
 export { getCategories };

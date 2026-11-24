@@ -4,6 +4,7 @@ import type { FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
+  Eye,
   Clock,
   MapPin,
   PawPrint,
@@ -89,7 +90,8 @@ function formatDuration(duration: number): string {
 }
 
 function ServiceCard({ service }: { service: Service }) {
-  const available = service.availability_status?.toLowerCase() === "available";
+  const available =
+    service.availability_status?.toLowerCase() === "available";
 
   return (
     <article className="services-card">
@@ -129,7 +131,9 @@ function ServiceCard({ service }: { service: Service }) {
 
         <div className="services-card-business">
           <PawPrint size={16} aria-hidden="true" />
-          <span>{service.business_name || "Verified Pawdigree business"}</span>
+          <span>
+            {service.business_name || "Verified Pawdigree business"}
+          </span>
         </div>
 
         <div className="services-card-meta">
@@ -152,9 +156,14 @@ function ServiceCard({ service }: { service: Service }) {
 
         <div className="services-card-footer">
           <strong>{formatPrice(service.price)}</strong>
-          <span className="services-card-contact">
-            {available ? "Available" : "Check availability"}
-          </span>
+
+          <Link
+            to={`/services/${service.service_id}`}
+            className="services-card-details"
+          >
+            <Eye size={15} aria-hidden="true" />
+            <span>View</span>
+          </Link>
         </div>
       </div>
     </article>
@@ -199,6 +208,7 @@ export default function ServicesPage() {
 
         setServices(response.results);
         setTotalCount(response.count);
+        setError(false);
       })
       .catch(() => {
         if (cancelled) return;
@@ -329,7 +339,10 @@ export default function ServicesPage() {
           </form>
         </header>
 
-        <section className="services-content" aria-labelledby="services-heading">
+        <section
+          className="services-content"
+          aria-labelledby="services-heading"
+        >
           <aside className="services-filter-panel">
             <div className="services-filter-heading">
               <h2>Filter services</h2>
