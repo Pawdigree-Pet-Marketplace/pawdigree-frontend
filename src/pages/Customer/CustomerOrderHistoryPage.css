@@ -13,14 +13,14 @@
 
 .customer-orders-layout {
   display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   align-items: start;
   gap: clamp(24px, 2vw, 36px);
   width: 100%;
   max-width: 1920px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 28px;
+  padding: 24px;
   background-color: #fbfaf7;
   background-image:
     radial-gradient(circle at 20px 10px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
@@ -48,7 +48,7 @@
   justify-content: space-between;
   min-height: 212px;
   width: 100%;
-  margin: 8px 0 24px;
+  margin: 0 0 24px;
   padding: 38px 40px;
   border: 1px solid #e7e5de;
   border-radius: 22px;
@@ -472,7 +472,7 @@
    RESPONSIVE DESIGN
 ========================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 860px) {
   .customer-orders-layout {
     grid-template-columns: 1fr;
     padding: 20px;

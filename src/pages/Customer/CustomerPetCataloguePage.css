@@ -1,4 +1,4 @@
-.pet-catalogue .catalogue-heading { position: relative; isolation: isolate; overflow: hidden; margin: 8px 0 24px; padding: clamp(24px, 4vw, 46px); border: 1px solid var(--dashboard-border); border-radius: 22px; background: linear-gradient(115deg, #f8f4e9, #eef6f1 66%, #fff0e8); text-align: left; animation: catalogue-hero-in .55s ease-out both; }
+.pet-catalogue .catalogue-heading { position: relative; isolation: isolate; overflow: hidden; margin: 0 0 24px; padding: clamp(24px, 4vw, 46px); border: 1px solid var(--dashboard-border); border-radius: 22px; background: linear-gradient(115deg, #f8f4e9, #eef6f1 66%, #fff0e8); text-align: left; animation: catalogue-hero-in .55s ease-out both; }
 .pet-catalogue .catalogue-heading > :not(.catalogue-heading-decor) { position: relative; }
 .catalogue-heading-decor { position: absolute; z-index: -1; inset: 0; overflow: hidden; color: rgb(33 108 104 / 22%); pointer-events: none; }
 .catalogue-decor-paw { position: absolute; width: 46px; height: 46px; animation: catalogue-paw-bob 5.5s ease-in-out infinite; }

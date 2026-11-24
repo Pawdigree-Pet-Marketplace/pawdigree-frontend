@@ -1,5 +1,5 @@
 .customer-adoption { padding-bottom: 50px; }
-.customer-adoption-hero { position: relative; isolation: isolate; overflow: hidden; margin: 8px 0 20px; padding: clamp(24px, 4vw, 42px); border: 1px solid var(--dashboard-border); border-radius: 22px; background: linear-gradient(120deg, #fbfaf7, #edf5ef); text-align: left; animation: adoption-hero-in .55s ease-out both; }
+.customer-adoption-hero { position: relative; isolation: isolate; overflow: hidden; margin: 0 0 20px; padding: clamp(24px, 4vw, 42px); border: 1px solid rgb(33 108 104 / 13%); border-radius: 22px; background: linear-gradient(115deg, #e7f3ec, #fbf5e9 68%, #ffeae1); text-align: left; animation: adoption-hero-in .55s ease-out both; }
 .customer-adoption-hero > :not(.customer-adoption-hero-decor) { position: relative; }
 .customer-adoption-hero-decor { position: absolute; z-index: -1; inset: 0; overflow: hidden; color: rgb(33 108 104 / 14%); pointer-events: none; }
 .adoption-decor-bone { position: absolute; top: 18%; right: 11%; width: clamp(48px, 7vw, 76px); height: auto; rotate: -28deg; animation: adoption-bone-drift 7s ease-in-out infinite; }

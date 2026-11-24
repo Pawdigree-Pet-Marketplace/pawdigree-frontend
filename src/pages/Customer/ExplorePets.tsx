@@ -58,7 +58,7 @@ import {
   fetchTrendingSearches,
 } from "../../services/petsApi";
 import "./ExplorePets.css";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const ALL_KINDS: SuggestionKind[] = ["breed", "pet", "location", "vendor"];
 const EMPTY_PAGE: PagedPets = { count: 0, results: [] };
@@ -421,12 +421,6 @@ export default function ExplorePets() {
             <Sparkles className="ep-decor ep-decor-sparkle-1" size={22} />
             <Sparkles className="ep-decor ep-decor-sparkle-2" size={15} />
           </div>
-
-          <nav className="ep-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/">Home</Link>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page">Browse Pets</span>
-          </nav>
 
           <p className="ep-eyebrow">Find your new best friend</p>
           <h1>Explore Pets</h1>

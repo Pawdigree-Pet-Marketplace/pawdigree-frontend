@@ -462,3 +462,7 @@
     max-width: 100%;
   }
 }
+
+.mp-page .common-cta-banner__btn {
+  color: #fff;
+}
