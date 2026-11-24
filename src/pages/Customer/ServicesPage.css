@@ -694,3 +694,32 @@
     padding-right: 18px;
   }
 }
+/* Service card View button */
+.services-card-details {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 110px;
+  min-height: 38px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: #216c68;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.services-card-details:hover {
+  background: #174e4b;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.services-card-details:focus-visible {
+  outline: 3px solid #fb8665;
+  outline-offset: 3px;
+}
