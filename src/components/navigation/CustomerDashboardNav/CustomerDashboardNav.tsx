@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   LogOut,
+  Bell,
 } from "lucide-react";
 import logo from "../../../assets/logos/lightmode-logo.svg";
 import { customerAuthenticatedFetch } from "../../../services/customerAuthenticatedFetch";
@@ -20,10 +21,12 @@ import {
 } from "../../../services/auth/authStorage";
 import "./CustomerDashboardNav.css";
 import { ConfirmLogout } from "../../layout/ConfirmLogout";
+import { getUnreadNotificationCount } from "../../../services/notificationsApi";
 import { Link, useLocation } from "react-router-dom";
 
 const navigationItems = [
   { label: "Overview", href: "/customer/dashboard", Icon: House },
+  { label: "Notifications", href: "/customer/notifications", Icon: Bell },
   { label: "Browse Pets", href: "/explore-pets", Icon: PawPrint },
   { label: "Pet Catalogue", href: "/pets", Icon: BookOpen },
   { label: "Pet Store", href: "/merchandise", Icon: ShoppingBag },
@@ -37,6 +40,7 @@ export default function CustomerDashboardNav() {
   const { pathname, search } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [storedName, setStoredName] = useState(
     localStorage.getItem("username") ||
       sessionStorage.getItem("username") ||
@@ -63,10 +67,30 @@ export default function CustomerDashboardNav() {
         return pathname.startsWith("/services");
       case "Adoption":
         return pathname === "/pets" && isAdoption;
+      case "Notifications":
+        return pathname === "/customer/notifications";
       default:
         return false;
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = () => {
+      void getUnreadNotificationCount("customer")
+        .then((count) => { if (!cancelled) setUnreadNotifications(count.unread); })
+        .catch(() => undefined);
+    };
+    const initialRefresh = window.setTimeout(refresh, 0);
+    const intervalId = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(initialRefresh);
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refresh);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,6 +155,11 @@ export default function CustomerDashboardNav() {
           <>
             <Icon size={19} strokeWidth={1.9} aria-hidden="true" />
             <span>{label}</span>
+            {label === "Notifications" && unreadNotifications > 0 && (
+              <span className="customer-dash-notification-count" aria-label={`${unreadNotifications} unread`}>
+                {unreadNotifications > 99 ? "99+" : unreadNotifications}
+              </span>
+            )}
           </>
         );
 

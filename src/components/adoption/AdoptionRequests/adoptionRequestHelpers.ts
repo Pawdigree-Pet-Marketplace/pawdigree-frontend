@@ -8,6 +8,7 @@ export type RequestStatus = "PENDING" | "INFO_REQUESTED" | "APPROVED" | "REJECTE
 export type StatusFilter = "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 
 export type PetInfo = { name: string; breed: string; image: string; vendorName: string };
+export type AdoptionInfoMessage = { id: string | number; kind: "REQUEST" | "REPLY"; body: string; created_at: string };
 
 export type AdoptionRequest = {
   id: string;
@@ -26,6 +27,7 @@ export type AdoptionRequest = {
   otherPetsDetails: string;
   experience: string;
   applicationMessage: string; // the customer's "why I want this pet"
+  infoMessages: AdoptionInfoMessage[];
 };
 
 const STATUSES: RequestStatus[] = ["PENDING", "INFO_REQUESTED", "APPROVED", "REJECTED", "CANCELLED"];
@@ -103,6 +105,14 @@ function normalize(raw: unknown): AdoptionRequest | null {
   if (!id) return null;
 
   const embedded = isRecord(raw.pet) ? readPet(raw.pet) : null;
+  const infoMessages = Array.isArray(raw.info_messages)
+    ? raw.info_messages.flatMap((entry, index) => {
+        if (!isRecord(entry) || (entry.kind !== "REQUEST" && entry.kind !== "REPLY")) return [];
+        const body = text(entry.body);
+        if (!body) return [];
+        return [{ id: typeof entry.id === "string" || typeof entry.id === "number" ? entry.id : index, kind: entry.kind, body, created_at: text(entry.created_at) } as AdoptionInfoMessage];
+      }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    : [];
 
   return {
     id,
@@ -121,6 +131,7 @@ function normalize(raw: unknown): AdoptionRequest | null {
     otherPetsDetails: text(raw.other_pets_details),
     experience: text(raw.previous_pet_experience),
     applicationMessage: text(raw.message),
+    infoMessages,
   };
 }
 

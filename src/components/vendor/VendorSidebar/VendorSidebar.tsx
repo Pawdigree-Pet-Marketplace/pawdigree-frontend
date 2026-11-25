@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import {
   Activity,
+  Bell,
   CalendarDays,
   ChartNoAxesCombined,
   ChevronRight,
@@ -22,6 +24,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { clearAuthSession } from "../../../services/auth/authStorage";
 import { useVendorBusiness } from "../../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
+import { getUnreadNotificationCount } from "../../../services/notificationsApi";
 const implementedVendorPages = new Set([
   "/vendor/dashboard",
   "/vendor/profile",
@@ -34,6 +37,7 @@ const implementedVendorPages = new Set([
   "/vendor/business-profile",
   "/vendor/availability",
   "/vendor/orders",
+  "/vendor/notifications",
 ]);
 const navigationGroups = [
   {
@@ -77,6 +81,7 @@ const navigationGroups = [
     title: "CUSTOMER CARE",
     items: [
       { label: "Orders & Bookings", path: "/vendor/orders", icon: ShoppingBag },
+      { label: "Notifications", path: "/vendor/notifications", icon: Bell },
       {
         label: "Customers & Messages",
         path: "/vendor/customers",
@@ -117,11 +122,30 @@ export default function VendorSidebar({
   const location = useLocation();
   const navigate = useNavigate();
   const business = useVendorBusiness();
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const currentPath = providedPath ?? location.pathname;
   function handleLogout() {
     clearAuthSession();
     navigate("/vendor/login", { replace: true });
   }
+
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = () => {
+      void getUnreadNotificationCount("vendor", business?.id ?? null)
+        .then((count) => { if (!cancelled) setUnreadNotifications(count.unread); })
+        .catch(() => undefined);
+    };
+    const initialRefresh = window.setTimeout(refresh, 0);
+    const intervalId = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(initialRefresh);
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [business?.id]);
 
   return (
     <aside className="dashboard-sidebar">
@@ -238,6 +262,11 @@ const scopedPath: string = (() => {
                     strokeWidth={1.9}
                   />
                   <span>{itemLabel}</span>
+                  {item.path === "/vendor/notifications" && unreadNotifications > 0 && (
+                    <span className="vendor-sidebar-notification-count" aria-label={`${unreadNotifications} unread`}>
+                      {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                    </span>
+                  )}
                   {isActive && (
                     <ChevronRight
                       className="dashboard-nav-chevron"

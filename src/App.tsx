@@ -51,6 +51,8 @@ import VendorEditServicePage from "./pages/Vendor/VendorEditServicePage";
 import VendorServiceAvailabilityPage from "./pages/Vendor/VendorServiceAvailabilityPage";
 import VendorAdoptionApplicationsPage from "./pages/Vendor/VendorAdoptionApplicationsPage";
 import CustomerAdoptionPage from "./pages/Customer/CustomerAdoptionPage";
+import CustomerNotificationsPage from "./pages/Customer/CustomerNotificationsPage";
+import VendorNotificationsPage from "./pages/Vendor/VendorNotificationsPage";
 import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
@@ -150,6 +152,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/customer/notifications"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerNotificationsPage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/customer/checkout"
@@ -203,6 +213,14 @@ function App() {
         element={
           <ProtectedRoute role="VENDOR">
             <VendorOrdersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/notifications"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorNotificationsPage />
           </ProtectedRoute>
         }
       />

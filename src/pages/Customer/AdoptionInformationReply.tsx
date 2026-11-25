@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-interface InfoMessage {
-  id: string;
-  kind: "REQUEST" | "REPLY";
-  body: string;
-  created_at: string;
-}
+import type { AdoptionInfoMessage as InfoMessage } from "../../services/adoptionInfoApi";
+import { AdoptionMessagingError } from "../../services/adoptionInfoApi";
+import "./AdoptionInformation.css";
 
 interface AdoptionInformationReplyProps {
   applicationId: string;
   petName: string;
   vendorQuestions: string[];
   messages: InfoMessage[];
+  canReply?: boolean;
   onSubmitReply: (
     applicationId: string,
     reply: string
@@ -23,8 +22,11 @@ export default function AdoptionInformationReply({
   applicationId,
   petName,
   messages,
+  canReply = true,
   onSubmitReply,
 }: AdoptionInformationReplyProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -48,6 +50,9 @@ export default function AdoptionInformationReply({
       await onSubmitReply(applicationId, trimmedReply);
       setReply("");
     } catch (err) {
+      if (err instanceof AdoptionMessagingError && err.status === 401) {
+        navigate("/login", { replace: true, state: { from: location } });
+      }
       setError(
         err instanceof Error
           ? err.message
@@ -94,7 +99,7 @@ export default function AdoptionInformationReply({
         )}
       </div>
 
-      <form
+      {canReply ? <form
         className="conversation-reply-form"
         onSubmit={handleSubmit}
       >
@@ -127,7 +132,7 @@ export default function AdoptionInformationReply({
         {error && (
           <p className="conversation-error">{error}</p>
         )}
-      </form>
+      </form> : messages.length > 0 ? <p className="conversation-closed">Replies are unavailable for this application status.</p> : null}
     </div>
   );
 }

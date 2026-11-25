@@ -8,8 +8,11 @@ import {
   RefreshCw,
   X,
 } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { customerAuthenticatedFetch } from "../../../services/customerAuthenticatedFetch";
+import API_BASE_URL from "../../../services/api";
+import AdoptionInformationReply from "../../../pages/Customer/AdoptionInformationReply";
+import { replyToAdoptionInfo } from "../../../services/adoptionInfoApi";
 import {
   BANNER,
   EXPERIENCE_LABEL,
@@ -111,9 +114,11 @@ const yesNo = (value: boolean | null) =>
 function RequestDetail({
   request,
   onBack,
+  onReply,
 }: {
   request: AdoptionRequest;
   onBack: () => void;
+  onReply: (applicationId: string, message: string) => Promise<void>;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const banner = BANNER[request.status];
@@ -176,57 +181,74 @@ function RequestDetail({
         </div>
       </section>
 
-      <section
-        className="adoption-req-timeline"
-        aria-label="Application timeline"
-      >
-        <h3>Timeline</h3>
-        <ol>
-          {steps.map((step) => (
-            <li key={step.label} className={`is-${step.state}`}>
-              <span className="adoption-req-dot" aria-hidden="true">
-                {step.state === "done" && <Check size={11} />}
-                {step.state === "stopped" && <X size={11} />}
-              </span>
-              <span className="adoption-req-step-label">{step.label}</span>
-              {step.meta && (
-                <span className="adoption-req-step-meta">{step.meta}</span>
-              )}
-            </li>
-          ))}
-        </ol>
-      </section>
+      <div className="adoption-req-detail-columns">
+        <div className="adoption-req-overview">
+          <section
+            className="adoption-req-timeline"
+            aria-label="Application timeline"
+          >
+            <h3>Timeline</h3>
+            <ol>
+              {steps.map((step) => (
+                <li key={step.label} className={`is-${step.state}`}>
+                  <span className="adoption-req-dot" aria-hidden="true">
+                    {step.state === "done" && <Check size={11} />}
+                    {step.state === "stopped" && <X size={11} />}
+                  </span>
+                  <span className="adoption-req-step-label">{step.label}</span>
+                  {step.meta && (
+                    <span className="adoption-req-step-meta">{step.meta}</span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </section>
 
-      {hasAnswers && (
-        <section className="adoption-req-answers" aria-label="Your application">
-          <h3>Your application</h3>
-          <dl>
-            <Fact
-              label="Home"
-              value={HOME_LABEL[request.homeType] ?? request.homeType}
-            />
-            <Fact
-              label="Outdoor space"
-              value={yesNo(request.hasOutdoorSpace)}
-            />
-            <Fact label="Other pets" value={yesNo(request.hasOtherPets)} />
-            <Fact
-              label="About your other pets"
-              value={request.otherPetsDetails}
-            />
-            <Fact
-              label="Pet experience"
-              value={EXPERIENCE_LABEL[request.experience] ?? request.experience}
-            />
-          </dl>
-          {request.applicationMessage && (
-            <>
-              <h4>Why you want this pet</h4>
-              <p>{request.applicationMessage}</p>
-            </>
+          {hasAnswers && (
+            <section className="adoption-req-answers" aria-label="Your application">
+              <h3>Your application</h3>
+              <dl>
+                <Fact
+                  label="Home"
+                  value={HOME_LABEL[request.homeType] ?? request.homeType}
+                />
+                <Fact
+                  label="Outdoor space"
+                  value={yesNo(request.hasOutdoorSpace)}
+                />
+                <Fact label="Other pets" value={yesNo(request.hasOtherPets)} />
+                <Fact
+                  label="About your other pets"
+                  value={request.otherPetsDetails}
+                />
+                <Fact
+                  label="Pet experience"
+                  value={EXPERIENCE_LABEL[request.experience] ?? request.experience}
+                />
+              </dl>
+              {request.applicationMessage && (
+                <>
+                  <h4>Why you want this pet</h4>
+                  <p>{request.applicationMessage}</p>
+                </>
+              )}
+            </section>
           )}
+        </div>
+
+        <section className="adoption-req-conversation" aria-label="Conversation with the vendor">
+          <h3>Conversation with the vendor</h3>
+          {request.status === "INFO_REQUESTED" && <p className="adoption-req-response-needed" role="status">The vendor is waiting for your response.</p>}
+          <AdoptionInformationReply
+            applicationId={request.id}
+            petName={petTitle(request)}
+            vendorQuestions={[]}
+            messages={request.infoMessages}
+            canReply={request.status === "INFO_REQUESTED"}
+            onSubmitReply={onReply}
+          />
         </section>
-      )}
+      </div>
 
       {request.petId !== null && (
         <div className="adoption-req-actions">
@@ -240,6 +262,7 @@ function RequestDetail({
 }
 
 export default function AdoptionRequests({ onFindPet }: Props) {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedId = searchParams.get("request");
 
@@ -253,19 +276,25 @@ export default function AdoptionRequests({ onFindPet }: Props) {
     let cancelled = false;
     async function load() {
       try {
-        const response = await customerAuthenticatedFetch(
-          "/api/adoptions/my-applications/",
-        );
-        if (!response.ok) {
-          throw new Error(
-            response.status === 401
-              ? "Your session has expired. Please sign in again."
-              : "We couldn’t load your adoption requests.",
-          );
-        }
-        const data: unknown = await response.json();
-        if (!cancelled)
-          setState({ status: "ready", items: parseRequests(data) });
+        let url: RequestInfo | URL = "/api/adoptions/my-applications/";
+        const records: unknown[] = [];
+        do {
+          const response = await customerAuthenticatedFetch(url);
+          if (!response.ok) {
+            if (response.status === 401) navigate("/login", { replace: true });
+            throw new Error(response.status === 401
+            ? "Your session has expired. Please sign in again."
+            : response.status === 403 ? "You’re not allowed to view these requests."
+            : "We couldn’t load your adoption requests.");
+          }
+          const data: unknown = await response.json();
+          if (Array.isArray(data)) { records.push(...data); break; }
+          if (!data || typeof data !== "object") break;
+          const page = data as { results?: unknown[]; next?: string | null };
+          records.push(...(page.results ?? []));
+          url = page.next ? new URL(page.next, API_BASE_URL) : "";
+        } while (url);
+        if (!cancelled) setState({ status: "ready", items: parseRequests(records) });
       } catch (error) {
         if (!cancelled) {
           setState({
@@ -282,7 +311,7 @@ export default function AdoptionRequests({ onFindPet }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [reload]);
+  }, [navigate, reload]);
 
   // Look up each pet once (GET /api/pets/public/{id}/) for its name, breed, photo and vendor.
   useEffect(() => {
@@ -348,6 +377,10 @@ export default function AdoptionRequests({ onFindPet }: Props) {
   const closeRequest = () => setSearchParams({ view: "requests" });
   const refresh = () => {
     setState({ status: "loading" });
+    setReload((current) => current + 1);
+  };
+  const submitReply = async (applicationId: string, message: string) => {
+    await replyToAdoptionInfo(applicationId, message);
     setReload((current) => current + 1);
   };
 
@@ -466,7 +499,7 @@ export default function AdoptionRequests({ onFindPet }: Props) {
 
         <section className="adoption-req-pane" aria-label="Request details">
           {selected ? (
-            <RequestDetail request={selected} onBack={closeRequest} />
+            <RequestDetail request={selected} onBack={closeRequest} onReply={submitReply} />
           ) : (
             <div className="adoption-req-empty">
               <span className="adoption-req-empty-art">

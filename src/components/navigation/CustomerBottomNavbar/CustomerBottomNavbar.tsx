@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, MessageSquare, User } from "lucide-react";
+import { Home, ShoppingBag, ClipboardList, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useSession from "../../../hooks/useSession";
 import "./CustomerBottomNavbar.css";
@@ -6,7 +6,7 @@ import "./CustomerBottomNavbar.css";
 const navItems = [
   { label: "Home", icon: Home },
   { label: "Cart", icon: ShoppingBag },
-  { label: "Chat", icon: MessageSquare },
+  { label: "Requests", icon: ClipboardList },
   { label: "Sign in", icon: User },
 ];
 
@@ -24,6 +24,10 @@ const BottomNavbar = () => {
         navigate(isLoggedIn ? "/profile" : "/customer-login");
         break;
 
+      case "Requests":
+        navigate(isLoggedIn ? "/customer/adoption?view=requests" : "/customer-login");
+        break;
+
       default:
         break;
     }
@@ -38,7 +42,7 @@ const BottomNavbar = () => {
               (location.pathname === "/" ||
                 location.pathname === "/customer/dashboard")) ||
             (label === "Cart" && location.pathname === "/cart") ||
-            (label === "Chat" && location.pathname === "/chat") ||
+            (label === "Requests" && location.pathname === "/customer/adoption" && location.search.includes("view=requests")) ||
             (label === "Sign in" &&
               (location.pathname === "/profile" ||
                 location.pathname.startsWith("/profile/")));

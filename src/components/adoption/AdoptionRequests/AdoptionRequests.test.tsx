@@ -380,4 +380,30 @@ describe("Customer adoption requests", () => {
       ).not.toHaveFocus();
     });
   });
+
+    it("shows the application conversation and submits a reply to an information request", async () => {
+      const requestApplication = {
+        ...applications[0],
+        status: "INFO_REQUESTED",
+        info_messages: [{ id: "message-1", kind: "REQUEST", body: "Do you have a fenced yard?", created_at: "2026-10-04T10:00:00Z" }],
+      };
+      vi.mocked(customerAuthenticatedFetch).mockImplementation(async (url, init) => {
+        if (String(url) === APPLICATIONS_URL) return json([requestApplication]);
+        if (String(url) === "/api/pets/public/5/") return json(pets[5]);
+        if (String(url).includes("/api/adoptions/applications/app-pending/reply/") && init?.method === "POST") return json({});
+        return json({}, 404);
+      });
+      renderRequests("/customer/adoption?view=requests&request=app-pending");
+
+      expect(await screen.findByText("The vendor is waiting for your response.")).toBeInTheDocument();
+      expect(screen.getByText("Do you have a fenced yard?")).toBeInTheDocument();
+      fireEvent.change(screen.getByPlaceholderText("Type your response to the vendor..."), { target: { value: "Yes, it is fenced." } });
+      fireEvent.click(screen.getByRole("button", { name: "Send Reply" }));
+
+      await waitFor(() => expect(customerAuthenticatedFetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/adoptions/applications/app-pending/reply/"),
+        expect.objectContaining({ method: "POST", body: JSON.stringify({ message: "Yes, it is fenced." }) }),
+      ));
+      await waitFor(() => expect(vi.mocked(customerAuthenticatedFetch).mock.calls.filter(([url]) => url === APPLICATIONS_URL)).toHaveLength(2));
+    });
 });
