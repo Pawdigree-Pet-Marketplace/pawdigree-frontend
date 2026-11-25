@@ -15,6 +15,7 @@ import BackButton from "../../components/BackButton/BackButton";
 import { DEFAULT_QUERY, type PublicPet } from "../../data/pets";
 import { useCart } from "../../context/CartContext";
 import { fetchPet, fetchPets } from "../../services/petsApi";
+import ReviewsSection from "../../components/reviews/ReviewsSection";
 import { primaryImage } from "../../utils/petUtils";
 import "./PetsDetailPage.css";
 
@@ -433,6 +434,7 @@ export default function PetDetailsPage() {
             </p>
           </section>
         </div>
+           <ReviewsSection kind="pet" targetId={pet.pet_id} />
 
         {current.similar.length > 0 && (
           <section className="pd-recommendations">

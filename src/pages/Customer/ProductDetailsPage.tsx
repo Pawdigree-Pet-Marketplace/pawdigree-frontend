@@ -3,6 +3,7 @@ import { ArrowLeft, ImageOff, PackageCheck, Store } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import AddToCartButton from "../../components/cart/AddToCartButton";
 import type { Product } from "../../data/merchandise";
+import ReviewsSection from "../../components/reviews/ReviewsSection";
 import { fetchProduct } from "../../services/publicMerchandiseApi";
 import "./ProductDetailsPage.css";
 
@@ -158,6 +159,7 @@ export default function ProductDetailsPage() {
           <p className="product-detail-cart-note">Secure checkout through your Pawdigree cart.</p>
         </section>
       </article>
+      <ReviewsSection kind="product" targetId={product.id} />
     </main>
   );
 }
