@@ -25,6 +25,7 @@ import {
 } from "../../services/bookings/bookingApi";
 import type { FreeTimesResponse } from "../../services/bookings/bookingApi";
 import { getSessionRole } from "../../services/auth/authStorage";
+import ReviewsSection from "../../components/reviews/ReviewsSection";
 import type { Service } from "../../data/services";
 import "./ServiceDetailsPage.css";
 
@@ -643,6 +644,7 @@ function ServiceDetailsPage() {
             </>
           )}
         </section>
+        <ReviewsSection kind="service" targetId={Number(serviceId)} />
       </div>
     </main>
   );

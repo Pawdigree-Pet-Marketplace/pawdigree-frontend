@@ -23,6 +23,29 @@ vi.mock("../../services/bookings/bookingApi", () => ({
   createServiceBooking: vi.fn(),
 }));
 
+// Mock the review API.
+// This prevents the review component from making real backend requests
+// while testing the service booking workflow.
+vi.mock("../../services/reviews/reviewApi", () => ({
+  fetchItemReviews: vi.fn().mockResolvedValue({
+    count: 0,
+    next: null,
+    previous: null,
+    results: [],
+    summary: {
+      average_rating: null,
+      review_count: 0,
+    },
+  }),
+
+  checkReviewEligibility: vi.fn().mockResolvedValue({
+    can_review: false,
+    reason: "You can review a service after your booking is completed.",
+  }),
+
+  submitReview: vi.fn(),
+}));
+
 // Mock the authentication role.
 vi.mock("../../services/auth/authStorage", () => ({
   getSessionRole: vi.fn(),
@@ -237,7 +260,9 @@ describe("ServiceDetailsPage booking workflow", () => {
       });
     });
 
-    expect(await screen.findByRole("status")).toHaveTextContent("123");
+    expect(
+  await screen.findByText(/Booking reference: #123/),
+  ).toBeInTheDocument();
   });
 
   it("displays an error when booking submission fails", async () => {
