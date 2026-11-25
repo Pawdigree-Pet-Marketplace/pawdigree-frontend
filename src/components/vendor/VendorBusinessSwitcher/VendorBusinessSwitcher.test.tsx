@@ -49,8 +49,7 @@ describe("VendorBusinessSwitcher", () => {
 
   it.each([
     ["99", "Merchandise Store"],
-    ["77", "Services Store"],
-  ])("switches to business %s and retains the current Availability section", async (nextId, name) => {
+  ])("switches to business %s and moves from Availability to its dashboard when unsupported", async (nextId, name) => {
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={["/vendor/business/42/availability"]}>
@@ -64,6 +63,22 @@ describe("VendorBusinessSwitcher", () => {
     await user.click(screen.getByLabelText(/switch business/i));
     await user.click(screen.getByRole("menuitemradio", { name }));
 
-    expect(screen.getByText(`/vendor/business/${nextId}/availability`)).toBeInTheDocument();
+    expect(screen.getByText(`/vendor/business/${nextId}/dashboard`)).toBeInTheDocument();
+  });
+
+  it("retains Availability when switching between service-provider businesses", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/vendor/business/99/availability"]}>
+        <VendorBusinessSwitcher />
+        <Routes>
+          <Route path="/vendor/business/:businessId/*" element={<CurrentPath />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByLabelText(/switch business/i));
+    await user.click(screen.getByRole("menuitemradio", { name: "Services Store" }));
+    expect(screen.getByText("/vendor/business/77/availability")).toBeInTheDocument();
   });
 });

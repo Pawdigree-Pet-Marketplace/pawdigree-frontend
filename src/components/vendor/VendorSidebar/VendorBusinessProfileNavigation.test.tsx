@@ -110,20 +110,20 @@ describe("business-scoped vendor profile navigation", () => {
   });
 
   it.each(["PET_SALE_ADOPTION", "PRODUCT_SELLER", "SERVICE_PROVIDER"])(
-    "keeps Dashboard and Availability inside the selected %s business workspace",
+    "keeps Dashboard and Notifications inside the selected %s business workspace",
     async (type) => {
       const user = userEvent.setup();
       renderWorkspace("/vendor/business/business-42/profile", type);
 
       expect(await screen.findByText("Personal vendor account")).toBeInTheDocument();
       const dashboard = screen.getByRole("link", { name: "Dashboard" });
-      const availability = screen.getByRole("link", { name: "Availability" });
+      const notifications = screen.getByRole("link", { name: "Notifications" });
       expect(dashboard).toHaveAttribute("href", "/vendor/business/business-42/dashboard");
-      expect(availability).toHaveAttribute("href", "/vendor/business/business-42/availability");
+      expect(notifications).toHaveAttribute("href", "/vendor/business/business-42/notifications");
 
-      await user.click(availability);
+      await user.click(notifications);
       expect(await screen.findByText("Business section")).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("aria-current", "page");
+      expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("aria-current", "page");
       expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute("href", "/vendor/business/business-42/dashboard");
 
       await user.click(screen.getByRole("link", { name: "Dashboard" }));
@@ -132,12 +132,20 @@ describe("business-scoped vendor profile navigation", () => {
     },
   );
 
+  it.each(["PET_SALE_ADOPTION", "PRODUCT_SELLER"])("hides Availability for %s businesses", async (type) => {
+    renderWorkspace("/vendor/business/business-42/dashboard", type);
+    expect(await screen.findByText("Business section")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Availability" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("href", "/vendor/business/business-42/notifications");
+  });
+
   it("shows merchandise business navigation without Bookings", async () => {
     renderWorkspace("/vendor/business/business-42/dashboard", "PRODUCT_SELLER");
     expect(await screen.findByText("Business section")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Merchandise" })).toHaveAttribute("href", "/vendor/business/business-42/merchandise");
     expect(screen.getByRole("link", { name: "Orders" })).toHaveAttribute("href", "/vendor/business/business-42/orders");
-    expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
+    expect(screen.queryByRole("link", { name: "Availability" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("href", "/vendor/business/business-42/notifications");
     expect(screen.queryByRole("link", { name: "Bookings" })).not.toBeInTheDocument();
   });
 
@@ -147,7 +155,8 @@ describe("business-scoped vendor profile navigation", () => {
     expect(screen.getByRole("link", { name: "Catalog" })).toHaveAttribute("href", "/vendor/business/business-42/listings");
     expect(screen.getByRole("link", { name: "Pet Sales" })).toHaveAttribute("href", "/vendor/business/business-42/listings?type=SALE");
     expect(screen.getByRole("link", { name: "Adoption applications" })).toHaveAttribute("href", "/vendor/business/business-42/adoption-applications");
-    expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
+    expect(screen.queryByRole("link", { name: "Availability" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("href", "/vendor/business/business-42/notifications");
     expect(screen.queryByRole("link", { name: /orders|bookings/i })).not.toBeInTheDocument();
   });
 
@@ -157,6 +166,7 @@ describe("business-scoped vendor profile navigation", () => {
     expect(screen.getByRole("link", { name: "Catalog" })).toHaveAttribute("href", "/vendor/business/business-42/services");
     expect(screen.getByRole("link", { name: "Bookings" })).toHaveAttribute("href", "/vendor/business/business-42/orders");
     expect(screen.getByRole("link", { name: "Availability" })).toHaveAttribute("href", "/vendor/business/business-42/availability");
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("href", "/vendor/business/business-42/notifications");
   });
 
 });

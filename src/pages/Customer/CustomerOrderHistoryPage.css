@@ -21,13 +21,6 @@
   min-height: 100vh;
   margin: 0 auto;
   padding: 24px;
-  background-color: #fbfaf7;
-  background-image:
-    radial-gradient(circle at 20px 10px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
-    radial-gradient(circle at 10px 20px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
-    radial-gradient(circle at 30px 20px, rgb(33 108 104 / 9%) 0 4px, transparent 4.5px),
-    radial-gradient(ellipse at 20px 27px, rgb(33 108 104 / 9%) 0 7px, transparent 7.5px);
-  background-size: 140px 140px;
 }
 
 .customer-orders-main {

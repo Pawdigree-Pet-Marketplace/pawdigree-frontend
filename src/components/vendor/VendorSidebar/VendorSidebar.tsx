@@ -175,6 +175,7 @@ export default function VendorSidebar({
             if (item.path === "/vendor/listings" || item.path === "/vendor/adoption-applications") return business.business_type === "PET_SALE_ADOPTION";
             if (item.path === "/vendor/merchandise") return business.business_type === "PRODUCT_SELLER";
             if (item.path === "/vendor/services/new" || item.path === "/vendor/services/catalog") return business.business_type === "SERVICE_PROVIDER";
+            if (item.path === "/vendor/availability") return business.business_type === "SERVICE_PROVIDER";
             if (item.path === "/vendor/orders") return ["PRODUCT_SELLER", "SERVICE_PROVIDER"].includes(business.business_type ?? "");
             return true;
           });
@@ -229,6 +230,9 @@ const scopedPath: string = (() => {
     case "/vendor/orders":
       return vendorBusinessPath(String(business.id), "orders");
 
+    case "/vendor/notifications":
+      return vendorBusinessPath(String(business.id), "notifications");
+
     case "/vendor/availability":
       return vendorBusinessPath(String(business.id), "availability");
 
@@ -264,7 +268,7 @@ const scopedPath: string = (() => {
                   <span>{itemLabel}</span>
                   {item.path === "/vendor/notifications" && unreadNotifications > 0 && (
                     <span className="vendor-sidebar-notification-count" aria-label={`${unreadNotifications} unread`}>
-                      {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
                     </span>
                   )}
                   {isActive && (

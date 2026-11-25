@@ -1,12 +1,74 @@
 
 .verification-card {
+  position: relative;
+  overflow: hidden;
   width: 100%;
-  padding: 24px;
+  padding: 22px 24px;
   border: 1px solid #e4e8e5;
   border-radius: 16px;
-  background: #ffffff;
+  background: linear-gradient(115deg, #fff 0%, #fbfaf7 72%, #f3f8f6 100%);
   color: #2c302f;
   box-sizing: border-box;
+  box-shadow: 0 10px 26px rgb(44 48 47 / 5%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.verification-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgb(44 48 47 / 8%);
+}
+
+.verification-card--merchandise { border-top: 3px solid #fb8665; background: linear-gradient(115deg, #fff 0%, #fffaf7 70%, #fff0e9 100%); }
+.verification-card--pets { border-top: 3px solid #216c68; background: linear-gradient(115deg, #fff 0%, #f8fbf9 70%, #eaf4f0 100%); }
+.verification-card--services { border-top: 3px solid #d8ad56; background: linear-gradient(115deg, #fff 0%, #fbfaf7 70%, #f4f0e7 100%); }
+
+.verification-card::after {
+  position: absolute;
+  right: 28px;
+  bottom: -43px;
+  width: 112px;
+  height: 112px;
+  border: 1px solid rgb(33 108 104 / 9%);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  z-index: 0;
+}
+
+.verification-card > * { position: relative; z-index: 1; }
+
+.verification-card--merchandise::after { border-color: rgb(251 134 101 / 14%); }
+.verification-card--services::after { border-color: rgb(216 173 86 / 17%); }
+
+.verification-card__icon {
+  position: relative;
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgb(33 108 104 / 10%);
+  color: #216c68;
+  animation: verification-icon-float 3.8s ease-in-out infinite;
+}
+
+.verification-card--merchandise .verification-card__icon { background: rgb(251 134 101 / 14%); color: #df6f50; }
+.verification-card--services .verification-card__icon { background: #f3f0e8; color: #9a792f; }
+
+.verification-card__verified-icon {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  padding: 2px;
+  border-radius: 50%;
+  background: #fff;
+  color: #25805b;
+}
+
+@keyframes verification-icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 .verification-card__heading {
@@ -15,11 +77,7 @@
   gap: 12px;
 }
 
-.verification-card__heading > svg {
-  flex-shrink: 0;
-  color: #216c68;
-  margin-top: 2px;
-}
+.verification-card__heading > div > p { font-weight: 700; }
 
 .verification-card__heading h2 {
   margin: 0 0 6px;
@@ -82,6 +140,15 @@
   font-size: 13px;
 }
 
+.verification-card__message {
+  margin: 16px 0 0;
+  color: #59635f;
+  font-family: "Nunito", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 .verification-card__reason {
   margin-top: 20px;
   padding: 16px;
@@ -116,4 +183,9 @@
   .verification-card__heading h2 {
     font-size: 18px;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verification-card, .verification-card__icon { animation: none; transition: none; }
+  .verification-card:hover { transform: none; }
 }

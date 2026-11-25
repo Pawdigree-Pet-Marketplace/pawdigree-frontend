@@ -37,7 +37,10 @@ export default function VendorBusinessSwitcher() {
 
   function switchBusiness(nextId: string) {
     if (!nextId) return;
-    const page = /^(edit-pet\/|services\/[^/]+\/(edit|availability))/.test(suffix)
+    const nextBusiness = businesses.find((business) => String(business.id) === nextId);
+    const unsupportedAvailability = suffix === "availability"
+      && nextBusiness?.business_type !== "SERVICE_PROVIDER";
+    const page = unsupportedAvailability || /^(edit-pet\/|services\/[^/]+\/(edit|availability))/.test(suffix)
       ? "dashboard"
       : suffix;
     navigate(vendorBusinessPath(nextId, page));

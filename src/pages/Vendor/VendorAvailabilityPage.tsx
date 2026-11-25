@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BriefcaseBusiness, CalendarDays, Clock3, LoaderCircle, Pencil, Plus, Wallet } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import BackButton from "../../components/BackButton/BackButton";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { useVendorBusiness } from "../../services/vendorBusinessStore";
@@ -17,7 +17,8 @@ type VendorService = {
   price?: string | number | null;
   duration?: number | null;
   availability_status?: string;
-  category_status?: string | null;
+  approved?: boolean;
+  rejection_reason?: string | null;
   business?: string | number;
 };
 
@@ -92,12 +93,20 @@ export default function VendorAvailabilityPage({ view = "availability" }: { view
       }
     }
 
+    if (activeBusiness && activeBusiness.business_type !== "SERVICE_PROVIDER") {
+      return () => { cancelled = true; };
+    }
+
     void loadServices();
 
     return () => {
       cancelled = true;
     };
-  }, [activeBusinessId]);
+  }, [activeBusinessId, activeBusiness]);
+
+  if (activeBusiness && activeBusiness.business_type !== "SERVICE_PROVIDER") {
+    return <Navigate to={vendorBusinessPath(String(activeBusiness.id), "dashboard")} replace />;
+  }
 
   function formatPrice(price: string | number | null | undefined) {
     if (price === null || price === undefined || price === "") {
@@ -206,11 +215,15 @@ export default function VendorAvailabilityPage({ view = "availability" }: { view
                       </span>
                     </div>
 
-                    {service.category_status === "pending" && (
-                      <p className="availability-pending-note">
-                        Category approval pending
-                      </p>
-                    )}
+                    <div className="availability-review-state">
+                      <span className={`availability-review-badge ${service.rejection_reason ? "is-rejected" : service.approved ? "is-approved" : "is-pending"}`}>
+                        {service.rejection_reason ? "Rejected" : service.approved ? "Approved" : "Pending Review"}
+                      </span>
+                      <span className={`availability-review-badge ${service.availability_status === "unavailable" ? "is-unavailable" : "is-available"}`}>
+                        {service.availability_status === "unavailable" ? "Unavailable" : "Available"}
+                      </span>
+                    </div>
+                    {service.rejection_reason && <p className="availability-rejection-reason"><strong>Review feedback:</strong> {service.rejection_reason}</p>}
                   </div>
 
                   <div className="availability-service-actions">

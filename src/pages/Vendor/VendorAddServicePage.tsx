@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { BriefcaseBusiness, Clock3, Info, LoaderCircle, Wallet } from "lucide-react";
+import { BriefcaseBusiness, Clock3, ImagePlus, Info, LoaderCircle, Wallet, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackButton from "../../components/BackButton/BackButton";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
@@ -18,7 +18,8 @@ import "./VendorAddServicePage.css";
 
 type Business = { id: string; name: string; business_type?: string | null };
 type BusinessResponse = Business[] | { results?: Business[] };
-type ServiceResponse = { category_status?: string };
+const SERVICE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_SERVICE_IMAGE_SIZE = 5 * 1024 * 1024;
 
 async function readError(response: Response): Promise<string> {
   if (response.status === 401) return "Your session has expired. Please log in again.";
@@ -46,6 +47,8 @@ export default function VendorAddServicePage() {
   const [descriptionError, setDescriptionError] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
+  const [serviceImage, setServiceImage] = useState<File | null>(null);
+  const [serviceImagePreview, setServiceImagePreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -58,6 +61,10 @@ export default function VendorAddServicePage() {
     (category) => category.is_active && category.kind === categoryKind,
   );
   const loading = businessesLoading || categoriesLoading;
+
+  useEffect(() => () => {
+    if (serviceImagePreview) URL.revokeObjectURL(serviceImagePreview);
+  }, [serviceImagePreview]);
 
   useEffect(() => {
     document.title = "Add Service - Pawdigree";
@@ -134,29 +141,37 @@ export default function VendorAddServicePage() {
     }
     setSubmitting(true);
     try {
+      const fields = {
+        business: selectedBusinessId,
+        category: selectedCategory.id,
+        name: serviceName.trim(),
+        service_type: selectedCategory.name,
+        description: description.trim(),
+        price,
+        duration: String(Number(duration)),
+        availability_status: "available",
+      };
+      const body: FormData | string = serviceImage
+        ? (() => {
+          const formData = new FormData();
+          Object.entries(fields).forEach(([key, value]) => formData.append(key, String(value)));
+          formData.append("image", serviceImage);
+          return formData;
+        })()
+        : JSON.stringify({ ...fields, duration: Number(duration) });
       const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/services/${activeBusinessId !== null ? `?business_id=${encodeURIComponent(selectedBusinessId)}` : ""}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          business: selectedBusinessId,
-          category: selectedCategory.id,
-          name: serviceName.trim(),
-          service_type: selectedCategory.name,
-          description: description.trim(),
-          price,
-          duration: Number(duration),
-          availability_status: "available",
-        }),
+        ...(serviceImage ? {} : { headers: { "Content-Type": "application/json" } }),
+        body,
       });
       if (!response.ok) throw new Error(await readError(response));
-      const created = (await response.json().catch(() => ({}))) as ServiceResponse;
-      setSuccess(created.category_status === "pending"
-        ? "Your service was saved. Its category is pending approval and will be available to customers once approved."
-        : "Your service was saved successfully.");
+      setSuccess("Your service was saved and is awaiting review.");
       setServiceName("");
       setDescription("");
       setPrice("");
       setDuration("");
+      setServiceImage(null);
+      setServiceImagePreview("");
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       setDescriptionError(getDescriptionErrorFromMessage(message) ?? "");
@@ -222,11 +237,49 @@ export default function VendorAddServicePage() {
                 </span>
               </label>
             </div>
+
+            <div className="service-field">
+              <span className="service-image-label">Service image <span>(optional)</span></span>
+              <p className="service-image-help">Add one clear photo. JPEG, PNG or WebP, up to 5 MB.</p>
+              <label className="service-image-picker">
+                <ImagePlus size={19} aria-hidden="true" />
+                <span>{serviceImage ? "Choose a different image" : "Choose image"}</span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  aria-label="Choose service image"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+                    event.currentTarget.value = "";
+                    if (!file) return;
+                    if (!SERVICE_IMAGE_TYPES.includes(file.type)) {
+                      setError("Choose a JPEG, PNG or WebP image.");
+                      return;
+                    }
+                    if (file.size > MAX_SERVICE_IMAGE_SIZE) {
+                      setError("The service image must be 5 MB or smaller.");
+                      return;
+                    }
+                    setError("");
+                    setServiceImage(file);
+                    setServiceImagePreview(URL.createObjectURL(file));
+                  }}
+                />
+              </label>
+              {serviceImagePreview && (
+                <div className="service-image-preview">
+                  <img src={serviceImagePreview} alt={`Preview of ${serviceImage?.name ?? "selected service image"}`} />
+                  <button type="button" onClick={() => { setServiceImage(null); setServiceImagePreview(""); }} aria-label="Remove selected service image">
+                    <X size={16} /> Remove image
+                  </button>
+                </div>
+              )}
+            </div>
           </section>
 
           <aside className="service-unavailable-note" role="note">
             <Info size={20} aria-hidden="true" />
-            <p>New service categories are requested for approval automatically. Customers can find the service when its category and business are approved.</p>
+            <p>New service listings are reviewed before they appear in customer discovery. Their review status is separate from service availability.</p>
           </aside>
 
           {error && <p className="service-form-message error" role="alert">{error}</p>}

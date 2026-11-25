@@ -57,6 +57,13 @@ describe("NotificationCenter", () => {
     await waitFor(() => expect(markAllNotificationsRead).toHaveBeenCalledWith("customer", undefined));
   });
 
+  it("marks only the selected vendor business notifications read", async () => {
+    render(<NotificationCenter role="vendor" businessId="business-42" presentation="page" />);
+    expect(await screen.findByText("A new adoption application was submitted.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Mark all notifications as read" }));
+    await waitFor(() => expect(markAllNotificationsRead).toHaveBeenCalledWith("vendor", "business-42"));
+  });
+
   it("reports an empty state", async () => {
     vi.mocked(getNotifications).mockResolvedValue({ count: 0, next: null, previous: null, results: [] });
     render(<NotificationCenter role="customer" />);

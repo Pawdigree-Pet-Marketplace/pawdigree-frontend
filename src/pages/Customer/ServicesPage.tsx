@@ -302,12 +302,6 @@ export default function ServicesPage() {
             <Stethoscope size={38} />
           </div>
 
-          <nav className="services-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span aria-current="page">Pet Services</span>
-          </nav>
-
           <p className="services-eyebrow">Care for every paw</p>
 
           <h1>Find the Right Care for Your Pet</h1>
@@ -317,27 +311,28 @@ export default function ServicesPage() {
             Find the care your furry friend deserves.
           </p>
 
-          <form
-            key={filters.search}
-            className="services-search"
-            role="search"
-            onSubmit={handleSearch}
-          >
-            <Search size={21} aria-hidden="true" />
-
-            <input
-              type="search"
-              name="search"
-              placeholder="Search grooming, veterinary care..."
-              aria-label="Search pet services"
-              defaultValue={filters.search}
-            />
-
-            <button type="submit" aria-label="Search services">
-              <ArrowRight size={21} />
-            </button>
-          </form>
         </header>
+
+        <form
+          key={filters.search}
+          className="services-search"
+          role="search"
+          onSubmit={handleSearch}
+        >
+          <Search size={21} aria-hidden="true" />
+
+          <input
+            type="search"
+            name="search"
+            placeholder="Search grooming, veterinary care..."
+            aria-label="Search pet services"
+            defaultValue={filters.search}
+          />
+
+          <button type="submit" aria-label="Search services">
+            <ArrowRight size={21} />
+          </button>
+        </form>
 
         <section
           className="services-content"

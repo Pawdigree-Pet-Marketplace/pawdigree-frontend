@@ -304,3 +304,10 @@
 .vendor-workspace .vendor-availability-page .availability-add-link {
   color: #FFFFFF;
 }
+.availability-review-state { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.availability-review-badge { display: inline-flex; align-items: center; width: fit-content; padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.availability-review-badge.is-pending { background: #FFF2D8; color: #8A5A12; }
+.availability-review-badge.is-approved, .availability-review-badge.is-available { background: #E5F3EC; color: #246B4A; }
+.availability-review-badge.is-rejected { background: #FCE8E4; color: #A93824; }
+.availability-review-badge.is-unavailable { background: #F0EDE8; color: #55504A; }
+.availability-rejection-reason { margin: 8px 0 0; color: #A93824; font-size: 12px; line-height: 1.5; }

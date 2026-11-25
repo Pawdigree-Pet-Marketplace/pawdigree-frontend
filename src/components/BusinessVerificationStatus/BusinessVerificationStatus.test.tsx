@@ -77,6 +77,38 @@ describe("BusinessVerificationStatus", () => {
     expect(await screen.findByText("Approved")).toBeInTheDocument();
   });
 
+  it("omits the no-selling-category message and styles the merchandise card by business type", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [{
+        ...mockBusinesses[0],
+        verification_status: "approved",
+        is_active: true,
+        can_sell: false,
+        categories: [],
+      }],
+    }));
+
+    render(<BusinessVerificationStatus businessId="business-1" businessType="PRODUCT_SELLER" />);
+
+    expect(await screen.findByText("Happy Paws")).toBeInTheDocument();
+    expect(screen.getByText("Merchandise")).toBeInTheDocument();
+    expect(screen.getByLabelText("Happy Paws verification status")).toHaveClass("verification-card--merchandise");
+    expect(screen.queryByText(/no selling category is currently approved/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/your business/i)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["PET_SALE_ADOPTION", "verification-card--pets", "Pet sales & adoption"],
+    ["SERVICE_PROVIDER", "verification-card--services", "Services"],
+  ])("uses the %s visual treatment", async (businessType, cardClass, label) => {
+    render(<BusinessVerificationStatus businessId="business-1" businessType={businessType} />);
+
+    const card = await screen.findByLabelText("Happy Paws verification status");
+    expect(card).toHaveClass(cardClass);
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
   it("displays the rejection reason when supplied", async () => {
     vi.stubGlobal(
       "fetch",
