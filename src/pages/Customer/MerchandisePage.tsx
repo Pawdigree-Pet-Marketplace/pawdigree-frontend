@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   PawPrint,
@@ -210,38 +210,33 @@ export default function MerchandisePage() {
             <Sparkles className="mp-decor mp-decor-sparkle" size={22} />
           </div>
 
-          <nav className="mp-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/">Home</Link>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page">Merchandise</span>
-          </nav>
-
           <p className="mp-eyebrow">Everything for your pet</p>
           <h1>Pet Merchandise</h1>
           <p className="mp-hero-sub">
             Products from verified vendors across Uganda.
           </p>
 
-          {/* key: remounts the form so the box follows chip removals and "Clear all" */}
-          <form
-            key={query.search}
-            className="mp-search"
-            role="search"
-            onSubmit={handleSearchSubmit}
-          >
-            <Search size={22} aria-hidden="true" />
-            <input
-              name="search"
-              type="search"
-              aria-label="Search merchandise"
-              placeholder="Search products by name…"
-              defaultValue={query.search}
-            />
-            <button type="submit" aria-label="Search merchandise">
-              <ArrowRight size={21} aria-hidden="true" />
-            </button>
-          </form>
         </header>
+
+        {/* Remount the form so it follows cleared or removed search terms. */}
+        <form
+          key={query.search}
+          className="mp-search"
+          role="search"
+          onSubmit={handleSearchSubmit}
+        >
+          <Search size={22} aria-hidden="true" />
+          <input
+            name="search"
+            type="search"
+            aria-label="Search merchandise"
+            placeholder="Search products by name…"
+            defaultValue={query.search}
+          />
+          <button type="submit" aria-label="Search merchandise">
+            <ArrowRight size={21} aria-hidden="true" />
+          </button>
+        </form>
       </div>
 
       <section

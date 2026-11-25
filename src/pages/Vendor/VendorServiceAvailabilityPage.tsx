@@ -1,9 +1,16 @@
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import ServiceAvailability from "../../components/vendor/ServiceAvailability/ServiceAvailability";
+import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 
 export default function VendorServiceAvailabilityPage() {
   const { serviceId = "" } = useParams();
+  const business = useVendorBusiness();
+
+  if (business && business.business_type !== "SERVICE_PROVIDER") {
+    return <Navigate to={vendorBusinessPath(String(business.id), "dashboard")} replace />;
+  }
 
   return (
     <VendorLayout

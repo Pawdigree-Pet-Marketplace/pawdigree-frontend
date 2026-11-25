@@ -5,7 +5,68 @@
 }
 
 .vendor-notifications-page-content {
-  padding: 8px 24px 28px 0;
+  color: #2c302f;
+  font-family: "Nunito", sans-serif;
+}
+
+.vendor-notifications-page-content .notification-center-panel {
+  border-color: #e5eae7;
+  border-radius: 16px;
+  background: #fbfaf7;
+  box-shadow: 0 5px 20px rgb(44 48 47 / 6%);
+}
+
+.vendor-notifications-page-content .notification-center-heading {
+  min-height: 62px;
+  padding: 16px 20px;
+  background: #fff;
+}
+
+.vendor-notifications-page-content .notification-center-heading span {
+  color: #68716d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vendor-notifications-page-content .notification-center-list {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.vendor-notifications-page-content .notification-center-item {
+  padding: 17px 18px;
+  border: 1px solid #e5eae7;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgb(44 48 47 / 3%);
+}
+
+.vendor-notifications-page-content .notification-center-item.is-unread {
+  padding-left: 14px;
+  border-left: 4px solid #216c68;
+  background: #f5faf8;
+}
+
+.vendor-notifications-page-content .notification-center-category {
+  font-size: 11px;
+}
+
+.vendor-notifications-page-content .notification-center-business {
+  font-size: 12px;
+}
+
+.vendor-notifications-page-content .notification-center-item p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.vendor-notifications-page-content .notification-center-item time {
+  font-size: 12px;
+}
+
+.vendor-notifications-page-content .notification-center-item-actions button {
+  font-size: 12px;
 }
 
 @media (max-width: 860px) {
@@ -13,7 +74,12 @@
     padding: 18px 16px 28px;
   }
 
-  .vendor-notifications-page-content {
-    padding: 12px 16px 24px;
+  .vendor-notifications-page-content .notification-center-list {
+    gap: 9px;
+    padding: 12px;
+  }
+
+  .vendor-notifications-page-content .notification-center-item {
+    padding: 14px;
   }
 }

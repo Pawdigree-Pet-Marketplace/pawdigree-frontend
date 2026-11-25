@@ -2,8 +2,11 @@
 import { useEffect, useState } from "react";
 import {
   BadgeCheck,
+  CalendarDays,
   Clock,
   FileWarning,
+  PawPrint,
+  ShoppingBag,
 } from "lucide-react";
 import { apiRequest } from "../../services/api";
 import "./BusinessVerificationStatus.css";
@@ -16,7 +19,7 @@ interface BusinessVerification {
   reviewed_at: string | null;
   is_active: boolean;
   can_sell: boolean;
-  categories?: Array<{ category_id: number; name: string; approval_status: string; can_sell: boolean }>;
+  business_type?: string;
 }
 
 interface ApiResponse {
@@ -91,7 +94,7 @@ function getStoredToken(): string | null {
   );
 }
 
-export default function BusinessVerificationStatus({ businessId }: { businessId?: string }) {
+export default function BusinessVerificationStatus({ businessId, businessType }: { businessId?: string; businessType?: string | null }) {
   const [businesses, setBusinesses] = useState<BusinessVerification[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
 
@@ -211,21 +214,37 @@ export default function BusinessVerificationStatus({ businessId }: { businessId?
     <div className="verification-list">
       {businesses.map((business) => {
         const status = normalizeStatus(business.verification_status);
+        const type = business.business_type ?? businessType;
+        const typeClass = type === "PRODUCT_SELLER"
+          ? "merchandise"
+          : type === "PET_SALE_ADOPTION"
+            ? "pets"
+            : type === "SERVICE_PROVIDER"
+              ? "services"
+              : "general";
+        const BusinessIcon = typeClass === "merchandise"
+          ? ShoppingBag
+          : typeClass === "pets"
+            ? PawPrint
+            : CalendarDays;
         const decisionReason = business.decision_reason?.trim();
         const needsAttention =
           status === "rejected" || status === "changes_requested";
 
         return (
           <section
-            className="verification-card"
+            className={`verification-card verification-card--${typeClass}`}
             aria-label={`${business.name} verification status`}
             key={business.id}
           >
             <div className="verification-card__heading">
-              <BadgeCheck size={22} aria-hidden="true" />
+              <span className="verification-card__icon" aria-hidden="true">
+                <BusinessIcon size={21} />
+                <BadgeCheck className="verification-card__verified-icon" size={13} />
+              </span>
               <div>
                 <h2>{business.name}</h2>
-                <p>Business verification</p>
+                <p>{typeClass === "merchandise" ? "Merchandise" : typeClass === "pets" ? "Pet sales & adoption" : typeClass === "services" ? "Services" : "Business verification"}</p>
               </div>
             </div>
 
@@ -259,15 +278,9 @@ export default function BusinessVerificationStatus({ businessId }: { businessId?
             )}
 
             {status === "approved" && (
-              <p className="verification-card__message">
-                {!business.is_active
-                  ? "Your business is approved, but currently inactive. Contact Pawdigree support if you need it reactivated."
-                  : business.can_sell
-                    ? "Your business is approved and active for selling."
-                    : business.categories?.some((category) => normalizeStatus(category.approval_status) === "pending")
-                      ? "Your business is approved and active. Selling is waiting for admin approval of your requested categories."
-                      : "Your business is approved and active, but no selling category is currently approved. Review your category requests or contact support."}
-              </p>
+              ( !business.is_active ? <p className="verification-card__message">Approved, but inactive. Contact Pawdigree support if reactivation is needed.</p>
+                : business.can_sell ? <p className="verification-card__message">Active and approved for selling.</p>
+                  : null )
             )}
 
             {status === "pending" && (
@@ -278,13 +291,13 @@ export default function BusinessVerificationStatus({ businessId }: { businessId?
 
             {status === "draft" && (
               <p className="verification-card__message">
-                Your business registration is still a draft.
+                Registration is still a draft.
               </p>
             )}
 
             {status === "suspended" && (
               <p className="verification-card__message">
-                Your business is currently suspended. Please contact support
+                Currently suspended. Please contact support
                 for assistance.
               </p>
             )}

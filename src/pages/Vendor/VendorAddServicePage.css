@@ -118,3 +118,12 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.service-image-label { display: block; margin-bottom: 7px; color: #2C302F; font-size: 13px; font-weight: 700; }
+.service-image-label span, .service-image-help { color: rgb(44 48 47 / 62%); font-weight: 400; }
+.service-image-help { margin: 0 0 10px; font-size: 12px; }
+.service-image-picker { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border: 1px dashed rgb(33 108 104 / 48%); border-radius: 12px; color: #216C68; font-size: 13px; font-weight: 700; cursor: pointer; }
+.service-image-picker input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.service-image-picker:focus-within { outline: 3px solid rgb(33 108 104 / 24%); outline-offset: 2px; }
+.service-image-preview { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.service-image-preview img { width: 112px; height: 88px; border-radius: 12px; object-fit: cover; }
+.service-image-preview button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: #A93824; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }

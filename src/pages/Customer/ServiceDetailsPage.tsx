@@ -571,7 +571,8 @@ function ServiceDetailsPage() {
                 ) : (
                   <p className="service-booking-empty">
                     No appointment times are available for this date.
-                    Please choose another date.
+                    The provider may not have hours set for this day, or all
+                    available times may already be booked. Try another date.
                   </p>
                 )}
               </div>

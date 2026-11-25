@@ -75,7 +75,7 @@ export default function VendorBusinessDashboardPage() {
       vendorWorkspace
     >
       <div className="dashboard-content">
-        <BusinessVerificationStatus businessId={String(business.id)} />
+        <BusinessVerificationStatus businessId={String(business.id)} businessType={businessType} />
         <section className="dashboard-metrics" aria-label="Business metrics">
           {metrics.map((metric) => {
             const MetricIcon = metric.icon;

@@ -220,9 +220,36 @@ describe("VendorAddServicePage", () => {
       duration: 60,
       availability_status: "available",
     });
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "saved successfully",
-    );
+    expect(await screen.findByRole("status")).toHaveTextContent("awaiting review");
+  });
+
+  it("previews an optional image and sends it as the singular multipart image field", async () => {
+    const user = userEvent.setup();
+    render(<VendorAddServicePage />);
+    await screen.findByRole("option", { name: "Grooming" });
+    await user.type(screen.getByRole("textbox", { name: /service name/i }), "Full dog grooming");
+    await user.type(screen.getByRole("textbox", { name: /description/i }), "Bathing and grooming for dogs.");
+    await user.type(screen.getByRole("spinbutton", { name: /price \(ugx\)/i }), "50000");
+    await user.type(screen.getByRole("spinbutton", { name: /duration \(minutes\)/i }), "60");
+    const image = new File(["image-bytes"], "grooming.webp", { type: "image/webp" });
+    fireEvent.change(screen.getByLabelText("Choose service image"), { target: { files: [image] } });
+    expect(await screen.findByRole("img", { name: /preview of grooming.webp/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /save service/i }));
+    await waitFor(() => expect(vendorAuthenticatedFetch).toHaveBeenCalledWith(expect.stringContaining("/api/services/"), expect.objectContaining({ method: "POST" })));
+    const [, request] = vi.mocked(vendorAuthenticatedFetch).mock.calls.at(-1)!;
+    expect(request?.body).toBeInstanceOf(FormData);
+    expect((request?.body as FormData).get("image")).toBe(image);
+    expect((request?.body as FormData).getAll("images")).toHaveLength(0);
+    expect(request?.headers).toBeUndefined();
+  });
+
+  it("rejects invalid image types without submitting", async () => {
+    render(<VendorAddServicePage />);
+    await screen.findByRole("option", { name: "Grooming" });
+    const file = new File(["text"], "notes.txt", { type: "text/plain" });
+    fireEvent.change(screen.getByLabelText("Choose service image"), { target: { files: [file] } });
+    expect(await screen.findByRole("alert")).toHaveTextContent("Choose a JPEG, PNG or WebP image.");
+    expect(screen.queryByRole("img", { name: /preview/i })).not.toBeInTheDocument();
   });
 
   it("shows API validation errors when the service cannot be saved", async () => {

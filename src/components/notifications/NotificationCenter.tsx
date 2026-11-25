@@ -12,7 +12,7 @@ import {
 import { vendorBusinessPath } from "../../services/vendorBusinessRoutes";
 import "./NotificationCenter.css";
 
-type Props = { role: NotificationRole; businessId?: string | null; compact?: boolean; presentation?: "popover" | "page" };
+type Props = { role: NotificationRole; businessId?: string | null; compact?: boolean; presentation?: "popover" | "page"; showPageTitle?: boolean; showSectionTitle?: boolean };
 
 const labels: Record<string, string> = {
   LISTING_APPROVED: "Listing approved", LISTING_REJECTED: "Listing update", LISTING_PENDING: "Listing pending",
@@ -68,7 +68,7 @@ function categoryLabel(type: string): string {
   return labels[type] ?? type.replaceAll("_", " ").toLowerCase().replace(/^./, (character) => character.toUpperCase());
 }
 
-export default function NotificationCenter({ role, businessId, compact = false, presentation = "popover" }: Props) {
+export default function NotificationCenter({ role, businessId, compact = false, presentation = "popover", showPageTitle = true, showSectionTitle = true }: Props) {
   const navigate = useNavigate();
   const isPage = presentation === "page";
   const [open, setOpen] = useState(isPage);
@@ -170,7 +170,7 @@ export default function NotificationCenter({ role, businessId, compact = false, 
 
   return (
     <div className={`notification-center${compact ? " is-compact" : ""}${isPage ? " is-page" : ""}`}>
-      {isPage && <header className="notification-page-title"><h1>Notifications</h1><p>All your latest updates in one place.</p></header>}
+      {isPage && showPageTitle && <header className="notification-page-title"><h1>Notifications</h1><p>All your latest updates in one place.</p></header>}
       {!isPage && <button
         type="button"
         className="notification-center-trigger"
@@ -189,7 +189,7 @@ export default function NotificationCenter({ role, businessId, compact = false, 
       {open && (
         <section className="notification-center-panel" aria-label="Notifications">
           <header className="notification-center-heading">
-            <div><h2>Notifications</h2><span>{unreadCount ? `${unreadCount} unread` : "You're all caught up"}</span></div>
+            <div>{showSectionTitle && <h2>Notifications</h2>}<span>{unreadCount ? `${unreadCount} unread` : "You're all caught up"}</span></div>
             <div className="notification-center-heading-actions">
               {unreadCount > 0 && <button type="button" onClick={() => void markAllRead()} aria-label="Mark all notifications as read" title="Mark all as read"><CheckCheck size={17} /></button>}
               {!isPage && <button type="button" onClick={() => setOpen(false)} aria-label="Close notifications"><X size={18} /></button>}

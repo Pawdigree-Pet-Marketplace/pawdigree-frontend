@@ -99,17 +99,23 @@
 
 .vendor-sidebar-notification-count {
   display: grid;
-  flex: 0 0 auto;
-  min-width: 20px;
+  flex: 0 0 21px;
+  width: 21px;
+  min-width: 21px;
   height: 20px;
   margin-left: auto;
-  padding: 0 5px;
+  padding: 0;
   place-items: center;
   color: #fff;
   background: #c4573a;
-  border-radius: 999px;
+  border-radius: 50%;
   font-size: 10px;
   font-weight: 800;
+}
+
+.dashboard-nav-item > .vendor-sidebar-notification-count {
+  flex: 0 0 21px;
+  display: grid;
 }
 
 .dashboard-nav-item:hover {

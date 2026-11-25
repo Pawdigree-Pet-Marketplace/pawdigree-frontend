@@ -401,6 +401,16 @@ function App() {
         }
       />
       <Route
+        path="/vendor/business/:businessId/notifications"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorBusinessRoute>
+              <VendorNotificationsPage />
+            </VendorBusinessRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/vendor/business/:businessId/profile"
         element={
           <ProtectedRoute role="VENDOR">

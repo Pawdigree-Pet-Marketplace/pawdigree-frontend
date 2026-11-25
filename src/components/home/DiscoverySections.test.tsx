@@ -4,11 +4,11 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Services from './Services'
 import Merchandise from './Merchandise'
 import Testimonials from './Testimonials'
-import { apiRequest } from '../../services/api'
 import { fetchProducts } from '../../services/publicMerchandiseApi'
+import { fetchServices } from '../../services/publicServicesApi'
 
-vi.mock('../../services/api', () => ({ apiRequest: vi.fn() }))
 vi.mock('../../services/publicMerchandiseApi', () => ({ fetchProducts: vi.fn() }))
+vi.mock('../../services/publicServicesApi', () => ({ fetchServices: vi.fn() }))
 // Cart actions are outside the homepage listing behavior under test.
 vi.mock('../cart/AddToCartButton', () => ({ default: () => null }))
 
@@ -40,16 +40,21 @@ afterEach(() => {
 })
 
 describe('landing discovery sections', () => {
-  it('shows approved businesses only when their backend categories identify a service', async () => {
-    vi.mocked(apiRequest).mockResolvedValue({ results: [
-      { id: 'clinic-1', name: 'Paws Clinic', city_district: 'Kampala', categories: ['Veterinary'], logo: null, cover_image: null },
-      { id: 'shop-1', name: 'Paws Shop', city_district: 'Entebbe', categories: ['Pet Food'], logo: null, cover_image: null },
-    ] })
+  it('shows actual public services and links separately to service and vendor discovery', async () => {
+    vi.mocked(fetchServices).mockResolvedValue({ count: 1, next: null, previous: null, results: [{
+      service_id: 5, name: 'Gentle grooming', service_type: 'Grooming', description: 'Wash and brush.',
+      price: '50000.00', duration: 60, availability_status: 'available', category_name: 'Grooming',
+      business_name: 'Paws Clinic', city_district: 'Kampala', image: null, average_rating: 4.5, review_count: 2,
+    }] })
 
     render(<MemoryRouter><Services /></MemoryRouter>)
-    expect(await screen.findByText('Paws Clinic · Kampala')).toBeInTheDocument()
-    expect(screen.queryByText('Paws Shop · Entebbe')).not.toBeInTheDocument()
-    expect(apiRequest).toHaveBeenCalledWith('/businesses/public/')
+    expect(await screen.findByRole('heading', { name: 'Gentle grooming' })).toBeInTheDocument()
+    expect(screen.getByText('Paws Clinic')).toBeInTheDocument()
+    expect(screen.getByText('UGX 50,000')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'See All Services' })).toHaveAttribute('href', '/services')
+    expect(screen.getByRole('link', { name: /meet our vendors/i })).toHaveAttribute('href', '/vendors')
+    expect(screen.getByRole('link', { name: /gentle grooming/i })).toHaveAttribute('href', '/services/5')
+    expect(fetchServices).toHaveBeenCalledWith(expect.objectContaining({ page: 1 }))
   })
 
   it('renders products returned by the public merchandise API, including their price and image', async () => {
