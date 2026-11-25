@@ -176,7 +176,7 @@ export default function VendorSidebar({
             if (item.path === "/vendor/merchandise") return business.business_type === "PRODUCT_SELLER";
             if (item.path === "/vendor/services/new" || item.path === "/vendor/services/catalog") return business.business_type === "SERVICE_PROVIDER";
             if (item.path === "/vendor/availability") return business.business_type === "SERVICE_PROVIDER";
-            if (item.path === "/vendor/orders") return ["PRODUCT_SELLER", "SERVICE_PROVIDER"].includes(business.business_type ?? "");
+            if (item.path === "/vendor/orders") return ["PRODUCT_SELLER", "SERVICE_PROVIDER", "PET_SALE_ADOPTION"].includes(business.business_type ?? "");
             return true;
           });
           if (scopedItems.length === 0) return null;
@@ -192,6 +192,8 @@ export default function VendorSidebar({
                   ? "Catalog"
                   : business?.business_type === "PRODUCT_SELLER" && item.path === "/vendor/orders"
                     ? "Orders"
+                    : business?.business_type === "PET_SALE_ADOPTION" && item.path === "/vendor/orders"
+                      ? "Pet Sale Orders"
                     : business?.business_type === "SERVICE_PROVIDER" && item.path === "/vendor/orders"
                       ? "Bookings"
                       : item.label;

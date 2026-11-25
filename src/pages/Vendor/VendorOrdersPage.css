@@ -5,6 +5,53 @@
   font-family: "Nunito", sans-serif;
 }
 
+.vendor-business-orders-section + .vendor-business-orders-section,
+.vendor-bookings-section + .vendor-business-orders-section {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid #e5eae7;
+}
+
+.vendor-order-business {
+  display: inline-block;
+  margin-left: 10px;
+  color: #737b78;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vendor-bookings-scope-note {
+  margin: -10px 0 18px;
+  color: #737b78;
+  font-size: 13px;
+}
+
+.vendor-booking-customer {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vendor-booking-actions {
+  margin-top: 16px;
+}
+
+.booking-status-pending { background: #fff1df; color: #9a5b0b; }
+.booking-status-accepted { background: #e4f4e9; color: #287346; }
+.booking-status-declined,
+.booking-status-cancelled { background: #fde9e7; color: #a33d35; }
+.booking-status-completed { background: #e8f1ff; color: #285b9a; }
+
+.orders-error button {
+  margin-left: auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #a33d35;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .vendor-orders-toolbar,
 .vendor-order-card-header,
 .vendor-order-card-footer {

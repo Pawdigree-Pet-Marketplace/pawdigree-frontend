@@ -149,15 +149,16 @@ describe("business-scoped vendor profile navigation", () => {
     expect(screen.queryByRole("link", { name: "Bookings" })).not.toBeInTheDocument();
   });
 
-  it("keeps pet sales within the unified Catalog and hides Orders and Bookings", async () => {
+  it("keeps adoption separate from pet sale orders", async () => {
     renderWorkspace("/vendor/business/business-42/dashboard", "PET_SALE_ADOPTION");
     expect(await screen.findByText("Business section")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Catalog" })).toHaveAttribute("href", "/vendor/business/business-42/listings");
     expect(screen.getByRole("link", { name: "Pet Sales" })).toHaveAttribute("href", "/vendor/business/business-42/listings?type=SALE");
     expect(screen.getByRole("link", { name: "Adoption applications" })).toHaveAttribute("href", "/vendor/business/business-42/adoption-applications");
+    expect(screen.getByRole("link", { name: "Pet Sale Orders" })).toHaveAttribute("href", "/vendor/business/business-42/orders");
     expect(screen.queryByRole("link", { name: "Availability" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("href", "/vendor/business/business-42/notifications");
-    expect(screen.queryByRole("link", { name: /orders|bookings/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Bookings" })).not.toBeInTheDocument();
   });
 
   it("shows service Catalog, Bookings and Availability for service businesses", async () => {
