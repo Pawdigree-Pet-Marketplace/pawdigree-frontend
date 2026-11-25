@@ -23,6 +23,7 @@
 
 /* Split layout */
 .adoption-req-split { display: grid; grid-template-columns: minmax(300px, 390px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.adoption-req.has-selection .adoption-req-split { grid-template-columns: minmax(0, 1fr); }
 .adoption-req-pane { position: sticky; top: 16px; min-width: 0; }
 
 /* List  */
@@ -46,6 +47,30 @@
 
 /* Detail */
 .adoption-req-detail { display: grid; gap: 14px; }
+.adoption-req-detail-columns { display: grid; grid-template-columns: minmax(280px, .9fr) minmax(0, 1.35fr); gap: 18px; align-items: start; min-width: 0; }
+.adoption-req-overview { display: grid; align-content: start; gap: 14px; min-width: 0; }
+.adoption-req-conversation { display: grid; gap: 10px; padding-top: 8px; }
+.adoption-req-conversation > h3 { margin: 0; color: var(--dashboard-ink); font-size: 1.05rem; }
+.adoption-req-response-needed { margin: 0; padding: 10px 12px; border-radius: 9px; background: #fff2d9; color: #875a17; font-size: 13px; font-weight: 800; }
+.adoption-conversation { display: grid; gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--dashboard-border); border-radius: 14px; background: #fff; }
+.conversation-messages { display: flex; flex-direction: column; gap: 10px; max-height: min(58vh, 560px); overflow-y: auto; padding: 2px 3px; }
+.adoption-conversation .conversation-message { width: fit-content; max-width: min(88%, 520px); padding: 11px 14px; border-radius: 13px; overflow-wrap: anywhere; box-shadow: 0 2px 7px rgb(44 48 47 / 4%); }
+.adoption-conversation .vendor-message { align-self: flex-start; border: 0; border-left: 3px solid #216c68; background: #f4f3ee; }
+.adoption-conversation .customer-message { align-self: flex-end; margin-left: 0; border: 0; border-right: 3px solid #fb8665; background: #eaf4f1; }
+.conversation-sender { display: block; margin-bottom: 4px; color: #216c68; font-size: 12px; font-weight: 800; }
+.conversation-message p { margin: 0; color: #343a37; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+.conversation-message time { display: block; margin-top: 7px; color: #777f7a; font-size: 11px; }
+.conversation-empty { margin: 0; padding: 12px; color: var(--dashboard-muted); font-size: 13px; text-align: center; }
+.conversation-reply-form { display: grid; gap: 9px; min-width: 0; }
+.conversation-reply-form label { color: var(--dashboard-ink); font-size: 13px; font-weight: 800; }
+.conversation-reply-form textarea { display: block; width: 100%; min-width: 0; min-height: 90px; box-sizing: border-box; padding: 11px 12px; border: 1px solid #d4d9d6; border-radius: 10px; background: #fff; color: var(--dashboard-ink); font: inherit; font-size: 13px; line-height: 1.5; resize: vertical; }
+.conversation-reply-form textarea:focus { border-color: var(--dashboard-teal); outline: 2px solid rgb(33 108 104 / 14%); }
+.reply-form-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 9px; }
+.reply-form-footer span { color: var(--dashboard-muted); font-size: 11px; }
+.reply-form-footer button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 0 13px; border: 0; border-radius: 9px; background: var(--dashboard-teal); color: #fff; cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; }
+.reply-form-footer button:disabled { cursor: not-allowed; opacity: .55; }
+.conversation-error { margin: 0; padding: 9px 11px; border-radius: 8px; background: #fdecec; color: #b42318; font-size: 12px; }
+.conversation-closed { margin: 0; color: var(--dashboard-muted); font-size: 12px; }
 .adoption-req-back { display: none; align-items: center; gap: 6px; justify-self: start; min-height: 40px; padding: 0; border: 0; background: none; color: var(--dashboard-teal); cursor: pointer; font: inherit; font-size: 14px; font-weight: 800; }
 .adoption-req-detail-title { margin: 0; color: var(--dashboard-ink); font-size: 1.4rem; }
 .adoption-req-detail-title:focus { outline: none; }
@@ -173,6 +198,17 @@
   box-shadow: none;
 }
 
+/* Keep foreground contrast stable against every dark teal action background. */
+.customer-adoption-search button,
+.customer-adoption-state button,
+.customer-adoption-refresh,
+.adoption-req-primary,
+.adoption-req-filters button.is-active,
+.reply-form-footer button {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff;
+}
+
 /*End of buttonsettings*/
 
 /* Tablet and phone: list OR detail */
@@ -187,6 +223,10 @@
   .adoption-req-back { display: inline-flex; }
 }
 
+@media (max-width: 760px) {
+  .adoption-req-detail-columns { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (max-width: 560px) {
   .adoption-req-filters { flex-wrap: nowrap; margin-right: -4px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
   .adoption-req-filters::-webkit-scrollbar { display: none; }
@@ -199,4 +239,5 @@
   .adoption-req-timeline li { grid-template-columns: 22px minmax(0, 1fr); }
   .adoption-req-step-meta { grid-column: 2; text-align: left; }
   .adoption-req-primary { flex: 1 1 100%; }
+  .conversation-messages { max-height: 48vh; }
 }

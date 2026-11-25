@@ -1,0 +1,19 @@
+.customer-notifications-main,
+.vendor-notifications-page-content {
+  min-width: 0;
+  padding-bottom: 28px;
+}
+
+.vendor-notifications-page-content {
+  padding: 8px 24px 28px 0;
+}
+
+@media (max-width: 860px) {
+  .customer-notifications-main {
+    padding: 18px 16px 28px;
+  }
+
+  .vendor-notifications-page-content {
+    padding: 12px 16px 24px;
+  }
+}

@@ -4,7 +4,6 @@ import "./VendorTopbar.css";
 import VendorBusinessSwitcher from "../VendorBusinessSwitcher/VendorBusinessSwitcher";
 import { useVendorBusiness } from "../../../services/vendorBusinessStore";
 import { vendorBusinessPath } from "../../../services/vendorBusinessRoutes";
-import VendorNotifications from "../VendorNotifications/VendorNotifications";
 
 type VendorTopbarProps = {
   businessName?: string;
@@ -36,7 +35,6 @@ export default function VendorTopbar({
       {showBusinessSwitcher && <VendorBusinessSwitcher />}
 
       <Link to="/vendor/dashboard?tour=replay" className="dashboard-notification-button vendor-tour-replay" aria-label="Replay dashboard tour" title="Replay dashboard tour"><CircleHelp size={18} aria-hidden="true" /></Link>
-      <VendorNotifications />
 
       <Link
         to={profilePath}

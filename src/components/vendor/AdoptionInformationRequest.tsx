@@ -1,7 +1,9 @@
 
 import { useState } from "react";
 import { MessageCircle, Send, Plus, Trash2 } from "lucide-react";
-import "./AdoptionInformation.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AdoptionMessagingError } from "../../services/adoptionInfoApi";
+import "../../pages/Vendor/AdoptionInformation.css";
 
 interface AdoptionInformationRequestProps {
   applicationId: string;
@@ -21,6 +23,8 @@ export default function AdoptionInformationRequest({
   questions = [],
   onSubmitQuestions,
 }: AdoptionInformationRequestProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [newQuestions, setNewQuestions] = useState<string[]>([""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -62,8 +66,11 @@ export default function AdoptionInformationRequest({
       await onSubmitQuestions(applicationId, validQuestions);
       setSuccess("Your questions have been sent to the applicant.");
       setNewQuestions([""]);
-    } catch {
-      setError("Unable to send questions. Please try again.");
+    } catch (reason) {
+      if (reason instanceof AdoptionMessagingError && reason.status === 401) {
+        navigate("/vendor/login", { replace: true, state: { from: location } });
+      }
+      setError(reason instanceof Error ? reason.message : "Unable to send questions. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Check, HeartHandshake, RefreshCw, Search, X } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import API_BASE_URL from "../../services/api";
 import { vendorAuthenticatedFetch } from "../../services/vendorAuthenticatedFetch";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
-import { useVendorBusiness } from "../../services/vendorBusinessStore";
+import { useVendorBusiness, useVendorBusinesses } from "../../services/vendorBusinessStore";
+import AdoptionInformationRequest from "../../components/vendor/AdoptionInformationRequest";
+import { requestAdoptionInfo, type AdoptionInfoMessage } from "../../services/adoptionInfoApi";
 import "./VendorAdoptionApplicationsPage.css";
 
 type ApplicationStatus = "PENDING" | "INFO_REQUESTED" | "APPROVED" | "REJECTED" | "CANCELLED";
@@ -27,6 +30,7 @@ type AdoptionApplication = {
   decided_at: string | null;
   decision_reason: string;
   business?: string | number;
+  info_messages?: AdoptionInfoMessage[];
 };
 type ListResponse = AdoptionApplication[] | { results?: AdoptionApplication[] };
 
@@ -61,9 +65,14 @@ async function responseMessage(response: Response) {
 }
 
 export default function VendorAdoptionApplicationsPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const focusedApplicationId = searchParams.get("application");
   const activeBusiness = useVendorBusiness();
+  const { businesses } = useVendorBusinesses();
   const activeBusinessId = activeBusiness ? String(activeBusiness.id) : null;
   const [applications, setApplications] = useState<AdoptionApplication[]>([]);
+  const [petBusinesses, setPetBusinesses] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [actionError, setActionError] = useState("");
@@ -83,32 +92,46 @@ export default function VendorAdoptionApplicationsPage() {
     setLoading(true);
     setLoadError("");
     try {
-      const businessQuery = activeBusinessId ? `?business_id=${encodeURIComponent(activeBusinessId)}` : "";
-      const response = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/adoptions/applications/vendor/${businessQuery}`);
-      if (!response.ok) {
-        setLoadError(response.status === 401
-          ? "Your session has expired. Please sign in again."
-          : await responseMessage(response));
-        return;
-      }
-      const data = (await response.json()) as ListResponse;
-      const items = Array.isArray(data) ? data : data.results ?? [];
-      if (!activeBusinessId) {
-        setApplications(items);
-      } else {
-        const petsResponse = await vendorAuthenticatedFetch(`${API_BASE_URL}/api/pets/?business_id=${encodeURIComponent(activeBusinessId ?? "")}`);
-        if (!petsResponse.ok) throw new Error("Could not match adoption applications to this business.");
-        const petData = await petsResponse.json() as { results?: { pet_id: number; business?: string | number }[] } | { pet_id: number; business?: string | number }[];
-        const pets = Array.isArray(petData) ? petData : petData.results ?? [];
-        const petBusiness = new Map(pets.map((pet) => [pet.pet_id, String(pet.business ?? "")]));
-        setApplications(items.filter((item) => (item.business !== undefined ? String(item.business) : petBusiness.get(item.pet)) === activeBusinessId));
-      }
+      const items: AdoptionApplication[] = [];
+      let url: RequestInfo | URL = `${API_BASE_URL}/api/adoptions/applications/vendor/`;
+      do {
+        const response = await vendorAuthenticatedFetch(url);
+        if (!response.ok) {
+          if (response.status === 401) navigate("/vendor/login", { replace: true });
+          setLoadError(response.status === 401 ? "Your session has expired. Please sign in again."
+            : response.status === 403 ? "You’re not allowed to view these adoption applications."
+            : response.status === 404 ? "These adoption applications are no longer available."
+            : response.status === 429 ? "Too many requests. Please wait and try again."
+            : await responseMessage(response));
+          return;
+        }
+        const data = (await response.json()) as ListResponse & { next?: string | null };
+        if (Array.isArray(data)) { items.push(...data); break; }
+        items.push(...(data.results ?? []));
+        url = data.next ? new URL(data.next, API_BASE_URL) : "";
+      } while (url);
+      const pets: { pet_id: number; business?: string | number }[] = [];
+      const petQuery = activeBusinessId ? `?business_id=${encodeURIComponent(activeBusinessId)}` : "";
+      let petsUrl: RequestInfo | URL = `${API_BASE_URL}/api/pets/${petQuery}`;
+      do {
+        const petsResponse = await vendorAuthenticatedFetch(petsUrl);
+        if (!petsResponse.ok) throw new Error("Could not match adoption applications to their business.");
+        const petData = await petsResponse.json() as { results?: { pet_id: number; business?: string | number }[]; next?: string | null } | { pet_id: number; business?: string | number }[];
+        if (Array.isArray(petData)) { pets.push(...petData); break; }
+        pets.push(...(petData.results ?? []));
+        petsUrl = petData.next ? new URL(petData.next, API_BASE_URL) : "";
+      } while (petsUrl);
+      const petBusiness = Object.fromEntries(pets.map((pet) => [pet.pet_id, String(pet.business ?? "")]));
+      setPetBusinesses(petBusiness);
+      setApplications(activeBusinessId
+        ? items.filter((item) => String(item.business ?? petBusiness[item.pet] ?? "") === activeBusinessId)
+        : items);
     } catch {
       setLoadError("We couldn't load adoption applications. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
-  }, [activeBusinessId]);
+  }, [activeBusinessId, navigate]);
 
   useEffect(() => {
     let cancelled = false;
@@ -126,10 +149,26 @@ export default function VendorAdoptionApplicationsPage() {
   const openCount = statusCounts.PENDING + statusCounts.INFO_REQUESTED;
   const visibleApplications = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return applications.filter((item) => (statusFilter === "ALL" || item.status === statusFilter)
-      && (!query || [item.pet_name, item.customer_username, item.customer_email, item.application_id]
-        .some((value) => value.toLowerCase().includes(query))));
-  }, [applications, search, statusFilter]);
+    return applications.filter((item) => item.application_id === focusedApplicationId
+      || ((statusFilter === "ALL" || item.status === statusFilter)
+        && (!query || [item.pet_name, item.customer_username, item.customer_email, item.application_id]
+          .some((value) => value.toLowerCase().includes(query)))));
+  }, [applications, focusedApplicationId, search, statusFilter]);
+
+  useEffect(() => {
+    if (!focusedApplicationId || loading) return;
+    const application = applications.find((item) => item.application_id === focusedApplicationId);
+    if (application) {
+      window.setTimeout(() => document.getElementById(`adoption-${focusedApplicationId}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
+    }
+  }, [applications, focusedApplicationId, loading]);
+
+  async function requestMoreInfo(applicationId: string, questions: string[]) {
+    const message = questions.join("\n").trim();
+    if (!message || message.length > 2000) throw new Error("Enter a message of 1–2000 characters.");
+    await requestAdoptionInfo(applicationId, message);
+    await loadApplications();
+  }
 
   async function decide(application: AdoptionApplication, status: "APPROVED" | "REJECTED") {
     setBusyId(application.application_id);
@@ -213,9 +252,13 @@ export default function VendorAdoptionApplicationsPage() {
               <div className="vendor-adoptions-state"><h2>No matching applications</h2><p>Try another search or status.</p></div>
             ) : <div className="vendor-adoptions-list">
             {visibleApplications.map((application) => (
-              <article className="vendor-adoption-card" key={application.application_id}>
+              <article className="vendor-adoption-card" id={`adoption-${application.application_id}`} key={application.application_id}>
                 <header className="vendor-adoption-card-header">
-                  <div><p className="vendor-adoption-eyebrow">{application.pet_name} · Pet #{application.pet}</p><h2>{application.customer_username || "Customer"}</h2></div>
+                  <div><p className="vendor-adoption-eyebrow">{application.pet_name} · Pet #{application.pet}{(() => {
+                    const businessId = String(application.business ?? petBusinesses[application.pet] ?? activeBusiness?.id ?? "");
+                    const businessName = businesses.find((business) => String(business.id) === businessId)?.name ?? activeBusiness?.name;
+                    return businessName ? ` · ${businessName}` : "";
+                  })()}</p><h2>{application.customer_username || "Customer"}</h2></div>
                   <span className={`vendor-adoption-status vendor-adoption-status-${application.status.toLowerCase()}`}>{readable(application.status)}</span>
                 </header>
                 <a className="vendor-adoption-email" href={`mailto:${application.customer_email}`}>{application.customer_email}</a>
@@ -229,6 +272,25 @@ export default function VendorAdoptionApplicationsPage() {
                 </dl>
                 <div className="vendor-adoption-message"><h3>Why they want to adopt</h3><p>{application.message}</p></div>
                 {application.decision_reason && <p className="vendor-adoption-reason"><strong>Decision note:</strong> {application.decision_reason}</p>}
+
+                <section className="vendor-adoption-conversation" aria-label={`Conversation about ${application.pet_name}`}>
+                  <h3>Conversation with applicant</h3>
+                  {application.info_messages?.length ? [...application.info_messages]
+                    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                    .map((message) => <div className={`vendor-adoption-chat-message vendor-adoption-chat-${message.kind.toLowerCase()}`} key={message.id}>
+                      <strong>{message.kind === "REQUEST" ? "You · Vendor" : application.customer_username || "Customer"}</strong>
+                      <p>{message.body}</p>
+                      {message.created_at && <time dateTime={message.created_at}>{formatDate(message.created_at)}</time>}
+                    </div>)
+                    : <p className="vendor-adoption-no-messages">No messages yet.</p>}
+                </section>
+
+                {application.status === "PENDING" && <AdoptionInformationRequest
+                  applicationId={application.application_id}
+                  petName={application.pet_name}
+                  applicantName={application.customer_username || "Customer"}
+                  onSubmitQuestions={requestMoreInfo}
+                />}
 
                 {isOpen(application.status) && (
                   <footer className="vendor-adoption-actions">
