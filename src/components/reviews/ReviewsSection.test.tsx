@@ -136,6 +136,30 @@ describe("ReviewsSection", () => {
     expect(submitReview).not.toHaveBeenCalled();
   });
 
+  it("limits review comments to 300 words", async () => {
+    renderReviews();
+
+    const reviewTextarea = await screen.findByLabelText(/Your review/);
+
+    const words = Array.from(
+      { length: 301 },
+      (_, index) => `word${index + 1}`,
+    );
+
+    fireEvent.change(reviewTextarea, {
+      target: {
+        value: words.join(" "),
+      },
+    });
+
+    const expectedComment = words.slice(0, 300).join(" ");
+
+    expect(reviewTextarea).toHaveValue(expectedComment);
+    expect(screen.getByText("300/300 words")).toBeInTheDocument();
+
+    expect(expectedComment.trim().split(/\s+/)).toHaveLength(300);
+  });
+
   it("allows an eligible customer to submit a rating and comment", async () => {
     renderReviews();
 

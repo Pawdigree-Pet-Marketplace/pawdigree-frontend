@@ -21,10 +21,19 @@ interface ReviewsSectionProps {
   targetId: number;
 }
 
+const MAX_REVIEW_WORDS = 300;
+
 const EMPTY_SUMMARY: RatingSummary = {
   average_rating: null,
   review_count: 0,
 };
+
+// Count words separated by whitespace.
+function countWords(value: string): number {
+  return value.trim()
+    ? value.trim().split(/\s+/).length
+    : 0;
+}
 
 function formatReviewDate(value: string): string {
   const date = new Date(value);
@@ -90,6 +99,20 @@ export default function ReviewsSection({
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Current number of words in the review comment.
+  const commentWordCount = countWords(comment);
+
+  // Enforce the 300-word limit, including pasted text.
+  function handleCommentChange(value: string) {
+    const words = value.trim().split(/\s+/).filter(Boolean);
+
+    if (words.length > MAX_REVIEW_WORDS) {
+      setComment(words.slice(0, MAX_REVIEW_WORDS).join(" "));
+    } else {
+      setComment(value);
+    }
+  }
 
   // Fetch the public reviews whenever the item changes.
   useEffect(() => {
@@ -181,6 +204,13 @@ export default function ReviewsSection({
 
     if (rating < 1 || rating > 5) {
       setFormError("Please select a star rating before submitting.");
+      return;
+    }
+
+    if (commentWordCount > MAX_REVIEW_WORDS) {
+      setFormError(
+        `Your review cannot exceed ${MAX_REVIEW_WORDS} words.`,
+      );
       return;
     }
 
@@ -418,14 +448,13 @@ export default function ReviewsSection({
               <textarea
                 id={`review-comment-${kind}-${targetId}`}
                 value={comment}
-                onChange={(event) => setComment(event.target.value)}
+                onChange={(event) => handleCommentChange(event.target.value)}
                 placeholder="Tell other customers about your experience..."
-                maxLength={1000}
                 rows={5}
               />
 
-              <span className="review-character-count">
-                {comment.length}/1000 characters
+              <span className="review-character-count" aria-live="polite">
+                {commentWordCount}/{MAX_REVIEW_WORDS} words
               </span>
 
               {formError && (
