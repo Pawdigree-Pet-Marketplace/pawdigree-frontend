@@ -17,17 +17,25 @@ export interface CreateBookingPayload {
   notes?: string;
 }
 
-// Booking information returned after successful submission.
+// All possible booking statuses supported by the backend.
+export type BookingStatus =
+  | "pending"
+  | "accepted"
+  | "declined"
+  | "completed"
+  | "cancelled";
+
+// Booking information returned by the backend.
 export interface BookingResponse {
   booking_id: number;
   service: number;
   service_name: string;
   start_at: string;
   end_at: string;
-  status: string;
+  status: BookingStatus;
   status_display: string;
   notes: string;
-  decision_reason: string | null;
+  decision_reason: string;
   created_at: string;
 }
 
@@ -80,4 +88,39 @@ export async function createServiceBooking(
   }
 
   return data as BookingResponse;
+}
+
+// Fetch all bookings belonging to the authenticated customer.
+// This endpoint requires an authenticated customer.
+export async function fetchCustomerBookings(): Promise<BookingResponse[]> {
+  const response = await customerAuthenticatedFetch(
+    "/api/bookings/customer/",
+    {
+      method: "GET",
+    },
+  );
+
+  const data: unknown = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const errors = data as Record<string, unknown> | null;
+
+    const message = errors
+      ? Object.entries(errors)
+          .map(([field, value]) => {
+            const readableValue = Array.isArray(value)
+              ? value.join(" ")
+              : typeof value === "string"
+                ? value
+                : JSON.stringify(value);
+
+            return `${field}: ${readableValue}`;
+          })
+          .join("\n")
+      : `Unable to fetch bookings. Status: ${response.status}.`;
+
+    throw new Error(message || "Unable to load your bookings.");
+  }
+
+  return data as BookingResponse[];
 }
