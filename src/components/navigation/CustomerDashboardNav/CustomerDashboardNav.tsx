@@ -8,6 +8,7 @@ import {
   Stethoscope,
   HeartHandshake,
   BookOpen,
+  CalendarDays,
   Menu,
   X,
   LogOut,
@@ -29,6 +30,7 @@ const navigationItems = [
   { label: "Pet Store", href: "/merchandise", Icon: ShoppingBag },
   { label: "Cart", href: "/customer/cart", Icon: ShoppingCart },
   { label: "Orders", href: "/customer/orders", Icon: ClipboardList },
+  { label: "My Bookings", href: "/customer/bookings", Icon: CalendarDays },
   { label: "Pet Services", href: "/services", Icon: Stethoscope },
   { label: "Adoption", href: "/customer/adoption", Icon: HeartHandshake },
 ];
@@ -59,6 +61,8 @@ export default function CustomerDashboardNav() {
         return pathname === "/customer/cart";
       case "Orders":
         return pathname === "/customer/orders";
+      case "My Bookings":
+        return pathname === "/customer/bookings";
       case "Pet Services":
         return pathname.startsWith("/services");
       case "Adoption":
