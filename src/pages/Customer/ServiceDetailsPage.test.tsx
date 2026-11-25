@@ -55,10 +55,10 @@ const bookingResponse = {
   service_name: "Pet Grooming",
   start_at: availableTimes[0],
   end_at: "2026-11-26T10:00:00+03:00",
-  status: "pending",
+  status: "pending" as const,
   status_display: "Pending",
   notes: "My dog needs grooming.",
-  decision_reason: null,
+  decision_reason: "",
   created_at: "2026-11-24T10:00:00+03:00",
 };
 

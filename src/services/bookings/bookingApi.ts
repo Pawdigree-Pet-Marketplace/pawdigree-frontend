@@ -17,18 +17,64 @@ export interface CreateBookingPayload {
   notes?: string;
 }
 
-// Booking information returned after successful submission.
+// All possible booking statuses supported by the backend.
+export type BookingStatus =
+  | "pending"
+  | "accepted"
+  | "declined"
+  | "completed"
+  | "cancelled";
+
+// Booking information returned by the backend.
 export interface BookingResponse {
   booking_id: number;
   service: number;
   service_name: string;
   start_at: string;
   end_at: string;
-  status: string;
+  status: BookingStatus;
   status_display: string;
   notes: string;
-  decision_reason: string | null;
+  decision_reason: string;
   created_at: string;
+}
+
+// Read API responses and produce useful error messages.
+async function readBookingResponse(
+  response: Response,
+  fallbackMessage: string,
+): Promise<BookingResponse> {
+  const data: unknown = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    let message = fallbackMessage;
+
+    if (data && typeof data === "object") {
+      const errors = data as Record<string, unknown>;
+
+      if (typeof errors.detail === "string") {
+        message = errors.detail;
+      } else {
+        const messages = Object.entries(errors).map(([field, value]) => {
+          const readableValue = Array.isArray(value)
+            ? value.join(" ")
+            : typeof value === "string"
+              ? value
+              : JSON.stringify(value);
+
+          return `${field}: ${readableValue}`;
+        });
+
+        if (messages.length > 0) {
+          message = messages.join("\n");
+        }
+      }
+    }
+
+    throw new Error(message);
+  }
+
+  return data as BookingResponse;
 }
 
 // Fetch available appointment times.
@@ -49,14 +95,20 @@ export async function fetchServiceAvailableTimes(
 export async function createServiceBooking(
   payload: CreateBookingPayload,
 ): Promise<BookingResponse> {
+  const response = await customerAuthenticatedFetch("/api/bookings/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  return readBookingResponse(response, "Unable to create your booking.");
+}
+
+// Fetch all bookings belonging to the authenticated customer.
+export async function fetchCustomerBookings(): Promise<BookingResponse[]> {
   const response = await customerAuthenticatedFetch(
-    "/api/bookings/",
+    "/api/bookings/customer/",
     {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+      method: "GET",
     },
   );
 
@@ -77,10 +129,40 @@ export async function createServiceBooking(
             return `${field}: ${readableValue}`;
           })
           .join("\n")
-      : `Booking failed with status ${response.status}.`;
+      : `Unable to fetch bookings. Status: ${response.status}.`;
 
-    throw new Error(message || "Unable to create your booking.");
+    throw new Error(message || "Unable to load your bookings.");
   }
 
-  return data as BookingResponse;
+  return data as BookingResponse[];
+}
+
+// Cancel one of the authenticated customer's bookings.
+export async function cancelCustomerBooking(
+  bookingId: number,
+): Promise<BookingResponse> {
+  const response = await customerAuthenticatedFetch(
+    `/api/bookings/${bookingId}/cancel/`,
+    {
+      method: "POST",
+    },
+  );
+
+  return readBookingResponse(response, "Unable to cancel your booking.");
+}
+
+// Reschedule one of the authenticated customer's bookings.
+export async function rescheduleCustomerBooking(
+  bookingId: number,
+  startAt: string,
+): Promise<BookingResponse> {
+  const response = await customerAuthenticatedFetch(
+    `/api/bookings/${bookingId}/reschedule/`,
+    {
+      method: "POST",
+      body: JSON.stringify({ start_at: startAt }),
+    },
+  );
+
+  return readBookingResponse(response, "Unable to reschedule your booking.");
 }

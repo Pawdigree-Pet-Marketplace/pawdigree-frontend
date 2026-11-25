@@ -13,6 +13,7 @@ import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage"
 import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
 import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
 import CustomerOrderDetailsPage from "./pages/Customer/CustomerOrderDetailsPage";
+import MyBookingsPage from "./pages/Customer/MyBookingsPage";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
 import CustomerLoginPage from "./pages/Customer/CustomerLoginPage";
 import CustomerPetCataloguePage from "./pages/Customer/CustomerPetCataloguePage";
@@ -186,6 +187,18 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      {/* Customer's service bookings */}
+       <Route
+         path="/customer/bookings"
+         element={
+            <ProtectedRoute role="CUSTOMER">
+              <CustomerShell />
+           </ProtectedRoute>
+        }
+       >
+        <Route index element={<MyBookingsPage />} />
+      </Route>
 
       <Route
         path="/customer/orders/:orderId"
