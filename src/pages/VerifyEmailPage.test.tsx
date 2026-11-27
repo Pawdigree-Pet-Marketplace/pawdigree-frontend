@@ -29,6 +29,8 @@ function renderVerification(role: "CUSTOMER" | "VENDOR", redirectTo: string) {
       <Routes>
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/pets" element={<p>Customer pets destination</p>} />
+        <Route path="/customer/cart" element={<p>Customer cart destination</p>} />
+        <Route path="/customer/checkout" element={<p>Customer checkout destination</p>} />
         <Route path="/vendor/documents" element={<p>Vendor documents destination</p>} />
         <Route path="/customer/dashboard" element={<p>Customer dashboard destination</p>} />
         <Route path="/vendor/dashboard" element={<p>Vendor dashboard destination</p>} />
@@ -58,6 +60,16 @@ describe("email verification destination", () => {
     await verify();
 
     expect(await screen.findByText("Customer pets destination")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["/customer/cart", "Customer cart destination"],
+    ["/customer/checkout", "Customer checkout destination"],
+  ])("preserves %s through email verification", async (destination, text) => {
+    apiRequestMock.mockResolvedValue({ access: "customer-token", refresh: "customer-refresh" });
+    renderVerification("CUSTOMER", destination);
+    await verify();
+    expect(await screen.findByText(text)).toBeInTheDocument();
   });
 
   it("returns a verified vendor to the intended page", async () => {

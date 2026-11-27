@@ -33,6 +33,7 @@
 }
 
 .icon-circle {
+    position: relative;
     width: 36px; height: 36px;
     display: grid;
     place-items: center;
@@ -40,6 +41,24 @@
     border-radius: 50%;
     color: var(--charcoal);
     transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+
+.nav-cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -7px;
+    display: grid;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 3px;
+    place-items: center;
+    border: 2px solid var(--white, #fff);
+    border-radius: 999px;
+    background: var(--coral, #fb8665);
+    color: var(--ink, #2c302f);
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .active-circle {

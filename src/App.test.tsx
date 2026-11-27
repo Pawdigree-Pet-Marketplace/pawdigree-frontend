@@ -25,8 +25,16 @@ vi.mock("./components/navigation/CustomerDashboardNav/CustomerDashboardNav", () 
   default: () => <nav aria-label="Customer dashboard">Customer dashboard navigation</nav>,
 }));
 
+vi.mock("./context/CartContext", () => ({
+  useCart: () => ({ cartCount: 0 }),
+}));
+
 vi.mock("./pages/Customer/CustomerLandingPage", () => ({
   default: () => <main><h1>Public landing route</h1></main>,
+}));
+
+vi.mock("./pages/Customer/ServicesPage", () => ({
+  default: () => <main><h1>Services route</h1></main>,
 }));
 
 vi.mock("./pages/Vendor/VendorLandingPage", () => ({
@@ -226,6 +234,8 @@ describe("App route configuration", () => {
     ).toBeInTheDocument();
 
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(document.querySelector(".top-navbar"))
+      .toHaveClass("top-navbar--transparent", "top-navbar--glow");
   });
 
   it("serves the public vendor landing page instead of the protected vendor catch-all", () => {
@@ -242,6 +252,9 @@ describe("App route configuration", () => {
 
   it("renders the public pet catalogue and pet detail route, including browser history navigation", () => {
     renderApp("/pets");
+
+    expect(document.querySelector(".top-navbar"))
+      .toHaveClass("top-navbar--transparent", "top-navbar--light-background");
 
     expect(
       screen.getByRole("heading", { name: "Pet catalogue route" }),
@@ -269,6 +282,9 @@ describe("App route configuration", () => {
   it("renders vendor listings and a specific vendor profile as separate public routes", () => {
     renderApp("/vendors");
 
+    expect(document.querySelector(".top-navbar"))
+      .toHaveClass("top-navbar--transparent", "top-navbar--light-background");
+
     expect(
       screen.getByRole("heading", { name: "Vendor listing route" }),
     ).toBeInTheDocument();
@@ -278,6 +294,14 @@ describe("App route configuration", () => {
     expect(
       screen.getByRole("heading", { name: "Vendor profile route clinic-7" }),
     ).toBeInTheDocument();
+  });
+
+  it("uses the shared scroll-reveal navbar on the services route", () => {
+    renderApp("/services");
+
+    expect(screen.getByRole("heading", { name: "Services route" })).toBeInTheDocument();
+    expect(document.querySelector(".top-navbar"))
+      .toHaveClass("top-navbar--transparent", "top-navbar--light-background");
   });
 
   it("requires a customer session for adoption requests and renders the customer shell", () => {
@@ -312,6 +336,9 @@ describe("App route configuration", () => {
 
   it("allows unauthenticated visitors to access the customer cart", () => {
     renderApp("/customer/cart");
+
+    expect(document.querySelector(".top-navbar"))
+      .toHaveClass("top-navbar--transparent", "top-navbar--light-background");
 
     expect(currentPath()).toBe("/customer/cart");
 

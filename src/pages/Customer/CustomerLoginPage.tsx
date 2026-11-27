@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, PawPrint, Store } from "lucide-react";
 import "./CustomerLoginPage.css";
 import CustomerLoginForm from "../../components/auth/CustomerLoginForm";
@@ -11,6 +11,7 @@ export default function CustomerLoginPage() {
   const [step, setStep] = useState<Step>("welcome");
 
   const navigate = useNavigate();
+  const location = useLocation();
   useEffect(() => {
     document.title = "Customer Login - Pawdigree";
   }, []);
@@ -84,7 +85,7 @@ export default function CustomerLoginPage() {
 
             <p className="bottom-link">
               New to Pawdigree?{" "}
-              <Link to="/registration">Create an account</Link>
+              <Link to="/registration" state={location.state}>Create an account</Link>
             </p>
 
             <p className="terms">

@@ -79,14 +79,28 @@ export interface TrendingSearch {
   count: number;
 }
 
-export type SuggestionKind = "breed" | "pet" | "location" | "vendor";
+export type SuggestionKind =
+  | "breed"
+  | "pet"
+  | "location"
+  | "vendor"
+  | "business"
+  | "product"
+  | "service";
 
 export interface Suggestion {
   kind: SuggestionKind;
   label: string;
   hint?: string;
+  href?: string;
+  image?: string;
   /** true when the match came from typo-tolerance ("Did you mean ...?") */
   fuzzy?: boolean;
+}
+
+export interface SuggestionResponse {
+  suggestions: Suggestion[];
+  warning?: string;
 }
 
 /* ================================================================== */

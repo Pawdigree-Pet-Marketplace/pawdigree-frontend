@@ -59,7 +59,9 @@
 
 .hero-search {
   position: relative;
-  z-index: 2;
+  /* Keep the input and its absolutely positioned suggestions above Quick Actions. */
+  z-index: 4;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: var(--space-2);

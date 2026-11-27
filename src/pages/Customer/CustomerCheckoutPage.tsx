@@ -152,7 +152,9 @@ export default function CustomerCheckoutPage() {
 
         {cartError && (
           <div className="customer-checkout-error" role="alert">
-            {cartError}
+            Cart synchronization had a problem. Please review your cart before
+            continuing. {cartError}
+            <Link to="/customer/cart">Review Cart</Link>
           </div>
         )}
 

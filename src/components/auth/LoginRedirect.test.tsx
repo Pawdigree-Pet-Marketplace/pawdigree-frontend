@@ -28,6 +28,8 @@ function renderLogin(entry: InitialEntry) {
         <Route path="/customer/dashboard" element={<p>Customer dashboard destination</p>} />
         <Route path="/vendor/dashboard" element={<p>Vendor dashboard destination</p>} />
         <Route path="/pets" element={<p>Customer pets destination</p>} />
+        <Route path="/customer/cart" element={<p>Customer cart destination</p>} />
+        <Route path="/customer/checkout" element={<p>Customer checkout destination</p>} />
         <Route path="/vendor/documents" element={<p>Vendor documents destination</p>} />
         <Route path="/verify-email" element={<p>Verification destination</p>} />
       </Routes>
@@ -67,6 +69,16 @@ describe("login destination handling", () => {
     renderLogin("/login");
     await submitCustomerLogin();
     expect(await screen.findByText("Customer dashboard destination")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["/customer/cart", "Customer cart destination"],
+    ["/customer/checkout", "Customer checkout destination"],
+  ])("returns a customer to %s after login", async (destination, text) => {
+    apiRequestMock.mockResolvedValue({ access: "customer-token", refresh: "customer-refresh" });
+    renderLogin({ pathname: "/login", state: { from: { pathname: destination } } });
+    await submitCustomerLogin();
+    expect(await screen.findByText(text)).toBeInTheDocument();
   });
 
   it("keeps customer login within customer paths and applies the rule to Google login", async () => {

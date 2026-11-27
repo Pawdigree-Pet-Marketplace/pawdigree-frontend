@@ -313,11 +313,17 @@ export default function CustomerCartPage() {
                   <p>
                     Please log in or create an account to proceed to checkout.
                   </p>
-                  <Link to="/login" className="customer-cart-button">
+
+                  <Link
+                    to="/login"
+                    state={{ from: { pathname: "/customer/checkout" } }}
+                    className="customer-cart-button"
+                  >
                     Log In to Checkout
                   </Link>
                   <Link
                     to="/registration"
+                    state={{ from: { pathname: "/customer/checkout" } }}
                     className="customer-cart-register-link"
                   >
                     Create an Account

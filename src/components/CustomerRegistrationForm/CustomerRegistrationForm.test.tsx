@@ -6,13 +6,18 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation, type InitialEntry } from "react-router-dom";
 import "@testing-library/jest-dom/vitest";
 
 import CustomerRegistrationForm from "./CustomerRegistrationForm";
 
-const render = (ui: React.ReactNode) =>
-  rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
+const render = (ui: React.ReactNode, initialEntry: InitialEntry = "/") =>
+  rtlRender(<MemoryRouter initialEntries={[initialEntry]}>{ui}</MemoryRouter>);
+
+function LoginDestinationProbe() {
+  const location = useLocation();
+  return <output data-testid="login-destination">{JSON.stringify(location.state)}</output>;
+}
 
 const { apiRequestMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),
@@ -491,5 +496,22 @@ describe("Customer Registration Form", () => {
     // The form is replaced by the success message.
     expect(screen.queryByLabelText(FIRST_NAME)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(PASSWORD)).not.toBeInTheDocument();
+  });
+
+  test("preserves checkout destination through registration to login", async () => {
+    render(
+      <Routes>
+        <Route path="/registration" element={<CustomerRegistrationForm />} />
+        <Route path="/customer-login" element={<LoginDestinationProbe />} />
+      </Routes>,
+      { pathname: "/registration", state: { from: { pathname: "/customer/checkout" } } },
+    );
+
+    await waitForCountries();
+    await fillForm();
+    submit();
+    fireEvent.click(await screen.findByRole("link", { name: /continue to log in/i }));
+
+    expect(await screen.findByTestId("login-destination")).toHaveTextContent('"pathname":"/customer/checkout"');
   });
 });
