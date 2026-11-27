@@ -4,6 +4,9 @@ import { FilterIcon, SearchIcon } from "../icons";
 import useScrollReveal from "../../hooks/useScrollReveal";
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import Typeahead from "../common/Typeahead";
+import { fetchGlobalSuggestions } from "../../services/globalSearchApi";
+import QuickActions from "./QuickActions";
 import "./Hero.css";
 
 
@@ -12,12 +15,16 @@ export default function Hero() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitSearch = (value: string) => {
     const query = new URLSearchParams();
-    if (search.trim()) query.set("search", search.trim());
+    if (value.trim()) query.set("search", value.trim());
     const suffix = query.toString();
     navigate(suffix ? `/explore-pets?${suffix}` : "/explore-pets");
+  };
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitSearch(search);
   };
 
   return (
@@ -45,18 +52,30 @@ export default function Hero() {
           role="search"
           onSubmit={handleSearch}
         >
-          <SearchIcon />
-          <input
-            type="search"
-            placeholder="Search pets, breeds, or locations"
-            aria-label="Search pets, breeds, or locations"
+          <Typeahead
+            label="Search Pawdigree"
+            hideLabel
+            variant="pill"
+            icon={<SearchIcon />}
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={setSearch}
+            onPick={(suggestion) => {
+              if (suggestion.href) navigate(suggestion.href);
+              else submitSearch(suggestion.label);
+            }}
+            loadSuggestions={fetchGlobalSuggestions}
+            onSubmit={submitSearch}
+            minQueryLength={2}
+            emptyText="No matches. Press Enter to search pet listings."
+            submitHint="Search opens pet matches. Select a suggestion to open that listing."
+            placeholder="Search pets, businesses, products or services"
           />
-          <button type="submit" aria-label="Filter and search">
+          <button type="submit" aria-label="Search pet listings">
             <FilterIcon />
           </button>
         </form>
+
+        <QuickActions />
 
         <ul className="hero-trust reveal reveal-delay-2" aria-label="Why shop with Pawdigree">
           <li><ShieldCheck size={16} aria-hidden="true" /> Verified vendors</li>
