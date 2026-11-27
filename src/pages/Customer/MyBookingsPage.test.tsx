@@ -27,8 +27,8 @@ const mockBooking: BookingResponse = {
   booking_id: 123,
   service: 12,
   service_name: "Pet Grooming",
-  start_at: "2026-11-26T10:00:00Z",
-  end_at: "2026-11-26T11:00:00Z",
+  start_at: "2026-11-28T10:00:00Z",
+  end_at: "2026-11-28T11:00:00Z",
   status: "pending",
   status_display: "Pending",
   notes: "Please handle my pet gently.",
@@ -53,9 +53,9 @@ describe("MyBookingsPage", () => {
 
     vi.mocked(fetchServiceAvailableTimes).mockResolvedValue({
       service_id: 12,
-      date: "2026-11-25",
+      date: "2026-11-28",
       duration: 60,
-      times: ["2026-11-27T07:00:00Z"],
+      times: ["2026-11-28T07:00:00Z"],
     });
 
     vi.mocked(cancelCustomerBooking).mockResolvedValue({
@@ -66,8 +66,8 @@ describe("MyBookingsPage", () => {
 
     vi.mocked(rescheduleCustomerBooking).mockResolvedValue({
       ...mockBooking,
-      start_at: "2026-11-27T07:00:00Z",
-      end_at: "2026-11-27T08:00:00Z",
+      start_at: "2026-11-28T07:00:00Z",
+      end_at: "2026-11-28T08:00:00Z",
       status: "pending",
       status_display: "Pending",
     });
@@ -211,13 +211,13 @@ describe("MyBookingsPage", () => {
     const dateInput = screen.getByLabelText("New appointment date");
 
     fireEvent.change(dateInput, {
-      target: { value: "2026-11-27" },
+      target: { value: "2026-11-28" },
     });
 
     await waitFor(() => {
       expect(fetchServiceAvailableTimes).toHaveBeenCalledWith(
         12,
-        "2026-11-27",
+        "2026-11-28",
       );
     });
 
@@ -232,7 +232,7 @@ describe("MyBookingsPage", () => {
     });
 
     fireEvent.change(timeSelect, {
-      target: { value: "2026-11-27T07:00:00Z" },
+      target: { value: "2026-11-28T07:00:00Z" },
     });
 
     fireEvent.click(
@@ -242,7 +242,7 @@ describe("MyBookingsPage", () => {
     await waitFor(() => {
       expect(rescheduleCustomerBooking).toHaveBeenCalledWith(
         123,
-        "2026-11-27T07:00:00Z",
+        "2026-11-28T07:00:00Z",
       );
     });
 
