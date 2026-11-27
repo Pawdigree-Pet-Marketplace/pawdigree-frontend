@@ -1,318 +1,133 @@
-
-import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  ShoppingBag,
+  ArrowLeft,
   MapPin,
-  Clock,
-  CheckCircle,
   PawPrint,
-  CreditCard,
-  Smartphone,
+  ShoppingBag,
+  Sparkles,
 } from "lucide-react";
 
 import CustomerDashboardNav from "../../components/navigation/CustomerDashboardNav/CustomerDashboardNav";
-import { useCart } from "../../context/CartContext";
-
-import {
-  createCheckoutOrder,
-  type CheckoutPayload,
-  type CustomerOrder,
-} from "../../services/orders/orderApi";
-
-import {
-  getPaymentMethods,
-  startPayment,
-} from "../../services/payments/paymentApi";
+import { useCart, type CartItem } from "../../context/CartContext";
 
 import "./CustomerCheckoutPage.css";
 
+type DeliveryFormData = {
+  fullName: string;
+  phone: string;
+  district: string;
+  city: string;
+  address: string;
+  instructions: string;
+};
+
+type DeliveryField = keyof DeliveryFormData;
+
+const requiredFields: DeliveryField[] = [
+  "fullName",
+  "phone",
+  "district",
+  "city",
+  "address",
+];
+
 export default function CustomerCheckoutPage() {
+  const navigate = useNavigate();
   const {
     cartItems,
     cartCount,
     cartTotal,
     hasUnavailableItems,
     loading,
+    error: cartError,
   } = useCart();
 
-  const hasPetItems = cartItems.some(
-    (item) => item.item_type === "pet"
+  const petItems = cartItems.filter((item) => item.item_type === "pet");
+  const merchandiseItems = cartItems.filter(
+    (item) => item.item_type !== "pet"
   );
 
-  const [formData, setFormData] = useState<CheckoutPayload>({
-    shipping_name: "",
-    shipping_phone: "",
-    shipping_address: "",
-    shipping_city_district: "",
-    notes: "",
+  const [formData, setFormData] = useState<DeliveryFormData>({
+    fullName: "",
+    phone: "",
+    district: "",
+    city: "",
+    address: "",
+    instructions: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<DeliveryField, string>>
+  >({});
+  const [formError, setFormError] = useState("");
 
-  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
-  const [currency, setCurrency] = useState("UGX");
-  const [selectedMethod, setSelectedMethod] = useState("");
+  const formatPrice = (price: string | number) =>
+    `UGX ${Number(price).toLocaleString("en-UG", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
-  const [methodsLoading, setMethodsLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [startingPayment, setStartingPayment] = useState(false);
+  const formatSubtotal = (items: CartItem[]) =>
+    formatPrice(
+      items.reduce((total, item) => total + Number(item.line_total), 0)
+    );
 
-  const [error, setError] = useState("");
-  const [createdOrder, setCreatedOrder] =
-    useState<CustomerOrder | null>(null);
-
-  // Load payment methods supported by the backend.
-  useEffect(() => {
-    async function loadPaymentMethods() {
-      setMethodsLoading(true);
-      setError("");
-
-      try {
-        const response = await getPaymentMethods();
-
-        setPaymentMethods(response.methods);
-        setCurrency(response.currency);
-
-        if (response.methods.length > 0) {
-          setSelectedMethod(response.methods[0]);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to load payment methods."
-        );
-      } finally {
-        setMethodsLoading(false);
-      }
-    }
-
-    loadPaymentMethods();
-  }, []);
-
-  // Update a form field.
-  function handleChange(
-    field: keyof CheckoutPayload,
-    value: string
-  ) {
+  function updateField(field: DeliveryField, value: string) {
     setFormData((previous) => ({
       ...previous,
       [field]: value,
     }));
-  }
 
-  // Convert backend payment method names into readable labels.
-  function getMethodLabel(method: string) {
-    switch (method) {
-      case "card":
-        return "Card";
-
-      case "mobile_money":
-        return "Mobile Money";
-
-      default:
-        return method
-          .split("_")
-          .map(
-            (word) =>
-              word.charAt(0).toUpperCase() + word.slice(1)
-          )
-          .join(" ");
-    }
-  }
-
-  // Start payment for an already-created order.
-  async function handleStartPayment(orderId: number) {
-    if (!selectedMethod) {
-      setError("Please select a payment method.");
-      return;
+    if (fieldErrors[field]) {
+      setFieldErrors((previous) => ({
+        ...previous,
+        [field]: undefined,
+      }));
     }
 
-    setError("");
-    setStartingPayment(true);
-
-    try {
-      const payment = await startPayment(orderId, selectedMethod);
-
-      if (!payment.payment_url) {
-        throw new Error(
-          "The backend did not provide a payment link."
-        );
-      }
-
-      window.location.assign(payment.payment_url);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to start payment. Please try again."
-      );
-    } finally {
-      setStartingPayment(false);
-    }
+    if (formError) setFormError("");
   }
 
-  // Create the order once, then start payment.
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
-  ) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!selectedMethod) {
-      setError("Please select a payment method.");
+    const nextErrors: Partial<Record<DeliveryField, string>> = {};
+    for (const field of requiredFields) {
+      if (!formData[field].trim()) {
+        nextErrors[field] = "This field is required.";
+      }
+    }
+    setFieldErrors(nextErrors);
+    setFormError("");
+
+    const firstInvalidField = requiredFields.find(
+      (field) => nextErrors[field]
+    );
+    if (firstInvalidField) {
+      document.getElementById(`checkout-${firstInvalidField}`)?.focus();
       return;
     }
 
     if (hasUnavailableItems) {
-      setError(
-        "Your cart contains unavailable items. Please review your cart."
+      setFormError(
+        "Your cart contains unavailable items. Review your cart before continuing."
       );
       return;
     }
 
-    setError("");
-    setSubmitting(true);
-
-    try {
-      const order = await createCheckoutOrder(formData);
-
-      // Save the order before attempting payment.
-      // Retrying payment must not create another order.
-      setCreatedOrder(order);
-
-      await handleStartPayment(order.id);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to place your order. Please try again."
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  // Format prices using the currency returned by the backend.
-  const formatPrice = (price: string) =>
-    `${currency} ${Number(price).toLocaleString("en-UG")}`;
-
-  // Order confirmation after the backend creates the order.
-  if (createdOrder) {
-    return (
-      <div className="customer-checkout-layout">
-        <CustomerDashboardNav />
-
-        <main className="customer-checkout-main">
-          <header className="customer-checkout-heading">
-            <div>
-              <p className="customer-checkout-eyebrow">
-                PAWDIGREE PET STORE
-              </p>
-
-              <h1>Checkout</h1>
-
-              <p>
-                Review your order and complete payment to finish
-                your purchase.
-              </p>
-            </div>
-
-            <PawPrint aria-hidden="true" />
-          </header>
-
-          <section className="customer-checkout-confirmation">
-            <CheckCircle size={58} />
-
-            <p className="customer-checkout-eyebrow">
-              PAWDIGREE PET STORE
-            </p>
-
-            <h1>Your order has been created!</h1>
-
-            <p>
-              Your order reference is{" "}
-              <strong>#{createdOrder.id}</strong>.
-            </p>
-
-            <div className="customer-checkout-pending">
-              <Clock size={20} />
-
-              <div>
-                <strong>Pending payment</strong>
-                <p>
-                  Your order is awaiting payment confirmation.
-                </p>
-              </div>
-            </div>
-
-            {createdOrder.expires_at && (
-              <p className="customer-checkout-expiry">
-                Payment deadline:{" "}
-                {new Date(
-                  createdOrder.expires_at
-                ).toLocaleString("en-UG", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </p>
-            )}
-
-            <div className="customer-checkout-confirmation-total">
-              <span>Order total</span>
-              <strong>
-                {formatPrice(createdOrder.total_amount)}
-              </strong>
-            </div>
-
-            {error && (
-              <div
-                className="customer-checkout-error"
-                role="alert"
-              >
-                {error}
-              </div>
-            )}
-
-            <button
-              type="button"
-              className="customer-checkout-primary-button"
-              disabled={startingPayment}
-              onClick={() => handleStartPayment(createdOrder.id)}
-            >
-              {startingPayment
-                ? "Starting Payment..."
-                : "Continue to Payment"}
-            </button>
-
-            <p className="customer-checkout-secure-note">
-              If payment did not open, you can try again using
-              the button above. Your existing order will be used.
-            </p>
-
-            <p className="customer-checkout-confirmation-note">
-              This is a sandbox payment for testing. No real money
-              will be charged. Your cart is not manually cleared
-              during checkout.
-            </p>
-
-            <Link
-              to="/customer/orders"
-              className="customer-checkout-secondary-link"
-            >
-              View My Orders
-            </Link>
-
-            <br />
-
-            <Link
-              to="/customer/cart"
-              className="customer-checkout-secondary-link"
-            >
-              Return to Cart
-            </Link>
-          </section>
-        </main>
-      </div>
-    );
+    navigate("/customer/payment", {
+      state: {
+        deliveryInformation: {
+          shipping_name: formData.fullName.trim(),
+          shipping_phone: formData.phone.trim(),
+          shipping_city_district: `${formData.district.trim()}, ${formData.city.trim()}`,
+          shipping_address: formData.address.trim(),
+          notes: formData.instructions.trim(),
+          district: formData.district.trim(),
+          city: formData.city.trim(),
+        },
+      },
+    });
   }
 
   return (
@@ -320,276 +135,277 @@ export default function CustomerCheckoutPage() {
       <CustomerDashboardNav />
 
       <main className="customer-checkout-main">
-        {/* PAGE HEADING */}
         <header className="customer-checkout-heading">
-          <div>
-            <p className="customer-checkout-eyebrow">
-              PAWDIGREE PET STORE
-            </p>
-
+          <div className="customer-checkout-heading-content">
+            <p className="customer-checkout-eyebrow">PAWDIGREE PET STORE</p>
             <h1>Checkout</h1>
-
             <p>
-              Provide your delivery details to complete your
-              {hasPetItems
-                ? " pet and merchandise purchase."
-                : " merchandise purchase."}
+              Almost there! Confirm your delivery information and review your
+              order.
             </p>
           </div>
-
-          <PawPrint aria-hidden="true" />
+          <div className="customer-checkout-decoration" aria-hidden="true">
+            <Sparkles className="checkout-sparkle" />
+            <PawPrint className="checkout-paw" />
+          </div>
         </header>
 
+        {cartError && (
+          <div className="customer-checkout-error" role="alert">
+            {cartError}
+          </div>
+        )}
+
         {loading ? (
-          <section className="customer-checkout-message">
+          <section className="customer-checkout-message" aria-live="polite">
             Loading your cart...
           </section>
         ) : cartItems.length === 0 ? (
           <section className="customer-checkout-message">
-            <ShoppingBag size={48} />
-
+            <ShoppingBag size={42} aria-hidden="true" />
             <h2>Your cart is empty</h2>
-
             <p>Add items to your cart before checking out.</p>
-
-            <Link to="/customer/cart">
-              Return to Cart
+            <Link to="/customer/cart" className="customer-checkout-back-link">
+              <ArrowLeft size={16} />
+              Back to Cart
             </Link>
           </section>
         ) : (
           <div className="customer-checkout-content">
-            {/* SHIPPING DETAILS AND PAYMENT FORM */}
             <section className="customer-checkout-form-section">
               <div className="customer-checkout-section-heading">
-                <MapPin size={22} />
-
+                <MapPin size={21} aria-hidden="true" />
                 <div>
                   <h2>Delivery Information</h2>
                   <p>Where should we deliver your order?</p>
                 </div>
               </div>
 
-              {error && (
-                <div
-                  className="customer-checkout-error"
-                  role="alert"
-                >
-                  {error}
-                </div>
-              )}
-
               {hasUnavailableItems && (
-                <div
-                  className="customer-checkout-error"
-                  role="alert"
-                >
-                  Your cart contains unavailable items. Return to
-                  your cart and resolve these items before checking
-                  out.
+                <div className="customer-checkout-error" role="alert">
+                  Your cart contains unavailable items. Review your cart
+                  before continuing.
                   <Link to="/customer/cart">Review Cart</Link>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit}>
-                <div className="customer-checkout-field">
-                  <label htmlFor="shipping_name">
-                    Full Name <span>*</span>
-                  </label>
-
-                  <input
-                    id="shipping_name"
-                    type="text"
-                    name="shipping_name"
-                    placeholder="Enter your full name"
-                    maxLength={150}
-                    autoComplete="name"
-                    required
-                    value={formData.shipping_name}
-                    onChange={(event) =>
-                      handleChange(
-                        "shipping_name",
-                        event.target.value
-                      )
-                    }
-                  />
+              {formError && (
+                <div className="customer-checkout-error" role="alert">
+                  {formError}
                 </div>
+              )}
 
-                <div className="customer-checkout-field">
-                  <label htmlFor="shipping_phone">
-                    Phone Number <span>*</span>
-                  </label>
-
-                  <input
-                    id="shipping_phone"
-                    type="tel"
-                    name="shipping_phone"
-                    placeholder="+256 7XX XXX XXX"
-                    maxLength={20}
-                    autoComplete="tel"
-                    required
-                    value={formData.shipping_phone}
-                    onChange={(event) =>
-                      handleChange(
-                        "shipping_phone",
-                        event.target.value
-                      )
-                    }
-                  />
-
-                  <small>
-                    Enter a phone number where the delivery team
-                    can reach you.
-                  </small>
-                </div>
-
-                <div className="customer-checkout-field">
-                  <label htmlFor="shipping_city_district">
-                    City / District <span>*</span>
-                  </label>
-
-                  <input
-                    id="shipping_city_district"
-                    type="text"
-                    name="shipping_city_district"
-                    placeholder="e.g. Kampala"
-                    maxLength={100}
-                    autoComplete="address-level2"
-                    required
-                    value={formData.shipping_city_district}
-                    onChange={(event) =>
-                      handleChange(
-                        "shipping_city_district",
-                        event.target.value
-                      )
-                    }
-                  />
-                </div>
-
-                <div className="customer-checkout-field">
-                  <label htmlFor="shipping_address">
-                    Delivery Address <span>*</span>
-                  </label>
-
-                  <textarea
-                    id="shipping_address"
-                    name="shipping_address"
-                    placeholder="Enter your street, building, area or other delivery details"
-                    maxLength={255}
-                    autoComplete="street-address"
-                    rows={3}
-                    required
-                    value={formData.shipping_address}
-                    onChange={(event) =>
-                      handleChange(
-                        "shipping_address",
-                        event.target.value
-                      )
-                    }
-                  />
-                </div>
-
-                <div className="customer-checkout-field">
-                  <label htmlFor="notes">
-                    Additional Delivery Notes
-                    <span className="optional-label">
-                      {" "}(Optional)
-                    </span>
-                  </label>
-
-                  <textarea
-                    id="notes"
-                    name="notes"
-                    placeholder="Any additional instructions for your delivery?"
-                    rows={3}
-                    value={formData.notes}
-                    onChange={(event) =>
-                      handleChange("notes", event.target.value)
-                    }
-                  />
-                </div>
-
-                {/* PAYMENT METHOD SELECTION */}
-                <div className="customer-checkout-payment-section">
-                  <div className="customer-checkout-section-heading">
-                    <CreditCard size={22} />
-
-                    <div>
-                      <h2>Payment Method</h2>
-                      <p>Choose how you would like to pay.</p>
-                    </div>
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="customer-checkout-form-grid">
+                  <div className="customer-checkout-field">
+                    <label htmlFor="checkout-fullName">
+                      Full Name <span>*</span>
+                    </label>
+                    <input
+                      id="checkout-fullName"
+                      name="fullName"
+                      type="text"
+                      autoComplete="name"
+                      placeholder="Enter your full name"
+                      maxLength={150}
+                      required
+                      value={formData.fullName}
+                      aria-invalid={Boolean(fieldErrors.fullName)}
+                      aria-describedby={
+                        fieldErrors.fullName
+                          ? "checkout-fullName-error"
+                          : undefined
+                      }
+                      onChange={(event) =>
+                        updateField("fullName", event.target.value)
+                      }
+                    />
+                    {fieldErrors.fullName && (
+                      <small
+                        className="customer-checkout-field-error"
+                        id="checkout-fullName-error"
+                        role="alert"
+                      >
+                        {fieldErrors.fullName}
+                      </small>
+                    )}
                   </div>
 
-                  {methodsLoading ? (
-                    <p className="customer-checkout-payment-message">
-                      Loading available payment methods...
-                    </p>
-                  ) : paymentMethods.length === 0 ? (
-                    <p className="customer-checkout-payment-message">
-                      No payment methods are currently available.
-                      Please try again later.
-                    </p>
-                  ) : (
-                    <div className="customer-checkout-payment-options">
-                      {paymentMethods.map((method) => (
-                        <label
-                          key={method}
-                          className={`customer-checkout-payment-option ${
-                            selectedMethod === method
-                              ? "selected"
-                              : ""
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="payment_method"
-                            value={method}
-                            checked={selectedMethod === method}
-                            onChange={() =>
-                              setSelectedMethod(method)
-                            }
-                          />
+                  <div className="customer-checkout-field">
+                    <label htmlFor="checkout-phone">
+                      Phone Number <span>*</span>
+                    </label>
+                    <input
+                      id="checkout-phone"
+                      name="phone"
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="+256 7XX XXX XXX"
+                      maxLength={20}
+                      required
+                      value={formData.phone}
+                      aria-invalid={Boolean(fieldErrors.phone)}
+                      aria-describedby={
+                        fieldErrors.phone ? "checkout-phone-error" : undefined
+                      }
+                      onChange={(event) =>
+                        updateField("phone", event.target.value)
+                      }
+                    />
+                    <small>
+                      Enter a phone number where the delivery team can reach
+                      you.
+                    </small>
+                    {fieldErrors.phone && (
+                      <small
+                        className="customer-checkout-field-error"
+                        id="checkout-phone-error"
+                        role="alert"
+                      >
+                        {fieldErrors.phone}
+                      </small>
+                    )}
+                  </div>
+                </div>
 
-                          {method === "mobile_money" ? (
-                            <Smartphone size={22} />
-                          ) : (
-                            <CreditCard size={22} />
-                          )}
+                <div className="customer-checkout-form-grid">
+                  <div className="customer-checkout-field">
+                    <label htmlFor="checkout-district">
+                      District <span>*</span>
+                    </label>
+                    <input
+                      id="checkout-district"
+                      name="district"
+                      type="text"
+                      autoComplete="address-level1"
+                      placeholder="e.g. Kampala"
+                      maxLength={100}
+                      required
+                      value={formData.district}
+                      aria-invalid={Boolean(fieldErrors.district)}
+                      aria-describedby={
+                        fieldErrors.district
+                          ? "checkout-district-error"
+                          : undefined
+                      }
+                      onChange={(event) =>
+                        updateField("district", event.target.value)
+                      }
+                    />
+                    {fieldErrors.district && (
+                      <small
+                        className="customer-checkout-field-error"
+                        id="checkout-district-error"
+                        role="alert"
+                      >
+                        {fieldErrors.district}
+                      </small>
+                    )}
+                  </div>
 
-                          <span>{getMethodLabel(method)}</span>
-                        </label>
-                      ))}
-                    </div>
+                  <div className="customer-checkout-field">
+                    <label htmlFor="checkout-city">
+                      City / Town <span>*</span>
+                    </label>
+                    <input
+                      id="checkout-city"
+                      name="city"
+                      type="text"
+                      autoComplete="address-level2"
+                      placeholder="e.g. Entebbe"
+                      maxLength={100}
+                      required
+                      value={formData.city}
+                      aria-invalid={Boolean(fieldErrors.city)}
+                      aria-describedby={
+                        fieldErrors.city ? "checkout-city-error" : undefined
+                      }
+                      onChange={(event) =>
+                        updateField("city", event.target.value)
+                      }
+                    />
+                    {fieldErrors.city && (
+                      <small
+                        className="customer-checkout-field-error"
+                        id="checkout-city-error"
+                        role="alert"
+                      >
+                        {fieldErrors.city}
+                      </small>
+                    )}
+                  </div>
+                </div>
+
+                <div className="customer-checkout-field">
+                  <label htmlFor="checkout-address">
+                    Delivery Address <span>*</span>
+                  </label>
+                  <textarea
+                    id="checkout-address"
+                    name="address"
+                    autoComplete="street-address"
+                    placeholder="Street, building, area, or other delivery details"
+                    maxLength={255}
+                    rows={3}
+                    required
+                    value={formData.address}
+                    aria-invalid={Boolean(fieldErrors.address)}
+                    aria-describedby={
+                      fieldErrors.address ? "checkout-address-error" : undefined
+                    }
+                    onChange={(event) =>
+                      updateField("address", event.target.value)
+                    }
+                  />
+                  {fieldErrors.address && (
+                    <small
+                      className="customer-checkout-field-error"
+                      id="checkout-address-error"
+                      role="alert"
+                    >
+                      {fieldErrors.address}
+                    </small>
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  className="customer-checkout-primary-button"
-                  disabled={
-                    submitting ||
-                    methodsLoading ||
-                    paymentMethods.length === 0 ||
-                    !selectedMethod ||
-                    hasUnavailableItems
-                  }
-                >
-                  {submitting
-                    ? "Creating Order..."
-                    : "Place Order & Continue to Payment"}
-                </button>
+                <div className="customer-checkout-field">
+                  <label htmlFor="checkout-instructions">
+                    Additional Delivery Instructions
+                    <span className="optional-label"> (Optional)</span>
+                  </label>
+                  <textarea
+                    id="checkout-instructions"
+                    name="instructions"
+                    placeholder="Any additional instructions for your delivery?"
+                    rows={3}
+                    value={formData.instructions}
+                    onChange={(event) =>
+                      updateField("instructions", event.target.value)
+                    }
+                  />
+                </div>
 
-                <p className="customer-checkout-secure-note">
-                  You will be redirected to a sandbox payment page.
-                  This is a test integration and does not charge
-                  real money.
-                </p>
+                <div className="customer-checkout-actions">
+                  <Link
+                    to="/customer/cart"
+                    className="customer-checkout-back-link"
+                  >
+                    <ArrowLeft size={16} />
+                    Back to Cart
+                  </Link>
+                  <button
+                    type="submit"
+                    className="customer-checkout-primary-button"
+                    disabled={hasUnavailableItems}
+                  >
+                    Continue to Payment
+                  </button>
+                </div>
               </form>
             </section>
 
-            {/* ORDER SUMMARY */}
             <aside className="customer-checkout-summary">
               <h2>Order Summary</h2>
-
               <p className="customer-checkout-item-count">
                 {cartCount} {cartCount === 1 ? "item" : "items"}
               </p>
@@ -599,43 +415,40 @@ export default function CustomerCheckoutPage() {
                   const isPet = item.item_type === "pet";
 
                   return (
-                    <div
-                      className="customer-checkout-product"
-                      key={item.id}
-                    >
+                    <div className="customer-checkout-product" key={item.id}>
                       <div>
                         <strong>{item.name}</strong>
-
                         <span>
                           {isPet
-                            ? "Pet for Sale · One pet"
-                            : `${item.business_name} · Qty: ${item.quantity}`}
+                            ? `${item.business_name} · Pet · Qty: 1`
+                            : `${item.business_name} · Merchandise · Qty: ${item.quantity}`}
                         </span>
                       </div>
-
                       <strong>{formatPrice(item.line_total)}</strong>
                     </div>
                   );
                 })}
               </div>
 
+              <div className="customer-checkout-summary-row">
+                <span>Pet Sales Subtotal</span>
+                <strong>{formatSubtotal(petItems)}</strong>
+              </div>
+              <div className="customer-checkout-summary-row">
+                <span>Merchandise Subtotal</span>
+                <strong>{formatSubtotal(merchandiseItems)}</strong>
+              </div>
+              <div className="customer-checkout-summary-row">
+                <span>Delivery Fee</span>
+                <strong>Calculated separately</strong>
+              </div>
               <div className="customer-checkout-total">
-                <span>Subtotal</span>
+                <span>Combined Cart Total</span>
                 <strong>{formatPrice(cartTotal)}</strong>
               </div>
-
               <p className="customer-checkout-delivery-note">
-                Delivery fees are not included in this payment.
-                You will pay the delivery fee separately when your
-                order is delivered.
+                Delivery fees, if applicable, will be calculated separately.
               </p>
-
-              <Link
-                to="/customer/cart"
-                className="customer-checkout-edit-link"
-              >
-                Edit Cart
-              </Link>
             </aside>
           </div>
         )}

@@ -12,6 +12,8 @@ import CustomerCartPage from "./pages/Customer/CustomerCartPage";
 import CustomerOrderHistoryPage from "./pages/Customer/CustomerOrderHistoryPage";
 import CustomerCheckoutPage from "./pages/Customer/CustomerCheckoutPage";
 import SandboxPaymentPage from "./pages/Customer/SandboxPaymentPage";
+import CustomerReceiptPage from "./pages/Customer/CustomerReceiptPage";
+import CustomerDeliveryTrackingPage from "./pages/Customer/CustomerDeliveryTrackingPage";
 import CustomerOrderDetailsPage from "./pages/Customer/CustomerOrderDetailsPage";
 import MyBookingsPage from "./pages/Customer/MyBookingsPage";
 import LandingPage from "./pages/Customer/CustomerLandingPage";
@@ -167,6 +169,30 @@ function App() {
         element={
           <ProtectedRoute role="CUSTOMER">
             <CustomerCheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/payment"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <SandboxPaymentPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/receipt"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerReceiptPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/tracking"
+        element={
+          <ProtectedRoute role="CUSTOMER">
+            <CustomerDeliveryTrackingPage />
           </ProtectedRoute>
         }
       />
