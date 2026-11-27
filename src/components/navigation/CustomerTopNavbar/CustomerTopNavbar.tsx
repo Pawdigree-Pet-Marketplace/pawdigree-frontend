@@ -1,8 +1,9 @@
-import darkLogo from "../../../assets/logos/darkmode-logo.svg";
 import lightLogo from "../../../assets/logos/lightmode-logo.svg";
-import { Menu, X } from "lucide-react";
+import darkLogo from "../../../assets/logos/darkmode-logo.svg";
+import { Menu, ShoppingCart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../../../context/CartContext";
 import Button from "../../Button/Button";
 import "./CustomerTopNavbar.css";
 
@@ -15,7 +16,7 @@ type TopNavbarProps = {
 
 const navLinks = [
   { label: "Browse Pets", href: "/explore-pets" },
-  { label: "Services", href: "#services" },
+  { label: "Services", href: "/services" },
   { label: "Merchandise", href: "/merchandise" },
   { label: "Become a Vendor", href: "/vendor" },
   { label: "Help Center", href: "#" },
@@ -29,18 +30,13 @@ const TopNavbar = ({
 }: TopNavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { cartCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const hash = location.hash;
   const path = location.pathname;
   const isLandingPage = path === "/";
-  const isExplorePetsPage = path === "/explore-pets";
-  const isMerchandisePage = path === "/merchandise";
   const isVendorLandingPage = path === "/vendor";
-  const isTransparentPage =
-    isLandingPage ||
-    isExplorePetsPage ||
-    isMerchandisePage ||
-    isVendorLandingPage;
+  const isLightBackgroundPage = !isLandingPage && !isVendorLandingPage;
 
   const useDarkLogo = isLandingPage && !isScrolled;
   const useMobileLightLogo = isVendorLandingPage && !isScrolled;
@@ -64,9 +60,9 @@ const TopNavbar = ({
 
   const navbarClass = [
     "top-navbar",
-    isTransparentPage ? "top-navbar--transparent" : "",
-    isExplorePetsPage || isMerchandisePage ? "top-navbar--explore" : "",
-    isTransparentPage && isScrolled ? "top-navbar--scrolled" : "",
+    "top-navbar--transparent",
+    isLightBackgroundPage ? "top-navbar--light-background" : "",
+    isScrolled ? "top-navbar--scrolled" : "",
     isLandingPage && !isScrolled ? "top-navbar--glow" : "",
     isVendorLandingPage && !isScrolled ? "top-navbar--band" : "",
   ]
@@ -122,6 +118,9 @@ const TopNavbar = ({
               onClick={() => {
                 navigate(
                   audience === "vendor" ? "/vendor/login" : "/customer-login",
+                  audience === "customer" && path === "/customer/cart"
+                    ? { state: { from: location } }
+                    : undefined,
                 );
               }}
             >
@@ -133,6 +132,9 @@ const TopNavbar = ({
               onClick={() => {
                 navigate(
                   audience === "vendor" ? "/vendor/register" : "/registration",
+                  audience === "customer" && path === "/customer/cart"
+                    ? { state: { from: location } }
+                    : undefined,
                 );
               }}
             >
@@ -153,6 +155,23 @@ const TopNavbar = ({
           >
             {audience === "vendor" ? "Vendor Dashboard" : "Go to Dashboard"}
           </Button>
+        )}
+
+        {audience === "customer" && (
+          <Link
+            to="/customer/cart"
+            className="cart-nav-link"
+            aria-label={`Shopping cart${cartCount ? `, ${cartCount} ${cartCount === 1 ? "item" : "items"}` : ""}`}
+            aria-current={path === "/customer/cart" ? "page" : undefined}
+            title="Shopping cart"
+          >
+            <ShoppingCart size={21} aria-hidden="true" />
+            {cartCount > 0 && (
+              <span className="cart-nav-badge" aria-hidden="true">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
         )}
 
         {audience === "customer" && (

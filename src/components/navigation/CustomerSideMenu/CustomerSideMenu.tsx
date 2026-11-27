@@ -1,6 +1,6 @@
 import logo from "../../../assets/logos/lightmode-logo.svg";
 import { X, HelpCircle } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./CustomerSidemenu.css";
 
 type SideMenuProps = {
@@ -17,6 +17,7 @@ const SideMenu = ({
   onClose,
 }: SideMenuProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   if (!isOpen) return null;
   const customer = audience === "customer";
   const homeHash = (hash: string) => `/${hash}`;
@@ -91,6 +92,9 @@ const SideMenu = ({
                   onClose();
                   navigate(
                     audience === "vendor" ? "/vendor/login" : "/customer-login",
+                    audience === "customer" && location.pathname === "/customer/cart"
+                      ? { state: { from: location } }
+                      : undefined,
                   );
                 }}
               >
@@ -105,6 +109,9 @@ const SideMenu = ({
                     audience === "vendor"
                       ? "/vendor/register"
                       : "/registration",
+                    audience === "customer" && location.pathname === "/customer/cart"
+                      ? { state: { from: location } }
+                      : undefined,
                   );
                 }}
               >

@@ -59,6 +59,13 @@ type CartContextType = {
   clearError: () => void;
 };
 
+const EMPTY_CART = {
+  items: [] as CartItem[],
+  total_quantity: 0,
+  total: "0.00",
+  has_unavailable_items: false,
+};
+
 // Create the context.
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -109,6 +116,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       updateCartState(cart);
     } catch (err) {
+      // If merging fails after a login, replace any guest data still in memory
+      // with a fresh account cart. Never let checkout use a stale guest snapshot.
+      if (role === "CUSTOMER") {
+        try {
+          updateCartState(await getCart());
+        } catch {
+          updateCartState(EMPTY_CART);
+        }
+      } else {
+        updateCartState(EMPTY_CART);
+      }
+
       setError(
         err instanceof Error ? err.message : "Could not load your cart."
       );

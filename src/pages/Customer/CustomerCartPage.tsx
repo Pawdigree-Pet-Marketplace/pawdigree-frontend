@@ -276,6 +276,7 @@ export default function CustomerCartPage() {
 
                   <Link
                     to="/login"
+                    state={{ from: { pathname: "/customer/checkout" } }}
                     className="customer-cart-button"
                   >
                     Log In to Checkout
@@ -283,6 +284,7 @@ export default function CustomerCartPage() {
 
                   <Link
                     to="/registration"
+                    state={{ from: { pathname: "/customer/checkout" } }}
                     className="customer-cart-register-link"
                   >
                     Create an Account
