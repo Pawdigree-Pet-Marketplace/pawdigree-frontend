@@ -1,5 +1,5 @@
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   fireEvent,
   render,
@@ -45,6 +45,8 @@ const renderPage = () =>
 
 describe("MyBookingsPage", () => {
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-25T12:00:00Z"));
     vi.clearAllMocks();
 
     vi.mocked(fetchCustomerBookings).mockResolvedValue([mockBooking]);
@@ -69,6 +71,10 @@ describe("MyBookingsPage", () => {
       status: "pending",
       status_display: "Pending",
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("shows a loading message while bookings are being fetched", () => {
@@ -264,6 +270,27 @@ describe("MyBookingsPage", () => {
       screen.queryByRole("button", { name: /reschedule/i }),
     ).not.toBeInTheDocument();
 
+    expect(
+      screen.queryByRole("button", { name: /cancel booking/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not show management actions for past pending bookings", async () => {
+    vi.mocked(fetchCustomerBookings).mockResolvedValue([
+      {
+        ...mockBooking,
+        start_at: "2026-11-24T10:00:00Z",
+        end_at: "2026-11-24T11:00:00Z",
+      },
+    ]);
+
+    renderPage();
+
+    expect(await screen.findByText("Pet Grooming")).toBeInTheDocument();
+    expect(screen.getByText("Pending")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /reschedule/i }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /cancel booking/i }),
     ).not.toBeInTheDocument();

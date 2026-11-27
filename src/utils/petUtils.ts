@@ -94,7 +94,7 @@ export function paramsToQuery(search: string): PetQuery {
   const species = (p.get("species") ?? "")
     .split(",")
     .filter((s): s is SpeciesKey => SPECIES.some((x) => x.key === s));
-  const listing = p.get("listing_type");
+  const listing = p.get("listing_type")?.toUpperCase();
   const gender = p.get("gender");
   const sort = p.get("sort");
   const page = Number(p.get("page"));
