@@ -12,6 +12,7 @@ describe("CustomerDashboardNav notifications link", () => {
     render(<MemoryRouter initialEntries={["/customer/dashboard"]}><CustomerDashboardNav /></MemoryRouter>);
     const link = screen.getByRole("link", { name: /notifications/i });
     expect(link).toHaveAttribute("href", "/customer/notifications");
+    expect(screen.getByRole("link", { name: /cart/i })).toHaveAttribute("href", "/customer/cart");
     expect(await screen.findByLabelText("4 unread")).toBeInTheDocument();
   });
 });

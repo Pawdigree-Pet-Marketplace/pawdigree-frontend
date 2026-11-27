@@ -1,9 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
 afterEach(() => {
+  cleanup();
   localStorage.clear();
   sessionStorage.clear();
 });
@@ -67,5 +68,23 @@ describe("ProtectedRoute", () => {
     renderRoute("VENDOR", "/customer/my-requests");
     expect(screen.getByRole("heading", { name: /you can’t access this page/i })).toBeInTheDocument();
     expect(screen.queryByText("Customer adoption requests")).not.toBeInTheDocument();
+  });
+
+  it("preserves the checkout destination when redirecting an anonymous visitor to login", () => {
+    function DestinationProbe() {
+      const location = useLocation();
+      return <output data-testid="protected-destination">{JSON.stringify(location.state)}</output>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={["/customer/checkout"]}>
+        <Routes>
+          <Route path="/customer/checkout" element={<ProtectedRoute role="CUSTOMER"><p>Checkout</p></ProtectedRoute>} />
+          <Route path="/login" element={<DestinationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId("protected-destination")).toHaveTextContent('"pathname":"/customer/checkout"');
   });
 });

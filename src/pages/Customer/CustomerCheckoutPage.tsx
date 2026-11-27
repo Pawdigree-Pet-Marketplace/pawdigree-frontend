@@ -34,6 +34,7 @@ export default function CustomerCheckoutPage() {
     cartTotal,
     hasUnavailableItems,
     loading,
+    error: cartError,
   } = useCart();
 
   const hasPetItems = cartItems.some(
@@ -339,6 +340,14 @@ export default function CustomerCheckoutPage() {
 
           <PawPrint aria-hidden="true" />
         </header>
+
+        {cartError && (
+          <div className="customer-checkout-error" role="alert">
+            Cart synchronization had a problem. Please review your cart before
+            continuing. {cartError}
+            <Link to="/customer/cart">Review Cart</Link>
+          </div>
+        )}
 
         {loading ? (
           <section className="customer-checkout-message">
