@@ -344,7 +344,9 @@ describe("VendorAddServicePage", () => {
       screen.getByRole("spinbutton", { name: /duration \(minutes\)/i }),
       { target: { value: "60" } },
     );
-    fireEvent.click(screen.getByRole("button", { name: /save service/i }));
+    const saveButton = screen.getByRole("button", { name: /save service/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
     expect(
       await screen.findByText(
         "Description must be 300 words or fewer (you wrote 312).",
