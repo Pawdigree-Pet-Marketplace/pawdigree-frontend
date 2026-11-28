@@ -754,6 +754,14 @@
     gap: 8px;
   }
 
+  .customer-cart-clear-button,
+  .customer-cart-continue-link {
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+}
+
 /* Match the shared marketplace page frame, hero, and typography. */
 .customer-cart-layout {
   width: min(1316px, calc(100% - 48px));
