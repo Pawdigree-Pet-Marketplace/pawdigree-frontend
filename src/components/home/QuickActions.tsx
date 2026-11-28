@@ -1,13 +1,10 @@
 import { useEffect, useRef, type CSSProperties } from "react";
-import { HeartHandshake, PawPrint, Scissors, ShoppingBag, Store } from "lucide-react";
+import { HeartHandshake, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./QuickActions.css";
 
 const actions = [
   { label: "Meet Vendors", detail: "Trusted pet businesses", href: "/vendors", Icon: Store },
-  { label: "Explore Pets", detail: "Find your new companion", href: "/explore-pets", Icon: PawPrint },
-  { label: "Shop Products", detail: "Essentials for every pet", href: "/merchandise", Icon: ShoppingBag },
-  { label: "Find Services", detail: "Care from local experts", href: "/services", Icon: Scissors },
   { label: "Adoption", detail: "Give a pet a home", href: "/explore-pets?listing_type=adoption", Icon: HeartHandshake },
 ];
 
@@ -33,11 +30,7 @@ export default function QuickActions() {
   }, []);
 
   return (
-    <section className="quick-actions" ref={sectionRef} aria-labelledby="quick-actions-title">
-      <div className="quick-actions-heading">
-        <span className="quick-actions-eyebrow">Your next step</span>
-        <h2 id="quick-actions-title">Explore Pawdigree</h2>
-      </div>
+    <section className="quick-actions" ref={sectionRef} aria-label="Homepage quick actions">
       <nav className="quick-actions-grid" aria-label="Quick actions">
         {actions.map(({ label, detail, href, Icon }, index) => (
           <Link className="quick-action-card" to={href} key={label} style={{ "--quick-action-index": index } as CSSProperties}>

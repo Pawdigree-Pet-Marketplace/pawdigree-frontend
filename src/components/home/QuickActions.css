@@ -2,42 +2,22 @@
   position: relative;
   z-index: 1;
   width: min(100% - 48px, 940px);
-  margin: 25px auto 0;
+  margin: 0 auto;
   color: var(--ink, #2c302f);
-}
-
-.quick-actions-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 9px;
-  margin-bottom: 10px;
-}
-
-.quick-actions-eyebrow {
-  color: #216c68;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .11em;
-  text-transform: uppercase;
-}
-
-.quick-actions-heading h2 {
-  margin: 0;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .quick-actions-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 700px;
   gap: 10px;
+  margin: 0 auto;
 }
 
 .quick-action-card {
   --action-accent: #216c68;
   display: flex;
+  min-height: 72px;
   min-width: 0;
   align-items: center;
   gap: 10px;
@@ -86,9 +66,6 @@
 }
 
 .quick-action-card:nth-child(2) .quick-action-icon { background: #fff0e9; color: #bb573c; }
-.quick-action-card:nth-child(3) .quick-action-icon { background: #fff5d9; color: #9a6a12; }
-.quick-action-card:nth-child(4) .quick-action-icon { background: #edf0ff; color: #5459a8; }
-.quick-action-card:nth-child(5) .quick-action-icon { background: #fcebf0; color: #a84360; }
 .quick-action-card:hover .quick-action-icon { transform: rotate(-6deg) scale(1.08); }
 
 .quick-action-copy { display: grid; min-width: 0; gap: 3px; }
@@ -103,20 +80,15 @@
 }
 
 @media (max-width: 900px) {
-  .quick-actions { width: min(100% - 40px, 680px); margin-top: 18px; }
-  .quick-actions-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .quick-actions { width: min(100% - 40px, 680px); }
+  .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .quick-action-card { padding: 10px; }
 }
 
 @media (max-width: 600px) {
-  .quick-actions { width: 100%; margin: 18px auto 0; }
-  .quick-actions-heading { margin-bottom: 8px; }
-  .quick-actions-heading h2 { font-size: 14px; }
-  .quick-actions-eyebrow { font-size: 10px; }
-  .quick-actions-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-  .quick-action-card { grid-column: span 2; min-height: 76px; padding: 9px; border-radius: 13px; gap: 8px; }
-  .quick-action-card:nth-child(4) { grid-column: 2 / span 2; }
-  .quick-action-card:nth-child(5) { grid-column: 4 / span 2; }
+  .quick-actions { width: 100%; margin: 0 auto; }
+  .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .quick-action-card { min-height: 76px; padding: 9px; border-radius: 13px; gap: 8px; }
   .quick-action-icon { width: 32px; height: 32px; border-radius: 10px; }
   .quick-action-icon svg { width: 18px; height: 18px; }
   .quick-action-copy strong { font-size: 11px; }

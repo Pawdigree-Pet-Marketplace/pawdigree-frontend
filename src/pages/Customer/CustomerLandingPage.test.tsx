@@ -45,12 +45,13 @@ describe("LandingPage", () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole("navigation", { name: "Quick actions" })).toBeInTheDocument();
+    const quickActions = screen.getByRole("navigation", { name: "Quick actions" });
+    expect(quickActions).toBeInTheDocument();
+    expect(quickActions.querySelectorAll("a")).toHaveLength(2);
     expect(screen.getByRole("link", { name: /meet vendors/i })).toHaveAttribute("href", "/vendors");
-    expect(screen.getByRole("link", { name: /explore pets/i })).toHaveAttribute("href", "/explore-pets");
-    expect(screen.getByRole("link", { name: /shop products/i })).toHaveAttribute("href", "/merchandise");
-    expect(screen.getByRole("link", { name: /find services/i })).toHaveAttribute("href", "/services");
     expect(screen.getByRole("link", { name: /^adoption/i })).toHaveAttribute("href", "/explore-pets?listing_type=adoption");
+    expect(screen.queryByText(/your next step/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Explore Pawdigree" })).not.toBeInTheDocument();
 
     expect(
       screen.getAllByRole("link", {
