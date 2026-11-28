@@ -38,6 +38,7 @@ const implementedVendorPages = new Set([
   "/vendor/availability",
   "/vendor/orders",
   "/vendor/notifications",
+  "/vendor/messages",
 ]);
 const navigationGroups = [
   {
@@ -112,18 +113,37 @@ const navigationGroups = [
   },
 ];
 
+const mainVendorNavigationGroups = [
+  {
+    title: "VENDOR",
+    items: [
+      { label: "Dashboard", path: "/vendor/dashboard", icon: LayoutDashboard },
+      { label: "My Businesses", path: "/vendor/business-profile", icon: BriefcaseBusiness },
+      { label: "Customer Messages", path: "/vendor/messages", icon: MessageCircle },
+      { label: "Notifications", path: "/vendor/notifications", icon: Bell },
+      { label: "My Profile", path: "/vendor/profile", icon: UserRound },
+    ],
+  },
+];
+
 type VendorSidebarProps = {
   currentPath?: string;
+  mainVendorDashboard?: boolean;
 };
 
 export default function VendorSidebar({
   currentPath: providedPath,
+  mainVendorDashboard = false,
 }: VendorSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const business = useVendorBusiness();
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const currentPath = providedPath ?? location.pathname;
+  const centralPaths = ["/vendor/dashboard", "/vendor/business-profile", "/vendor/profile", "/vendor/notifications", "/vendor/messages", "/vendor/reviews"];
+  const visibleNavigationGroups = mainVendorDashboard || centralPaths.includes(location.pathname)
+    ? mainVendorNavigationGroups
+    : navigationGroups;
   function handleLogout() {
     clearAuthSession();
     navigate("/vendor/login", { replace: true });
@@ -169,7 +189,7 @@ export default function VendorSidebar({
       </Link>
 
       <nav className="dashboard-navigation" aria-label="Vendor navigation">
-        {navigationGroups.map((group) => {
+        {visibleNavigationGroups.map((group) => {
           const scopedItems = group.items.filter((item) => {
             if (!business) return item.path !== "/vendor/services/catalog";
             if (item.path === "/vendor/listings" || item.path === "/vendor/adoption-applications") return business.business_type === "PET_SALE_ADOPTION";
@@ -312,7 +332,7 @@ const scopedPath: string = (() => {
                   className={`dashboard-nav-item${isActive ? " active" : ""}`}
                   aria-current={isActive ? "page" : undefined}
                   title={item.label}
-                  data-vendor-tour={item.path === "/vendor/listings" ? "pets" : item.path === "/vendor/services/catalog" ? "services" : item.path === "/vendor/orders" ? "orders-navigation" : undefined}
+                  data-vendor-tour={item.path === "/vendor/listings" ? "pets" : item.path === "/vendor/services/catalog" ? "services" : item.path === "/vendor/orders" ? "orders-navigation" : item.path === "/vendor/notifications" ? "notifications" : item.path === "/vendor/profile" ? "profile" : undefined}
                 >
                   {itemContent}
                 </Link>

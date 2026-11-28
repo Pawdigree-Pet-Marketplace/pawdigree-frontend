@@ -60,6 +60,7 @@ import VendorChangeRequests from "./pages/Vendor/VendorChangeRequests";
 import VendorMerchandisePage from "./pages/Vendor/VendorMerchandisePage";
 import VendorStoreProfilePage from "./pages/Vendor/VendorStoreProfilePage";
 import VendorProfilePage from "./pages/Vendor/VendorProfilePage";
+import VendorDashboardCapabilityPage from "./pages/Vendor/VendorDashboardCapabilityPage";
 import { VendorBusinessRoute } from "./services/vendorBusinessContext";
 function App() {
   return (
@@ -260,6 +261,26 @@ function App() {
         element={
           <ProtectedRoute role="VENDOR">
             <VendorNotificationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/messages"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorDashboardCapabilityPage title="Customer Messages" description="Customer conversations across your businesses.">
+              General customer conversations are not supported by the current API. This page does not combine adoption application messages with general conversations.
+            </VendorDashboardCapabilityPage>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vendor/reviews"
+        element={
+          <ProtectedRoute role="VENDOR">
+            <VendorDashboardCapabilityPage title="Reviews" description="Reviews associated with your businesses.">
+              The current API provides reviews by individual item and does not expose a vendor-wide review list. A central reviews feed cannot be loaded from the available endpoints.
+            </VendorDashboardCapabilityPage>
           </ProtectedRoute>
         }
       />

@@ -1,207 +1,153 @@
-
 import { useEffect, useState } from "react";
-import {
-  CalendarCheck,
-  DollarSign,
-  ExternalLink,
-  Package,
-  ShoppingCart,
-  Wallet,
-} from "lucide-react";
+import { CalendarCheck, DollarSign, MessageCircle, ShoppingCart, Star, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import VendorLayout from "../../layouts/VendorLayout/VendorLayout";
 import { apiRequest } from "../../services/api";
 import { useVendorBusinesses, useVendorBusiness } from "../../services/vendorBusinessStore";
 import VendorDashboardTour from "../../components/vendor/VendorDashboardTour/VendorDashboardTour";
 import { VendorBusinessList } from "../../components/vendor/VendorBusinessSwitcher/VendorBusinessSwitcher";
-import { getMerchandise, type Merchandise } from "../../services/merchandiseApi";
+import {
+  fetchVendorDashboardBookings,
+  fetchVendorDashboardOrders,
+  fetchVendorDashboardPetSales,
+  type VendorBookingActivity,
+  type VendorSale,
+} from "../../services/vendorDashboardApi";
 import "./VendorDashboardPage.css";
 
+type MetricState = "loading" | "loaded" | "error";
 const metrics = [
-  { icon: DollarSign, label: "Total Sales", tone: "teal" },
-  { icon: ShoppingCart, label: "Orders", tone: "coral" },
-  { icon: Wallet, label: "Revenue (net)", tone: "green" },
-  { icon: CalendarCheck, label: "Pending Bookings", tone: "red" },
+  { icon: DollarSign, label: "Total Sales", value: "Unavailable", note: "Current APIs do not expose a complete vendor sales total.", key: "sales" },
+  { icon: ShoppingCart, label: "Orders", value: "—", note: "Paid merchandise orders plus paid pet sales; unpaid reservations are excluded.", key: "orders" },
+  { icon: Wallet, label: "Revenue (Net)", value: "Unavailable", note: "Net revenue cannot be calculated from current API data.", key: "revenue" },
+  { icon: CalendarCheck, label: "Pending Bookings", value: "—", note: "Bookings awaiting a vendor decision.", key: "bookings" },
 ];
+
+function dateLabel(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Date unavailable" : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
+function readableStatus(value: string) {
+  return value.replaceAll("_", " ").toLowerCase().replace(/^\w/, (letter) => letter.toUpperCase());
+}
 
 function VendorDashboardPage() {
   const activeBusiness = useVendorBusiness();
   const { businesses, loading: businessesLoading, error: businessesError } = useVendorBusinesses();
   const [firstName, setFirstName] = useState("");
   const [vendorId, setVendorId] = useState("");
-  const [merchandise, setMerchandise] = useState<Merchandise[]>([]);
-  const [merchandiseLoading, setMerchandiseLoading] = useState(true);
-  const [merchandiseLoadError, setMerchandiseLoadError] = useState(false);
-  const token =
-    localStorage.getItem("token") ||
-    sessionStorage.getItem("token");
-
-  const role =
-    localStorage.getItem("role") ||
-    sessionStorage.getItem("role");
-  const eligibleBusinessIds = new Set(businesses.filter((business) => business.business_type === "PRODUCT_SELLER").map((business) => String(business.id)));
-  const eligibleMerchandise = merchandise.filter((product) => eligibleBusinessIds.has(String(product.business)));
+  const [orders, setOrders] = useState<VendorSale[]>([]);
+  const [bookings, setBookings] = useState<VendorBookingActivity[]>([]);
+  const [orderCount, setOrderCount] = useState<number | null>(null);
+  const [pendingBookingCount, setPendingBookingCount] = useState<number | null>(null);
+  const [ordersState, setOrdersState] = useState<MetricState>("loading");
+  const [bookingsState, setBookingsState] = useState<MetricState>("loading");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const role = localStorage.getItem("role") || sessionStorage.getItem("role");
 
   useEffect(() => {
     if (!token || role !== "VENDOR") return;
-
     let cancelled = false;
-
     void apiRequest<{ first_name?: string; id?: string | number }>("/auth/current-user/", {
       headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((user) => {
-        if (!cancelled) {
-          setFirstName(user.first_name?.trim() ?? "");
-          setVendorId(user.id === undefined ? "" : String(user.id));
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setFirstName("");
-      });
-
-    return () => {
-      cancelled = true;
-    };
+    }).then((user) => {
+      if (!cancelled) {
+        setFirstName(user.first_name?.trim() ?? "");
+        setVendorId(user.id === undefined ? "" : String(user.id));
+      }
+    }).catch(() => { if (!cancelled) setFirstName(""); });
+    return () => { cancelled = true; };
   }, [token, role]);
 
   useEffect(() => {
     if (!token || role !== "VENDOR") return;
     let cancelled = false;
-    void getMerchandise()
-      .then((products) => {
+    void Promise.all([fetchVendorDashboardOrders(), fetchVendorDashboardPetSales(), fetchVendorDashboardPetSales("PAID")])
+      .then(([productOrders, petSales, paidPetSales]) => {
         if (!cancelled) {
-          setMerchandise(products);
-          setMerchandiseLoadError(false);
-          setMerchandiseLoading(false);
+          setOrders([...productOrders.results, ...petSales.results].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)).slice(0, 5));
+          // Orders counts vendor-order records: paid merchandise rows plus paid pet-sale rows.
+          // The two backend queries are item-type exclusive; RESERVED pet holds are excluded.
+          setOrderCount(productOrders.count + paidPetSales.count);
+          setOrdersState("loaded");
         }
       })
-      .catch(() => {
+      .catch(() => { if (!cancelled) setOrdersState("error"); });
+    void Promise.all([fetchVendorDashboardBookings(), fetchVendorDashboardBookings("pending")])
+      .then(([recent, pending]) => {
         if (!cancelled) {
-          setMerchandiseLoadError(true);
-          setMerchandiseLoading(false);
+          setBookings(recent.results);
+          setPendingBookingCount(pending.count);
+          setBookingsState("loaded");
         }
-      });
+      })
+      .catch(() => { if (!cancelled) setBookingsState("error"); });
     return () => { cancelled = true; };
   }, [token, role]);
-  if (!token || role !== "VENDOR") {
-    return null;
-  }
+
+  if (!token || role !== "VENDOR") return null;
 
   return (
     <VendorLayout
       title={`Welcome back, ${firstName || "there"}`}
-      description="Here's how your store is doing today"
-      businessName={activeBusiness?.name ?? "Your store"}
+      description="Here's how your businesses are doing today"
+      businessName={activeBusiness?.name ?? "Your businesses"}
       vendorWorkspace
+      mainVendorDashboard
     >
       <div className="dashboard-content">
         <VendorBusinessList businesses={businesses} loading={businessesLoading} error={businessesError} />
-        {/* METRIC CARDS */}
-        <section
-          className="dashboard-metrics"
-          aria-label="Store metrics"
-          data-vendor-tour="overview"
-        >
+
+        <section className="dashboard-metrics" aria-label="Vendor-wide summary" data-vendor-tour="overview">
           {metrics.map((metric) => {
-            const MetricIcon = metric.icon;
-
-            return (
-              <article
-                className="dashboard-metric-card"
-                key={metric.label}
-              >
-                <span
-                  className={`dashboard-metric-icon ${metric.tone}`}
-                  aria-hidden="true"
-                >
-                  <MetricIcon size={18} strokeWidth={1.9} />
-                </span>
-
-                <strong aria-label={`${metric.label} not available`}>—</strong>
-
-                <div className="dashboard-metric-bottom">
-                  <span>{metric.label}</span>
-
-                </div>
-              </article>
-            );
+            const Icon = metric.icon;
+            const state = metric.key === "orders" ? ordersState : metric.key === "bookings" ? bookingsState : "loaded";
+            const value = metric.key === "orders"
+              ? state === "loading" ? "…" : state === "error" ? "Unavailable" : orderCount ?? 0
+              : metric.key === "bookings"
+                ? state === "loading" ? "…" : state === "error" ? "Unavailable" : pendingBookingCount ?? 0
+                : metric.value;
+            return <article className="dashboard-metric-card" key={metric.label}>
+              <span className={`dashboard-metric-icon ${metric.key}`} aria-hidden="true"><Icon size={18} strokeWidth={1.9} /></span>
+              <strong>{value}</strong>
+              <div className="dashboard-metric-bottom"><span>{metric.label}</span></div>
+              <p className="dashboard-metric-note">{metric.key === "orders" && state === "error" || metric.key === "bookings" && state === "error" ? "Could not load this figure." : metric.note}</p>
+            </article>;
           })}
         </section>
 
-        <section className="dashboard-panel dashboard-merchandise-panel" aria-labelledby="dashboard-merchandise-title" data-vendor-tour="merchandise">
-          <div className="dashboard-merchandise-heading">
-            <div>
-              <span className="dashboard-metric-icon" aria-hidden="true"><Package size={18} strokeWidth={1.9} /></span>
-              <h2 id="dashboard-merchandise-title">MERCHANDISE · VENDOR-WIDE</h2>
-            </div>
-            <Link className="dashboard-merchandise-link" to="/vendor/merchandise">
-              Manage Merchandise <ExternalLink size={15} aria-hidden="true" />
-            </Link>
-          </div>
-          {merchandiseLoading || businessesLoading ? (
-            <p className="dashboard-merchandise-message" role="status">Loading merchandise totals…</p>
-          ) : merchandiseLoadError || businessesError ? (
-            <p className="dashboard-merchandise-message" role="status">Merchandise totals could not be loaded.</p>
-          ) : (
-            <div className="dashboard-merchandise-stats" aria-label="Merchandise totals">
-              <div><strong>{eligibleMerchandise.length}</strong><span>Total products</span></div>
-              <div><strong>{eligibleMerchandise.filter((product) => product.is_active).length}</strong><span>Active</span></div>
-              <div><strong>{eligibleMerchandise.filter((product) => !product.is_active).length}</strong><span>Inactive</span></div>
-              <div><strong>{eligibleMerchandise.filter((product) => !product.approved && !product.rejection_reason).length}</strong><span>Awaiting approval</span></div>
-            </div>
-          )}
+        <section className="dashboard-panel dashboard-orders-panel" aria-labelledby="recent-orders-title" data-vendor-tour="recent-orders">
+          <div className="dashboard-activity-heading"><h2 id="recent-orders-title">RECENT ORDERS</h2><Link to="/vendor/orders">View all</Link></div>
+          {ordersState === "loading" ? <p className="dashboard-activity-state" role="status">Loading recent orders…</p>
+            : ordersState === "error" ? <p className="dashboard-activity-state" role="alert">Orders could not be loaded. Please try again later.</p>
+              : orders.length === 0 ? <p className="dashboard-activity-state">No recent orders or pet sales.</p>
+                : <div className="dashboard-table-wrapper"><table className="dashboard-orders-table"><thead><tr><th>REFERENCE</th><th>CUSTOMER</th><th>BUSINESS</th><th>DATE</th><th>STATUS</th></tr></thead>
+                  <tbody>{orders.map((item) => <tr key={`order-${item.id}`}><td>#{item.order_id}</td><td>{item.customer?.name || "Customer"}</td><td>{item.business_name}</td><td>{dateLabel(item.created_at)}</td><td>{readableStatus(item.sale_state === "RESERVED" ? "RESERVED" : item.status)}</td></tr>)}</tbody></table></div>}
         </section>
 
-        {/* SALES CHART AND STOCK ALERTS */}
-        <section className="dashboard-analytics">
-          <article className="dashboard-panel dashboard-sales-panel" data-vendor-tour="sales">
-            <h2>SALES — LAST 7 DAYS</h2>
-
-            <div className="dashboard-chart dashboard-empty-chart">
-              <p className="dashboard-empty-state">Sales history will appear here when store activity is available.</p>
-            </div>
-          </article>
-
-          <article className="dashboard-panel dashboard-stock-panel">
-            <h2>LOW STOCK ALERTS</h2>
-
-            <p className="dashboard-empty-state dashboard-stock-empty">Stock alerts will appear here when inventory data is available.</p>
-          </article>
+        <section className="dashboard-panel dashboard-orders-panel" aria-labelledby="recent-bookings-title" data-vendor-tour="recent-bookings">
+          <div className="dashboard-activity-heading"><h2 id="recent-bookings-title">RECENT BOOKINGS</h2><Link to="/vendor/orders">View all</Link></div>
+          {bookingsState === "loading" ? <p className="dashboard-activity-state" role="status">Loading recent bookings…</p>
+            : bookingsState === "error" ? <p className="dashboard-activity-state" role="alert">Bookings could not be loaded. Please try again later.</p>
+              : bookings.length === 0 ? <p className="dashboard-activity-state">No recent bookings.</p>
+                : <div className="dashboard-table-wrapper"><table className="dashboard-orders-table"><thead><tr><th>CUSTOMER</th><th>BUSINESS</th><th>SERVICE</th><th>BOOKING TIME</th><th>STATUS</th></tr></thead>
+                  <tbody>{bookings.map((item) => <tr key={`booking-${item.booking_id}`}><td>{item.customer?.name || "Customer"}</td><td>{item.business_name}</td><td>{item.service_name}</td><td>{dateLabel(item.start_at)}</td><td>{readableStatus(item.status)}</td></tr>)}</tbody></table></div>}
         </section>
 
-        {/* RECENT ORDERS */}
-        <section className="dashboard-panel dashboard-orders-panel">
-          <h2>RECENT ORDERS & BOOKINGS</h2>
+        <section className="dashboard-panel dashboard-capability-panel" aria-labelledby="recent-messages-title" data-vendor-tour="messages">
+          <div className="dashboard-activity-heading"><h2 id="recent-messages-title"><MessageCircle size={17} /> RECENT CUSTOMER MESSAGES</h2><Link to="/vendor/messages">View all</Link></div>
+          <p className="dashboard-activity-state">General customer conversations are not available in the current services. Adoption information exchanges remain available in the <Link to="/vendor/adoption-applications">adoption applications workflow</Link>.</p>
+        </section>
 
-          <div className="dashboard-table-wrapper">
-            <table className="dashboard-orders-table">
-              <thead>
-                <tr>
-                  <th>ORDER</th>
-                  <th>CUSTOMER</th>
-                  <th>TYPE</th>
-                  <th>AMOUNT</th>
-                  <th>STATUS</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td colSpan={5} className="dashboard-activity-empty">
-                    Recent order and booking activity will appear here when it is available.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <section className="dashboard-panel dashboard-capability-panel" aria-labelledby="recent-reviews-title" data-vendor-tour="reviews">
+          <div className="dashboard-activity-heading"><h2 id="recent-reviews-title"><Star size={17} /> RECENT REVIEWS</h2><Link to="/vendor/reviews">View all</Link></div>
+          <p className="dashboard-activity-state">The current review APIs list reviews for individual items; they do not provide a vendor-wide review feed.</p>
         </section>
       </div>
-      <VendorDashboardTour vendorId={vendorId} businessTypes={businesses.map((business) => business.business_type ?? "")} />
+      <VendorDashboardTour vendorId={vendorId} />
     </VendorLayout>
   );
 }
 
 export default VendorDashboardPage;
-
-

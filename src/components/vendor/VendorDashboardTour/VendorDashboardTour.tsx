@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./VendorDashboardTour.css";
 
-type Step = { selector?: string; title: string; description: string; types?: string[] };
+type Step = { selector?: string; title: string; description: string };
 type Placement = "top" | "bottom" | "left" | "right";
 type CardPosition = { top: number; left: number; placement: Placement };
 const TOUR_GAP = 12;
@@ -44,23 +44,24 @@ function placeTourCard(target: DOMRect, cardWidth: number, cardHeight: number, v
 }
 
 const steps: Step[] = [
-  { title: "Welcome to Pawdigree", description: "This short tour shows you where to manage your business and review store activity." },
-  { selector: "[data-vendor-tour='overview']", title: "Dashboard overview", description: "See your key store activity and the latest summaries." },
-  { selector: "[data-vendor-tour='businesses']", title: "My Businesses", description: "Choose a business to open its dashboard, or manage your business details." },
-  { selector: "[data-vendor-tour='merchandise']", title: "Merchandise", description: "Review vendor-wide product totals and manage merchandise for a product seller.", types: ["PRODUCT_SELLER"] },
-  { selector: "[data-vendor-tour='pets']", title: "Pet listings", description: "Manage your pet listings and adoption applications.", types: ["PET_SALE_ADOPTION"] },
-  { selector: "[data-vendor-tour='services']", title: "Services", description: "Manage the services offered by your service provider business.", types: ["SERVICE_PROVIDER"] },
-  { selector: "[data-vendor-tour='orders-navigation']", title: "Orders and bookings", description: "Open your customer orders and booking workspace." },
-  { selector: "[data-vendor-tour='sales']", title: "Sales and payouts", description: "Sales summaries are shown here when activity data is available." },
+  { title: "Welcome to Your Dashboard", description: "Your main dashboard is the central place to monitor activity across all your businesses." },
+  { selector: "[data-vendor-tour='businesses']", title: "My Businesses", description: "View and register businesses, open an individual business dashboard, or switch between businesses." },
+  { selector: "[data-vendor-tour='overview']", title: "Dashboard Statistics", description: "These cards summarize activity across your businesses, including sales, orders, net revenue, and pending bookings. Some financial figures may be unavailable when the current data cannot support an accurate total." },
+  { selector: "[data-vendor-tour='recent-orders']", title: "Recent Orders", description: "Monitor recent merchandise orders and pet sales across your businesses." },
+  { selector: "[data-vendor-tour='recent-bookings']", title: "Recent Bookings", description: "Review recent customer bookings across businesses without opening each business dashboard." },
+  { selector: "[data-vendor-tour='messages']", title: "Customer Messages", description: "This is the central place intended for conversations associated with your businesses. General conversations are not available yet; adoption messages remain in their existing application workflow." },
+  { selector: "[data-vendor-tour='reviews']", title: "Recent Reviews", description: "This overview is intended to bring reviews from your businesses together while keeping each review connected to the business and item it concerns. A vendor-wide review feed is not available yet." },
+  { selector: "[data-vendor-tour='notifications']", title: "Notifications", description: "Open account-wide notifications to stay informed about activity across your businesses." },
+  { selector: "[data-vendor-tour='profile']", title: "My Profile", description: "Access and manage your personal vendor account information here." },
 ];
 
-export default function VendorDashboardTour({ vendorId, businessTypes }: { vendorId: string; businessTypes: string[] }) {
+export default function VendorDashboardTour({ vendorId }: { vendorId: string }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [index, setIndex] = useState(-1);
   const [position, setPosition] = useState<CardPosition>({ top: 100, left: 24, placement: "bottom" });
   const cardRef = useRef<HTMLElement | null>(null);
-  const visibleSteps = useMemo(() => steps.filter((step) => !step.types || businessTypes.some((type) => step.types?.includes(type))), [businessTypes]);
+  const visibleSteps = steps;
   const storageKey = vendorId ? `pawdigree:vendor-dashboard-tour:${vendorId}` : "";
 
   useEffect(() => {

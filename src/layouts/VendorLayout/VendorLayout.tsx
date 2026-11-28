@@ -12,6 +12,7 @@ type VendorLayoutProps = {
   businessName?: string;
   vendorWorkspace?: boolean;
   showBusinessSwitcher?: boolean;
+  mainVendorDashboard?: boolean;
 };
 
 export default function VendorLayout({
@@ -21,10 +22,11 @@ export default function VendorLayout({
   businessName = "Your store",
   vendorWorkspace = false,
   showBusinessSwitcher = false,
+  mainVendorDashboard = false,
 }: VendorLayoutProps) {
   return (
     <main className={`vendor-dashboard${vendorWorkspace ? " vendor-workspace" : ""}`}>
-      <VendorSidebar />
+      <VendorSidebar mainVendorDashboard={mainVendorDashboard} />
 
       <section className="dashboard-main">
         <header className="dashboard-header">

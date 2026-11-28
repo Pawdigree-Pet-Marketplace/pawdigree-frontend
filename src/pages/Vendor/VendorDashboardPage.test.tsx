@@ -1,154 +1,93 @@
-import { cleanup, render as rtlRender, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
-import { apiRequest } from '../../services/api'
-import VendorDashboardPage from './VendorDashboardPage'
-import { getMerchandise } from '../../services/merchandiseApi'
+import { cleanup, render as rtlRender, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import { apiRequest } from "../../services/api";
+import {
+  fetchVendorDashboardBookings,
+  fetchVendorDashboardOrders,
+  fetchVendorDashboardPetSales,
+} from "../../services/vendorDashboardApi";
+import VendorDashboardPage from "./VendorDashboardPage";
 
-const vendorBusinessState = vi.hoisted(() => ({ businesses: [] as Array<{ id: string; name: string; business_type: string; verification_status: string }>, loading: false, error: '' }))
+const vendorBusinessState = vi.hoisted(() => ({ businesses: [] as Array<{ id: string; name: string; business_type: string; verification_status: string }>, loading: false, error: "" }));
 
-vi.mock('../../services/vendorBusinessStore', () => ({
+vi.mock("../../services/vendorBusinessStore", () => ({
   useVendorBusiness: () => null,
   useVendorBusinesses: () => vendorBusinessState,
-}))
+}));
+vi.mock("../../services/api", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../services/api")>();
+  return { ...actual, apiRequest: vi.fn() };
+});
+vi.mock("../../services/vendorDashboardApi", () => ({
+  fetchVendorDashboardBookings: vi.fn(),
+  fetchVendorDashboardOrders: vi.fn(),
+  fetchVendorDashboardPetSales: vi.fn(),
+}));
+vi.mock("../../layouts/VendorLayout/VendorLayout", () => ({
+  default: ({ title, children }: { title: string; children: React.ReactNode }) => <main><h1>{title}</h1>{children}</main>,
+}));
 
-vi.mock('../../services/api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../services/api')>()
-  return { ...actual, apiRequest: vi.fn() }
-})
+const page = (results: unknown[] = [], count = results.length) => ({ results, count, next: null });
+const render = () => rtlRender(<MemoryRouter><VendorDashboardPage /></MemoryRouter>);
 
-vi.mock('../../services/merchandiseApi', () => ({ getMerchandise: vi.fn() }))
-
-vi.mock('../../layouts/VendorLayout/VendorLayout', () => ({
-  default: ({
-    title,
-    description,
-    children,
-  }: {
-    title: string
-    description: string
-    children: React.ReactNode
-  }) => (
-    <main>
-      <h1>{title}</h1>
-      <p>{description}</p>
-      {children}
-    </main>
-  ),
-}))
-
-const render = (ui: React.ReactNode) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>)
-
-describe('VendorDashboardPage', () => {
+describe("VendorDashboardPage", () => {
   beforeEach(() => {
-    vendorBusinessState.businesses = []
-    localStorage.clear()
-    sessionStorage.clear()
-    localStorage.setItem('token', 'test-vendor-token')
-    localStorage.setItem('role', 'VENDOR')
-    vi.mocked(apiRequest).mockResolvedValue({ first_name: 'Faith' })
-    vi.mocked(getMerchandise).mockResolvedValue([])
-  })
+    vendorBusinessState.businesses = [];
+    localStorage.clear();
+    sessionStorage.clear();
+    localStorage.setItem("token", "vendor-token");
+    localStorage.setItem("role", "VENDOR");
+    vi.mocked(apiRequest).mockResolvedValue({ first_name: "Faith", id: 2 });
+    vi.mocked(fetchVendorDashboardOrders).mockResolvedValue(page([
+      { id: 1, order_id: 101, customer: { name: "Amina" }, business_name: "Paws Shop", created_at: "2026-11-28T10:00:00Z", status: "PAID" },
+    ], 3) as never);
+    vi.mocked(fetchVendorDashboardPetSales).mockResolvedValue(page([
+      { id: 2, order_id: 102, customer: { name: "Noah" }, business_name: "Puppy House", created_at: "2026-11-28T11:00:00Z", status: "PROCESSING", sale_state: "PAID" },
+    ], 2) as never);
+    vi.mocked(fetchVendorDashboardBookings).mockImplementation(async (status) => page(
+      status === "pending" ? [] : [{ booking_id: 7, customer: { name: "Joan" }, business_name: "Happy Tails", service_name: "Grooming", start_at: "2026-11-29T09:30:00Z", created_at: "2026-11-28T10:00:00Z", status: "pending" }],
+      status === "pending" ? 4 : 1,
+    ) as never);
+  });
 
-  afterEach(() => {
-    cleanup()
-    vi.restoreAllMocks()
-  })
+  afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
-  it('greets the vendor by the first name returned by the backend', async () => {
-    render(<VendorDashboardPage />)
+  it("greets the vendor and loads vendor-wide order, pet sale and booking activity", async () => {
+    render();
+    expect(await screen.findByRole("heading", { name: "Welcome back, Faith" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("5", { selector: "strong" })).toBeInTheDocument());
+    expect(screen.getByText("Amina")).toBeInTheDocument();
+    expect(screen.getByText("Noah")).toBeInTheDocument();
+    expect(screen.getByText("Paws Shop")).toBeInTheDocument();
+    expect(screen.getByText("Puppy House")).toBeInTheDocument();
+    expect(screen.getByText("Joan")).toBeInTheDocument();
+    expect(screen.getByText("Happy Tails")).toBeInTheDocument();
+    expect(fetchVendorDashboardBookings).toHaveBeenCalledWith("pending");
+    expect(fetchVendorDashboardPetSales).toHaveBeenCalledWith("PAID");
+  });
 
-    await waitFor(() =>
-      expect(
-        screen.getByRole('heading', { name: 'Welcome back, Faith' }),
-      ).toBeInTheDocument(),
-    )
+  it("does not present unsupported financial figures as real values", () => {
+    render();
+    expect(screen.getByText("Total Sales")).toBeInTheDocument();
+    expect(screen.getByText("Revenue (Net)")).toBeInTheDocument();
+    expect(screen.getAllByText("Unavailable").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText(/current APIs do not expose a complete vendor sales total/i)).toBeInTheDocument();
+  });
 
-    expect(apiRequest).toHaveBeenCalledWith('/auth/current-user/', {
-      headers: { Authorization: 'Bearer test-vendor-token' },
-    })
-    expect(
-      screen.getByText("Here's how your store is doing today"),
-    ).toBeInTheDocument()
-  })
+  it("shows activity errors and empty states honestly", async () => {
+    vi.mocked(fetchVendorDashboardOrders).mockRejectedValue(new Error("offline"));
+    vi.mocked(fetchVendorDashboardPetSales).mockRejectedValue(new Error("offline"));
+    vi.mocked(fetchVendorDashboardBookings).mockRejectedValue(new Error("offline"));
+    render();
+    expect(await screen.findByText("Orders could not be loaded. Please try again later.")).toBeInTheDocument();
+    expect(screen.getByText("Bookings could not be loaded. Please try again later.")).toBeInTheDocument();
+  });
 
-  it('uses a safe greeting when the current user request fails', async () => {
-    vi.mocked(apiRequest).mockRejectedValue(new Error('Request failed'))
-
-    render(<VendorDashboardPage />)
-
-    await waitFor(() =>
-      expect(
-        screen.getByRole('heading', { name: 'Welcome back, there' }),
-      ).toBeInTheDocument(),
-    )
-  })
-
-  it('shows all four store metric cards', () => {
-    render(<VendorDashboardPage />)
-
-    expect(screen.getByText('Total Sales')).toBeInTheDocument()
-    expect(screen.getByText('Orders')).toBeInTheDocument()
-    expect(screen.getByText('Revenue (net)')).toBeInTheDocument()
-    expect(screen.getByText('Pending Bookings')).toBeInTheDocument()
-    expect(screen.getAllByText('—')).toHaveLength(4)
-    expect(screen.queryByText(',480')).not.toBeInTheDocument()
-  })
-
-  it('shows vendor merchandise totals and the existing management link', async () => {
-    vendorBusinessState.businesses = [{ id: 'seller-1', name: 'Seller', business_type: 'PRODUCT_SELLER', verification_status: 'approved' }]
-    vi.mocked(getMerchandise).mockResolvedValue([
-      { id: 1, business: 'seller-1', is_active: true, approved: true, rejection_reason: '' },
-      { id: 2, business: 'seller-1', is_active: false, approved: false, rejection_reason: '' },
-      { id: 3, business: 'seller-1', is_active: true, approved: false, rejection_reason: 'Needs changes' },
-    ] as never)
-
-    render(<VendorDashboardPage />)
-
-    expect(await screen.findByText('Awaiting approval')).toBeInTheDocument()
-    expect(screen.getByText('Total products').previousElementSibling).toHaveTextContent('3')
-    expect(screen.getByText('Active').previousElementSibling).toHaveTextContent('2')
-    expect(screen.getByText('Inactive').previousElementSibling).toHaveTextContent('1')
-    expect(screen.getByText('Awaiting approval').previousElementSibling).toHaveTextContent('1')
-    expect(screen.getByRole('link', { name: /manage merchandise/i })).toHaveAttribute('href', '/vendor/merchandise')
-    expect(getMerchandise).toHaveBeenCalledWith()
-  })
-
-  it('shows an honest empty state for sales history', () => {
-    render(<VendorDashboardPage />)
-    expect(screen.getByRole('heading', { name: 'SALES — LAST 7 DAYS' })).toBeInTheDocument()
-    expect(screen.getByText('Sales history will appear here when store activity is available.')).toBeInTheDocument()
-  })
-
-  it('shows an honest empty state for low stock alerts', () => {
-    render(<VendorDashboardPage />)
-    expect(screen.getByRole('heading', { name: 'LOW STOCK ALERTS' })).toBeInTheDocument()
-    expect(screen.getByText('Stock alerts will appear here when inventory data is available.')).toBeInTheDocument()
-    expect(screen.queryByText('Salmon Dry Food 5kg')).not.toBeInTheDocument()
-  })
-
-  it('shows an honest empty state for order and booking activity', () => {
-    render(<VendorDashboardPage />)
-    expect(screen.getByRole('heading', { name: 'RECENT ORDERS & BOOKINGS' })).toBeInTheDocument()
-    expect(screen.getByText('Recent order and booking activity will appear here when it is available.')).toBeInTheDocument()
-    expect(screen.queryByText('#PD-2291')).not.toBeInTheDocument()
-  })
-
-  it('does not render the dashboard when the vendor token is missing', () => {
-    localStorage.removeItem('token')
-    sessionStorage.removeItem('token')
-
-    const { container } = render(<VendorDashboardPage />)
-
-    expect(container).toBeEmptyDOMElement()
-  })
-
-  it('does not render the dashboard for a non-vendor role', () => {
-    localStorage.setItem('role', 'CUSTOMER')
-
-    const { container } = render(<VendorDashboardPage />)
-
-    expect(container).toBeEmptyDOMElement()
-  })
-})
-
+  it("does not render without a vendor session", () => {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    const { container } = render();
+    expect(container).toBeEmptyDOMElement();
+  });
+});

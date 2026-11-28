@@ -178,17 +178,25 @@ describe("main vendor sidebar navigation", () => {
     vi.clearAllMocks();
   });
 
-  it("shows Merchandise under Your Store on the unscoped vendor dashboard", () => {
+  it("shows only central vendor navigation on the unscoped vendor dashboard", () => {
     render(
       <MemoryRouter initialEntries={["/vendor/dashboard"]}>
         <VendorSidebar />
       </MemoryRouter>,
     );
 
-    const storeNavigation = screen.getByRole("navigation", { name: "Vendor navigation" });
-    const merchandiseLink = screen.getByRole("link", { name: "Merchandise" });
-    expect(storeNavigation).toContainElement(merchandiseLink);
-    expect(screen.getByText("YOUR STORE").parentElement).toContainElement(merchandiseLink);
-    expect(merchandiseLink).toHaveAttribute("href", "/vendor/merchandise");
+    const navigation = screen.getByRole("navigation", { name: "Vendor navigation" });
+    expect(navigation.querySelectorAll("a")).toHaveLength(5);
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute("href", "/vendor/dashboard");
+    expect(screen.getByRole("link", { name: "My Businesses" })).toHaveAttribute("href", "/vendor/business-profile");
+    expect(screen.getByRole("link", { name: "Customer Messages" })).toHaveAttribute("href", "/vendor/messages");
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("href", "/vendor/notifications");
+    expect(screen.getByRole("link", { name: "My Profile" })).toHaveAttribute("href", "/vendor/profile");
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveAttribute("data-vendor-tour", "notifications");
+    expect(screen.getByRole("link", { name: "My Profile" })).toHaveAttribute("data-vendor-tour", "profile");
+    for (const removedItem of ["Sales & Payouts", "Catalog", "Adoption applications", "Merchandise", "Orders & Bookings", "Availability", "Store Profile", "Settings", "Support"]) {
+      expect(screen.queryByRole("link", { name: removedItem })).not.toBeInTheDocument();
+    }
+    expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
   });
 });
